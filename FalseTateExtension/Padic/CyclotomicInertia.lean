@@ -1,0 +1,410 @@
+module
+
+public import FalseTateExtension.Padic.CyclotomicResidueBound
+public import FontaineWintenberger.LocalField.ResidueField
+public import FontaineWintenberger.Ramification.InfiniteRestriction
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Algebra
+
+/-!
+# Stabilization of actual cyclotomic inertia preimages
+
+Ordinary restriction to the actual finite cyclotomic layers gives decreasing
+open normal subgroups. Their indices are the actual finite residue degrees,
+uniformly bounded by the base ramification index. Their stabilization and
+cofinality of the chosen layers prove openness of the actual infinite zero
+upper group. Ordinary infinite restriction identifies it with the image of
+the zero upper group of the algebraic closure.
+
+This proves blueprint `ft:cyclotomic-inertia-preimages`. No identification
+with an infinite residue quotient is asserted here.
+-/
+
+@[expose] public section
+
+noncomputable section
+
+open FontaineWintenberger
+
+namespace FalseTateExtension
+
+section Fields
+
+variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
+
+/-- Ordinary restriction along the original inclusion of a chosen finite
+cyclotomic layer in the actual infinite cyclotomic extension. -/
+def cyclotomicRestrictionToLayer (m : ℕ) :
+    (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →*
+      (cyclotomicLayer (K := K) p m ≃ₐ[K] cyclotomicLayer (K := K) p m) := by
+  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
+    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
+  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
+    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := K) p m)
+
+theorem cyclotomicRestrictionToLayer_commutes (m : ℕ)
+    (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)
+    (x : cyclotomicLayer (K := K) p m) :
+    IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m)
+        (cyclotomicRestrictionToLayer p m g x) =
+      g (IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m) x) := by
+  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
+    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
+  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
+    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := K) p m) x
+
+theorem cyclotomicRestrictionToLayer_surjective (m : ℕ) :
+    Function.Surjective (cyclotomicRestrictionToLayer (K := K) p m) := by
+  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
+    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
+  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
+    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  exact AlgEquiv.restrictNormalHom_surjective (cyclotomicExtension (K := K) p)
+
+/-- Ordinary restriction is continuous for the actual Krull topologies. -/
+theorem continuous_cyclotomicRestrictionToLayer (m : ℕ) :
+    Continuous (cyclotomicRestrictionToLayer (K := K) p m) := by
+  let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := K) p m)
+  let e := i.equivFieldRange
+  have : Module.Finite K i.fieldRange := Module.Finite.equiv e.toLinearEquiv
+  have : IsGalois K i.fieldRange := IsGalois.of_algEquiv e
+  have hc : Continuous (fun g : cyclotomicExtension (K := K) p ≃ₐ[K]
+      cyclotomicExtension (K := K) p ↦
+      e.symm.autCongr (AlgEquiv.restrictNormalHom i.fieldRange g)) :=
+    continuous_of_discreteTopology.comp (InfiniteGalois.restrictNormalHom_continuous i.fieldRange)
+  convert hc using 1
+  funext g
+  apply AlgEquiv.ext
+  intro x
+  apply (show Function.Injective i from i.injective)
+  rw [cyclotomicRestrictionToLayer_commutes]
+  change g (i x) = i (e.symm ((g.restrictNormal i.fieldRange) (e x)))
+  have he (y : i.fieldRange) : i (e.symm y) = y := by
+    change (e (e.symm y) : cyclotomicExtension (K := K) p) = _
+    rw [e.apply_symm_apply]
+  rw [he]
+  exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
+
+/-- Ordinary restriction between the original chosen finite layers. -/
+def cyclotomicRestrictionBetweenLayers {m n : ℕ} (h : m ≤ n) :
+    (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) →*
+      (cyclotomicLayer (K := K) p m ≃ₐ[K] cyclotomicLayer (K := K) p m) := by
+  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
+    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_mono p h))
+  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
+    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := K) p m)
+
+theorem cyclotomicRestrictionBetweenLayers_commutes {m n : ℕ} (h : m ≤ n)
+    (g : cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n)
+    (x : cyclotomicLayer (K := K) p m) :
+    IntermediateField.inclusion (cyclotomicLayer_mono p h)
+        (cyclotomicRestrictionBetweenLayers p h g x) =
+      g (IntermediateField.inclusion (cyclotomicLayer_mono p h) x) := by
+  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
+    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_mono p h))
+  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
+    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := K) p m) x
+
+theorem cyclotomicRestrictionToLayer_comp {m n : ℕ} (h : m ≤ n) :
+    cyclotomicRestrictionToLayer (K := K) p m =
+      (cyclotomicRestrictionBetweenLayers p h).comp (cyclotomicRestrictionToLayer p n) := by
+  apply MonoidHom.ext
+  intro g
+  apply AlgEquiv.ext
+  intro x
+  apply Subtype.ext
+  have hm := congrArg Subtype.val (cyclotomicRestrictionToLayer_commutes p m g x)
+  have hn := congrArg Subtype.val (cyclotomicRestrictionToLayer_commutes p n g
+    (IntermediateField.inclusion (cyclotomicLayer_mono p h) x))
+  have hmn := congrArg Subtype.val (cyclotomicRestrictionBetweenLayers_commutes p h
+    (cyclotomicRestrictionToLayer p n g) x)
+  exact hm.trans (hn.symm.trans hmn.symm)
+
+/-- The positive chosen layer, viewed by its original inclusion as a finite
+Galois intermediate field of the actual infinite cyclotomic field. -/
+def cyclotomicFiniteLayer (n : ℕ) :
+    FiniteGaloisIntermediateField K (cyclotomicExtension (K := K) p) := by
+  let i := IntermediateField.inclusion
+    (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1))
+  let : Module.Finite K i.fieldRange := Module.Finite.equiv i.equivFieldRange.toLinearEquiv
+  let : IsGalois K i.fieldRange := IsGalois.of_algEquiv i.equivFieldRange
+  exact .mk i.fieldRange
+
+/-- The original inclusion is an isomorphism onto the actual finite field range. -/
+def cyclotomicFiniteLayerEquiv (n : ℕ) :
+    cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicFiniteLayer (K := K) p n :=
+  (IntermediateField.inclusion
+    (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1))).equivFieldRange
+
+/-- Restriction to the field range is conjugate to restriction to the
+original finite layer through the original inclusion isomorphism. -/
+theorem restrictNormal_cyclotomicFiniteLayer (n : ℕ)
+    (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
+    g.restrictNormal (cyclotomicFiniteLayer (K := K) p n) =
+      (cyclotomicFiniteLayerEquiv (K := K) p n).autCongr
+        (cyclotomicRestrictionToLayer p (n + 1) g) := by
+  let e := cyclotomicFiniteLayerEquiv (K := K) p n
+  apply AlgEquiv.ext
+  intro x
+  obtain ⟨y, rfl⟩ := e.surjective x
+  apply Subtype.ext
+  change ((g.restrictNormal (cyclotomicFiniteLayer (K := K) p n)) (e y) :
+      cyclotomicExtension (K := K) p) =
+    (e (cyclotomicRestrictionToLayer p (n + 1) g (e.symm (e y))) :
+      cyclotomicExtension (K := K) p)
+  rw [e.symm_apply_apply]
+  exact (AlgEquiv.restrictNormal_commutes g (cyclotomicFiniteLayer (K := K) p n) (e y)).trans
+    (cyclotomicRestrictionToLayer_commutes p (n + 1) g y).symm
+
+/-- Every actual finite intermediate field is contained in a positive
+chosen cyclotomic layer. No finiteness of the infinite field is needed. -/
+theorem exists_le_cyclotomicFiniteLayer
+    (E : IntermediateField K (cyclotomicExtension (K := K) p)) [FiniteDimensional K E] :
+    ∃ n, E ≤ (cyclotomicFiniteLayer (K := K) p n).toIntermediateField := by
+  classical
+  have hfg : E.FG := IntermediateField.essFiniteType_iff.mp inferInstance
+  obtain ⟨s, hs⟩ := hfg
+  have hx (x : cyclotomicExtension (K := K) p) :
+      ∃ m, (x : AlgebraicClosure K) ∈ cyclotomicLayer p m :=
+    (mem_cyclotomicExtension_iff p (x : AlgebraicClosure K)).mp x.property
+  choose level hlevel using hx
+  refine ⟨s.sup level, ?_⟩
+  rw [← hs]
+  apply IntermediateField.adjoin_le_iff.mpr
+  intro x hx
+  have hmem : (x : AlgebraicClosure K) ∈ cyclotomicLayer p (s.sup level + 1) :=
+    cyclotomicLayer_mono p ((Finset.le_sup (f := level) hx).trans (Nat.le_succ _)) (hlevel x)
+  change ∃ y : cyclotomicLayer (K := K) p (s.sup level + 1),
+    IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p (s.sup level + 1)) y = x
+  exact ⟨⟨x, hmem⟩, Subtype.ext rfl⟩
+
+end Fields
+
+section Valued
+
+variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
+    [IsUltrametricDist K] [CompleteSpace K]
+    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
+
+include p in
+omit [CharZero K] [CompleteSpace K] in
+/-- The original residue field of a finite compatible extension of the
+p-adic rationals is finite. -/
+theorem cyclotomicBase_residueFinite :
+    Finite (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring) := by
+  have := normedAlgebra_residueField_finiteDimensional (Padic p) K
+  exact Module.finite_of_finite
+    (IsLocalRing.ResidueField (NormedField.valuation (K := Padic p)).valuationSubring)
+
+/-- The actual finite Galois quotient by zero upper inertia has order the
+actual residue degree, via the actual residue automorphism group. -/
+theorem cyclotomicLayer_inertia_index (n : ℕ) :
+    letI : IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring :=
+      cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    (upperRamificationGroup
+      (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
+      (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0).index =
+    Module.finrank
+      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))) := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  let := cyclotomicBase_residueFinite p K
+  let R := (NormedField.valuation (K := K)).valuationSubring
+  let S := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))
+  let G := cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)
+  rw [upperRamificationGroup_zero, ← lowerRamificationGroup_zero]
+  exact (Nat.card_congr (localResidueGaloisEquiv R S G).toEquiv).trans
+    (IsGalois.card_aut_eq_finrank (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField S))
+
+/-- The actual preimage of finite zero upper inertia in the infinite
+cyclotomic Galois group. Its index is numbered by the positive level `n+1`. -/
+def cyclotomicInertiaPreimage (n : ℕ) :
+    Subgroup (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  exact (upperRamificationGroup
+    (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
+    (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0).comap
+      (cyclotomicRestrictionToLayer p (n + 1))
+
+instance cyclotomicInertiaPreimage_finiteIndex (n : ℕ) :
+    (cyclotomicInertiaPreimage p K n).FiniteIndex := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  unfold cyclotomicInertiaPreimage
+  infer_instance
+
+instance cyclotomicInertiaPreimage_normal (n : ℕ) :
+    (cyclotomicInertiaPreimage p K n).Normal := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  unfold cyclotomicInertiaPreimage
+  infer_instance
+
+theorem isOpen_cyclotomicInertiaPreimage (n : ℕ) :
+    IsOpen (cyclotomicInertiaPreimage p K n :
+      Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  exact (isOpen_discrete _).preimage (continuous_cyclotomicRestrictionToLayer p (n + 1))
+
+theorem cyclotomicInertiaPreimage_index (n : ℕ) :
+    (cyclotomicInertiaPreimage p K n).index = Module.finrank
+      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))) := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  rw [cyclotomicInertiaPreimage, Subgroup.index_comap_of_surjective _
+    (cyclotomicRestrictionToLayer_surjective p (n + 1))]
+  exact cyclotomicLayer_inertia_index p K n
+
+theorem cyclotomicInertiaPreimage_index_le (n : ℕ) :
+    (cyclotomicInertiaPreimage p K n).index ≤
+      (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
+        (NormedField.valuation (K := Padic p)).valuationSubring := by
+  rw [cyclotomicInertiaPreimage_index]
+  exact cyclotomicLayer_spectral_residueDegree_le p K n
+
+/-- Finite upper restriction makes the actual inertia preimages decrease. -/
+theorem cyclotomicInertiaPreimage_antitone : Antitone (cyclotomicInertiaPreimage p K) := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  let := cyclotomicBase_residueFinite p K
+  intro m n h g hg
+  let : Algebra (cyclotomicLayer (K := K) p (m + 1)) (cyclotomicLayer (K := K) p (n + 1)) :=
+    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_mono p (Nat.add_le_add_right h 1)))
+  let : IsScalarTower K (cyclotomicLayer (K := K) p (m + 1))
+      (cyclotomicLayer (K := K) p (n + 1)) :=
+    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  change cyclotomicRestrictionToLayer p (n + 1) g ∈
+    upperRamificationGroup (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
+      (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0 at hg
+  change cyclotomicRestrictionToLayer p (m + 1) g ∈
+    upperRamificationGroup (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (m + 1)))
+      (cyclotomicLayer (K := K) p (m + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (m + 1)) 0
+  rw [cyclotomicRestrictionToLayer_comp p (Nat.add_le_add_right h 1)]
+  rw [← restrictNormalHom_map_upperRamificationGroup_tower K
+    (cyclotomicLayer (K := K) p (m + 1)) (cyclotomicLayer (K := K) p (n + 1)) 0
+    (by norm_num : (-1 : ℝ) ≤ 0)]
+  exact Subgroup.mem_map.mpr ⟨cyclotomicRestrictionToLayer p (n + 1) g, hg, rfl⟩
+
+theorem cyclotomicInertiaPreimage_index_monotone :
+    Monotone (fun n ↦ (cyclotomicInertiaPreimage p K n).index) := by
+  intro m n h
+  exact Subgroup.index_antitone (cyclotomicInertiaPreimage_antitone p K h)
+
+/-- Uniformly bounded positive indices force stabilization of the actual
+decreasing subgroups, and their intersection is an attained preimage. -/
+theorem exists_cyclotomicInertiaPreimage_stable :
+    ∃ N, (∀ n, N ≤ n → cyclotomicInertiaPreimage p K n = cyclotomicInertiaPreimage p K N) ∧
+      (⨅ n, cyclotomicInertiaPreimage p K n) = cyclotomicInertiaPreimage p K N := by
+  obtain ⟨b, N, hN⟩ := converges_of_monotone_of_bounded
+    (cyclotomicInertiaPreimage_index_monotone p K) (cyclotomicInertiaPreimage_index_le p K)
+  have hstable (n : ℕ) (hn : N ≤ n) :
+      cyclotomicInertiaPreimage p K n = cyclotomicInertiaPreimage p K N := by
+    apply Subgroup.eq_of_index_dvd_index (cyclotomicInertiaPreimage_antitone p K hn)
+    rw [hN n hn, hN N le_rfl]
+  refine ⟨N, hstable, le_antisymm (iInf_le _ N) (le_iInf fun n ↦ ?_)⟩
+  rcases le_total N n with hn | hn
+  · rw [hstable n hn]
+  · exact cyclotomicInertiaPreimage_antitone p K hn
+
+/-- Cofinality of the chosen positive layers identifies the actual infinite
+zero upper group with the intersection of the actual inertia preimages. -/
+theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
+    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
+      ⨅ n, cyclotomicInertiaPreimage p K n := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  let := cyclotomicBase_residueFinite p K
+  ext g
+  rw [mem_upperRamificationGroupInfinite]
+  constructor
+  · intro hg
+    rw [Subgroup.mem_iInf]
+    intro n
+    change cyclotomicRestrictionToLayer p (n + 1) g ∈
+      upperRamificationGroup (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
+        (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0
+    have h := hg (cyclotomicFiniteLayer (K := K) p n)
+    rw [restrictNormal_cyclotomicFiniteLayer] at h
+    rw [← upperRamificationGroup_map_autCongr K (cyclotomicFiniteLayerEquiv (K := K) p n)
+      (by norm_num : (-1 : ℝ) ≤ 0), Subgroup.mem_map_equiv] at h
+    simpa only [MulEquiv.symm_apply_apply] using h
+  · intro hg E
+    obtain ⟨n, hn⟩ := exists_le_cyclotomicFiniteLayer p E.toIntermediateField
+    let f : Opposite.op (cyclotomicFiniteLayer (K := K) p n) ⟶ Opposite.op E :=
+      (CategoryTheory.homOfLE (show E ≤ cyclotomicFiniteLayer (K := K) p n from hn)).op
+    have hn' := Subgroup.mem_iInf.mp hg n
+    change cyclotomicRestrictionToLayer p (n + 1) g ∈
+      upperRamificationGroup (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
+        (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0 at hn'
+    have hD : g.restrictNormal (cyclotomicFiniteLayer (K := K) p n) ∈
+        upperRamificationGroup (R := spectralIntegerRing K (cyclotomicFiniteLayer (K := K) p n))
+          (cyclotomicFiniteLayer (K := K) p n ≃ₐ[K] cyclotomicFiniteLayer (K := K) p n) 0 := by
+      rw [restrictNormal_cyclotomicFiniteLayer,
+        ← upperRamificationGroup_map_autCongr K (cyclotomicFiniteLayerEquiv (K := K) p n)
+          (by norm_num : (-1 : ℝ) ≤ 0)]
+      exact Subgroup.mem_map.mpr ⟨cyclotomicRestrictionToLayer p (n + 1) g, hn', rfl⟩
+    have hres := (InfiniteGalois.algEquivToLimit K (cyclotomicExtension (K := K) p) g).property f
+    change (finGaloisGroupMap f).hom.hom
+      (g.restrictNormal (cyclotomicFiniteLayer (K := K) p n)) = g.restrictNormal E at hres
+    rw [← finGaloisGroupMap_map_upperRamificationGroup K (cyclotomicExtension (K := K) p) f 0
+      (by norm_num : (-1 : ℝ) ≤ 0)]
+    exact Subgroup.mem_map.mpr ⟨g.restrictNormal (cyclotomicFiniteLayer (K := K) p n), hD, hres⟩
+
+/-- The actual infinite inertia group is already an attained finite-layer
+inertia preimage, and all subsequent preimages are the same subgroup. -/
+theorem exists_cyclotomic_inertia_eq_preimage :
+    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    ∃ N, upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
+        cyclotomicInertiaPreimage p K N ∧
+      ∀ n, N ≤ n → cyclotomicInertiaPreimage p K n = cyclotomicInertiaPreimage p K N := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  obtain ⟨N, hstable, hinf⟩ := exists_cyclotomicInertiaPreimage_stable p K
+  exact ⟨N, (upperRamificationGroupInfinite_cyclotomic_eq_iInf p K).trans hinf, hstable⟩
+
+theorem cyclotomic_inertia_finiteIndex :
+    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).FiniteIndex := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
+  rw [hN]
+  infer_instance
+
+/-- The actual infinite inertia index retains the sharp finite-layer bound. -/
+theorem cyclotomic_inertia_index_le :
+    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).index ≤
+      (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
+        (NormedField.valuation (K := Padic p)).valuationSubring := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
+  rw [hN]
+  exact cyclotomicInertiaPreimage_index_le p K N
+
+/-- The actual zero upper group is open in the Krull Galois group of the
+infinite cyclotomic extension. -/
+theorem isOpen_cyclotomic_inertia :
+    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    IsOpen (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 :
+      Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
+  rw [hN]
+  exact isOpen_cyclotomicInertiaPreimage p K N
+
+/-- Full ordinary infinite restriction identifies the actual cyclotomic
+inertia with the image of the actual algebraic closure's zero upper group. -/
+theorem cyclotomic_inertia_eq_absolute_image :
+    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
+      (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)) =
+        upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 := by
+  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  let := cyclotomicBase_residueFinite p K
+  exact restrictNormalHom_map_upperRamificationGroupInfinite K (AlgebraicClosure K)
+    (cyclotomicExtension (K := K) p) 0 (by norm_num : (-1 : ℝ) ≤ 0)
+
+end Valued
+
+end FalseTateExtension
+
+end

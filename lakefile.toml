@@ -1,0 +1,18 @@
+name = "FalseTateExtension"
+version = "0.1.0"
+requiresModuleSystem = true
+defaultTargets = ["FalseTateExtension"]
+packagesDir = ".lake/packages"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "f0b4c8150aa0dbc758aff1291410c5ae335aff3a"
+
+[[require]]
+name = "FontaineWintenberger"
+git = "https://github.com/YijunYuan/FontaineWintenberger"
+rev = "7a8d63c3033279942684e03643d50153caf2bf6d"
+
+[[lean_lib]]
+name = "FalseTateExtension"

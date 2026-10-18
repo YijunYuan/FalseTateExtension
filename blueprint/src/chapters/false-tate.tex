@@ -1,0 +1,2645 @@
+\chapter{False Tate extensions}
+
+Let $p$ be prime, let $K/\Qp$ be finite, and fix an algebraic closure
+$\overline K$. Let $\pi$ be a uniformizer of $K$. All field inclusions below
+are taken inside this fixed closure. Valuations of finite local fields are
+normalized to have value group $\mathbb Z$.
+
+\begin{definition}[Compatible radicals and roots of unity]
+\label{ft:compatible-roots}
+\lean{FalseTateExtension.exists_compatible_radicals, FalseTateExtension.exists_compatible_primitive_roots, FalseTateExtension.exists_compatible_roots, FalseTateExtension.radical, FalseTateExtension.radical_zero, FalseTateExtension.radical_succ_pow, FalseTateExtension.radical_pow, FalseTateExtension.rootOfUnity, FalseTateExtension.rootOfUnity_zero, FalseTateExtension.rootOfUnity_succ_pow, FalseTateExtension.isPrimitiveRoot_rootOfUnity, FalseTateExtension.rootOfUnity_pow}
+\leanok
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1}
+Choose $\pi_0=\pi$ and $\pi_{m+1}^p=\pi_m$ for $m\geq0$.
+Choose primitive $p^n$-th roots of unity $\zeta_n$ for $n\geq1$ such that
+$\zeta_{n+1}^p=\zeta_n$. Put $\zeta_0=1$.
+\end{definition}
+\begin{proof}
+Such systems exist in every algebraically closed field of characteristic
+zero. Starting at $\pi_0=\pi$, recursively choose a root of
+$X^p-\pi_n$. Induction gives $\pi_n^{p^n}=\pi$, including $\pi=0$.
+Choose a primitive $p$-th root $\zeta_1$: the polynomial $X^p-1$ has
+$p$ distinct roots, and any root other than $1$ has order $p$.
+Having chosen $\zeta_n$ for $n\geq1$, choose a root $\eta$ of
+$X^p-\zeta_n$ and set $\zeta_{n+1}=\eta$.
+Then $\eta^{p^{n+1}}=1$, so its order divides $p^{n+1}$ and hence
+is $p^r$ for some $r\leq n+1$. If $r\leq n$, then
+$\zeta_n^{p^{n-1}}=\eta^{p^n}=1$, contradicting primitivity of
+$\zeta_n$. Thus $r=n+1$. This proves primitivity at every level;
+the step from $\zeta_0=1$ is the initial choice. The argument includes
+$p=2$.
+\end{proof}
+
+\begin{definition}[Finite layers and infinite extensions]
+\label{ft:extensions}\uses{ft:compatible-roots}
+\lean{FalseTateExtension.radicalLayer, FalseTateExtension.radical_mem_radicalLayer, FalseTateExtension.radicalLayer_zero, FalseTateExtension.radicalLayer_le_succ, FalseTateExtension.radicalLayer_mono, FalseTateExtension.radicalLayer_finiteDimensional, FalseTateExtension.kummerExtension, FalseTateExtension.radicalLayer_le_kummerExtension, FalseTateExtension.kummerExtension_eq_iSup_succ, FalseTateExtension.mem_kummerExtension_iff, FalseTateExtension.cyclotomicLayer, FalseTateExtension.rootOfUnity_mem_cyclotomicLayer, FalseTateExtension.cyclotomicLayer_zero, FalseTateExtension.cyclotomicLayer_le_succ, FalseTateExtension.cyclotomicLayer_mono, FalseTateExtension.cyclotomicLayer_finiteDimensional, FalseTateExtension.cyclotomicExtension, FalseTateExtension.cyclotomicLayer_le_cyclotomicExtension, FalseTateExtension.cyclotomicExtension_eq_iSup_succ, FalseTateExtension.mem_cyclotomicExtension_iff, FalseTateExtension.falseTateLayer, FalseTateExtension.falseTateLayer_zero_zero, FalseTateExtension.radical_mem_falseTateLayer, FalseTateExtension.rootOfUnity_mem_falseTateLayer, FalseTateExtension.falseTateLayer_mono, FalseTateExtension.falseTateLayer_directed, FalseTateExtension.falseTateLayer_le_diagonal, FalseTateExtension.falseTateLayer_finiteDimensional, FalseTateExtension.falseTateExtension, FalseTateExtension.falseTateLayer_le_falseTateExtension, FalseTateExtension.falseTateExtension_eq_iSup_diagonal, FalseTateExtension.mem_falseTateExtension_iff_diagonal, FalseTateExtension.mem_falseTateExtension_iff, FalseTateExtension.falseTateExtension_eq_iSup_succ, FalseTateExtension.mem_falseTateExtension_iff_pos, FalseTateExtension.falseTateExtension_eq_sup}
+\leanok
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1}
+For $m,n\geq1$, set
+\[
+ K^{\mathrm{FT}}_{m,n}=K(\pi_m,\zeta_n),\qquad
+ K^{\mathrm{FT}}_\infty=\bigcup_{m,n\geq1}K^{\mathrm{FT}}_{m,n}.
+\]
+Set $K^{\mathrm{Kum}}=\bigcup_mK(\pi_m)$ and
+$K^{\mathrm{cyc}}=\bigcup_nK(\zeta_n)$.
+The unions are directed by the two indices, and the false Tate extension
+is the compositum $K^{\mathrm{Kum}}K^{\mathrm{cyc}}$.
+\end{definition}
+\begin{proof}
+The successive power relations put $\pi_m$ in $K(\pi_{m+1})$ and
+$\zeta_n$ in $K(\zeta_{n+1})$. Repeated inclusion proves monotonicity
+in each index. The generators satisfy the monic equations
+$X^{p^m}-\pi=0$ and $X^{p^n}-1=0$, respectively. Each simple layer
+is therefore finite over $K$, and adjoining both generators gives a
+finite layer as a tower of two finite simple extensions. In
+characteristic zero these extensions are separable.
+
+For two pairs of indices take the coordinatewise maximum; the resulting
+layer contains both original layers. Hence their union is a field:
+each field operation on finitely many elements can be performed in one
+common layer. The diagonal layers are cofinal, because the layer at
+$(m,n)$ is contained in the layer at $(r,r)$ for $r=\max(m,n)$.
+Allowing index zero changes none of these infinite fields, by the same
+cofinality with indices at least one. Each finite two-generator layer
+lies in the compositum of the two infinite simple towers. Conversely,
+the union of the two-generator layers contains every generator of both
+towers, and thus their compositum. These two inclusions prove the final
+identity.
+\end{proof}
+
+\begin{lemma}[Galois finite layers and their directed unions]
+\label{ft:galois-layers}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; finite splitting-field argument at every prime}
+\uses{ft:extensions}
+\lean{FalseTateExtension.cyclotomicLayer_isGalois, FalseTateExtension.radical_ne_zero, FalseTateExtension.adjoin_rootSet_eq_falseTateLayer, FalseTateExtension.falseTateLayer_isSplittingField, FalseTateExtension.falseTateLayer_isGalois, FalseTateExtension.cyclotomicExtension_isGalois, FalseTateExtension.falseTateExtension_isGalois}
+\leanok
+For every prime $p$ and every characteristic-zero field $K$, the
+cyclotomic layers $K(\zeta_n)/K$ are finite Galois. If $\pi\ne0$,
+the diagonal fields $K(\pi_n,\zeta_n)/K$ are finite Galois. Their
+directed infinite cyclotomic and false Tate unions are Galois over $K$.
+No degree or ramification formula is asserted here.
+\end{lemma}
+\begin{proof}
+Put $d=p^n$. The roots of $X^d-1$ are exactly the powers of the
+primitive root $\zeta_n$. Thus $K(\zeta_n)$ is its splitting field.
+For the radical polynomial put $\alpha=\pi_n$; then $\alpha^d=\pi$,
+so $\alpha\ne0$. Its roots are precisely $\alpha\zeta_n^j$:
+division of any root by $\alpha$ gives a $d$-th root of unity, and
+conversely every displayed element is a root. All these roots lie in
+$K(\alpha,\zeta_n)$. Conversely the field generated by the roots
+contains $\alpha$ and $\alpha\zeta_n$, and hence their ratio
+$\zeta_n$. Therefore the diagonal field is exactly the splitting
+field of $X^d-\pi$. This includes $n=0$. In characteristic zero both
+splitting-field extensions are separable, hence finite Galois.
+
+Every element of either directed union lies in a finite layer. Its
+minimal polynomial over $K$ splits in that layer by normality, and
+therefore splits in the union. The unions are thus normal algebraic
+extensions. Characteristic zero supplies separability, so they are
+Galois. The diagonal cofinality in the preceding definition identifies
+the second union with the actual two-index false Tate extension.
+\end{proof}
+
+\begin{lemma}[Finite cyclotomic and Kummer coordinates]
+\label{ft:finite-coordinates}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; finite coordinate calculation}
+\uses{ft:galois-layers,ft:compatible-roots}
+\lean{FalseTateExtension.layerRadical, FalseTateExtension.layerRootOfUnity, FalseTateExtension.coe_layerRadical, FalseTateExtension.coe_layerRootOfUnity, FalseTateExtension.isPrimitiveRoot_layerRootOfUnity, FalseTateExtension.layerRadical_pow, FalseTateExtension.layerRadical_ne_zero, FalseTateExtension.finiteCyclotomicCharacter, FalseTateExtension.finiteCyclotomicCharacter_spec, FalseTateExtension.layerRootUnit, FalseTateExtension.coe_layerRootUnit, FalseTateExtension.isPrimitiveRoot_layerRootUnit, FalseTateExtension.kummerRatio, FalseTateExtension.coe_kummerRatio, FalseTateExtension.kummerRatio_mem_zpowers, FalseTateExtension.finiteKummerExponent, FalseTateExtension.finiteKummerExponent_spec, FalseTateExtension.layerRootOfUnity_pow_injective, FalseTateExtension.finiteKummerExponent_unique, FalseTateExtension.finiteCyclotomicCharacter_unique, FalseTateExtension.finiteKummerExponent_mul, FalseTateExtension.finiteLayer_aut_ext, FalseTateExtension.finiteCoordinates_injective}
+\leanok
+Let $\pi\ne0$, $n\geq0$, $q=p^n$, and $E=K(\pi_n,\zeta_n)$.
+There are actual maps
+\[
+ \chi_n:\Gal(E/K)\longrightarrow(\mathbb Z/q\mathbb Z)^\times,
+ \qquad b_n:\Gal(E/K)\longrightarrow\mathbb Z/q\mathbb Z
+\]
+with $\chi_n$ a group homomorphism, characterized by
+\[
+ g(\zeta_n)=\zeta_n^{\chi_n(g)},\qquad
+ g(\pi_n)=\zeta_n^{b_n(g)}\pi_n.
+\]
+They satisfy
+\[
+ b_n(gh)=b_n(g)+\chi_n(g)b_n(h),
+\]
+and the map $g\mapsto(b_n(g),\chi_n(g))$ is injective. This includes
+$p=2$ and $n=0$.
+\end{lemma}
+\begin{proof}
+An automorphism preserves primitive $q$-th roots, so it sends $\zeta_n$
+to a unique power with exponent a unit modulo $q$. Evaluating a product
+of automorphisms on $\zeta_n$ and using exponent uniqueness proves that
+$\chi_n$ is a homomorphism. Since $\pi_n\ne0$ and both $g(\pi_n)$ and
+$\pi_n$ have $q$-th power $\pi$, their ratio is a $q$-th root of unity.
+It is a unique power of $\zeta_n$ with exponent modulo $q$, defining
+$b_n(g)$.
+
+Apply $g$ to $h(\pi_n)=\zeta_n^{b_n(h)}\pi_n$ and substitute both
+evaluation formulas. This gives
+\[
+ (gh)(\pi_n)=\zeta_n^{\chi_n(g)b_n(h)+b_n(g)}\pi_n.
+\]
+Cancel the nonzero factor $\pi_n$ and use the order $q$ of $\zeta_n$
+to obtain the cocycle identity modulo $q$. Automorphisms with the same
+coordinates agree on $\pi_n$ and $\zeta_n$, so they agree on the field
+these elements generate. This proves injectivity. When $n=0$, the root
+of unity is $1$, the radical lies in $K$, and both coordinate groups are
+trivial, consistent with the same argument.
+\end{proof}
+
+\begin{lemma}[Finite cyclotomic groups at odd primes]
+\label{ft:odd-finite-cyclotomic-cyclic}
+\source{liu-2008-lattices:page-0023}
+\dcref{Finite cyclic form of the cyclotomic group argument in Lemma 5.1.2}
+\uses{ft:extensions,ft:galois-layers,ft:compatible-roots}
+\lean{FalseTateExtension.cyclotomicLayer_isCyclic}
+\leanok
+Assume $p\geq3$. For every $m\geq0$, the actual group
+$\operatorname{Gal}(K(\zeta_m)/K)$ is finite cyclic.
+\end{lemma}
+\begin{proof}
+The actual cyclotomic character embeds this group in
+$(\mathbb Z/p^m\mathbb Z)^\times$: its kernel fixes the generator
+$\zeta_m$ and hence the whole field. The unit group modulo an odd
+prime power is cyclic, including the trivial modulus $p^0=1$.
+A subgroup of a cyclic group is cyclic. The source's infinite
+principal-unit argument is thus replaced here by its finite cyclic
+consequence, available for every actual finite cyclotomic field.
+\end{proof}
+
+\begin{lemma}[The first radical is not cyclotomic at an odd prime]
+\label{ft:first-radical-not-cyclotomic}
+\source{liu-2008-lattices:page-0022,liu-2008-lattices:page-0023}
+\dcref{Liu, Lemma 5.1.2, first nontrivial radical step; finite cyclic adaptation}
+\uses{ft:odd-finite-cyclotomic-cyclic,ft:radical-layer-ramification,ft:compatible-roots,ft:extensions}
+\lean{FalseTateExtension.radical_one_not_mem_cyclotomicExtension}
+\leanok
+Assume $p\geq3$. Then $\pi_1\notin K^{\mathrm{cyc}}$.
+\end{lemma}
+\begin{proof}
+Suppose otherwise and choose $m$ with
+$F=K(\pi_1)\subseteq C_m=K(\zeta_m)$.
+Eisenstein irreducibility gives $[F:K]=p$.
+The cyclic extension $C_m/K$ is abelian, so $F/K$ is Galois.
+The polynomial $X^p-\pi$ therefore splits in $F$; ratios of its
+roots give a primitive $p$th root of unity in $F$.
+The degree $[K(\zeta_1):K]$ divides $p$ and is at most $p-1$,
+so it equals one. Thus $\zeta_1\in K$.
+
+Choose the least $r\leq m$ such that $C_r\ne K$.
+It exists since $F\subseteq C_m$ and $[F:K]=p$.
+Then $r\geq2$ and $\zeta_{r-1}\in K$.
+The actual group of $C_r/K$ embeds in the $p$th roots of unity
+by its action on $\zeta_r$, since $\zeta_r^p\in K$.
+Its nontrivial degree therefore divides $p$ and equals $p$.
+A finite cyclic group has a unique subgroup of index $p$:
+if a generator is $g$, that subgroup is generated by $g^p$.
+Galois correspondence inside $C_m$ now gives $F=C_r$.
+
+Choose $1\ne\sigma\in\operatorname{Gal}(F/K)$.
+There are $b,c\in(\mathbb Z/p\mathbb Z)^\times$ with
+\[
+ \sigma(\pi_1)=\zeta_1^b\pi_1,\qquad
+ \sigma(\zeta_r)=\zeta_1^c\zeta_r.
+\]
+Neither exponent vanishes because each displayed element generates
+$F$ over $K$. Write
+$\pi_1=\sum_{i=0}^{p-1}a_i\zeta_r^i$ in the power basis of $C_r/K$.
+Since $\zeta_1\in K$, applying $\sigma$ and comparing coefficients
+gives $a_i(\zeta_1^{ci}-\zeta_1^b)=0$ for each $i$.
+There is exactly one residue $i$ with $ci=b$, and it is nonzero.
+As $\pi_1\ne0$, its coefficient is nonzero and
+$\pi_1=a\zeta_r^i$ for some $a\in K^\times$.
+Taking $p$th powers yields
+$\pi=a^p\zeta_{r-1}^i$. A root of unity is a unit, so normalized
+valuation on the original field $K$ gives $1=pv_K(a)$, impossible
+for the integer $v_K(a)$.
+This reverse power-basis comparison gives the same unit-versus-radical
+contradiction as Liu's first step, using finite cyclicity in place
+of an infinite logarithm classification.
+\end{proof}
+
+\begin{lemma}[The Galois structure]
+\label{ft:galois-structure}\uses{ft:first-radical-not-cyclotomic,ft:affine-embedding,ft:affine-additive-kernel,ft:padic-closed-additive-subgroups,ft:finite-coordinates,fw:profinite-galois-foundations}\lean{FalseTateExtension.kummerExtension_inf_cyclotomicExtension, FalseTateExtension.falseTateGaloisEquiv, FalseTateExtension.cyclotomicRelativeGaloisEquiv, FalseTateExtension.kummerRelativeGaloisEquiv, FalseTateExtension.falseTateGaloisEquiv_left, FalseTateExtension.falseTateGaloisEquiv_right, FalseTateExtension.falseTateGaloisEquiv_mem_translations, FalseTateExtension.falseTateGaloisEquiv_mem_units}
+\leanok
+\source{liu-2008-lattices:page-0022,liu-2008-lattices:page-0023}
+\dcref{Liu, Lemma 5.1.2}
+Assume $p\geq3$. Then
+\[
+ K^{\mathrm{Kum}}\cap K^{\mathrm{cyc}}=K.
+\]
+Write $H_K=\Gal(K^{\mathrm{cyc}}/K)$, viewed through the cyclotomic
+character as a closed subgroup of $\Zp^\times$. Restriction and the action
+on the compatible radicals give topological isomorphisms
+\[
+ \Gal(K^{\mathrm{FT}}_\infty/K^{\mathrm{cyc}})\simeq\Zp(1),\qquad
+ \Gal(K^{\mathrm{FT}}_\infty/K^{\mathrm{Kum}})\simeq H_K,
+\]
+and
+\[
+ \Gal(K^{\mathrm{FT}}_\infty/K)\simeq\Zp(1)\rtimes H_K,
+\]
+where $H_K$ acts on $\Zp(1)$ through the cyclotomic character.
+\end{lemma}
+\begin{proof}
+Use the actual closed affine realization $G$ of the original
+Galois group, with translation kernel $M\subseteq\mathbb Z_p$
+and actual unit projection $H_K$.
+If $M\subseteq p\mathbb Z_p$, every automorphism of the false Tate
+field fixing its cyclotomic subfield has translation coordinate
+zero modulo $p$, so fixes $\pi_1$ by the finite coordinate formula.
+Its fixed field is the actual cyclotomic subfield by infinite
+Galois correspondence. This would put $\pi_1$ in that subfield,
+contrary to the preceding lemma.
+Thus $M\nsubseteq p\mathbb Z_p$.
+The closed-additive-subgroup classification gives
+$M=p^a\mathbb Z_p$ or $M=0$; the noncontainment forces $a=0$.
+Hence $M=\mathbb Z_p$.
+
+For each $h\in H_K$, choose $(b,h)\in G$.
+The element $(-b,1)$ belongs to the now full translation kernel,
+and $(-b,1)(b,h)=(0,h)$.
+Thus the actual pure-unit subgroup is exactly $\{0\}\rtimes H_K$,
+and every pair $(b,h)$ with $b\in\mathbb Z_p$, $h\in H_K$
+belongs to $G$. Restricting the original affine homeomorphism
+therefore identifies $G$ with $\mathbb Z_p\rtimes H_K$,
+continuously in both directions. Its multiplication law is the
+semidirect law with the cyclotomic action.
+The original subgroups fixing the cyclotomic and radical fields
+are respectively the full translations and the pure units.
+They generate $G$, so the intersection of their actual fixed
+fields is the fixed field of $G$, namely $K$.
+Restriction of the same homeomorphism to the two actual fixing
+subgroups gives both asserted topological group isomorphisms.
+\end{proof}
+
+
+\begin{definition}[The Kummer generator]
+\label{ft:tau}\uses{ft:galois-structure}\lean{FalseTateExtension.relativeTau, FalseTateExtension.relativeTau_extensionRadical, FalseTateExtension.cyclotomicRelativeGaloisEquiv_relativeTau, FalseTateExtension.relativeTau_unique, FalseTateExtension.denseRange_relativeTau_zpow}
+\leanok
+\source{liu-2008-lattices:page-0023}
+\dcref{Liu, discussion after Lemma 5.1.2}
+Assume $p\geq3$. The element $\tau\in\Gal(K^{\mathrm{FT}}_\infty/K^{\mathrm{cyc}})$
+is specified by
+\[
+ \tau(\pi_m)=\zeta_m\pi_m\quad(m\geq1).
+\]
+It corresponds to $1\in\Zp$ under the isomorphism determined by the
+chosen roots of unity, and is a topological generator.
+\end{definition}
+\begin{proof}
+Under the preceding isomorphism choose the actual element
+$(1,1)\in\mathbb Z_p\rtimes H_K$. It has trivial cyclotomic
+character, so fixes the actual cyclotomic field.
+The finite Kummer coordinate formula gives its value on every
+$\pi_m$ as $\zeta_m\pi_m$.
+These values, together with fixing all roots of unity, determine
+its action on every finite false Tate layer and hence uniquely
+on their union. Its integral powers correspond to the integers
+inside $\mathbb Z_p$, whose image is dense. It is therefore a
+topological generator of the actual translation subgroup.
+\end{proof}
+
+
+\section{Finite residue degree at every prime}
+
+The argument in this section applies to every prime, including $2$.
+It uses the action on radicals rather than a splitting of the Galois
+extension into Kummer and cyclotomic factors.
+
+\begin{lemma}[The p-adic cyclotomic polynomials]
+\label{ft:padic-cyclotomic-polynomial}
+\source{serre-1979-local-fields:page-0085}
+\dcref{Serre, Chapter IV, Section 4, proof of Proposition 17}
+\lean{PadicInt.coeff_zero_cyclotomic_prime_pow_comp_X_add_one, PadicInt.monic_cyclotomic_prime_pow_comp_X_add_one, PadicInt.natDegree_cyclotomic_prime_pow_comp_X_add_one, PadicInt.p_not_mem_span_p_sq, PadicInt.cyclotomic_prime_pow_comp_X_add_one_isEisensteinAt, PadicInt.irreducible_cyclotomic_prime_pow_comp_X_add_one, PadicInt.cyclotomic_prime_pow_comp_X_add_one_isEisensteinAt_of_pos, Padic.irreducible_cyclotomic_prime_pow_comp_X_add_one, Padic.irreducible_cyclotomic_prime_pow, Padic.minpoly_primitive_root, Padic.finrank_adjoin_primitive_root, FalseTateExtension.finrank_cyclotomicLayer_padic, FalseTateExtension.finrank_cyclotomicLayer_padic_zero}
+\leanok
+For every prime $p$ and integer $m\geq1$, the polynomial
+$\Phi_{p^m}(1+T)\in\Zp[T]$ is Eisenstein at $(p)$, with constant
+coefficient $p$ and degree $(p-1)p^{m-1}$.
+For every $m\geq0$, $\Phi_{p^m}$ is irreducible over $\Qp$.
+Consequently a primitive $p^m$-th root $\zeta_m$ generates an extension
+of $\Qp$ of degree $\varphi(p^m)$, including degree one when $m=0$.
+\end{lemma}
+\begin{proof}
+For $m\geq1$ the prime-power cyclotomic identity gives
+\[
+ \Phi_{p^m}(1+T)=\sum_{j=0}^{p-1}(1+T)^{jp^{m-1}}.
+\]
+This polynomial is monic of the stated degree and has constant term
+$p$. In characteristic $p$, put $X=T^{p^{m-1}}$. The reduction of
+the right side is $\sum_{j=0}^{p-1}(1+X)^j=X^{p-1}$:
+multiplying by $X$ gives $(1+X)^p-1=X^p$, and cancellation by
+$X$ in $\mathbb F_p[X]$ proves the identity. Thus every coefficient
+below the leading term is divisible by $p$, whereas the constant
+term $p$ is not divisible by $p^2$. This is the Eisenstein criterion
+over the discrete valuation ring $\Zp$. Gauss's lemma proves
+irreducibility over its fraction field $\Qp$. Translation by one
+is an invertible polynomial substitution, so $\Phi_{p^m}$ is
+irreducible as well. For $m=0$ it is the linear polynomial $T-1$.
+Finally $\zeta_m$ is a root of this monic irreducible polynomial,
+so it is its minimal polynomial, and its degree is the extension
+degree. The prime-power degree formula gives $\varphi(p^m)$.
+\end{proof}
+
+\begin{lemma}[Total ramification of the rational cyclotomic layers]
+\label{ft:cyclotomic-total-ramification}
+\source{serre-1979-local-fields:page-0085}
+\dcref{Serre, Chapter IV, Section 4, Proposition 17}
+\uses{ft:padic-cyclotomic-polynomial,fw:norm-valuation,fw:local-dvr-degree-identity}
+\lean{FalseTateExtension.padic_valuationSubring_toSubring, FalseTateExtension.padicUnitBallEquiv, FalseTateExtension.padicUnitBall_isDiscreteValuationRing, FalseTateExtension.padicUnitBall_normalizedValuation_p, FalseTateExtension.cyclotomicLayerRoot, FalseTateExtension.isPrimitiveRoot_cyclotomicLayerRoot, FalseTateExtension.cyclotomicLayer_padic_isCyclotomicExtension, FalseTateExtension.norm_cyclotomicLayerRoot_sub_one, FalseTateExtension.cyclotomicValuationSubring_isDiscreteValuationRing, FalseTateExtension.cyclotomicLayer_normalizedValuation_pow, FalseTateExtension.cyclotomicLayer_residueDegree, FalseTateExtension.cyclotomicLayer_normalizedValuation_sub_one, FalseTateExtension.cyclotomicLayerRoot_sub_one_mem, FalseTateExtension.cyclotomicUniformizer, FalseTateExtension.irreducible_cyclotomicUniformizer, FalseTateExtension.span_cyclotomicUniformizer, FalseTateExtension.cyclotomicLayer_ramificationIdx, FalseTateExtension.cyclotomicLayer_ramificationIdx_eq_totient, FalseTateExtension.cyclotomicLayer_spectral_residueDegree, FalseTateExtension.irreducible_cyclotomicUniformizer_spectral, FalseTateExtension.cyclotomicLayer_spectral_ramificationIdx}
+\leanok
+For every prime $p$ and $m\geq1$, put $E_m=\Qp(\zeta_m)$ for a
+primitive $p^m$-th root of unity. Then $E_m/\Qp$ is totally ramified,
+and $\zeta_m-1$ is a uniformizer of its actual valuation ring.
+\end{lemma}
+\begin{proof}
+Put $\lambda=\zeta_m-1$ and $d=\varphi(p^m)$. Its monic minimal
+polynomial is $\Phi_{p^m}(1+T)$, by irreducibility and translation.
+The constant coefficient is $p$, so
+$N_{E_m/\Qp}(\lambda)=(-1)^d p$ and
+$v_{\Qp}(N(\lambda))=1$. The element $\lambda$ is integral, being
+the difference of the integral root of unity and one.
+If $f$ is the residue degree, the normalized norm identity gives
+$1=fv_{E_m}(\lambda)$. Here $f$ is a positive integer and
+$v_{E_m}(\lambda)$ is a nonnegative integer. Their product is one,
+so both are one. Thus $\lambda$ is a uniformizer, and the
+fundamental degree identity gives $e(E_m/\Qp)=d$, proving total
+ramification. This proves the ramification assertion through the
+norm of the Eisenstein generator.
+\end{proof}
+
+\begin{lemma}[Finite rational cyclotomic characters]
+\label{ft:finite-cyclotomic-character}
+\uses{ft:padic-cyclotomic-polynomial,ft:galois-layers}
+\lean{FalseTateExtension.cyclotomicLayerCharacter, FalseTateExtension.cyclotomicLayerCharacter_spec, FalseTateExtension.cyclotomicLayerCharacter_unique, FalseTateExtension.cyclotomicLayerCharacter_injective, FalseTateExtension.card_cyclotomicLayer_galois_eq_finrank, FalseTateExtension.card_cyclotomicLayer_galois, FalseTateExtension.card_cyclotomicLayer_character_units, FalseTateExtension.cyclotomicLayerCharacter_bijective, FalseTateExtension.cyclotomicLayerCharacter_surjective, FalseTateExtension.cyclotomicLayerGaloisEquivUnits, FalseTateExtension.cyclotomicLayerGaloisEquivUnits_apply, FalseTateExtension.cyclotomicLayerGaloisEquivUnits_spec, FalseTateExtension.cyclotomicLayerGaloisEquivUnits_symm_spec}
+\leanok
+For every prime $p$ and $m\geq0$, the actual cyclotomic character
+of $E_m=\Qp(\zeta_m)$ is an isomorphism
+\[
+ \Gal(E_m/\Qp)\simeq(\mathbb Z/p^m\mathbb Z)^\times.
+\]
+Here the character sends $\sigma$ to the unique unit $u$ satisfying
+$\sigma(\zeta_m)=\zeta_m^u$.
+\end{lemma}
+\begin{proof}
+The root $\zeta_m$ generates $E_m$, so an automorphism whose
+character is one fixes a field generator and is the identity.
+Thus the character is injective. The extension is finite Galois,
+and its degree is $\varphi(p^m)$ by the polynomial lemma.
+Its automorphism group and the indicated unit group consequently
+both have $\varphi(p^m)$ elements. An injective map between these
+finite sets of the same cardinality is surjective. The character
+is multiplicative by its defining action on the root, so it is
+a group isomorphism. At $m=0$, both groups are trivial, and the
+same degree and cardinality argument applies.
+\end{proof}
+
+\begin{lemma}[The infinite rational cyclotomic character]
+\label{ft:infinite-cyclotomic-character}
+\uses{ft:finite-cyclotomic-character,ft:padic-cyclotomic-polynomial,ft:cyclotomic-projection-image}
+\lean{FalseTateExtension.cyclotomicLayerRestriction, FalseTateExtension.cyclotomicLayerRestriction_commutes, FalseTateExtension.cyclotomicLayerRestriction_surjective, FalseTateExtension.continuous_cyclotomicLayerRestriction, FalseTateExtension.cyclotomicLayerCharacter_restrict, FalseTateExtension.cyclotomicCharacterFiber, FalseTateExtension.isClosed_cyclotomicCharacterFiber, FalseTateExtension.cyclotomicCharacterFiber_nonempty, FalseTateExtension.cyclotomicCharacterFiber_succ_subset, FalseTateExtension.cyclotomicExtensionCharacter_surjective_padic, FalseTateExtension.cyclotomicExtensionGaloisEquivUnits, FalseTateExtension.cyclotomicExtensionGaloisEquivUnits_apply, FalseTateExtension.cyclotomicLayer_padic_degrees_unbounded, FalseTateExtension.not_finiteDimensional_cyclotomicExtension_padic}
+\leanok
+For every prime $p$, the actual cyclotomic character of
+$C=\Qp(\mu_{p^\infty})$ is a continuous group isomorphism
+\[
+ \chi:\Gal(C/\Qp)\simeq\Zp^\times,
+\]
+with continuous inverse. The extension $C/\Qp$ has infinite degree.
+\end{lemma}
+\begin{proof}
+The actual character is a continuous closed embedding, since the
+chosen roots generate $C$. Fix $u\in\Zp^\times$. For each $m\geq0$,
+let $D_m$ be the subset of $\Gal(C/\Qp)$ on which reduction of the
+character modulo $p^m$ equals the reduction of $u$.
+The finite character is surjective, and every automorphism of
+$E_m=\Qp(\zeta_m)$ extends to $C$: extend the embedding to an
+algebraic closure and restrict it to the normal extension $C$.
+Thus $D_m$ is nonempty. It is closed, being the fiber of a continuous
+map into a finite discrete group. Compatibility of character
+coordinates gives $D_{m+1}\subseteq D_m$. The actual Krull Galois
+group is compact, so these nested nonempty closed sets have a common
+point $\sigma$. All reductions of $\chi(\sigma)$ and $u$ agree,
+and a p-adic integer is determined by its reductions modulo every
+$p^m$. Hence $\chi(\sigma)=u$. This proves surjectivity and,
+together with the closed embedding, the topological group isomorphism.
+
+If $C/\Qp$ had finite degree $N$, every subfield $E_m$ would have
+degree at most $N$. Their degrees are $\varphi(p^m)=(p-1)p^{m-1}$
+for $m\geq1$, which are unbounded since $p\geq2$. This contradicts
+the bound $N$ and proves infinite degree, including at $p=2$.
+\end{proof}
+
+\begin{lemma}[The rational cyclotomic layers]
+\label{ft:rational-cyclotomic}
+\lean{FalseTateExtension.finrank_cyclotomicLayer_padic, FalseTateExtension.cyclotomicLayer_residueDegree, FalseTateExtension.irreducible_cyclotomicUniformizer, FalseTateExtension.cyclotomicLayer_ramificationIdx_eq_totient, FalseTateExtension.cyclotomicLayerGaloisEquivUnits, FalseTateExtension.cyclotomicExtensionGaloisEquivUnits, FalseTateExtension.not_finiteDimensional_cyclotomicExtension_padic}
+\leanok
+\source{serre-1979-local-fields:page-0085}
+\dcref{Serre, Chapter IV, Section 4, Proposition 17}
+\uses{ft:padic-cyclotomic-polynomial,ft:cyclotomic-total-ramification,ft:finite-cyclotomic-character,ft:infinite-cyclotomic-character}
+For $n\geq1$, put $F_n=\Qp(\zeta_n)$ and
+$d_n=(p-1)p^{n-1}$. Then $F_n/\Qp$ is totally ramified of degree $d_n$,
+$\zeta_n-1$ is a uniformizer, and the cyclotomic character identifies
+$\Gal(F_n/\Qp)$ with $(\mathbb Z/p^n\mathbb Z)^\times$.
+Consequently, for $F_\infty=\bigcup_n F_n$,
+$\Gal(F_\infty/\Qp)=\Zp^\times$ and $F_\infty/\Qp$ is infinite.
+\end{lemma}
+\begin{proof}
+The polynomial
+\[
+ P_n(T)=\Phi_{p^n}(1+T)
+       =\sum_{j=0}^{p-1}(1+T)^{jp^{n-1}}
+\]
+is monic of degree $d_n$ and has constant term $p$. In
+$\mathbb F_p[T]$ it equals $T^{d_n}$: putting
+$X=T^{p^{n-1}}$, its reduction is
+$\sum_{j=0}^{p-1}(1+X)^j=X^{p-1}$.
+The polynomial lemma gives $[F_n:\Qp]=d_n$.
+The preceding total-ramification lemma gives residue degree one and
+makes $\zeta_n-1$ a uniformizer.
+All the primitive roots $\zeta_n^u$, for
+$u\in(\mathbb Z/p^n\mathbb Z)^\times$, belong to $F_n$ and are the
+distinct roots of the irreducible polynomial $\Phi_{p^n}$.
+They give exactly the stated automorphisms. Taking inverse limits gives
+$\Zp^\times$. The degrees $d_n$ are unbounded, including when $p=2$.
+\end{proof}
+
+\begin{lemma}[The finite cyclotomic residue-degree bound]
+\label{ft:cyclotomic-finite-residue-bound}
+\uses{ft:extensions,ft:padic-cyclotomic-polynomial,ft:cyclotomic-total-ramification,fw:local-dvr-degree-identity,fw:normalized-valuation-scaling,fw:ramification-field-equiv}
+\lean{FalseTateExtension.padicUnitBall_residueFinite, FalseTateExtension.cyclotomicLayer_padic_upper_zero, FalseTateExtension.rationalCyclotomic_ramificationIdx, FalseTateExtension.finrank_cyclotomicLayer_le_totient, FalseTateExtension.rationalCyclotomicSubfield, FalseTateExtension.isPrimitiveRoot_cyclotomicLayer_generator, FalseTateExtension.rationalCyclotomicSubfield_isCyclotomicExtension, FalseTateExtension.rationalCyclotomicSubfield_finiteDimensional, FalseTateExtension.cyclotomicBase_unitBall_isDiscreteValuationRing, FalseTateExtension.cyclotomicLayer_spectral_residueDegree_le, FalseTateExtension.cyclotomicLayer_extensionValuationSubring_eq, FalseTateExtension.compatibleSpectralIntegerRingEquiv, FalseTateExtension.cyclotomicLayerIntegerRingEquiv, FalseTateExtension.coe_cyclotomicLayerIntegerRingEquiv, FalseTateExtension.cyclotomicLayerResidueEquiv, FalseTateExtension.cyclotomicLayerResidueEquiv_residue, FalseTateExtension.cyclotomicLayer_residueDegree_eq, FalseTateExtension.cyclotomicLayer_residueDegree_le}
+\leanok
+Let $K/\Qp$ be finite, with its compatible complete valuation,
+and let $C_m=K(\zeta_m)$ for $m\geq1$, with its actual compatible
+extension valuation. Then
+\[
+ f(C_m/K)\leq e(K/\Qp).
+\]
+The assertion holds for the actual chosen-root field and is
+independent of the chosen compatible extension valuation.
+\end{lemma}
+\begin{proof}
+Inside this same field $C_m$, put $F_m=\Qp(\zeta_m)$ and
+$d_m=\varphi(p^m)$. The root remains primitive as an element of
+$F_m$ and $C_m$, since all inclusions are injective. The actual
+rational cyclotomic polynomial and total-ramification theorems,
+transported along the $\Qp$-isomorphism carrying the original
+chosen primitive root to this one, give
+$[F_m:\Qp]=e(F_m/\Qp)=d_m$. Compatible extension valuations
+have the same valuation ring, so this is the ramification index
+of the actual inclusion $F_m\subseteq C_m$ under consideration.
+
+The minimal polynomial of $\zeta_m$ over $K$ divides the image
+of its rational minimal polynomial. Since $C_m=K(\zeta_m)$,
+the degree of this minimal polynomial is $[C_m:K]$, whence
+$[C_m:K]\leq d_m$.
+Write $e_m=e(C_m/K)$, $f_m=f(C_m/K)$ and
+$e_K=e(K/\Qp)$. The actual local degree identity and the two
+ramification-index tower identities give
+\[
+ e_mf_m=[C_m:K]\leq d_m
+ \leq d_m e(C_m/F_m)=e(C_m/\Qp)=e_K e_m.
+\]
+Here $e(C_m/F_m)\geq1$, and $e_m>0$ for a finite injective
+local extension of DVRs. Cancelling this positive integer proves
+$f_m\leq e_K$. Every index and residue degree in the argument
+comes from the actual compatible valuation rings, so uniqueness
+of those rings also gives the asserted independence.
+\end{proof}
+
+\begin{lemma}[Stabilization of cyclotomic inertia preimages]
+\label{ft:cyclotomic-inertia-preimages}
+\uses{ft:extensions,ft:cyclotomic-finite-residue-bound,fw:galois-ring-residue-theory,fw:local-inertia-size,fw:ordinary-upper-restriction,fw:infinite-upper-groups,fw:infinite-upper-restriction,fw:finite-base-residue}
+\lean{FalseTateExtension.cyclotomicRestrictionToLayer, FalseTateExtension.cyclotomicRestrictionToLayer_commutes, FalseTateExtension.cyclotomicRestrictionToLayer_surjective, FalseTateExtension.continuous_cyclotomicRestrictionToLayer, FalseTateExtension.cyclotomicRestrictionBetweenLayers, FalseTateExtension.cyclotomicRestrictionBetweenLayers_commutes, FalseTateExtension.cyclotomicRestrictionToLayer_comp, FalseTateExtension.cyclotomicFiniteLayer, FalseTateExtension.cyclotomicFiniteLayerEquiv, FalseTateExtension.restrictNormal_cyclotomicFiniteLayer, FalseTateExtension.exists_le_cyclotomicFiniteLayer, FalseTateExtension.cyclotomicBase_residueFinite, FalseTateExtension.cyclotomicLayer_inertia_index, FalseTateExtension.cyclotomicInertiaPreimage, FalseTateExtension.cyclotomicInertiaPreimage_finiteIndex, FalseTateExtension.cyclotomicInertiaPreimage_normal, FalseTateExtension.isOpen_cyclotomicInertiaPreimage, FalseTateExtension.cyclotomicInertiaPreimage_index, FalseTateExtension.cyclotomicInertiaPreimage_index_le, FalseTateExtension.cyclotomicInertiaPreimage_antitone, FalseTateExtension.cyclotomicInertiaPreimage_index_monotone, FalseTateExtension.exists_cyclotomicInertiaPreimage_stable, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_eq_iInf, FalseTateExtension.exists_cyclotomic_inertia_eq_preimage, FalseTateExtension.cyclotomic_inertia_finiteIndex, FalseTateExtension.cyclotomic_inertia_index_le, FalseTateExtension.isOpen_cyclotomic_inertia, FalseTateExtension.cyclotomic_inertia_eq_absolute_image}
+\leanok
+Let $K/\Qp$ be finite, $C=K^{\mathrm{cyc}}$, and
+$C_m=K(\zeta_m)$ for $m\geq1$. Write $D=\Gal(C/K)$,
+$r_m:D\to\Gal(C_m/K)$ for ordinary restriction and
+\[
+ B_m=r_m^{-1}(\Gal(C_m/K)^0).
+\]
+Each $B_m$ is an open normal subgroup of finite index,
+\[
+ [D:B_m]=f(C_m/K)\leq e(K/\Qp),\qquad B_{m+1}\subseteq B_m.
+\]
+There exists $m_0\geq1$ such that
+\[
+ B_m=B_{m_0}\quad(m\geq m_0),\qquad
+ D^0=\bigcap_{m\geq1}B_m=B_{m_0}.
+\]
+In particular the actual infinite upper group $D^0$ is open.
+It is also the image of
+$\Gal(\overline K/K)^0$ under ordinary restriction to $C$.
+\end{lemma}
+\begin{proof}
+Each $C_m/K$ is finite Galois. Ordinary restriction is continuous
+and surjective, because an automorphism of a normal intermediate
+field extends to the algebraic closure and then preserves $C$.
+Its target is finite discrete; the preimage of its normal inertia
+subgroup is therefore open and normal. The finite residue extension
+is Galois: normality follows from the actual residue reduction
+homomorphism, and separability follows from perfection of the
+base residue field. That residue field is finite, since $K/\Qp$
+is finite and the residue field of $\Qp$ is $\mathbb F_p$.
+The actual quotient by inertia is its residue automorphism group,
+so its order is $f(C_m/K)$. Surjectivity of $r_m$ now gives the
+index equality, and the finite residue-degree bound gives the
+inequality. Finite upper restriction sends the next layer's zero
+upper group into the previous layer's zero upper group; compatibility
+of ordinary restriction proves $B_{m+1}\subseteq B_m$.
+
+The positive integers $[D:B_m]$ form a nondecreasing sequence
+bounded by $e(K/\Qp)$. Its range is finite and nonempty, so it
+has a largest element, attained at some $m_0$. For $m\geq m_0$
+the indices coincide. The inclusion $B_m\subseteq B_{m_0}$ and
+the finite index formula
+\[
+ [D:B_m]=[D:B_{m_0}][B_{m_0}:B_m]
+\]
+force the relative index to be one. Thus $B_m=B_{m_0}$, and
+monotonicity identifies their intersection with $B_{m_0}$.
+
+Every finite intermediate field $E/K$ of $C/K$ is contained in
+some $C_m$. Indeed choose a finite $K$-basis of $E$; each basis
+element belongs to a layer because $C$ is their union. The largest
+of these finitely many layer indices contains the basis and hence
+all of $E$. For a finite Galois $E$, finite upper restriction
+therefore shows that membership in every $B_m$ implies the
+zero-upper condition on $E$. Conversely the infinite upper condition
+implies every layer condition by its definition. This proves
+$D^0=\bigcap_m B_m$. Its openness follows from stabilization.
+Finally the proved infinite upper-restriction theorem, applied to
+the actual inclusion $C\subseteq\overline K$ and $u=0$, identifies
+$D^0$ with the image of $\Gal(\overline K/K)^0$.
+This argument establishes openness directly from finite preimages;
+it does not assert an identification with the infinite residue quotient.
+\end{proof}
+
+\begin{lemma}[The actual infinite cyclotomic residue bound]
+\label{ft:cyclotomic-infinite-residue-bound}
+\uses{ft:extensions,ft:cyclotomic-finite-residue-bound,fw:spectral-integer-residue-maps,fw:finite-base-residue}
+
+\lean{FalseTateExtension.cyclotomicResidueToExtension, FalseTateExtension.cyclotomicResidueBetweenLayers, FalseTateExtension.cyclotomicResidueToExtension_comp, FalseTateExtension.exists_cyclotomicResidueToExtension_preimage, FalseTateExtension.cyclotomicResidue_degree_monotone, FalseTateExtension.exists_cyclotomicResidueToExtension_bijective, FalseTateExtension.exists_cyclotomicResidueEquiv, FalseTateExtension.cyclotomicExtension_residue_finiteDimensional, FalseTateExtension.cyclotomicExtension_residue_degree_le}
+\leanok
+Let $K/\Qp$ be finite and $C=K^{\mathrm{cyc}}$.
+Let $\mathcal O_C$ be its actual spectral valuation ring and
+$k_C$ its actual residue field. Then $k_C/k_K$ is finite with
+\[
+ [k_C:k_K]\leq e(K/\Qp).
+\]
+For some positive chosen finite layer $C_N$, the actual residue
+map $k_{C_N}\to k_C$ is an isomorphism over the original $k_K$.
+No discrete valuation or completeness assertion about $C$ is required.
+\end{lemma}
+\begin{proof}
+Every inclusion of a chosen finite layer into a later layer or into
+$C$ preserves its spectral norm. Indeed the spectral norm of an
+algebraic extension of a complete nonarchimedean field is unique,
+and its restriction along an injective algebraic field map is that
+of the source. Thus the inclusions give actual local maps of their
+valuation rings. The induced residue maps are field homomorphisms,
+hence injective, and commute with one another and with the original
+base residue map. They are therefore $k_K$-linear.
+
+Every $z\in k_C$ has an integral representative $x\in\mathcal O_C$.
+The underlying element $x\in C$ lies in a chosen finite layer,
+since $C$ is their union. Norm preservation makes that representative
+integral already in the finite layer; its residue maps to $z$.
+Hence every element of the actual $k_C$ comes from a finite-layer
+residue field.
+
+Write $f_m=[k_{C_m}:k_K]$ for positive layers. Injectivity of the
+actual residue maps makes $f_m$ nondecreasing; the finite-layer
+bound gives $1\leq f_m\leq e(K/\Qp)$. Choose $N$ attaining the
+largest value of this nonempty finite set of integer degrees.
+For $m\geq N$, the injective $k_K$-linear map
+$k_{C_N}\to k_{C_m}$ is between finite vector spaces of equal
+dimension, so it is surjective. For any $z\in k_C$, choose a layer
+$m$ representing it, pass to $\max(m,N)$, and use that surjectivity.
+Commutativity of the actual residue maps shows that $z$ comes from
+$k_{C_N}$. The map $k_{C_N}\to k_C$ is therefore bijective and
+is an actual $k_K$-algebra isomorphism. Transporting finite
+dimensionality along this map gives
+$[k_C:k_K]=f_N\leq e(K/\Qp)$.
+\end{proof}
+
+\begin{lemma}[Inertia and residue fields]
+\label{ft:inertia-residue}\notready
+\source{serre-1979-local-fields:page-0069}
+\dcref{Serre, Chapter IV, Section 1, Proposition 1}
+Let $N/K$ be an algebraic Galois extension, and write $I_K$ for the
+inertia subgroup of the absolute Galois group of $K$. The image $I_N$
+of $I_K$ in $\Gal(N/K)$ is the kernel of reduction, and
+\[
+ \Gal(N/K)/I_N\simeq\Gal(k_N/k_K).
+\]
+This quotient is abelian. Inertia images commute with restriction to
+Galois intermediate extensions. Moreover $I_N$ is open if and only if
+$[k_N:k_K]$ is finite.
+\end{lemma}
+\begin{proof}
+For a finite Galois extension $E/K$, the maximal unramified subfield
+has residue field $k_E$ and degree $[k_E:k_K]$. To see its existence,
+lift the irreducible polynomial of a generator of the finite field
+extension $k_E/k_K$ to $\mathcal O_K[T]$. Hensel lifting a simple
+residue root in $E$ gives a root of the lift; its field has that degree,
+residue degree that degree, and therefore ramification index one.
+The unramified field is unique in the fixed algebraic closure: its
+residue elements have unique multiplicative lifts as roots of unity
+of order prime to $p$, and those lifts generate it.
+Every residue automorphism lifts to this subfield and extends to an
+automorphism of $E$, since $E/K$ is normal. Thus reduction onto
+$\Gal(k_E/k_K)$ is surjective. Its kernel is the inertia group, and
+the image of absolute inertia is precisely this kernel: the maximal
+unramified extension of $K$ has the union of all finite unramified
+extensions as its field, so its intersection with $E$ is the subfield
+just constructed.
+
+Apply the finite statement to the finite Galois subextensions of $N/K$.
+An element of $\Gal(N/K)$ acting trivially on $k_N$ restricts to inertia
+at every finite level. Its lifts to $I_K$ form nonempty closed subsets
+of the compact group $I_K$ with the finite intersection property
+(use the compositum for finitely many levels). It therefore lifts to
+$I_K$. The same compactness argument, lifting a prescribed residue
+automorphism at finitely many levels, proves surjectivity of reduction.
+The quotient is consequently the inverse limit of the cyclic Galois
+groups of finite residue fields and is abelian. Restriction commutes
+with images of the single group $I_K$. Finally a closed subgroup of a
+profinite group is open exactly when it has finite index, which here
+is equivalent to the residue extension being finite.
+\end{proof}
+
+\begin{lemma}[Naturality of the canonical cyclotomic character]
+\label{ft:cyclotomic-character-naturality}
+\lean{FalseTateExtension.cyclotomicCharacter_eq_of_intertwines}
+\leanok
+Let $E$ and $E'$ be characteristic-zero fields containing primitive
+$p^n$-th roots of unity for every $n$, and let $i:E\hookrightarrow E'$
+be a field embedding. If field automorphisms $g$ and $g'$ satisfy
+$i\circ g=g'\circ i$, their canonical cyclotomic characters are equal.
+\end{lemma}
+\begin{proof}
+Choose a primitive $p^n$-th root $\zeta\in E$. Its image $i(\zeta)$
+is primitive of the same order, since the embedding is injective.
+Write $b_n$ and $b'_n$ for the reductions of the two characters
+modulo $p^n$. The defining character identities and the intertwining
+identity give
+\[
+ i(\zeta)^{b_n}=i(g(\zeta))=g'(i(\zeta))=i(\zeta)^{b'_n}.
+\]
+Primitivity implies $b_n=b'_n$ in $\mathbb Z/p^n\mathbb Z$.
+Thus the underlying p-adic integers have equal reductions for every
+$n$, hence are equal. Units are determined by their underlying
+elements, which proves equality of the characters. The argument
+also covers $n=0$, where the residue ring has one element.
+\end{proof}
+
+\begin{lemma}[Openness of the cyclotomic image over a finite base field]
+\label{ft:cyclotomic-image-open}
+\uses{ft:extensions,ft:infinite-cyclotomic-character,ft:cyclotomic-projection-image,ft:cyclotomic-character-naturality}
+\lean{FalseTateExtension.cyclotomicCharacter_algebraicClosure_padic_surjective, FalseTateExtension.cyclotomicCharacter_surjective_of_isAlgClosure, FalseTateExtension.range_restrictScalarsHom_eq_fixingSubgroup, FalseTateExtension.index_range_restrictScalarsHom, FalseTateExtension.cyclotomicCharacter_restrict_cyclotomicExtension, FalseTateExtension.cyclotomicExtensionCharacter_range_eq_map, FalseTateExtension.cyclotomicExtensionCharacter_finiteIndex, FalseTateExtension.cyclotomicExtensionCharacter_index_dvd, FalseTateExtension.cyclotomicExtensionCharacter_index_pos, FalseTateExtension.cyclotomicExtensionCharacter_index_bounds, FalseTateExtension.isOpen_cyclotomicExtensionCharacter_range}
+\leanok
+Let $K/\Qp$ be finite and let $C=K(\mu_{p^\infty})$ be the
+actual cyclotomic extension defined by the chosen roots. Its
+canonical character image $H\subseteq\Zp^\times$ has finite index,
+\[
+ [\Zp^\times:H]\mid[K:\Qp],\qquad
+ 1\leq[\Zp^\times:H]\leq[K:\Qp],
+\]
+and is open. This holds at every prime.
+\end{lemma}
+\begin{proof}
+Put $\Omega=\overline K$, with its composite $\Qp$-algebra
+structure. Since $K/\Qp$ is algebraic, $\Omega$ is also an
+algebraic closure of $\Qp$. Choose a $\Qp$-isomorphism from
+$\overline{\Qp}$ to $\Omega$. On $\overline{\Qp}$, restriction
+to the rational cyclotomic extension is surjective: every embedding
+of that normal extension extends to the algebraic closure. Its
+character is surjective by the infinite rational character lemma.
+Naturality therefore proves that the canonical character
+\[
+ \chi_\Omega:\Gal(\Omega/\Qp)\longrightarrow\Zp^\times
+\]
+is surjective as well.
+
+Let $\kappa$ be the actual image of $K$ in $\Omega$, and let
+$S\subseteq\Gal(\Omega/\Qp)$ be the scalar-restriction image
+of $\Gal(\Omega/K)$. Then $S$ is exactly the subgroup fixing
+$\kappa$: the forward inclusion follows from $K$-linearity;
+an automorphism fixing $\kappa$ is $K$-linear and gives the reverse
+inclusion. Galois correspondence gives
+$[\Gal(\Omega/\Qp):S]=[\kappa:\Qp]=[K:\Qp]$.
+In particular $S$ has finite index.
+Ordinary restriction $\Gal(\Omega/K)\to\Gal(C/K)$ is
+surjective, and naturality of the character shows
+$H=\chi_\Omega(S)$. For a surjective group homomorphism,
+the cosets of a subgroup map surjectively to the cosets of its
+image; the image index divides the original finite index, by
+the subgroup index formula applied to the preimage of the image.
+Consequently $H$ has finite index dividing $[K:\Qp]$.
+Both indices are positive integers, so the displayed bounds follow.
+Finally the actual character of $C/K$ is a closed embedding;
+its image $H$ is closed. A closed subgroup of finite index in
+a profinite group is open, proving the assertion.
+\end{proof}
+
+\begin{lemma}[Cyclotomic image and cyclotomic inertia]
+\label{ft:cyclotomic-inertia}
+\uses{ft:extensions,ft:rational-cyclotomic,ft:cyclotomic-image-open,ft:cyclotomic-finite-residue-bound,ft:cyclotomic-inertia-preimages,ft:cyclotomic-infinite-residue-bound}
+\lean{FalseTateExtension.cyclotomicInertiaCharacterImage, FalseTateExtension.cyclotomicInertiaCharacterImage_eq_map, FalseTateExtension.cyclotomicInertiaCharacterImage_eq_absolute_character, FalseTateExtension.isOpenEmbedding_cyclotomicExtensionCharacter, FalseTateExtension.isOpen_cyclotomicInertiaCharacterImage, FalseTateExtension.cyclotomicInertiaCharacterImage_finiteIndex, FalseTateExtension.padicUnits_infinite, FalseTateExtension.exists_ne_one_mem_cyclotomicInertiaCharacterImage}
+\leanok
+Put $C=K^{\mathrm{cyc}}$ and
+$H=\Gal(C/K)\subset\Zp^\times$. Both $H$ and the image
+$J=\operatorname{im}(I_K\longrightarrow H)$ are open in
+$\Zp^\times$. In particular $J$ contains an element $h\ne1$.
+Furthermore $[k_C:k_K]\leq e(K/\Qp)$.
+\end{lemma}
+\begin{proof}
+The actual character of $C/K$ is a closed embedding with open image
+$H$, by the cyclotomic image theorem. It is therefore an open
+embedding: it is a homeomorphism onto its image, and that image is
+open in $\Zp^\times$.
+The actual infinite zero upper group $\Gal(C/K)^0$ is open by
+finite inertia-preimage stabilization. Its image under this open
+embedding is open in $\Zp^\times$. Ordinary infinite upper
+restriction identifies it with the stated image of absolute inertia,
+so this image is precisely $J$.
+
+The group $\Zp^\times$ is infinite: the distinct elements
+$1+pn$ for $n\geq0$ are units, since their reduction modulo $p$
+is one, and they are distinct by characteristic zero.
+An open subgroup of this compact group has finite index: its
+coset space is discrete and compact, hence finite. If that subgroup
+were finite, the group would be a finite union of finite cosets,
+a contradiction. Thus $J$ is infinite and has an element different
+from one. The actual infinite residue bound just proved supplies
+$[k_C:k_K]\leq e(K/\Qp)$ independently of any identification
+of an infinite residue quotient.
+\end{proof}
+
+\begin{lemma}[Compatibility of finite coordinates under restriction]
+\label{ft:coordinate-transitions}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; transition maps on compatible roots}
+\uses{ft:finite-coordinates,ft:extensions}
+\lean{FalseTateExtension.finiteGaloisLayer, FalseTateExtension.finiteLayerRestriction, FalseTateExtension.finiteLayerRestriction_commutes, FalseTateExtension.finiteLayerRestriction_surjective, FalseTateExtension.finiteLayerRestriction_refl, FalseTateExtension.finiteLayerRestriction_comp, FalseTateExtension.radical_add_pow, FalseTateExtension.radical_pow_sub, FalseTateExtension.rootOfUnity_add_pow, FalseTateExtension.rootOfUnity_pow_sub, FalseTateExtension.inclusion_layerRadical, FalseTateExtension.inclusion_layerRootOfUnity, FalseTateExtension.finiteLayerRestriction_radical, FalseTateExtension.finiteLayerRestriction_rootOfUnity, FalseTateExtension.layerRootOfUnity_pow_reduction, FalseTateExtension.finiteKummerExponent_restrict, FalseTateExtension.finiteCyclotomicCharacter_restrict}
+\leanok
+Let $\pi\ne0$ and $n\leq m$. Put $E_j=K(\pi_j,\zeta_j)$ and
+let $r_{m,n}:\Gal(E_m/K)\to\Gal(E_n/K)$ be the ordinary finite
+Galois restriction. Let $\rho_{m,n}:\mathbb Z/p^m\mathbb Z\to
+\mathbb Z/p^n\mathbb Z$ be reduction and $\rho_{m,n}^{\times}$ its
+map on units. Then
+\[
+ b_n(r_{m,n}(g))=\rho_{m,n}(b_m(g)),\qquad
+ \chi_n(r_{m,n}(g))=\rho_{m,n}^{\times}(\chi_m(g)).
+\]
+The restrictions are the identity for $m=n$ and compose in towers.
+\end{lemma}
+\begin{proof}
+Iterating the chosen root compatibilities gives
+$\pi_n=\pi_m^{p^{m-n}}$ and $\zeta_n=\zeta_m^{p^{m-n}}$.
+Apply $g$ to the first identity and substitute its radical evaluation
+at level $m$. Commuting multiplication and powers gives
+\[
+ r_{m,n}(g)(\pi_n)=\zeta_n^{b_m(g)}\pi_n.
+\]
+Powers of $\zeta_n$ depend only on the exponent modulo $p^n$.
+Uniqueness of the radical coordinate therefore gives the first formula.
+The same calculation with the root-of-unity identity gives
+$r_{m,n}(g)(\zeta_n)=\zeta_n^{\chi_m(g)}$. Reduction preserves units,
+and character uniqueness gives the second formula. Ordinary restriction
+preserves values on the smaller field, so its identity and composition
+laws follow by evaluation there. At $n=0$ the target coordinate groups
+are trivial, and the same formulas apply.
+\end{proof}
+
+\begin{lemma}[Actual $p$-adic cyclotomic and Kummer coordinates]
+\label{ft:padic-coordinates}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; compatible-coordinate construction over a characteristic-zero base}
+\uses{ft:coordinate-transitions,ft:galois-layers,ft:extensions}
+\lean{FalseTateExtension.infiniteLayerRestriction, FalseTateExtension.infiniteLayerRestriction_commutes, FalseTateExtension.infiniteLayerRestriction_surjective, FalseTateExtension.infiniteLayerRestriction_comp, FalseTateExtension.infiniteLayerRestriction_jointly_injective, FalseTateExtension.extensionRootOfUnity, FalseTateExtension.coe_extensionRootOfUnity, FalseTateExtension.isPrimitiveRoot_extensionRootOfUnity, FalseTateExtension.falseTateExtension_hasEnoughRootsOfUnity, FalseTateExtension.padicCyclotomicCharacter, FalseTateExtension.padicCyclotomicCharacter_toZModPow, FalseTateExtension.kummerRepresentative, FalseTateExtension.kummerRepresentative_step, FalseTateExtension.padicKummerExponent, FalseTateExtension.padicKummerExponent_toZModPow, FalseTateExtension.padicKummerExponent_unique, FalseTateExtension.padicKummerExponent_mul, FalseTateExtension.padicCoordinates_injective}
+\leanok
+Let $\pi\ne0$ and $L=K^{\mathrm{FT}}_\infty$. For every $n$, ordinary
+restriction $r_n:\Gal(L/K)\to\Gal(E_n/K)$ is surjective, commutes
+with the original field inclusion, and satisfies
+$r_{m,n}r_m=r_n$. The actual field $L$ contains primitive $p^n$-th
+roots of unity for every $n$. Its usual cyclotomic character restricts
+to a homomorphism $\chi:\Gal(L/K)\to\Zp^\times$ with
+\[
+ \chi(g)\bmod p^n=\chi_n(r_n(g)).
+\]
+There is a unique map $b:\Gal(L/K)\to\Zp$ satisfying
+\[
+ b(g)\bmod p^n=b_n(r_n(g)).
+\]
+It satisfies $b(gh)=b(g)+\chi(g)b(h)$, and
+$g\mapsto(b(g),\chi(g))$ is injective, for every prime $p$.
+\end{lemma}
+\begin{proof}
+Each $E_n/K$ and $L/K$ is actually Galois. The normal-extension
+embedding theorem extends every automorphism of $E_n$ to $L$, proving
+surjectivity of ordinary restriction. Evaluation in the ambient field
+proves its inclusion and transition identities.
+
+The element $\zeta_n$ belongs to $E_n\subset L$ and retains its
+primitive order under this injective inclusion. Thus $L$ has enough
+$p^n$-th roots of unity for every $n$. The cyclotomic character on
+$L$ is consequently characterized by its action on these actual roots.
+Its projection at $p^n$ agrees with $\chi_n(r_n(g))$ by the finite
+character evaluation and uniqueness theorem.
+
+The finite transition lemma makes $b_n(r_n(g))$ compatible under all
+reductions. Choose integer representatives $a_n$. For $m\geq n$,
+the difference $a_m-a_n$ is divisible by $p^n$. Hence $(a_n)$ is a
+$p$-adic Cauchy sequence and converges to an element $b(g)\in\Zp$.
+Its projection modulo $p^n$ is the prescribed finite value. Changing
+representatives changes none of these projections, and an element of
+$\Zp$ is uniquely determined by all its projections, so this defines
+the unique stated map.
+
+Project $b(gh)$ and $b(g)+\chi(g)b(h)$ modulo every $p^n$.
+Restriction is a homomorphism, the cyclotomic projection has just been
+identified, and the finite cocycle identity identifies these
+projections. Uniqueness of $p$-adic projections proves the cocycle law.
+Equal pairs give equal finite pairs at every level, so finite-coordinate
+injectivity identifies the restrictions on every $E_n$. Every element
+of $L$ lies in a diagonal layer, and the original field inclusions are
+injective. The two automorphisms therefore agree on all of $L$.
+\end{proof}
+
+\begin{lemma}[The actual closed topological affine embedding]
+\label{ft:affine-closed-embedding}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; topology of the compatible-coordinate realization}
+\uses{ft:padic-coordinates,ft:galois-layers}
+\lean{FalseTateExtension.padicAffineAction, FalseTateExtension.PadicAffineGroup, FalseTateExtension.padicAffineEquivProd, FalseTateExtension.padicAffineTopologicalSpace, FalseTateExtension.padicAffineHomeomorphProd, FalseTateExtension.padicAffineT2Space, FalseTateExtension.continuous_padicAffine_left, FalseTateExtension.continuous_padicAffine_right, FalseTateExtension.padicAffineIsTopologicalGroup, PadicInt.continuous_of_toZModPow, FalseTateExtension.continuous_infiniteLayerRestriction, FalseTateExtension.continuous_padicKummerExponent, FalseTateExtension.continuous_padicCyclotomicCharacter, FalseTateExtension.affineGaloisHom, FalseTateExtension.affineGaloisHom_coordinates, FalseTateExtension.affineGaloisHom_injective, FalseTateExtension.continuous_affineGaloisHom, FalseTateExtension.isClosedEmbedding_affineGaloisHom}
+\leanok
+For every prime $p$ and $\pi\ne0$, give the usual semidirect product
+$\Zp\rtimes\Zp^\times$, with action $u\cdot b=ub$, its product
+topology. It is a Hausdorff topological group. The actual map
+\[
+ \Gal(K^{\mathrm{FT}}_\infty/K)\longrightarrow\Zp\rtimes\Zp^\times,
+ \qquad g\longmapsto(b(g),\chi(g))
+\]
+is a continuous group homomorphism and a closed topological embedding.
+The source has its actual Krull topology.
+\end{lemma}
+\begin{proof}
+The group law is $(b,u)(c,v)=(b+uc,uv)$, and inversion is
+$(b,u)^{-1}=(-u^{-1}b,u^{-1})$. Continuity of addition and
+multiplication on $\Zp$ and of the unit operations proves the
+topological group assertion for the product topology; both factors are
+Hausdorff. The preceding coordinate theorem proves the homomorphism
+law and injectivity.
+
+Ordinary restriction to an actual finite Galois layer is continuous:
+the preimage of its identity is the open subgroup fixing that layer,
+and the fibers are its cosets. In particular every finite projection
+of $b$ factors through a continuous map to a finite discrete Galois
+group and is continuous. Residue cosets modulo $p^n$ form a basis of
+the actual $p$-adic topology on $\Zp$. Indeed their kernels are
+$p^n\Zp$, and their translates are the closed balls of radius $p^{-n}$;
+these balls are open as well. Given a positive real radius, choose $n$
+with $p^{-n}$ smaller than that radius. Thus every neighborhood contains
+such a residue coset. Continuity of all finite projections therefore
+proves continuity of $b$. The cyclotomic coordinate is the usual
+continuous cyclotomic character restricted to the actual $K$-algebra
+automorphisms. Hence the displayed map is continuous in the product
+topology.
+
+The actual infinite false Tate extension is Galois, so its Krull Galois
+group is compact. A continuous injection from a compact space to a
+Hausdorff space is a homeomorphism onto its image. The image is compact
+and therefore closed. These facts give the claimed closed embedding.
+\end{proof}
+
+\begin{lemma}[The actual cyclotomic projection image]
+\label{ft:cyclotomic-projection-image}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; the cyclotomic projection}
+\uses{ft:affine-closed-embedding,ft:extensions,ft:galois-layers}
+\lean{FalseTateExtension.cyclotomicRootOfUnity, FalseTateExtension.isPrimitiveRoot_cyclotomicRootOfUnity, FalseTateExtension.cyclotomicExtension_hasEnoughRootsOfUnity, FalseTateExtension.cyclotomicExtensionCharacter, FalseTateExtension.continuous_cyclotomicExtensionCharacter, FalseTateExtension.cyclotomicExtensionCharacter_spec, FalseTateExtension.cyclotomicExtensionCharacter_injective, FalseTateExtension.isClosedEmbedding_cyclotomicExtensionCharacter, FalseTateExtension.cyclotomicExtension_le_falseTateExtension, FalseTateExtension.cyclotomicRestriction, FalseTateExtension.cyclotomicRestriction_commutes, FalseTateExtension.cyclotomicRestriction_surjective, FalseTateExtension.padicCyclotomicCharacter_eq_comp, FalseTateExtension.continuous_cyclotomicRestriction, FalseTateExtension.padicCyclotomicCharacter_ker, FalseTateExtension.padicCyclotomicCharacter_range, FalseTateExtension.cyclotomicImageEquiv, FalseTateExtension.cyclotomicImageEquiv_apply, FalseTateExtension.cyclotomicImageEquiv_restrict}
+\leanok
+Put $C=K^{\mathrm{cyc}}$, $L=K^{\mathrm{FT}}_\infty$, and
+$G=\Gal(L/K)$. Restriction $r:G\to\Gal(C/K)$ is a continuous
+surjection. The canonical cyclotomic character $\chi_C$ is injective
+and continuous, and $\chi=\chi_C\circ r$. Therefore
+$\ker\chi=\ker r$, and the actual projection image $\chi(G)$ is
+isomorphic as a topological group to $\Gal(C/K)$.
+\end{lemma}
+\begin{proof}
+Each finite cyclotomic layer is the splitting field of $X^{p^n}-1$;
+their increasing union $C$ is Galois over $K$, as is $L$. The usual
+extension theorem for embeddings into a normal algebraic extension
+makes restriction onto $C$ surjective. Equivalently, extend an
+embedding of $C$ to the algebraic closure and restrict the extension to
+$L$, which is stable by normality. The continuity of restriction will follow from the actual character
+factorization below.
+
+The chosen primitive root $\zeta_n$ belongs to $C$ for every $n$,
+so this field contains all $p$-power roots of unity. The canonical
+cyclotomic character describes their actual action. If two
+automorphisms have the same character, they agree on every $\zeta_n$,
+then on each field $K(\zeta_n)$ and hence on its union $C$. This proves
+injectivity. For $g\in G$, restriction and the original automorphism
+act identically on every $\zeta_n$. Their character residues modulo
+$p^n$ therefore agree for all $n$, and separation of $\Zp$ gives
+$\chi(g)=\chi_C(r(g))$. Injectivity gives equality of the kernels,
+and surjectivity gives $\chi(G)=\chi_C(\Gal(C/K))$.
+Finally $\Gal(C/K)$ is compact in its Krull topology, the unit group
+$\Zp^\times$ is Hausdorff, and the canonical character is continuous.
+The injective map $\chi_C$ is therefore a closed embedding, so it
+induces the actual topology on its domain. The identity
+$\chi=\chi_C\circ r$ and continuity of $\chi$ now imply continuity
+of $r$ through this inducing topology. The same closed embedding is a
+homeomorphism onto its image. Since it is a group homomorphism, this
+gives the stated topological group isomorphism.
+\end{proof}
+
+\begin{lemma}[The actual closed additive affine kernel]
+\label{ft:affine-additive-kernel}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; the Kummer kernel in affine coordinates}
+\uses{ft:affine-closed-embedding}
+\lean{FalseTateExtension.continuous_padicAffine_inl, FalseTateExtension.affineAdditiveKernel, FalseTateExtension.mem_affineAdditiveKernel_iff, FalseTateExtension.padicKummerExponent_mem_affineAdditiveKernel, FalseTateExtension.kummerKernelHom, FalseTateExtension.kummerKernelHom_apply, FalseTateExtension.kummerKernelHom_bijective, FalseTateExtension.continuous_kummerKernelHom, FalseTateExtension.kummerKernelEquiv, FalseTateExtension.kummerKernelEquiv_apply}
+\leanok
+Let $f:G\to\Zp\rtimes\Zp^\times$ be the actual closed affine
+embedding, $H=f(G)$, and let $\chi$ be its right coordinate. Then
+\[
+ M=\{a\in\Zp:(a,1)\in H\}
+\]
+is a closed additive subgroup. The actual Kummer coordinate gives a
+topological group isomorphism $\ker\chi\longrightarrow M$, viewing the
+target additively. Equivalently this is an additive topological group
+isomorphism from the additive type tag of $\ker\chi$ onto $M$.
+\end{lemma}
+\begin{proof}
+The canonical inclusion $\iota:a\mapsto(a,1)$ from the additive
+$p$-adic group into the semidirect product is an injective continuous
+group homomorphism. Its image is exactly the kernel of the right
+projection. The inverse image of the closed subgroup $H$ under $\iota$
+therefore gives the displayed closed additive subgroup $M$.
+
+For $g\in\ker\chi$, the actual affine coordinate identity says
+$f(g)=(b(g),1)$, so $b(g)\in M$. The cocycle identity reduces on this
+kernel to $b(gh)=b(g)+b(h)$. Injectivity of $f$ makes this map
+injective. If $a\in M$, by definition $(a,1)=f(g)$ for some $g\in G$;
+comparison of right coordinates gives $g\in\ker\chi$ and comparison of
+left coordinates gives $b(g)=a$. This proves surjectivity and the
+actual coordinate formula.
+
+The kernel is closed in the compact Krull group, since it is the
+preimage of $\{1\}$ under the continuous cyclotomic character. Thus it
+is compact. The coordinate map is continuous by restriction of the
+actual continuous Kummer coordinate, while $M$ is Hausdorff as a
+subgroup of $\Zp$. The continuous bijection is a homeomorphism, which
+proves the asserted topological identification.
+\end{proof}
+
+\begin{lemma}[A closed affine realization]
+\label{ft:affine-embedding}\uses{ft:extensions,ft:affine-closed-embedding,ft:cyclotomic-projection-image,ft:affine-additive-kernel}
+\lean{FalseTateExtension.falseTateExtension_isGalois, FalseTateExtension.affineGaloisHom, FalseTateExtension.affineGaloisHom_coordinates, FalseTateExtension.isClosedEmbedding_affineGaloisHom, FalseTateExtension.cyclotomicImageEquiv, FalseTateExtension.cyclotomicImageEquiv_restrict, FalseTateExtension.padicCyclotomicCharacter_ker, FalseTateExtension.padicCyclotomicCharacter_range, FalseTateExtension.affineAdditiveKernel, FalseTateExtension.kummerKernelEquiv, FalseTateExtension.kummerKernelEquiv_apply}
+\leanok
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1, action on compatible radicals}
+Put $L=K^{\mathrm{FT}}_\infty$ and $G=\Gal(L/K)$. For every prime $p$,
+$L/K$ is Galois, and there is a closed topological embedding
+\[
+ G\lhook\joinrel\longrightarrow\Zp\rtimes\Zp^\times,
+ \qquad g\longmapsto(b(g),\chi(g)),
+\]
+where the multiplication is $(b,u)(c,v)=(b+uc,uv)$.
+The projection image is $H=\Gal(K^{\mathrm{cyc}}/K)$, and its kernel
+identifies with a closed additive subgroup $M$ of $\Zp$.
+\end{lemma}
+\begin{proof}
+The preceding closed-embedding lemma supplies the displayed actual
+homomorphism and its topological conclusion. Restriction onto the
+cyclotomic Galois subextension is surjective. Its kernel is precisely
+the intersection of this image with $\Zp\times\{1\}$ and is therefore
+a closed additive subgroup. This construction requires no splitting
+of the image as a semidirect product.
+\end{proof}
+
+\begin{lemma}[Closed additive subgroups of the p-adic integers]
+\label{ft:padic-closed-additive-subgroups}
+\source{liu-2008-lattices:page-0022}
+\dcref{Liu, Section 5.1; closed translation subgroups}
+\lean{PadicInt.mul_mem_closedAddSubgroup, PadicInt.closedAddSubgroupIdeal, PadicInt.mem_closedAddSubgroupIdeal, PadicInt.closedAddSubgroupIdeal_toAddSubgroup, PadicInt.closedAddSubgroup_eq_bot_or_span_pow, PadicInt.closedAddSubgroup_map_mulLeft_le, PadicInt.closedAddSubgroupIdeal_map_mulLeft_toAddSubgroup, PadicInt.isOpen_closedAddSubgroup_map_mulLeft, PadicInt.closedAddSubgroup_map_mulLeft_finiteRelIndex, PadicInt.closedAddSubgroup_map_mulLeft_relIndex_pos, PadicInt.closedAddSubgroup_map_mulLeft_relIndex_eq_one_of_eq_bot}
+\leanok
+For every prime $p$, each closed additive subgroup $M\subset\Zp$ is
+zero or $p^s\Zp$ for some $s\geq0$. For every nonzero $a\in\Zp$,
+the actual image $aM$ has positive finite index in $M$; if $M=0$,
+this index is one.
+\end{lemma}
+\begin{proof}
+For $x\in M$, all natural integer multiples belong to $M$. The natural
+integers are dense in $\Zp$, multiplication by $x$ is continuous, and
+$M$ is closed. Thus $ax\in M$ for every $a\in\Zp$. Consequently the
+same carrier $M$ is an ideal of the discrete valuation ring $\Zp$.
+Its ideals are zero or the powers $(p^s)$ of the maximal ideal,
+which proves the classification.
+
+If $M\ne0$ and $a\ne0$, the image $aM$ is the nonzero ideal
+$(ap^s)$, contained in $M$. Every nonzero ideal of this compact
+discrete valuation ring is open. Thus $aM$ is open in the compact
+subgroup $M$, and its coset quotient is discrete and compact, hence
+finite. Its index is positive because the quotient is nonempty.
+When $M=0$, multiplication has the same zero image and the quotient
+has one element, giving index one.
+\end{proof}
+
+\begin{lemma}[Closed additive subgroups and commutators]
+\label{ft:affine-commutator}\uses{ft:padic-closed-additive-subgroups}
+\lean{FalseTateExtension.padicAffine_commutator_inl, FalseTateExtension.padicAffineCompactSpace, FalseTateExtension.affineProjection, FalseTateExtension.continuous_affineProjection, FalseTateExtension.affineTranslationKernel, FalseTateExtension.affineTranslationHom, FalseTateExtension.affineTranslationHom_injective, FalseTateExtension.affineTranslationHom_range, FalseTateExtension.affineProjection_index, FalseTateExtension.affineTranslation_index, FalseTateExtension.affineTranslation_index_product, FalseTateExtension.affineTranslation_commutator, FalseTateExtension.affineTranslation_scalar_mem, FalseTateExtension.affineTranslation_scalar_image_le, FalseTateExtension.affineProjection_kernel_finiteRelIndex, FalseTateExtension.affineProjection_finiteIndex, FalseTateExtension.isOpen_of_affineProjection}
+\leanok
+Let $G\subset\Zp\rtimes\Zp^\times$ be a closed subgroup with projection
+image $H$ and additive kernel $M$. Let $I\triangleleft G$ be closed, and assume its projection image
+$J\subset H$ is open and contains $h\ne1$. Then $I$ is open in $G$.
+More precisely,
+\[
+ (h-1)M\subset [G,G]\cap I\cap M,
+ \qquad [G:I]=[H:J][M:M\cap I]<\infty.
+\]
+\end{lemma}
+\begin{proof}
+The preceding closed-additive-subgroup lemma makes multiplication by
+the nonzero scalar $h-1$ have finite positive index in $M$, including
+index one if $M=0$. Choose $(b,h)\in I$ above $h$.
+The inverse in the affine group is $(b,h)^{-1}=(-h^{-1}b,h^{-1})$,
+and direct multiplication gives, for every $m\in M$,
+\[
+ [(b,h),(m,1)]=((h-1)m,1).
+\]
+Every such commutator lies in $[G,G]$, in $M$, and in $I$ (also by
+normality of $I$). Thus $M\cap I$ has finite index in $M$.
+The preimage of $J$ in $G$ is $IM$: given an element over $J$, choose
+an element of $I$ with the same projection and divide by it.
+The quotient isomorphisms
+$G/IM\simeq H/J$ and $IM/I\simeq M/(M\cap I)$ now prove the index
+formula. The projection image $H$ is compact: the affine group has compact
+$p$-adic and unit factors, and $G$ is closed. Thus the open subgroup
+$J$ has finite index in $H$. The subgroup $I$ is closed of finite index,
+so its finitely many closed cosets have open complements; in particular
+$I$ is open.
+\end{proof}
+
+\begin{lemma}[Finite residue extension and Lie group structure]
+\label{ft:lie-structure}
+\uses{ft:affine-embedding,ft:cyclotomic-inertia,ft:affine-commutator,ft:inertia-residue}
+\notready
+For every prime $p$, $K^{\mathrm{FT}}_\infty/K$ is an infinite Galois
+extension with finite residue extension and a $p$-adic Lie Galois group.
+The same assertions hold for $K^{\mathrm{cyc}}/K$.
+\end{lemma}
+\begin{proof}
+Use the closed affine realization and let $I$ be the image of $I_K$ in
+$G$. By the residue lemma $I$ is closed and normal and $G/I$ is abelian.
+Its image in $H$ is exactly the cyclotomic inertia image $J$, which is
+open and contains $h\ne1$. The commutator lemma shows that $I$ is open;
+the residue lemma then gives $[k_L:k_K]<\infty$.
+The cyclotomic assertion on residue fields was already proved above.
+
+For completeness the Lie group assertion also follows from this affine
+realization. The group $H$ is open in $\Zp^\times$. If $M=0$, projection
+is a continuous bijection $G\longrightarrow H$ between compact Hausdorff
+groups and is a topological isomorphism; transport the $p$-adic Lie
+structure of $H$ to $G$. If $M\ne0$, the preceding proof gives
+$M=p^s\Zp$. Every left coset of $G$ in $\Zp\rtimes H$ has a
+representative $(b,1)$, by multiplying by an element of $G$ with the same
+projection. Two such representatives give the same coset exactly when
+their difference lies in $M$. Thus the index is $[\Zp:M]=p^s$.
+The subgroup $G$ is closed and of finite index, hence open in
+$\Zp\rtimes H$. The latter is a $p$-adic Lie group: its two coordinates
+have analytic multiplication $(b,u)(c,v)=(b+uc,uv)$ and inverse
+$(-u^{-1}b,u^{-1})$. Its open subgroup $G$ is therefore a $p$-adic Lie
+group. Finally both extensions contain the cyclotomic tower, whose
+degrees over $K$ are unbounded because
+$[KF_n:K]\geq d_n/[K:\Qp]$. They are infinite.
+\end{proof}
+
+\begin{remark}[Relation to the odd-prime splitting]
+The affine coordinates are those underlying Liu\textquotesingle s description
+of the false Tate Galois group. The argument above only uses closedness
+of their image and thus applies at $p=2$ as well. It proves finite
+residue degree over general $K$; total ramification is a separate
+assertion over $\Qp$ in the odd-prime setting below.
+\end{remark}
+
+\subsection{A direct all-prime strict APF argument}
+
+The following argument uses the actual radical tower and affine action.
+It allows a finite initial residue extension in the false Tate tower.
+
+\begin{lemma}[The actual finite radical layers and their differents]
+\label{ft:radical-layer-ramification}
+\uses{ft:extensions,fw:totally-ramified-uniformizer-generation,fw:monogenic-different,fw:norm-valuation,fw:local-dvr-degree-identity,fw:normalized-valuation-scaling,fw:different-order-transitivity}
+\lean{FalseTateExtension.X_pow_sub_uniformizer_isEisensteinAt, FalseTateExtension.irreducible_X_pow_sub_uniformizer, FalseTateExtension.minpoly_root_uniformizer, FalseTateExtension.radicalLayerRoot, FalseTateExtension.radicalLayerRoot_pow, FalseTateExtension.finrank_radicalLayer, FalseTateExtension.minpoly_radicalLayerRoot, FalseTateExtension.norm_radicalLayerRoot, FalseTateExtension.radicalLayer_normalizedValuation_pow, FalseTateExtension.radicalLayer_residueDegree, FalseTateExtension.radicalLayer_normalizedValuation_root, FalseTateExtension.radicalLayerRoot_mem, FalseTateExtension.radicalUniformizer, FalseTateExtension.irreducible_radicalUniformizer, FalseTateExtension.radicalLayer_ramificationIdx, FalseTateExtension.adjoin_radicalUniformizer_eq_top, FalseTateExtension.minpoly_radicalUniformizer, FalseTateExtension.radicalLayer_different_order, FalseTateExtension.radicalLayer_different_order_toNat, FalseTateExtension.radicalLayer_step_finrank, FalseTateExtension.radicalLayer_step_ramificationIdx, FalseTateExtension.radicalLayer_step_residueDegree, FalseTateExtension.radicalLayer_step_different_order, FalseTateExtension.addVal_p_eq_padic_ramificationIdx, FalseTateExtension.addVal_p_toNat_eq_padic_ramificationIdx}
+\leanok
+Let $K$ be a complete discretely valued field of characteristic zero,
+let $p$ be prime and let $\pi$ be an actual uniformizer of $K$.
+For compatible $p$-power roots put $F_n=K(\pi_n)$ with
+$\pi_n^{p^n}=\pi$. For every $n\geq0$, the original field $F_n$
+has degree $p^n$ and minimal polynomial $X^{p^n}-\pi$, with
+\[
+ N_{F_n/K}(\pi_n)=(-1)^{p^n+1}\pi.
+\]
+For every compatible extension valuation its actual residue degree
+is one, its ramification index is $p^n$, and $\pi_n$ is an actual
+integral uniformizer generating the integer ring. Its actual different
+exponent is
+\[
+ d_n=p^n n\,v_K(p)+p^n-1.
+\]
+Consecutive original radical fields have relative degree and
+ramification index $p$, residue degree one, and actual different
+exponent $p^{n+1}v_K(p)+p-1$. If the norm on $K$ is compatible
+with its $\mathbb Q_p$-algebra structure, then $v_K(p)$ equals
+its actual ramification index over $\mathbb Q_p$.
+\end{lemma}
+\begin{proof}
+For every positive $d$, the polynomial $X^d-\pi$ is Eisenstein
+at the actual maximal ideal: its leading coefficient is a unit,
+all lower coefficients lie in that ideal, and its constant term
+is outside its square. It is therefore irreducible over $K$.
+Apply this with $d=p^n$ to the actual chosen root. Its power basis
+computes both the degree and minimal polynomial, including $n=0$;
+the constant coefficient gives the displayed signed norm.
+For any compatible extension valuation, the normalized norm identity
+gives $f v_{F_n}(\pi_n)=1$. Both are integers and $f>0$, so
+$f=1$ and $v_{F_n}(\pi_n)=1$. The fundamental degree identity
+then gives $e=p^n$. Thus the root is integral and is an actual
+uniformizer. Total ramification makes its integral power basis
+generate the actual integer ring. The monogenic different is
+therefore generated by $p^n\pi_n^{p^n-1}$. Its normalized
+valuation is $p^n v_K(p^n)+p^n-1=d_n$.
+
+Absolute field-degree and ramification-index transitivity give
+relative degree and ramification index $p$ at each consecutive
+step. The relative degree identity then forces relative residue
+degree one. Different transitivity gives
+$d_{n+1}=d(F_{n+1}/F_n)+p d_n$; substitution of the two proved
+absolute exponents and cancellation yields
+$d(F_{n+1}/F_n)=p^{n+1}v_K(p)+p-1$.
+Finally $p$ is an actual uniformizer of $\mathbb Q_p$.
+Normalized valuation scaling along its original integer-ring map
+gives $v_K(p)=e(K/\mathbb Q_p)$, proving the last assertion.
+\end{proof}
+
+\begin{lemma}[The relative different in the radical tower]
+\label{ft:direct-radical-step}
+\uses{ft:radical-layer-ramification,fw:prime-degree-nonnormal-index-profile}
+\lean{FalseTateExtension.radicalLayer_step_own_ramificationIdx, FalseTateExtension.radicalLayer_step_own_different_order, FalseTateExtension.radicalLayer_step_apfIndex, FalseTateExtension.radicalLayer_step_apfPsi, FalseTateExtension.radicalLayer_step_apfRamificationBound}
+\leanok
+Let $p$ be any prime, let $K/\mathbb Q_p$ be finite, and put
+$e_K=e(K/\mathbb Q_p)$. For compatible roots
+$\pi_{n+1}^p=\pi_n$ of a uniformizer $\pi_0$ of $K$, set
+$F_n=K(\pi_n)$. The field $F_n/K$ is totally ramified of degree
+$p^n$, and $\pi_n$ is a uniformizer. The actual relative extension
+$F_{n+1}/F_n$ has degree $p$ and
+\[
+ d(F_{n+1}/F_n)=p e_Kp^n+p-1,\qquad
+ i(F_{n+1}/F_n)=t_n=\frac{e_Kp^{n+1}}{p-1}.
+\]
+Its intrinsic upper index is one through $t_n$ and $p$ after $t_n$.
+No normality of this relative extension is required.
+\end{lemma}
+\begin{proof}
+The polynomial $X^{p^n}-\pi_0$ is Eisenstein over the actual
+integer ring of $K$. It is irreducible, its root is a uniformizer,
+and its degree and ramification index are $p^n$. Alternatively,
+its root has value $1/p^n$ in the normalization extending $v_K$;
+the ramification index is therefore divisible by $p^n$, while
+the polynomial bounds the degree by $p^n$. The fundamental degree
+identity forces equality and residue degree one. Tower degrees
+give $[F_{n+1}:F_n]=p$ and $e(F_n/\mathbb Q_p)=e_Kp^n$.
+The uniformizer integral power basis makes $X^p-\pi_n$ the actual
+monogenic polynomial for the relative extension. Its derivative
+at $\pi_{n+1}$ is $p\pi_{n+1}^{p-1}$, whose normalized valuation
+is $p e_Kp^n+p-1$. Equivalently the absolute different exponent is
+$d_n=p^n v_K(p^n)+p^n-1$. Transitivity of the different gives
+$d_{n+1}=d(F_{n+1}/F_n)+p d_n$; subtracting the two explicit
+absolute exponents yields $p^{n+1}v_K(p)+p-1$, the same relative
+exponent. The nonnormal prime-degree index-profile
+identity $d=(p-1)(i+1)$ gives the displayed $t_n$ and profile.
+To identify the intrinsic extended first bound explicitly, use any
+actual separable-closure embedding of $F_{n+1}/F_n$.
+Total ramification identifies its full APF-product index with its
+intrinsic index for every nonnegative parameter. Since $p>1$,
+that full product is the whole group exactly through $t_n$.
+Thus $t_n$ belongs to the defining set of the extended supremum.
+Every other parameter in that set is either negative, hence at
+most $0\leq t_n$, or nonnegative, hence at most $t_n$ by the
+proved index profile. The supremum is precisely $t_n$.
+\end{proof}
+
+\begin{lemma}[The index profile of the infinite radical tower]
+\label{ft:direct-kummer-profile}
+\uses{ft:direct-radical-step,fw:apf-nested-index-factor,fw:apf-finite-base-index,fw:apf-finite-base-herbrand,fw:apf}
+\lean{FalseTateExtension.isAPF_kummerExtension, FalseTateExtension.isStrictlyAPF_kummerExtension, FalseTateExtension.kummerExtension_apfIndex_initial, FalseTateExtension.kummerExtension_apfIndex_interval, FalseTateExtension.kummerExtension_apfIndex_growth, FalseTateExtension.kummerExtension_apfPsi_break, FalseTateExtension.kummerExtension_apfPsi_div_index_ge, FalseTateExtension.apfSubgroup_kummerExtension_zero_eq_top, FalseTateExtension.kummerExtension_apfSubgroup_fieldRange_index}
+\leanok
+For the preceding tower set
+$u_j=e_K(j+1/(p-1))$ for $j\geq1$. The extension
+$K^{\mathrm{Kum}}/K=\bigcup_n F_n/K$ is APF. Its intrinsic index
+$A(u)$ equals one on $[0,u_1]$ and equals $p^j$ on
+$(u_j,u_{j+1}]$. In particular
+\[
+ A(u+e_K)\leq p A(u)\quad(u\geq0),\qquad
+ \psi_{K^{\mathrm{Kum}}/K}(u_j)=\frac{e_Kp^j}{p-1}.
+\]
+This extension is strictly APF. For every actual embedding
+$j:K^{\mathrm{Kum}}\hookrightarrow K^{\rm sep}$, its full
+APF product at zero is $G_K$, and
+$[G_K:G_{j(K^{\mathrm{Kum}})}G_K^u]=A(u)$ for every $u\geq0$.
+\end{lemma}
+\begin{proof}
+Let $A_n$ and $\psi_n$ be the actual index and inverse Herbrand
+function of $F_n/K$. The nested-index formula says
+\[
+ A_{n+1}(u)=A_n(u)\,
+  a_{F_{n+1}/F_n}(\psi_n(u)).
+\]
+The last factor changes from one to $p$ when $\psi_n(u)$ passes
+$t_n$. For $n=0$ the inverse function is the identity, so the
+first new threshold is $u_1=t_0=e_Kp/(p-1)$.
+Suppose the first $n$ thresholds are the displayed $u_j$.
+Then $A_n=p^n$ after $u_n$, and direct integration of its
+previous pieces gives $\psi_n(u_n)=t_{n-1}$.
+Since $t_n-t_{n-1}=e_Kp^n$, the unique solution of
+$\psi_n(u)=t_n$ is $u=u_n+e_K=u_{n+1}$.
+The nested-index formula proves the next index profile, including
+the endpoint because the relative prime-degree profile includes
+its right endpoint. This completes the induction.
+
+For each fixed $u$, the finite indices thus stabilize once
+$u_n\geq u$. In the separable closure, the products of the
+fixing groups with the fixed absolute upper group form a nested
+sequence of closed subgroups. The bounded finite indices force
+eventual equality. Their intersection is the product for the
+union field: if an element is in every product, the corresponding
+closed sets of possible factors in the compact absolute upper
+group are nested and nonempty, so have nonempty intersection.
+The limiting product is therefore open with the stabilized index.
+This proves APF and the claimed infinite profile.
+At zero every actual finite radical layer is totally ramified,
+so its full APF product is $G_K$. The intersection identity
+therefore gives the same equality for their union, without
+requiring positivity of $v_K(p)$ for this zero-level assertion.
+At every nonnegative parameter, stabilization identifies the
+full infinite-product index with that of an actual finite
+radical layer. Total ramification identifies the latter with
+its intrinsic inertia index, already shown to equal $A(u)$.
+Conjugacy of separable-closure embeddings transports both
+statements to the specified $j$.
+
+The thresholds are spaced by $e_K$, with the initial interval
+at least that long; shifting by $e_K$ crosses at most one jump.
+This proves the growth inequality. Integrating the profile gives
+$\psi(u_1)=u_1=e_Kp/(p-1)$ and increments
+$\psi(u_{j+1})-\psi(u_j)=e_Kp^j$, proving the formula at every
+threshold. On $(u_j,u_{j+1}]$ the ratio $\psi(u)/A(u)$ is at
+least $e_K/(p-1)$. At a threshold the index is smaller, so the
+same bound holds. Its lower limit at infinity is positive,
+which is strict APF by definition.
+\end{proof}
+
+\begin{lemma}[Actual finite cyclotomic displacements at every prime]
+\label{ft:finite-cyclotomic-displacement}
+\source{serre-1979-local-fields:page-0085}
+\dcref{Serre, Chapter IV, Section 4, Propositions 17--18}
+\uses{ft:cyclotomic-total-ramification,ft:finite-cyclotomic-character,fw:totally-ramified-uniformizer-generation,fw:generator-evaluation,fw:norm-valuation}
+\lean{FalseTateExtension.norm_primitive_cyclotomic_sub_one, FalseTateExtension.normalizedValuation_primitive_cyclotomic_sub_one, FalseTateExtension.normalizedValuation_primitive_cyclotomic_pow_sub_one, FalseTateExtension.cyclotomic_exponent_decomposition, FalseTateExtension.normalizedValuation_primitive_cyclotomic_root, FalseTateExtension.normalizedValuation_cyclotomic_displacement_of_exponent, FalseTateExtension.normalizedValuation_cyclotomic_displacement, FalseTateExtension.cyclotomicUniformizer_adjoin_spectral, FalseTateExtension.ramificationOrder_cyclotomic_of_exponent, FalseTateExtension.ramificationOrder_cyclotomic}
+\leanok
+For every prime $p$, let $m\geq1$, $E_m=\mathbb Q_p(\zeta_m)$
+and normalize $v_{E_m}$ to have value group $\mathbb Z$.
+For every primitive $p^m$-th root $\zeta\in E_m$,
+\[
+ N_{E_m/\mathbb Q_p}(\zeta-1)=(-1)^{\varphi(p^m)}p,
+ \qquad v_{E_m}(\zeta^{p^s}-1)=p^s\quad(0\leq s<m).
+\]
+The actual integer ring is generated by $\zeta_m-1$. If a
+nonidentity automorphism has character $a\in(\mathbb Z/p^m)^\times$,
+then its actual ramification order is
+\[
+ j(g)=p^{v_p(\widetilde a-1)},\qquad v_p(\widetilde a-1)<m,
+\]
+where $\widetilde a\in\{1,\ldots,p^m-1\}$ is the canonical
+unit representative. This includes $p=2,m=1$, whose group is
+trivial and whose signed norm is $-2$.
+\end{lemma}
+\begin{proof}
+The minimal polynomial of $\zeta-1$ is
+$\Phi_{p^m}(1+X)$, with constant term $p$ and degree
+$\varphi(p^m)$. Its constant coefficient gives the signed norm.
+The normalized norm identity and residue degree one show that
+$\zeta-1$ is a uniformizer. For $s<m$, the root $\zeta^{p^s}$
+is primitive of order $p^{m-s}$. The field it generates is a
+totally ramified subfield of degree $\varphi(p^{m-s})$.
+Restriction of normalized valuation therefore multiplies its
+uniformizer order by
+$\varphi(p^m)/\varphi(p^{m-s})=p^s$, proving the power formula.
+The uniformizer generator theorem gives generation of the
+actual integer ring.
+
+For a nonidentity unit $a$, its representative differs from one.
+Write $\widetilde a=1+p^s b$ with $p\nmid b$; its size implies
+$s<m$. The element $\zeta_m^b$ is still primitive of order
+$p^m$. The identity
+\[
+ \zeta_m^{\widetilde a}-\zeta_m
+ =\zeta_m\bigl((\zeta_m^b)^{p^s}-1\bigr)
+\]
+and unit valuation of $\zeta_m$ give displacement order $p^s$.
+The actual integral generator computes the ramification order
+from precisely this displacement. The identity automorphism has
+infinite order and is treated separately; no $p$-adic order of
+zero is used.
+\end{proof}
+
+\begin{proposition}[The finite rational cyclotomic filtration at every prime]
+\label{ft:finite-rational-cyclotomic-filtration}
+\source{serre-1979-local-fields:page-0085}
+\dcref{Serre, Chapter IV, Section 4, Proposition 18 and upper numbering}
+\uses{ft:finite-cyclotomic-displacement,ft:finite-cyclotomic-character,fw:herbrand-functions,fw:real-lower-groups,fw:finite-upper-groups}
+\lean{FalseTateExtension.mem_lowerRamificationGroup_cyclotomic_iff, FalseTateExtension.mem_lowerRamificationGroupReal_cyclotomic_iff, FalseTateExtension.cyclotomicUnitReduction_ker_index, FalseTateExtension.cyclotomicUnitReduction_ker_card, FalseTateExtension.mem_cyclotomicUnitReduction_ker_iff, FalseTateExtension.lowerRamificationGroup_cyclotomic_eq_comap_unitReduction, FalseTateExtension.lowerRamificationGroup_cyclotomic_index, FalseTateExtension.lowerRamificationGroup_cyclotomic_zero, FalseTateExtension.lowerRamificationGroup_cyclotomic_map_character, FalseTateExtension.lowerRamificationGroup_cyclotomic_card, FalseTateExtension.lowerRamificationGroupReal_cyclotomic_threshold, FalseTateExtension.lowerRamificationGroupReal_cyclotomic_constant, FalseTateExtension.lowerRamificationGroupReal_cyclotomic_card_on, FalseTateExtension.integral_cyclotomic_lower_slope, FalseTateExtension.herbrandFunction_cyclotomic_threshold, FalseTateExtension.upperRamificationGroup_cyclotomic_eq_comap_unitReduction, FalseTateExtension.upperRamificationGroup_cyclotomic_index, FalseTateExtension.upperRamificationGroup_cyclotomic_card, FalseTateExtension.upperRamificationGroup_cyclotomic_zero, FalseTateExtension.upperRamificationGroup_cyclotomic_eq_bot}
+\leanok
+In $E_m/\mathbb Q_p$ let $G=\operatorname{Gal}(E_m/\mathbb Q_p)$
+and identify it by its actual character. Then $G_0=G$, and for
+$0\leq r\leq m$,
+\[
+ G_{p^r-1}=\ker\bigl(G\longrightarrow(\mathbb Z/p^r)^\times\bigr),
+ \quad [G:G_{p^r-1}]=\varphi(p^r),\quad
+ \varphi_{E_m/\mathbb Q_p}(p^r-1)=r.
+\]
+For $r\geq1$ the displayed subgroup has order $p^{m-r}$.
+The real lower group is constant on
+$(p^r-1,p^{r+1}-1]$. For $0\leq r<m$ and $r<u\leq r+1$,
+\[
+ G^u=\ker\bigl(G\longrightarrow(\mathbb Z/p^{r+1})^\times\bigr),
+ \quad [G:G^u]=\varphi(p^{r+1}),\quad |G^u|=p^{m-r-1}.
+\]
+Moreover $G^0=G$ and $G^u=1$ for $u>m-1$.
+All assertions hold at every prime and retain their closed right
+endpoints. Here $m$ is the positive cyclotomic level.
+\end{proposition}
+\begin{proof}
+The displacement formula gives $g\in G_t$ exactly when $g=1$
+or $t+1\leq p^{v_p(\widetilde a-1)}$. At $t=p^r-1$ this is
+exactly $a\equiv1\pmod{p^r}$, including $r=0$ and the identity.
+Reduction of units modulo prime powers is surjective: every unit
+class has a representative prime to $p$, which remains a unit
+at the higher level. Thus its kernel has index $\varphi(p^r)$;
+for $r>0$ division of the two group orders gives $p^{m-r}$.
+The same displacement powers show constancy on each indicated
+real interval, with the closed right endpoint.
+
+On $(p^r-1,p^{r+1}-1]$, for $r<m$, the lower subgroup has order
+$p^{m-r-1}$. The interval length is $(p-1)p^r$ and $|G_0|$ is
+$(p-1)p^{m-1}$, so the integral of $|G_t|/|G_0|$ over it is
+exactly one. Starting at $\varphi(0)=0$ and adding consecutive
+integrals gives $\varphi(p^r-1)=r$ for $0\leq r\leq m$.
+Strict increase and the actual inverse identities then put
+$\psi(u)$ in $(p^r-1,p^{r+1}-1]$ exactly when $r<u\leq r+1$.
+The upper-group definition gives the claimed kernels and orders.
+For $u>m-1$ the group is trivial through $u=m$, and monotonicity
+makes it trivial thereafter. The equality at zero follows from
+full inertia. These arguments include the trivial first dyadic
+layer without omitting any interval.
+\end{proof}
+
+\begin{lemma}[Cyclotomic upper-index growth over a finite base]
+\label{ft:direct-cyclotomic-growth}
+\uses{ft:cyclotomic-total-ramification,ft:finite-cyclotomic-character,ft:finite-rational-cyclotomic-filtration,ft:cyclotomic-image-open,fw:absolute-finite-base-upper,fw:apf-finite-extension,fw:apf-finite-base,fw:apf-finite-slope,fw:strict-apf-finite-base,fw:inertia-relative-index,fw:abstract-normed-finite-base,fw:finite-base-eventual-ramification-slope,fw:apf-finite-stages}
+\lean{FalseTateExtension.mem_upperRamificationGroupInfinite_cyclotomic_iff, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_eq_ker, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_zero, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_of_nonpos, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_eq_character_ker, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_map_character, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_index, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_finiteIndex, FalseTateExtension.isAPF_cyclotomicExtension_padic, FalseTateExtension.apfIndex_cyclotomicExtension_padic, FalseTateExtension.upperRamificationGroupInfinite_cyclotomic_index_add_one, FalseTateExtension.apfIndex_cyclotomicExtension_padic_add_one, FalseTateExtension.isStrictlyAPF_cyclotomicExtension_padic, FalseTateExtension.mem_cyclotomicLayer_of_pow_eq_one, FalseTateExtension.rationalCyclotomicEmbedding, FalseTateExtension.cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding, FalseTateExtension.rationalCyclotomicEmbedding_adjoin_base, FalseTateExtension.rationalCyclotomicEmbedding_finiteDimensional, FalseTateExtension.isStrictlyAPF_cyclotomicExtension_over_padic, FalseTateExtension.isStrictlyAPF_cyclotomicExtension, FalseTateExtension.isAPF_cyclotomicExtension, FalseTateExtension.cyclotomicCharacter_map_upper_autCongr, FalseTateExtension.cyclotomicExtension_map_upper_from_algebraicClosure, FalseTateExtension.cyclotomicCharacter_map_upperRamificationGroupInfinite, FalseTateExtension.cyclotomicCharacter_map_upper_finiteBase, FalseTateExtension.cyclotomicExtension_map_upper_finiteBase, FalseTateExtension.exists_cyclotomicExtension_upper_principal_finiteBase, FalseTateExtension.exists_cyclotomicExtension_upper_index_finiteBase, FalseTateExtension.exists_upperRamificationGroupInfinite_cyclotomic_index_add_ramificationIdx}
+\leanok
+For every prime $p$ and finite $K/\mathbb Q_p$, the extension
+$C=K^{\mathrm{cyc}}/K$ is strictly APF. Write
+$H=\Gal(C/K)$ in its actual cyclotomic character and let
+$B(u)=[H:H^u]$ for $u\geq0$. These are finite indices and,
+for all sufficiently large $u$,
+\[
+ B(u+e_K)=p B(u).
+\]
+\end{lemma}
+\begin{proof}
+First take $K=\mathbb Q_p$. In the layer generated by a primitive
+$p^n$-th root $\zeta$, the element $\zeta-1$ is a uniformizer.
+For a nonidentity exponent $a$, put $j=v_p(a-1)<n$.
+The primitive-root valuation gives
+$v(\zeta^{a-1}-1)=p^j$, hence its lower break is $p^j-1$.
+For odd $p$, the first positive lower interval has length $p-1$
+and inertia index $p-1$, and subsequent intervals have length
+$(p-1)p^j$ and index $(p-1)p^j$. Every such interval has upper
+length one. For $p=2$, all units already lie in the first
+principal-unit group: the initial positive interval has length
+one and index one, and each subsequent interval again has upper
+length one. The level $n=1$ at $p=2$ is trivial. Thus in the
+infinite rational tower the actual character image at $u>0$ is
+$1+p^{\lceil u\rceil}\mathbb Z_p$ at every prime. These open
+groups prove APF. Their index grows by a factor $p$ on shifting
+$u$ by one. Integrating over the preceding unit interval gives
+a positive eventual lower bound for $\psi(u)/a(u)$; explicitly
+$\psi(u)\geq a(u-1)\geq a(u)/p$ for $u$ sufficiently large.
+This proves rational strict APF.
+
+Put $C_0=\mathbb Q_p(\mu_{p^\infty})$ and $N=KC_0$ inside the
+same algebraic closure. The extension $N/C_0$ is finite, so finite-top
+strictness gives strict APF for $N/\mathbb Q_p$; finite-base
+strictness then gives it for $N/K=C/K$. This handles a base $K$
+which is not contained in $C_0$. To obtain the
+quantitative assertion, put $v=\varphi_{K/\mathbb Q_p}(u)$.
+After the last break of a finite Galois closure of $K/\mathbb Q_p$,
+the rational absolute upper group is contained in the actual fixing
+group of $K$. Absolute finite base change therefore identifies its
+image in the cyclotomic character with the actual group $H^u$,
+where $u=\psi_{K/\mathbb Q_p}(v)$. The finite-base inverse function
+has eventual slope $e_K$: once the absolute upper group lies in
+the fixing group of $K$, its intrinsic index is the fixed index
+of the base inertia modulo its intersection with that fixing
+group. Projection to a finite Galois closure and the actual
+inertia-relative index formula identify this index with
+$e(K/\mathbb Q_p)=e_K$. Integrating this constant tail gives
+$\psi_{K/\mathbb Q_p}(v)=e_Kv+c$ for a fixed $c$. Replacing $u$
+by $u+e_K$ consequently replaces $v$ by $v+1$. The rational
+principal-unit formula gives precisely the factor $p$ in the
+displayed full index $[H:H^u]$. More precisely, put
+$D=[\mathbb Z_p^\times:\chi(H)]$, which is a positive finite
+integer by openness of the actual character image. Equality of the
+upper character images gives
+$B_K(\psi_{K/\mathbb Q_p}(v))D=B_{\mathbb Q_p}(v)$.
+The two formulas at $v$ and $v+1$, together with the rational
+shift identity, give equal products with $D$; cancellation of
+this positive integer proves the assertion.
+\end{proof}
+
+\begin{lemma}[The actual false Tate affine indices]
+\label{ft:direct-affine-index-comparison}
+\source{wintenberger:page-0005}
+\dcref{Local application of the closed affine index comparison to the actual upper groups}
+\uses{ft:affine-embedding,ft:cyclotomic-image-open,ft:closed-affine-index-comparison,ft:affine-zero-kernel-isomorphism,ft:direct-kummer-profile,ft:direct-cyclotomic-growth,fw:infinite-upper-restriction,fw:galois-apf-criterion}
+\lean{FalseTateExtension.falseTateAffineImage, FalseTateExtension.falseTateAffineEquiv, FalseTateExtension.falseTateAffineEquiv_apply, FalseTateExtension.falseTateAffineEquiv_projection, FalseTateExtension.falseTateAffineImage_projection_range, FalseTateExtension.kummerExtension_le_falseTateExtension, FalseTateExtension.falseTateKummerInclusion, FalseTateExtension.falseTateKummerFixing, FalseTateExtension.mem_falseTateKummerFixing_iff, FalseTateExtension.falseTateAffineEquiv_mem_pureUnits, FalseTateExtension.falseTateKummerFixing_map_affine, FalseTateExtension.falseTateAffineImage_projection_infinite, FalseTateExtension.padicCyclotomicCharacter_injective_of_translationKernel_eq_bot, FalseTateExtension.falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot, FalseTateExtension.falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot, FalseTateExtension.apfSubgroup_fieldRange_index_eq_falseTateFixing_sup_upper, FalseTateExtension.falseTateCharacter_map_upperRamificationGroupInfinite, FalseTateExtension.cyclotomicRestriction_map_upperRamificationGroupInfinite, FalseTateExtension.falseTateAffine_upper_projection_index, FalseTateExtension.falseTateAffine_upper_radical_index, FalseTateExtension.exists_falseTate_upper_index_comparison, FalseTateExtension.falseTate_upper_index_of_translationKernel_eq_bot}
+\leanok
+Let $G\subseteq\mathbb Z_p\rtimes\mathbb Z_p^\times$ be the
+actual closed affine image of the false Tate group, let $H$ be
+its unit projection, $M$ its translation kernel, and
+$S=G\cap(\{0\}\rtimes\mathbb Z_p^\times)$.
+Write $U(u)$ for its actual upper ramification group, and put
+\[
+ A(u)=a_{K^{\mathrm{Kum}}/K}(u),\qquad
+ B(u)=[\operatorname{Gal}(K^{\mathrm{cyc}}/K):
+                 \operatorname{Gal}(K^{\mathrm{cyc}}/K)^u].
+\]
+Then $S$ is the actual radical fixing subgroup,
+$[G:SU(u)]=A(u)$ for $u\geq0$, and
+$[H:\chi(U(u))]=B(u)$ for $u\geq-1$.
+If $M\ne0$, there are positive integers $C,D$ such that, for
+all $u\geq0$, $[G:U(u)]$ is finite and
+\[
+ A(u)B(u)\leq D[G:U(u)],\qquad
+ [G:U(u)]\leq C A(u)B(u).
+\]
+If $M=0$, the actual false Tate extension equals its
+cyclotomic subextension and $[G:U(u)]=B(u)$ for $u\geq-1$.
+\end{lemma}
+\begin{proof}
+The faithful continuous affine map from the original compact Galois
+group gives a topological group isomorphism onto its closed image.
+An automorphism fixes every compatible radical exactly when each
+finite Kummer exponent vanishes, equivalently when its $p$-adic
+translation coordinate is zero. Thus its actual radical fixer
+maps exactly to $S$.
+Ordinary upper restriction from a common algebraic closure identifies
+the upper character images for the actual false Tate and cyclotomic
+fields. The character on the cyclotomic group is injective. Its image
+has positive finite index in the full unit group, so cancellation
+of that common positive index gives $[H:\chi(U(u))]=B(u)$.
+Likewise, restriction to the original false Tate field identifies the
+full radical APF product index with $[G:SU(u)]$. The radical tower
+is totally ramified, so its full product index is exactly the
+intrinsic inertia index $A(u)$.
+The actual unit projection is infinite: the full $p$-adic unit
+group is infinite, while the actual cyclotomic image has finite
+index. For $M\ne0$, both $A(u)$ and $B(u)$ are positive finite
+by the already proved radical and cyclotomic APF assertions.
+Apply the closed affine index comparison to the actual closed
+normal group $U(u)$. It produces finite index and the two bounds.
+For $M=0$, the actual cyclotomic character is injective, hence
+its original field restriction has trivial fixing subgroup.
+Infinite Galois correspondence makes the cyclotomic subfield the
+entire original false Tate field. The projection isomorphism and
+the already proved projection-index equality also give the final
+index formula.
+\end{proof}
+
+\begin{lemma}[Bounded index growth implies strict APF]
+\label{ft:direct-index-growth-strictness}
+\uses{fw:apf-bounded-index-growth}
+\lean{FontaineWintenberger.isStrictlyAPF_of_apfIndex_boundedGrowth}
+\leanok
+Let $L/K$ be APF, with intrinsic inertia index $a(u)$.
+If there are $h>0$, $Q\geq1$ and $U\geq0$ such that
+$a(u+h)\leq Q a(u)$ for every $u\geq U$, then $L/K$ is
+strictly APF.
+\end{lemma}
+\begin{proof}
+For $v\geq U+h$, monotonicity of the actual index and its integral
+formula give
+\[
+ \psi_{L/K}(v)=\int_0^v a(t)\,dt
+ \geq\int_{v-h}^v a(t)\,dt
+ \geq h a(v-h)\geq\frac hQ a(v).
+\]
+The first inequality uses nonnegativity of the integral over
+$[0,v-h]$. Dividing by the positive finite index shows that
+the lower limit of the strictness ratio is at least $h/Q>0$.
+This proves strict APF directly from its definition, including
+extensions with a finite initial unramified or tame part.
+\end{proof}
+
+\begin{theorem}[Strict arithmetic profiniteness]
+\label{ft:strict-apf}
+\uses{ft:direct-kummer-profile,ft:direct-cyclotomic-growth,ft:direct-affine-index-comparison,ft:direct-index-growth-strictness,fw:galois-apf-criterion,fw:infinite-upper-restriction,fw:apf-inertia-indices}
+\lean{FalseTateExtension.isAPF_falseTateExtension, FalseTateExtension.exists_falseTate_upper_index_boundedGrowth, FalseTateExtension.falseTate_upper_index_eq_apfIndex_mul_inertia_index, FalseTateExtension.exists_falseTate_apfIndex_boundedGrowth, FalseTateExtension.isStrictlyAPF_falseTateExtension, FalseTateExtension.isStrictlyAPF_falseTateExtension_of_finiteDimensional, FalseTateExtension.isAPF_falseTateExtension_of_finiteDimensional, FalseTateExtension.isStrictlyAPF_kummerExtension, FalseTateExtension.isStrictlyAPF_cyclotomicExtension}
+\leanok
+\source{wintenberger:page-0005}
+\dcref{Wintenberger, Definition 1.2.1 and Proposition 1.2.3; direct radical and affine argument}
+For every prime $p$, the extensions $K^{\mathrm{FT}}_\infty/K$,
+$K^{\mathrm{cyc}}/K$, and $K^{\mathrm{Kum}}/K$ are strictly APF.
+\end{theorem}
+\begin{proof}
+The radical and cyclotomic assertions follow from the direct profiles
+just proved. Write $G$ for the actual false Tate group in its closed
+affine image. If its translation kernel is zero, the extension
+equals its cyclotomic subextension and the assertion follows.
+Otherwise use the fixed constants $C,D$ of the affine index
+comparison. For its actual closed normal upper group $I(u)$,
+ordinary upper restriction identifies
+\[
+ [G:S I(u)]=A(u),\qquad [H:\chi(I(u))]=B(u),
+\]
+with the actual radical and cyclotomic full indices. The former
+equals the intrinsic radical index because that tower is totally
+ramified. Both are finite by the two APF assertions. The comparison
+therefore proves $[G:I(u)]$ finite for every $u\geq0$; it is
+also finite for $-1\leq u<0$ by monotonicity. The intrinsic Galois
+criterion gives APF of the actual false Tate extension.
+
+For all sufficiently large $u$, the two explicit growth bounds give
+\[
+ [G:I(u+e_K)]\leq C A(u+e_K)B(u+e_K)
+ \leq Cp^2 A(u)B(u)\leq CDp^2[G:I(u)].
+\]
+The actual intrinsic inertia index is
+$a(u)=[G:I(u)]/[G:I(0)]$. Its fixed positive denominator cancels,
+so the same bound holds for $a$. Apply bounded-index-growth
+strictness with $h=e_K>0$ and $Q=CDp^2$.
+This argument uses the prime-degree different identity, the actual
+radical profile and the affine action at every prime; it does not
+require total ramification of the full tower over a general base.
+\end{proof}
+
+\subsection{Quotient compatibility in a totally ramified tower}
+
+For the finite calculations we use the totally ramified specializations of
+Lemmas~\ref{fw:totally-ramified-uniformizer-generation},
+\ref{fw:integral-fraction-generator} and~\ref{fw:generator-evaluation},
+the coset average of Lemma~\ref{fw:coset-ramification-average}, and
+Theorems~\ref{fw:herbrand-lower-quotients},
+\ref{fw:herbrand-transitivity} and~\ref{fw:herbrand-quotients}.
+These results apply to the actual local fields here. In a totally ramified
+tower inertia is the full Galois group, so the coset-average denominator is
+the order of the relative Galois group. These are the totally ramified
+cases of Serre\textquotesingle s quotient theorem
+\cite[Chapter IV, Sections 1 and 3]{Serre1979}.
+
+\section{Finite diagonal affine quotients}
+
+\begin{lemma}[The actual diagonal finite affine quotient]
+\label{ft:diagonal-finite-affine-structure}
+\uses{ft:galois-structure,ft:finite-coordinates,ft:galois-layers,ft:extensions,fw:profinite-galois-foundations}
+\lean{FalseTateExtension.finiteDiagonalGaloisEquiv, FalseTateExtension.finrank_falseTateLayer_diagonal, FalseTateExtension.finrank_falseTateLayer_over_cyclotomic, FalseTateExtension.finiteDiagonalGaloisEquiv_mem_translations, FalseTateExtension.finiteDiagonalGaloisEquiv_mem_units}
+\leanok
+\source{liu-2008-lattices:page-0022,liu-2008-lattices:page-0023}
+\dcref{Finite-quotient consequence of Liu, Lemma 5.1.2}
+Let $p\geq3$, let $K/\mathbb Q_p$ be finite, and let $\pi$ be a
+uniformizer of $K$. For $n\geq1$ put
+\[
+ C_{K,n}=K(\zeta_n),\qquad D_{K,n}=K(\pi_n,\zeta_n),
+\]
+and let $H_{K,n}\subseteq(\mathbb Z/p^n\mathbb Z)^\times$ be the
+actual image of the cyclotomic character of $\operatorname{Gal}(C_{K,n}/K)$.
+The action on these two generators identifies the original finite
+Galois group with
+\[
+ \operatorname{Gal}(D_{K,n}/K)
+ \simeq (\mathbb Z/p^n\mathbb Z)\rtimes H_{K,n},
+ \qquad (b,u)(c,v)=(b+uc,uv),
+\]
+where $(b,u)$ acts by
+$\pi_n\mapsto\zeta_n^b\pi_n$ and $\zeta_n\mapsto\zeta_n^u$.
+Consequently
+\[
+ [D_{K,n}:K]=p^n[C_{K,n}:K],\qquad
+ [D_{K,n}:C_{K,n}]=p^n.
+\]
+In these same coordinates the subgroup fixing $C_{K,n}$ is the full
+translation group and the subgroup fixing $K(\pi_n)$ is the pure-unit
+subgroup $\{0\}\rtimes H_{K,n}$.
+\end{lemma}
+\begin{proof}
+The field $D_{K,n}$ is the splitting field of $X^{p^n}-\pi$ over $K$:
+it contains all its roots $\zeta_n^b\pi_n$, and conversely these roots
+supply $\pi_n$ and their quotients supply $\zeta_n$.
+The polynomial is separable in characteristic zero, so the extension is
+finite Galois. Its normalized finite action coordinates are injective,
+since fixing both generators fixes the whole field. Applying two
+automorphisms to the generators gives the displayed affine product.
+
+Write $H_K$ for the actual infinite cyclotomic character image.
+Every automorphism of $C_{K,n}/K$ extends to the cyclotomic union,
+by Galois restriction; hence the reduction of $H_K$ modulo $p^n$
+is exactly $H_{K,n}$. Given $b\in\mathbb Z/p^n\mathbb Z$ and
+$u\in H_{K,n}$, lift $b$ to $\beta\in\mathbb Z_p$ and lift $u$
+to $h\in H_K$. The proved infinite Galois structure gives an actual
+automorphism of the original false Tate union with coordinates
+$(\beta,h)$. Its restriction to the stable diagonal field $D_{K,n}$
+has exactly the prescribed finite coordinates $(b,u)$.
+Thus the finite action map is onto the entire displayed semidirect
+product, rather than merely onto a subgroup.
+
+The finite cyclotomic character is injective, since $\zeta_n$
+generates $C_{K,n}$. Thus $|H_{K,n}|=[C_{K,n}:K]$.
+The cardinality of the finite affine group and the finite Galois degree
+formula give the first degree equality; degree multiplicativity gives
+the second. Finally primitivity of $\zeta_n$ and nonzeroness of
+$\pi_n$ show that fixing $\pi_n$ is equivalent to $b=0$, and fixing
+$\zeta_n$ is equivalent to $u=1$. These are the asserted original
+fixing subgroups. This finite-quotient argument uses the full normalized
+infinite coordinates and the actual finite cyclotomic image.
+\end{proof}
+
+\section{Finite radical layers over the rational p-adic field}
+
+Throughout this section $p$ is odd and $a\in\mathbb Z$ satisfies
+$v_p(a)=1$. The calculation follows the extensions considered in
+\cite[Section 6]{Viviani2004}. We recover the translation depth of each
+actual upper group from the intrinsic indices of the pure radical
+subfields. The finite Galois-overfield index identity relates these two
+quantities, including every right endpoint. This replaces the inductive
+mixed-tower calculation while keeping the original fields and groups.
+
+\begin{notation}[Finite radical fields and affine coordinates]
+\label{ft:finite-radical-setup}
+\uses{ft:extensions}\lean{FalseTateExtension.finiteTranslationSubgroup, FalseTateExtension.finiteTranslationSubgroup_card, FalseTateExtension.finiteUnitSubgroup, FalseTateExtension.finiteAffineSubgroup, FalseTateExtension.irreducible_integerParameter}
+\leanok
+Choose compatible elements $\alpha_s$ with $\alpha_s^{p^s}=a$ and
+$\alpha_{s+1}^p=\alpha_s$, and compatible primitive roots $\zeta_n$ of
+order $p^n$. For $n\geq1$ and $1\leq s\leq n$ put
+\[
+ F_s=\mathbb Q_p(\alpha_s),\qquad
+ C_n=\mathbb Q_p(\zeta_n),\qquad
+ L_n(a)=C_n(\alpha_n),\qquad
+ G_n=\operatorname{Gal}(L_n(a)/\mathbb Q_p).
+\]
+Put $F_0=\mathbb Q_p$. In the affine group
+$A_n=(\mathbb Z/p^n\mathbb Z)\rtimes(\mathbb Z/p^n\mathbb Z)^\times$
+the product is $(b,u)(c,v)=(b+uc,uv)$. Write
+\[
+ T_k=p^k\mathbb Z/p^n\mathbb Z\quad(0\leq k\leq n),\qquad
+ U_0=(\mathbb Z/p^n\mathbb Z)^\times,\qquad
+ U_j=1+p^j\mathbb Z/p^n\mathbb Z\quad(j\geq1).
+\]
+Thus $T_n=\{0\}$ and $U_j=\{1\}$ for $j\geq n$.
+The notation $C(p^b)$ denotes $T_{n-b}$, a cyclic group of order $p^b$.
+\end{notation}
+
+\begin{lemma}[Finite Galois structure]
+\label{ft:finite-galois-structure}
+\uses{ft:extensions,ft:diagonal-finite-affine-structure,ft:finite-cyclotomic-character}\lean{FalseTateExtension.finiteDiagonalGaloisEquiv_padic, FalseTateExtension.finiteDiagonalGaloisEquiv_padic_left, FalseTateExtension.finiteDiagonalGaloisEquiv_padic_right, FalseTateExtension.finrank_falseTateLayer_diagonal_padic, FalseTateExtension.finiteDiagonalGaloisEquiv_padic_mem_translations, FalseTateExtension.finiteDiagonalGaloisEquiv_padic_mem_units}
+\leanok
+\source{liu-2008-lattices:page-0022,liu-2008-lattices:page-0023}
+\dcref{Rational-base specialization of the finite affine quotient}
+For $n\geq1$, the extension $L_n(a)/\mathbb Q_p$ is Galois and the rules
+\[
+ \sigma(\alpha_n)=\zeta_n^b\alpha_n,\qquad
+ \sigma(\zeta_n)=\zeta_n^u
+\]
+identify $G_n$ with $A_n$. In particular,
+$[L_n(a):\mathbb Q_p]=p^n(p-1)p^{n-1}$.
+The full translation subgroup is precisely
+$\operatorname{Gal}(L_n(a)/C_n)$, and the pure-unit subgroup
+$\{0\}\rtimes U_0$ is precisely $\operatorname{Gal}(L_n(a)/F_n)$.
+\end{lemma}
+\begin{proof}
+The element $a$ has normalized valuation one in $\mathbb Q_p$, so it
+is a uniformizer. Apply the preceding diagonal quotient lemma with
+$K=\mathbb Q_p$ and $\pi=a$, using the specified compatible roots.
+The finite rational cyclotomic character is onto the whole unit group,
+so $H_{K,n}=U_0$. Its order is $(p-1)p^{n-1}$.
+The affine isomorphism, its degree formula, and its actual pure-unit
+fixing subgroup give every assertion, including at $n=1$.
+\end{proof}
+
+\begin{lemma}[Commutators act trivially on a rational residue extension]
+\label{ft:finite-rational-residue-commutators}
+\uses{fw:local-inertia-size,fw:local-dvr-degree-identity}
+\lean{FalseTateExtension.finite_spectralResidue_padic, FalseTateExtension.isCyclic_rationalResidueGaloisImage, FalseTateExtension.commutator_mem_inertia_padic}
+\leanok
+\source{serre-1979-local-fields:page-0069}
+\dcref{Finite-field consequence of the residue action in Chapter IV, Section 1}
+For a finite Galois extension $E/\mathbb Q_p$, let $G$ be its actual
+Galois group and let $I=G_0$ be its actual inertia subgroup.
+The image of the action of $G$ on $k_E$ is cyclic, and every
+commutator of $G$ belongs to $I$.
+\end{lemma}
+\begin{proof}
+The residue field $k_E$ is a finite extension of $k_{\mathbb Q_p}=\mathbb F_p$,
+since its degree is finite by the local degree identity. Write
+$|k_E|=p^f$. The Frobenius $x\mapsto x^p$ is an automorphism,
+and its order is exactly $f$: its $f$th power is the identity,
+whereas for $0<r<f$ the polynomial $X^{p^r}-X$ has fewer than
+$p^f$ roots and hence cannot vanish on all of $k_E$.
+The finite field extension is simple of degree $f$, so an automorphism
+is determined by a root of the minimal polynomial of a generator.
+There are at most $f$ such automorphisms. The $f$ distinct Frobenius
+powers therefore give its entire automorphism group, which is cyclic.
+
+Every automorphism of $E/\mathbb Q_p$ preserves the unique extended
+valuation and hence induces an automorphism of $k_E$ fixing $\mathbb F_p$.
+Its kernel consists exactly of those automorphisms satisfying
+$g(x)-x\in\mathfrak m_E$ for every $x\in\mathcal O_E$; this is the
+original ideal definition of $G_0$.
+The residue image is a subgroup of the cyclic group just described,
+so is cyclic and in particular abelian. Every commutator is consequently
+in the kernel $I$. No surjectivity of the residue action is needed.
+\end{proof}
+
+\begin{theorem}[Total ramification]
+\label{ft:total-ramification}
+\uses{ft:finite-galois-structure,ft:cyclotomic-total-ramification,ft:finite-rational-residue-commutators,fw:inertia-residue-index}
+\lean{FalseTateExtension.lowerRamificationGroup_falseTateLayer_zero, FalseTateExtension.falseTateLayer_spectral_residueDegree, FalseTateExtension.falseTateLayer_spectral_ramificationIdx, FalseTateExtension.falseTateExtension_residue_algebraMap_surjective, FalseTateExtension.falseTateExtension_residueDegree_padic, FalseTateExtension.finiteSubextension_falseTate_residueDegree_padic, FalseTateExtension.finiteSubextension_falseTate_ramificationIdx_padic}
+\leanok\source{viviani-2004-radical-extensions:page-0032}
+\dcref{Viviani, Corollary 6.2; odd-prime affine proof}
+For every odd prime $p$ and every $n\geq1$, $L_n(a)/\mathbb Q_p$ is
+totally ramified. Consequently $\bigcup_nL_n(a)/\mathbb Q_p$ is totally
+ramified, including the false Tate extension obtained by taking $a=p$.
+\end{theorem}
+\begin{proof}
+Let $I=(G_n)_0$ be the original inertia subgroup. Every commutator
+belongs to $I$ by the preceding finite residue-action lemma.
+Since $p$ is odd, $2$ is a unit modulo $p^n$, and the actual affine
+coordinates give
+\[
+ [(0,2),(b,1)]=(b,1)\qquad(b\in T_0).
+\]
+Thus $T_0\subseteq I$. Its actual fixed field is $C_n$, by the
+finite affine fixing-subgroup identity.
+The residue-index formula in the actual finite Galois overfield
+$L_n(a)$ gives
+\[
+ 1=f(C_n/\mathbb Q_p)=[G_n:T_0I]=[G_n:I],
+\]
+where the first equality is cyclotomic total ramification.
+Hence $I=G_n$. The same residue-index formula for $L_n(a)$ itself
+now gives $f(L_n(a)/\mathbb Q_p)=1$, proving total ramification.
+Every finite subextension of the directed diagonal union is contained
+in some $L_n(a)$: put a finite set of its field generators in one
+common diagonal layer. Its residue field is therefore also $\mathbb F_p$.
+This proves the infinite assertion with the same explicit odd-prime
+restriction.
+\end{proof}
+
+\subsection{Intrinsic indices of the pure radical fields}
+
+\begin{lemma}[The complete finite pure-radical index profile]
+\label{ft:finite-radical-index-profile}
+\uses{ft:finite-radical-setup,ft:direct-radical-step,fw:apf-finite-base-index,fw:apf-finite-base-herbrand}
+\lean{FalseTateExtension.radicalTranslationDepth, FalseTateExtension.radicalLayer_apfIndex_eq_pow_translationDepth, FalseTateExtension.radicalTranslationDepth_interval, FalseTateExtension.radicalTranslationDepth_initial, FalseTateExtension.radicalTranslationDepth_tail}
+\leanok
+\source{viviani-2004-radical-extensions:page-0033,viviani-2004-radical-extensions:page-0034}
+\dcref{Intrinsic-index adaptation of the prime-radical tower calculation}
+Put $b_r=r+1/(p-1)$ for $r\geq1$. For every $n\geq0$ and $u\geq0$,
+the intrinsic index of the original pure radical field is
+\[
+ a_{F_n/\mathbb Q_p}(u)=p^{m_n(u)},\qquad
+ m_n(u)=\#\{r:1\leq r\leq n,\ b_r<u\}.
+\]
+Equivalently it is one on $[0,b_1]$, is $p^{\min(n,j)}$ on
+$(b_j,b_{j+1}]$ for $j\geq1$, and is $p^n$ after $b_n$ when $n\geq1$.
+The assertion for $n=0$ is the constant index one.
+\end{lemma}
+\begin{proof}
+The relative extension $F_{n+1}/F_n$ is a totally ramified degree-$p$
+extension with intrinsic index one through
+$t_n=p^{n+1}/(p-1)$ and $p$ after $t_n$, by the direct radical-step lemma
+with $e(\mathbb Q_p/\mathbb Q_p)=1$. This statement concerns the original
+nonnormal pure radical fields; no Galois hypothesis on $F_n/\mathbb Q_p$
+is used.
+
+Write $A_n=a_{F_n/\mathbb Q_p}$ and
+$\Psi_n=\psi_{F_n/\mathbb Q_p}$. The finite-base index identity gives
+\[
+ A_{n+1}(u)=A_n(u)
+ \begin{cases}
+ 1,&\Psi_n(u)\leq t_n,\\
+ p,&\Psi_n(u)>t_n.
+ \end{cases}
+\]
+For $n=0$, $A_0=1$ and $\Psi_0$ is the identity, so the first
+threshold is $b_1=p/(p-1)$.
+Suppose the displayed profile has been proved for $n$.
+Its integral at the next proposed threshold is
+\[
+ \Psi_n(b_{n+1})
+ =b_1+\sum_{r=1}^{n}p^r(b_{r+1}-b_r)
+ =\frac p{p-1}+\sum_{r=1}^{n}p^r
+ =\frac{p^{n+1}}{p-1}=t_n.
+\]
+The empty sum gives the same equality when $n=0$.
+The intrinsic inverse Herbrand function is strictly increasing.
+Thus the new factor is one exactly for $u\leq b_{n+1}$ and is $p$
+exactly for $u>b_{n+1}$. This proves the formula for $n+1$ by induction.
+Counting the strictly smaller thresholds gives the equivalent interval
+formulas, with the asserted finite-level truncation and right endpoints.
+The thresholds are the same as in Viviani's mixed Galois calculation;
+here they are obtained by the intrinsic nonnormal finite-base identities.
+\end{proof}
+
+\subsection{The upper filtration}
+
+\begin{lemma}[The cyclotomic upper filtration]
+\label{ft:cyclotomic-upper-filtration}
+\uses{ft:finite-radical-setup,ft:finite-rational-cyclotomic-filtration}
+\lean{FalseTateExtension.upperRamificationGroup_cyclotomic_zero, FalseTateExtension.upperRamificationGroup_cyclotomic_eq_comap_unitReduction, FalseTateExtension.upperRamificationGroup_cyclotomic_eq_bot}
+\leanok\source{serre-1979-local-fields:page-0085}
+\dcref{Serre, Chapter IV, Section 4}
+The upper filtration on $\operatorname{Gal}(C_n/\mathbb Q_p)=U_0$ is
+$U_0$ at $u=0$ and $U_{\lceil u\rceil}$ for $u>0$.
+\end{lemma}
+\begin{proof}
+The actual finite cyclotomic character is the identification with $U_0$.
+The proved rational cyclotomic filtration gives the whole group at zero
+and, for every positive real parameter $u$, exactly the units congruent
+to one modulo $p^{\lceil u\rceil}$ under this same character.
+This is $U_{\lceil u\rceil}$ by definition, with trivial group when
+$\lceil u\rceil\geq n$. In particular the first layer has trivial
+positive upper groups, and every right endpoint is included as stated.
+\end{proof}
+
+\begin{lemma}[Normal subgroups in affine coordinates]
+\label{ft:normal-affine-subgroup}\uses{ft:finite-radical-setup}\lean{FalseTateExtension.mem_finiteAffine_normal_iff, FalseTateExtension.finiteAffine_units_sup_index, FalseTateExtension.finiteAffine_normal_index}
+\leanok
+For a normal subgroup $N\leq A_n$, put
+$H=\iota_T^{-1}(N)\leq T_0$ and $V=\rho_U(N)\leq U_0$, where
+$\iota_T(b)=(b,1)$ and $\rho_U(b,u)=u$.
+Then $(b,u)\in N$ if and only if $b\in H$ and $u\in V$.
+Thus $N=H\rtimes V$, and
+\[
+ [A_n:U_0N]=[T_0:H],\qquad
+ [A_n:N]=[U_0:V][T_0:H].
+\]
+\end{lemma}
+\begin{proof}
+The prime is odd, so $2$ is a unit in $\mathbb Z/p^n\mathbb Z$.
+For $(b,u)\in N$, normality and the actual affine multiplication give
+\[
+ (0,2)(b,u)(0,2)^{-1}(b,u)^{-1}=(b,1)\in N.
+\]
+Multiplication by $(-b,1)$ then gives $(0,u)\in N$.
+If $u\in V$, choose a preimage $(c,u)\in N$ and apply this argument
+to obtain $(0,u)\in N$; if also $b\in H$, their product
+$(b,1)(0,u)=(b,u)$ belongs to $N$. This proves the membership assertion.
+Conjugating $(b,1)\in N$ by $(0,v)$ for arbitrary $v\in U_0$ shows
+that $H$ is stable under every unit. Consequently $U_0N=H\rtimes U_0$:
+every product has translation in $H$, and
+$(b,v)=(0,v)(v^{-1}b,1)$ proves the reverse inclusion.
+The genuine coordinate bijections identify the orders of
+$N$, $U_0N$ and $A_n$ with $|H||V|$, $|H||U_0|$ and
+$|T_0||U_0|$, respectively. Dividing these finite orders proves
+both index formulas.
+\end{proof}
+
+\begin{lemma}[The affine shape of the actual upper groups]
+\label{ft:finite-upper-structure}
+\uses{ft:finite-galois-structure,ft:normal-affine-subgroup,ft:finite-rational-cyclotomic-filtration,fw:finite-tower-upper-restriction}
+\lean{FalseTateExtension.finiteUpperAffineGroup, FalseTateExtension.finiteUpperAffine_unit_projection, FalseTateExtension.finiteUpperAffine_unit_interval, FalseTateExtension.finiteUpperAffine_unit_tail}
+\leanok
+For $n\geq1$ and $u>0$, let $N_n(u)$ be the image of the original
+group $G_n^u$ under its actual affine isomorphism, and put
+$H_n(u)=\iota_T^{-1}(N_n(u))\leq T_0$. Then $N_n(u)$ is normal and
+\[
+ N_n(u)=H_n(u)\rtimes U_{\lceil u\rceil}.
+\]
+\end{lemma}
+\begin{proof}
+An original upper group is an original lower group with its parameter
+changed by the finite Herbrand inverse, so it is normal.
+Its image under the actual Galois isomorphism is therefore normal.
+Restriction to the original cyclotomic subfield is the unit coordinate
+of this same isomorphism. The finite upper-restriction theorem identifies
+its image with the original cyclotomic upper group, which the checked
+cyclotomic filtration identifies as $U_{\lceil u\rceil}$.
+This formula includes every right endpoint and triviality when
+$\lceil u\rceil\geq n$. The preceding normal-coordinate splitting now
+gives exactly the displayed subgroup.
+\end{proof}
+
+\begin{lemma}[The intrinsic radical index measures actual translation depth]
+\label{ft:finite-upper-radical-index}
+\uses{ft:finite-upper-structure,ft:finite-galois-structure,ft:total-ramification,ft:finite-radical-index-profile,fw:finite-galois-overfield-apf}
+\lean{FalseTateExtension.finiteUpperAffine_translation_index}
+\leanok
+For $n\geq1$ and $u>0$,
+\[
+ a_{F_n/\mathbb Q_p}(u)
+ =[G_n:\operatorname{Gal}(L_n(a)/F_n)G_n^u]
+ =[T_0:H_n(u)]=p^{m_n(u)},
+\]
+where $m_n$ is the strict-threshold count of the radical index profile.
+\end{lemma}
+\begin{proof}
+Set $J=\operatorname{Gal}(L_n(a)/F_n)$, the actual pure-unit subgroup.
+The intrinsic finite Galois-overfield formula gives
+\[
+ a_{F_n/\mathbb Q_p}(u)
+ =[(G_n)_0:(J\cap(G_n)_0)G_n^u].
+\]
+Actual total ramification gives $(G_n)_0=G_n$, proving the first equality.
+In the actual affine coordinates, $J$ is $U_0$, and the preceding
+normal-coordinate index formula identifies $[G_n:JG_n^u]$ with
+$[T_0:H_n(u)]$. The already proved pure-radical index profile says
+$a_{F_n/\mathbb Q_p}(u)=p^{m_n(u)}$, giving the last equality.
+All indices therefore refer to the original fields and their actual
+upper groups.
+\end{proof}
+
+\begin{lemma}[The Kummer upper jumps]
+\label{ft:kummer-upper-jumps}
+\uses{ft:finite-radical-index-profile,ft:finite-upper-radical-index}
+\lean{FalseTateExtension.finiteUpperAffine_translation}
+\leanok
+For $n\geq1$ and $u>0$, the actual translation subgroup is
+$H_n(u)=T_{m_n(u)}$. In particular, put $k_n(u)=m_n(u)$.
+For $1\leq r\leq n$ and $b_r=r+1/(p-1)$,
+\[
+ k_n(u)<r\quad\Longleftrightarrow\quad 0<u\leq b_r,\qquad
+ k_n(u)=\#\{r:1\leq r\leq n,\ b_r<u\}.
+\]
+Thus the actual translation depth increases by exactly one immediately
+after each $b_r$, including the single jump when $n=1$.
+\end{lemma}
+\begin{proof}
+The actual translation group $T_0$ is cyclic of order $p^n$.
+The previous lemma computes $[T_0:H_n(u)]=p^{m_n(u)}$.
+The subgroup $T_{m_n(u)}$ has that same index, since
+$0\leq m_n(u)\leq n$. Subgroups of a finite cyclic group with the same
+index are equal, so $H_n(u)=T_{m_n(u)}$.
+The thresholds $b_1,\ldots,b_n$ are strictly increasing.
+Fewer than $r$ are strictly less than $u$ precisely when $u\leq b_r$,
+which proves the equivalence including its right endpoint.
+Crossing one threshold adds exactly that threshold to the count,
+proving the final assertion.
+\end{proof}
+
+\begin{theorem}[Upper ramification groups of the radical layers]
+\label{ft:upper-filtration}
+\uses{ft:kummer-upper-jumps,ft:finite-upper-structure,ft:total-ramification}
+\lean{FalseTateExtension.finiteUpperAffine_nonpos, FalseTateExtension.finiteUpperAffine_initial, FalseTateExtension.finiteUpperAffine_fractional, FalseTateExtension.finiteUpperAffine_integer, FalseTateExtension.finiteUpperAffine_fractional_integer, FalseTateExtension.finiteUpperAffine_integer_fractional, FalseTateExtension.finiteUpperAffine_final_interval, FalseTateExtension.finiteUpperAffine_eq_bot, FalseTateExtension.finiteUpperAffine_integerParameter_interval}
+\leanok\source{viviani-2004-radical-extensions:page-0034,viviani-2004-radical-extensions:page-0035}
+\dcref{Viviani, Theorem 6.5 and Corollary 6.10}
+Let $n\geq2$. At upper breaks the groups of $L_n(a)/\mathbb Q_p$ are
+\[
+\begin{aligned}
+ G_n^0&=C(p^n)\rtimes U_0,\\
+ G_n^1&=C(p^n)\rtimes U_1,\\
+ G_n^{i+1/(p-1)}&=C(p^{n-i+1})\rtimes U_{i+1},\\
+ G_n^{i+1}&=C(p^{n-i})\rtimes U_{i+1},\\
+ G_n^{n-1+1/(p-1)}&=C(p^2),\\
+ G_n^{n+1/(p-1)}&=C(p).
+\end{aligned}
+\]
+The two indexed rows have $1\leq i\leq n-2$. On each intervening open
+left, closed right interval the group equals its value at the right
+endpoint. Beyond the last break it is trivial.
+\end{theorem}
+\begin{proof}
+At $u=0$ total ramification gives the whole group. For $u>0$ the affine
+shape lemma gives the cyclotomic factor $U_{\lceil u\rceil}$; it drops
+immediately after the integers $1,\ldots,n-1$. The Kummer-jump lemma says
+that the translation depth is the number of elements of
+$\{r+1/(p-1):1\leq r\leq n\}$ strictly less than $u$.
+At $u=1$ this number is zero. At $u=i+1/(p-1)$ it is $i-1$; at
+$u=i+1$ it is $i$, since $0<1/(p-1)<1$. At the last two fractional
+breaks the cyclotomic factor is trivial and the translation depths are
+$n-2$ and $n-1$. These give every displayed group. There are no other
+drops in either factor, and both factors are trivial after the last break.
+\end{proof}
+
+\subsection{The lower indices and the first layer}
+
+\begin{lemma}[Fractional-break lower indices]
+\label{ft:fractional-break-index}
+\uses{ft:upper-filtration,fw:ramification-filtration}\lean{FalseTateExtension.inverseHerbrandFunction_falseTate_fractional}
+\leanok
+\source{viviani-2004-radical-extensions:page-0035}
+For $n\geq2$ and $t_i=i+1/(p-1)$, the inverse Herbrand function satisfies
+\[
+ \psi_n(t_i)=\frac{2p^{2i}+p-1}{p+1}
+ \qquad(1\leq i\leq n-1).
+\]
+\end{lemma}
+\begin{proof}
+On $0<u\leq1$ the upper group has index $p-1$; on
+$1<u\leq t_1$ it has index $(p-1)p$.
+Consequently $\psi_n(t_1)=p-1+p=2p-1$, which is the asserted value.
+For $1\leq i\leq n-2$, the upper indices on
+$(t_i,i+1]$ and $(i+1,t_{i+1}]$ are respectively
+$(p-1)p^{2i}$ and $(p-1)p^{2i+1}$.
+The interval lengths are $(p-2)/(p-1)$ and $1/(p-1)$, so
+\[
+ \psi_n(t_{i+1})-\psi_n(t_i)
+   =(p-2)p^{2i}+p^{2i+1}=2(p-1)p^{2i}.
+\]
+The proposed expression has this difference and the computed initial
+value; induction proves the formula.
+\end{proof}
+
+\begin{lemma}[The corrected integer-break index]
+\label{ft:integer-break-index}
+\uses{ft:upper-filtration,ft:fractional-break-index,fw:ramification-filtration}
+\lean{FalseTateExtension.inverseHerbrandFunction_falseTate_integer}
+\leanok\source{false-tate-lift:page-0011}
+\dcref{Yuan, Remark 5.2}
+For $n\geq2$ and $1\leq i\leq n-2$,
+\[
+ \psi_n(i+1)=\frac{(p-1)(p^{2i+1}+1)}{p+1}.
+\]
+\end{lemma}
+\begin{proof}
+At $t_i=i+1/(p-1)$ the preceding lemma gives
+$\psi_n(t_i)=(2p^{2i}+p-1)/(p+1)$. On $(t_i,i+1]$ the index is
+$(p-1)p^{2i}$. Integration adds $(p-2)p^{2i}$, and therefore
+\[
+ \psi_n(i+1)=\frac{2p^{2i}+p-1}{p+1}+(p-2)p^{2i}
+            =\frac{(p-1)(p^{2i+1}+1)}{p+1}.
+\]
+\end{proof}
+
+\begin{lemma}[The final lower break]
+\label{ft:final-break-index}
+\uses{ft:upper-filtration,ft:fractional-break-index,fw:ramification-filtration}
+\lean{FalseTateExtension.inverseHerbrandFunction_falseTate_final, FalseTateExtension.inverseHerbrandFunction_falseTate_one}
+\leanok\source{viviani-2004-radical-extensions:page-0035}
+For $n\geq2$,
+\[
+ \psi_n\left(n+\frac1{p-1}\right)
+  =\frac{p^{2n}+p^{2n-2}+p-1}{p+1},\qquad
+ \psi_n(1)=p-1.
+\]
+\end{lemma}
+\begin{proof}
+The second formula integrates the constant index $p-1$ on $(0,1]$.
+Between $t_{n-1}=n-1+1/(p-1)$ and $t_n=n+1/(p-1)$ the upper group
+is $C(p)$ and has index $(p-1)p^{2n-2}$ in the group of order
+$(p-1)p^{2n-1}$. This interval has length one. Hence
+\[
+ \psi_n(t_n)=\frac{2p^{2n-2}+p-1}{p+1}+(p-1)p^{2n-2}
+            =\frac{p^{2n}+p^{2n-2}+p-1}{p+1}.
+\]
+\end{proof}
+
+\begin{theorem}[Corrected finite ramification filtration]
+\label{ft:finite-ramification}
+\uses{ft:upper-filtration,ft:fractional-break-index,ft:integer-break-index,ft:final-break-index,fw:ramification-filtration}
+\lean{FalseTateExtension.lowerRamificationGroupReal_falseTate_nonpos, FalseTateExtension.lowerRamificationGroupReal_falseTate_initial, FalseTateExtension.lowerRamificationGroupReal_falseTate_fractional, FalseTateExtension.lowerRamificationGroupReal_falseTate_integer, FalseTateExtension.lowerRamificationGroupReal_falseTate_final, FalseTateExtension.lowerRamificationGroupReal_falseTate_fractional_integer, FalseTateExtension.lowerRamificationGroupReal_falseTate_integer_fractional, FalseTateExtension.lowerRamificationGroupReal_falseTate_final_interval, FalseTateExtension.lowerRamificationGroupReal_falseTate_eq_bot, FalseTateExtension.inverseHerbrandFunction_falseTate_integerParameter}
+\leanok\source{viviani-2004-radical-extensions:page-0035,false-tate-lift:page-0011}
+\dcref{Viviani, Corollary 6.10; Yuan, Remark 5.2}
+For $n\geq2$, the upper and lower groups of $L_n(a)/\mathbb Q_p$ satisfy
+\[
+\begin{aligned}
+ G_n^0&=C(p^n)\rtimes U_0=(G_n)_0,\\
+ G_n^1&=C(p^n)\rtimes U_1=(G_n)_{p-1},\\
+ G_n^{i+1/(p-1)}&=C(p^{n-i+1})\rtimes U_{i+1}
+       =(G_n)_{(2p^{2i}+p-1)/(p+1)},\\
+ G_n^{i+1}&=C(p^{n-i})\rtimes U_{i+1}
+       =(G_n)_{(p-1)(p^{2i+1}+1)/(p+1)},\\
+ G_n^{n-1+1/(p-1)}&=C(p^2)
+       =(G_n)_{(2p^{2n-2}+p-1)/(p+1)},\\
+ G_n^{n+1/(p-1)}&=C(p)
+       =(G_n)_{(p^{2n}+p^{2n-2}+p-1)/(p+1)}.
+\end{aligned}
+\]
+The middle two rows have $1\leq i\leq n-2$. On each interval between
+successive upper breaks, open at the left and closed at the right, the
+group equals its value at the right endpoint; the same holds in lower
+numbering between the corresponding lower breaks. Beyond the last break
+the groups are trivial. In particular the integer-break exponent is
+$2i+1$.
+\end{theorem}
+\begin{proof}
+The upper filtration theorem gives the groups and all upper intervals.
+The three preceding index lemmas compute $\psi_n$ at every positive
+break. The definition $G_n^u=(G_n)_{\psi_n(u)}$ gives all equalities.
+Since $\psi_n$ is strictly increasing and continuous, it sends each
+interval between consecutive upper breaks onto the corresponding
+interval between lower breaks, preserving endpoint inclusion. The
+integer-break computation gives the exponent $2i+1$, correcting the
+printed $2i$ in Viviani's corollary as in Yuan's remark.
+\end{proof}
+
+\begin{theorem}[The first radical layer]
+\label{ft:first-layer-filtration}
+\uses{ft:finite-upper-structure,ft:kummer-upper-jumps,ft:total-ramification,fw:ramification-filtration}
+\lean{FalseTateExtension.finiteUpperAffine_first_layer_filtration, FalseTateExtension.inverseHerbrandFunction_falseTate_first_layer, FalseTateExtension.inverseHerbrandFunction_falseTate_first_break, FalseTateExtension.lowerRamificationGroupReal_falseTate_first_layer_filtration}
+\leanok\source{viviani-2004-radical-extensions:page-0033}
+\dcref{Viviani, Theorem 6.3 and Lemma 6.4, first layer}
+For $n=1$, put $b=p/(p-1)$. The full filtration is
+\[
+ G_1^u=\begin{cases}
+ C(p)\rtimes(\mathbb Z/p\mathbb Z)^\times,&-1\leq u\leq0,\\
+ C(p),&0<u\leq b,\\
+ \{1\},&u>b,
+ \end{cases}
+ \qquad
+ (G_1)_t=\begin{cases}
+ G_1,&-1\leq t\leq0,\\
+ C(p),&0<t\leq p,\\
+ \{1\},&t>p.
+ \end{cases}
+\]
+Thus the positive upper break is $p/(p-1)$ and the positive lower break
+is $p$.
+\end{theorem}
+\begin{proof}
+For $n=1$ every positive cyclotomic upper group is trivial, since
+$U_j=\{1\}$ for $j\geq1$. The actual affine upper-group shape is
+therefore $G_1^u=T_{k_1(u)}$ for $u>0$.
+The Kummer-jump formula says that $k_1(u)=0$ for $0<u\leq b_1$
+and $k_1(u)=1$ for $u>b_1$, where
+$b_1=1+1/(p-1)=p/(p-1)$. This proves the positive upper filtration.
+Total ramification gives the whole group at all indices from $-1$ to $0$.
+On $0<u\leq b_1$, the upper group $C(p)$ has index $p-1$ in $G_1$.
+Consequently
+\[
+ \psi_1(u)=(p-1)u\quad(0\leq u\leq b_1),\qquad
+ \psi_1(b_1)=p.
+\]
+The defining relation $G_1^u=(G_1)_{\psi_1(u)}$, with its strictly
+increasing continuous parameter change, now gives exactly the stated
+lower groups, including both endpoints and triviality after $p$.
+This derives the first-layer result of Viviani from the same intrinsic
+index route as the higher layers.
+\end{proof}
+
+For the remaining statements take $K=\Qp$, $\pi=p$, and $a=p$; put
+$L_n=L_n(p)$, and retain the compatible radicals $\pi_n$ chosen above.
+
+\begin{lemma}[Canonical tame units in the p-adic integers]
+\label{ft:padic-tame-units}
+\source{serre-1979-local-fields:page-0041,false-tate-lift:page-0003}
+\dcref{Simple-root Hensel lifting; torsion-unit choice in Yuan, Lemma 1.2}
+\lean{PadicInt.existsUnique_teichmullerLift, PadicInt.teichmuller, PadicInt.toZMod_teichmuller, PadicInt.teichmullerUnits, PadicInt.toZMod_teichmullerUnits, PadicInt.teichmullerUnitsEquivRange, PadicInt.natCard_teichmullerUnits_range, PadicInt.isCyclic_teichmullerUnits_range, PadicInt.exists_teichmullerUnit_orderOf}
+\leanok
+For each $a\in\mathbb F_p$ there is a unique $[a]\in\mathbb Z_p$
+with residue $a$ and $[a]^p=[a]$. These lifts give an injective
+multiplicative map preserving zero and one. On units its image is a
+cyclic subgroup of $\mathbb Z_p^\times$ of order $p-1$, and reduction
+is its inverse isomorphism to $\mathbb F_p^\times$. In particular
+there is a unit of exact order $p-1$ whose reduction generates
+$\mathbb F_p^\times$.
+\end{lemma}
+\begin{proof}
+For $F(X)=X^p-X$, choose any integral lift $b$ of $a$. Its reduction
+satisfies $\overline{F}(a)=a^p-a=0$ and
+$\overline{F}'(a)=-1\ne0$. Hensel's simple-root theorem gives a unique
+root $[a]$ with this residue. The roots $0,1$ show $[0]=0$ and $[1]=1$.
+The product $[a][b]$ has residue $ab$ and satisfies
+$([a][b])^p=[a][b]$, so uniqueness gives $[ab]=[a][b]$.
+Reduction proves injectivity. If $a\ne0$, then
+$[a][a^{-1}]=1$, so $[a]$ is a unit; conversely its residue must be
+nonzero if it is a unit. Thus restriction to $\mathbb F_p^\times$
+is an injective group homomorphism with reduction as inverse on its
+image. The multiplicative group of the finite field is cyclic of order
+$p-1$, so its image has the same properties. Lifting a generator
+therefore gives a unit of exact order $p-1$ and the stated primitive
+residue. This constructs the units explicitly from simple residue roots;
+no torsion-unit or lifting section is assumed.
+\end{proof}
+
+\begin{definition}[The tame generator]
+\label{ft:delta}\uses{ft:galois-structure,ft:tau,ft:padic-tame-units,ft:infinite-cyclotomic-character}\lean{FalseTateExtension.tameGenerator, FalseTateExtension.padicCyclotomicCharacter_tameGenerator, FalseTateExtension.orderOf_tameGenerator, FalseTateExtension.tameGenerator_fixes_kummerExtension, FalseTateExtension.tauPadicPower, FalseTateExtension.continuous_tauPadicPower, FalseTateExtension.tauPadicPower_intCast, FalseTateExtension.tameGenerator_conj_tau, FalseTateExtension.orderOf_tameGenerator_residueCharacter, FalseTateExtension.relativeTameGenerator, FalseTateExtension.relativeTameGenerator_restrictScalars, FalseTateExtension.orderOf_relativeTameGenerator}
+\leanok
+\source{false-tate-lift:page-0003}
+\dcref{Yuan, Lemma 1.2}
+Choose a generator $\delta$ of the subgroup of order $p-1$ in the complement
+$\Gal(\Qp^{\mathrm{FT}}/\Qp^{\mathrm{Kum}})\simeq\Zp^\times$.
+Then $\delta\tau\delta^{-1}=\tau^{\chi(\delta)}$.
+\end{definition}
+\begin{proof}
+For the rational base the actual cyclotomic character has image all of
+$\mathbb Z_p^\times$. The proved splitting identifies the actual
+complement fixing the radical extension with this unit group. Transport
+a generator of the preceding subgroup of order $p-1$ through this
+isomorphism to obtain $\delta$. In the actual affine coordinates,
+$\tau=(1,1)$ and $\delta=(0,\chi(\delta))$. The multiplication law
+$(b,u)(c,v)=(b+uc,uv)$ gives
+\[
+ (0,\chi(\delta))(1,1)(0,\chi(\delta)^{-1})
+ =(\chi(\delta),1).
+\]
+Here the continuous power $\tau^c$ for $c\in\mathbb Z_p$ is the
+actual Kummer element corresponding to $c$ under its proved additive
+isomorphism; its integer powers agree with this definition by the
+generator specification and continuity. The last displayed pair is
+therefore $\tau^{\chi(\delta)}$, proving the relation.
+\end{proof}
+
+
+\begin{lemma}[The finite order of the prescribed Kummer generator]
+\label{ft:finite-kummer-generator-order}
+\uses{ft:finite-ramification,ft:total-ramification,ft:tau,fw:totally-ramified-uniformizer-generation,fw:generator-evaluation,fw:integer-lower-groups,fw:integral-order-function}
+\lean{FalseTateExtension.kummerTauFinite, FalseTateExtension.finiteDiagonalGaloisEquiv_kummerTauFinite, FalseTateExtension.ramificationOrder_kummerTauFinite, FalseTateExtension.addVal_kummerTauFinite_uniformizer, FalseTateExtension.normalizedValuation_kummerTauFinite_displacement, FalseTateExtension.normalizedValuation_kummerTauFinite_div_sub_one, FalseTateExtension.kummerRamificationBreak_zero, FalseTateExtension.kummerRamificationBreak_mul, FalseTateExtension.kummerRamificationBreak_recurrence, FalseTateExtension.kummerRamificationBreak_growth, FalseTateExtension.kummerRamificationBreak_succ_dvd, FalseTateExtension.kummerRamificationBreak_tendsto_real, FalseTateExtension.kummerRamificationBreak_tendsto_padic}
+\leanok
+\source{viviani-2004-radical-extensions:page-0035,false-tate-lift:page-0011,serre-1979-local-fields:page-0068,serre-1979-local-fields:page-0069}
+Let $p$ be odd, let $\pi$ be a uniformizer of $\mathbb Q_p$, and use
+its prescribed compatible roots and Kummer generator $\tau$. Put
+$D_N=\mathbb Q_p(\zeta_{p^N},\pi^{1/p^N})$, and let $g_{N,k}$ be the
+ordinary restriction of $\tau^{p^k}$ to this original field. Define
+\[
+ d_k=1+2(p-1)\sum_{j=0}^{k}p^{2j}\in\mathbb N.
+\]
+For every $k\geq0$ and every $N\geq k+2$, its actual normalized
+integral ramification order is $d_k+1$, its shifted lower break is $d_k$,
+and every uniformizer $\varpi$ of the original integer ring satisfies
+\[
+ v_{D_N}\bigl(g_{N,k}(\varpi)-\varpi\bigr)=d_k+1,
+ \qquad
+ v_{D_N}\bigl(g_{N,k}(\varpi)/\varpi-1\bigr)=d_k.
+\]
+The sequence has the exact properties
+\[
+ (p+1)d_k=2p^{2k+2}+p-1,\qquad d_0=2p-1,\qquad p\mid d_k+1,
+\]
+\[
+ d_{k+1}=p^2d_k-(p-1)^2\geq(p+1)d_k,\qquad
+ d_k\longrightarrow+\infty\text{ in }\mathbb R,
+ \qquad
+ d_k\longrightarrow\frac{p-1}{p+1}\text{ in }\mathbb Z_p.
+\]
+The indexing condition is the diagonal exponent $N\geq k+2$.
+The smaller level $N=k+1$ belongs to the distinct final row of the
+finite table and is not asserted to have this stable break.
+\end{lemma}
+\begin{proof}
+Write $S_k=\sum_{j=0}^{k}p^{2j}$. The telescoping identity
+$(p^2-1)S_k=p^{2k+2}-1$ gives
+\[
+ (p+1)\bigl(1+2(p-1)S_k\bigr)=2p^{2k+2}+p-1.
+\]
+Thus the displayed rational expression for $d_k$ is an integer, and
+the defining sum gives $d_0=2p-1$. Adding its last summand gives
+$d_{k+1}=d_k+2(p-1)p^{2k+2}$; eliminating the power with the preceding
+identity gives $d_{k+1}=p^2d_k-(p-1)^2$.
+
+The actual Kummer coordinate is additive on the cyclotomic-character
+kernel, and $\tau$ has coordinate one. The restriction formulas for
+the actual finite Kummer and cyclotomic coordinates consequently give
+\[
+ e_N(g_{N,k})=(p^k,1)
+ \quad\text{in }(\mathbb Z/p^N\mathbb Z)\rtimes
+                  (\mathbb Z/p^N\mathbb Z)^\times.
+\]
+These are ordinary restrictions under the original field inclusions.
+Since $k<N$, the translation $p^k$ belongs to $T_k$ but not to
+$T_{k+1}$. For the latter assertion reduce modulo $p^{k+1}$:
+every element of $T_{k+1}$ becomes zero, whereas $p^k$ does not.
+
+Set $i=k+1$, so $1\leq i\leq N-1$. At
+$b_i=i+1/(p-1)$ the actual upper group has translation part $T_{i-1}$,
+and $g_{N,k}$ therefore belongs to it. The finite lower table places
+this group at
+\[
+ \psi_N(b_i)=\frac{2p^{2i}+p-1}{p+1}=d_k.
+\]
+On $(b_i,i+1]$ the translation part is $T_i$, which excludes
+$g_{N,k}$. Its full upper index is $(p-1)p^{2i}$, so
+\[
+ \psi_N(i+1)-\psi_N(b_i)=(p-2)p^{2i}\geq1.
+\]
+This calculation also applies to $i=N-1$: the unit factor is already
+trivial and this interval is contained in the final fractional interval;
+the integer $N$ need not be a new break. Hence
+$g_{N,k}\in(G_N)_{d_k}$ but $g_{N,k}\notin(G_N)_{d_k+1}$.
+The integer lower-group criterion gives
+$d_k+1\leq j_{\mathcal O_{D_N}}(g_{N,k})<d_k+2$, and the order is
+integer-valued, so it equals $d_k+1$.
+
+The preceding odd-prime total-ramification theorem applies to the actual
+field $D_N$. Every one of its uniformizers generates its original
+integer ring over $\mathbb Z_p$, by total-ramification uniformizer
+generation. Generator evaluation therefore identifies the same
+intrinsic order with $v_{D_N}(g_{N,k}(\varpi)-\varpi)$ for every
+$\varpi$. Dividing the displacement by $\varpi$, whose valuation is
+one, gives the asserted shifted value. This argument contains no
+field-of-norms action or ramification-transfer premise.
+
+Reducing $(p+1)d_k=2p^{2k+2}+p-1$ modulo $p$ gives
+$d_k\equiv-1\pmod p$. The defining sum gives $d_k\geq p-1>0$.
+Since $p^2-p-1\geq p-1$, one has
+$(p^2-p-1)d_k\geq(p-1)^2$, and the recurrence implies
+$d_{k+1}\geq(p+1)d_k$. In particular $d_k\geq(p+1)^kd_0$, which
+proves divergence in $\mathbb R$.
+Finally $p+1$ has residue one and is a unit of $\mathbb Z_p$. In this
+same p-adic ring the exact closed formula gives
+\[
+ d_k-\frac{p-1}{p+1}=\frac{2p^{2k+2}}{p+1}.
+\]
+The right side tends to zero because $|p|_p=p^{-1}<1$. This proves
+the stated p-adic limit in the original p-adic topology.
+\end{proof}
+
+\begin{proposition}[The actual norm-field displacement of Kummer powers]
+\label{ft:norm-field-kummer-displacement}
+\uses{ft:finite-kummer-generator-order,ft:strict-apf,ft:tau,fw:norm-field-isomorphism,fw:cofinal-displacement-valuation,fw:norm-limit-uniformizer}
+\lean{FalseTateExtension.normLimitValuation_tau_pow_displacement, FalseTateExtension.normLimitValuation_tau_pow_div_sub_one, FalseTateExtension.normLimitTau_infiniteOrder}
+\leanok
+\source{false-tate-lift:page-0011,viviani-2004-radical-extensions:page-0035}
+Let $p$ be odd, let $\pi$ be a uniformizer of $\mathbb Q_p$, and let
+$L=\mathbb Q_p^{\mathrm{FT}}$ with its prescribed Kummer generator $\tau$.
+Write $X=X_{\mathbb Q_p}(L)$ for the original field of norm-compatible
+families, and $X(g)$ for the action obtained by transporting original finite
+coordinates along $g$. For every $u\in X$ with normalized additive valuation
+one and every $k\geq0$, one has
+\[
+ v_X\bigl(X(\tau^{p^k})(u)-u\bigr)=d_k+1,\qquad
+ v_X\bigl(X(\tau^{p^k})(u)/u-1\bigr)=d_k,
+ \qquad d_k=1+2(p-1)\sum_{j=0}^k p^{2j}.
+\]
+In particular $X(\tau)$ has infinite order as an automorphism of the same
+original norm field.
+\end{proposition}
+\begin{proof}
+The original diagonal fields $D_N=\mathbb Q_p(\zeta_{p^N},\pi^{1/p^N})$
+are cofinal among finite subfields of $L$: choose finitely many field generators
+of a given finite subfield, put each in a diagonal field, and take the maximum
+of their finitely many indices. Their ordinary inclusions identify their
+images in $L$ with $D_N$ itself. Each $D_N$ is Galois, so every automorphism
+of $L/\mathbb Q_p$ preserves this image. The defining coordinate formula for
+$X(g)$ therefore gives
+\[
+ (X(g)u)_{D_N}=g|_{D_N}(u_{D_N}).
+\]
+The stable normalized norm-field valuation equals its coordinate valuation on
+an actual finite tail. Consequently $u_{D_N}$ has normalized valuation one
+for every sufficiently large $N$. It lies in the original spectral integer
+ring and is a uniformizer there. For $N\geq k+2$, the finite Kummer-generator
+order theorem thus gives
+\[
+ v_{D_N}\bigl((X(\tau^{p^k})u)_{D_N}-u_{D_N}\bigr)=d_k+1.
+\]
+To pass from this ordinary coordinate difference to the actual norm-field
+difference, fix an integer $s>d_k+1$. Approximate additivity on an actual finite
+tail says that their difference belongs to $\mathfrak m_{D_N}^{s}$. Choose
+$N$ above that tail, above the stable valuation tail, and above $k+2$.
+Its error has valuation strictly greater than $d_k+1$, so the ultrametric
+inequality gives exact equality of the valuations of the two differences.
+Stable coordinate evaluation now yields the first displayed equality on the
+original $X$. Since $v_X(u)=1$, division by $u$ gives the second equality.
+Finally the sums defining $d_k$ are strictly increasing because $p>1$.
+If two powers $X(\tau)^{p^j}$ and $X(\tau)^{p^k}$ were equal, evaluating at
+any norm-field uniformizer and using their exact displacement valuations
+would give $d_j=d_k$, hence $j=k$. There are infinitely many distinct powers
+of $X(\tau)$, whereas an automorphism of finite order has only finitely many
+powers. This proves infinite order.
+\end{proof}
+
+\begin{theorem}[The actual false Tate action in Laurent coordinates]
+\label{ft:false-tate-laurent-coordinates}
+\source{false-tate-lift:page-0002}
+\dcref{Yuan, Definition 1.1, the evaluation coordinate}
+\uses{ft:strict-apf,ft:total-ramification,ft:infinite-cyclotomic-character,fw:abstract-extension-residue-field,fw:source-residue-constants-field-embedding,fw:uniformizer-laurent-coordinates,fw:laurent-power-series-substitution,fw:norm-field-isomorphism}
+\lean{FalseTateExtension.falseTateResidueEquiv, FalseTateExtension.falseTateNormFieldLaurentEquiv, FalseTateExtension.falseTateNormFieldLaurentEquiv_unique, FalseTateExtension.falseTateLaurentAction, FalseTateExtension.falseTateLaurentAction_powerSeries, FalseTateExtension.falseTatePowerSeriesCoordinate_constantCoeff, FalseTateExtension.falseTatePowerSeriesCoordinate_linear_isUnit, FalseTateExtension.falseTatePowerSeriesCoordinate_one, FalseTateExtension.falseTatePowerSeriesCoordinate_mul, FalseTateExtension.falseTatePowerSeriesCoordinate_pow, FalseTateExtension.valuation_falseTatePowerSeriesCoordinate_displacement}
+\leanok
+Let $p$ be odd, let $\pi$ be a uniformizer of $\mathbb Q_p$, and put
+$L=\mathbb Q_p(\mu_{p^\infty},\pi^{1/p^\infty})$ and $X=X_{\mathbb Q_p}(L)$,
+where $X$ is the original field of norm-compatible families.
+The canonical residue field $k_L$ of the integral closure in $L$ is
+canonically isomorphic to $\mathbb F_p$. For every original $u\in X$
+with $w(u)=\exp(-1)$ there is a unique continuous field isomorphism
+\[
+ e_u:\mathbb F_p((T))\xrightarrow{\ \sim\ }X
+\]
+sending $T$ to $u$ and sending each constant to its actual source
+coefficient in $X$. It and its inverse preserve the original normalized
+valuations and valuation uniformities.
+
+For $g\in\operatorname{Aut}_{\mathbb Q_p}(L)$, let $X(g)$ be the
+original finite-coordinate action and put
+$\sigma_{g,u}=e_u^{-1}X(g)e_u$. This is a continuous
+$\mathbb F_p$-linear field automorphism. There is a unique
+$f_{g,u}\in T\mathbb F_p[[T]]$ with nonzero linear coefficient such that
+\[
+ \sigma_{g,u}(T)=f_{g,u},\qquad
+ \sigma_{g,u}(A)=A\circ f_{g,u}\quad(A\in\mathbb F_p[[T]]).
+\]
+These are the coordinates of the actual action:
+\[
+ f_{gh,u}=f_{h,u}\circ f_{g,u},\qquad f_{1,u}=T.
+\]
+In particular $f_{g^n,u}$ is the $n$-fold compositional iterate of
+$f_{g,u}$ for every $n\in\mathbb N$.
+\end{theorem}
+\begin{proof}
+Every finite subextension of $L/\mathbb Q_p$ is totally ramified.
+Every residue class of the original infinite algebraic extension has a
+representative in an actual finite subextension. The canonical map from
+the residue field of $\mathbb Q_p$ to the spectral residue field of $L$
+is consequently surjective, and it is injective because it is a unital
+map of fields. The identity-valued isomorphism from the canonical integral
+closure to the spectral integer ring identifies their residue fields.
+Composing these maps with the usual residue isomorphism
+$\mathbb Z_p/(p)\simeq\mathbb F_p$ gives the asserted canonical
+identification of $k_L$.
+
+The extension $L/\mathbb Q_p$ is infinite: it contains cyclotomic
+subextensions of unbounded finite degree. It is APF by strict APF.
+The actual source coefficient embedding and its induced residue
+isomorphism, transported along $k_L\simeq\mathbb F_p$, therefore satisfy
+the hypotheses of the Laurent-coordinate theorem for the original
+complete norm field and the specified original uniformizer $u$.
+That theorem constructs $e_u$, gives its exact valuation and both
+uniform continuities, and proves uniqueness from constants and $T$.
+
+The original norm-field action preserves its actual normalized valuation
+and is a group homomorphism. Conjugation by $e_u$ thus gives continuous
+valuation-preserving automorphisms satisfying
+$\sigma_{gh,u}=\sigma_{g,u}\sigma_{h,u}$. Each fixes $\mathbb F_p$:
+a unital ring homomorphism fixes the prime field, since it fixes $1$ and
+therefore all integral multiples of $1$.
+The Laurent element $\sigma_{g,u}(T)$ has normalized additive valuation
+one. Its coefficients in degrees below one vanish, and its coefficient
+in degree one is nonzero. It is therefore the image of a unique power
+series $f_{g,u}$ with the asserted constant and linear coefficients.
+
+On polynomials in $T$, the equality
+$\sigma_{g,u}(A)=A\circ f_{g,u}$ follows by the ring laws, the constant
+formula and the value at $T$. Polynomial truncations converge to each
+power series. Substitution by a power series with zero constant term is
+continuous for these topologies, as follows degree by degree because the
+coefficient in degree $m$ depends only on the first $m+1$ input
+coefficients. Continuity of both sides extends the equality to every
+power series. Applying the group identity to $T$ now gives
+$f_{gh,u}=\sigma_{g,u}(f_{h,u})=f_{h,u}\circ f_{g,u}$.
+The identity gives $f_{1,u}=T$, and induction gives the iterate formula.
+\end{proof}
+
+\begin{lemma}[The actual action profile in every norm-field coordinate]
+\label{ft:norm-field-action-profile}
+\uses{ft:norm-field-kummer-displacement,ft:false-tate-laurent-coordinates,ft:finite-kummer-generator-order}
+\lean{FalseTateExtension.falseTatePowerSeriesCoordinate_tau_pow_valuation, FalseTateExtension.falseTatePowerSeriesCoordinate_tau_pow_order, FalseTateExtension.falseTatePowerSeriesCoordinate_tau_coeff_one, FalseTateExtension.falseTatePowerSeriesCoordinate_tau_coeff_first_ne_zero, FalseTateExtension.falseTatePowerSeriesCoordinate_tau_infiniteOrder, FalseTateExtension.falseTatePowerSeriesCoordinate_tau_iterate_order}
+\leanok
+\source{false-tate-lift:page-0011,false-tate-lift:page-0012}
+Let $p$ be odd, let $\pi$ be a uniformizer of $\mathbb Q_p$, and use
+the prescribed original false Tate field, generator $\tau$, and original
+norm field $X$. For every original uniformizer $u$ of $X$ put
+$f=f_{\tau,u}$. The literal power-series coordinates satisfy
+\[
+ v_T(f_{\tau^{p^k},u}-T)=d_k+1,\qquad
+ d_k=1+2(p-1)\sum_{j=0}^k p^{2j}.
+\]
+In particular $f=T+\alpha T^{2p}+O(T^{2p+1})$ with
+$\alpha\in\mathbb F_p^\times$, and $f$ has infinite compositional order.
+All coordinates here are formed from the same original $u$ and the same
+original coefficient section.
+\end{lemma}
+\begin{proof}
+The original Laurent evaluation isomorphism $e_u$ preserves normalized
+valuations and sends $T$ to $u$. It sends the actual coordinate
+$f_{\tau^{p^k},u}$ to $X(\tau^{p^k})(u)$. Its additivity and the actual
+norm-field Kummer displacement theorem therefore give
+\[
+ \exp\bigl(-v_T(f_{\tau^{p^k},u}-T)\bigr)
+ =w\bigl(X(\tau^{p^k})(u)-u\bigr)=\exp(-(d_k+1)).
+\]
+The exponential is injective and its value is nonzero, so the displacement
+is nonzero and has the stated exact integer order. The first coefficient
+at that order is consequently nonzero and every smaller displacement
+coefficient vanishes. At $k=0$, $d_0+1=2p\geq2$, giving the displayed
+expansion of $f$ with tangent coefficient one.
+The actual anti-composition law identifies $f_{\tau^{p^k},u}$ with the
+$p^k$-fold iterate of $f$. If $f$ had a positive compositional period $m$,
+all its iterates would belong to the finite list
+$T,f,\ldots,f^{\circ(m-1)}$, by dividing each exponent by $m$.
+Their orders relative to $T$ would then take only finitely many values.
+But the orders $d_k+1$ are strictly increasing, since each successive
+defining sum adds the positive summand $2(p-1)p^{2k+2}$.
+This contradiction proves infinite compositional order.
+\end{proof}
+
+\begin{proposition}[Ramification numbers on the field of norms]
+\label{ft:ramification-numbers}
+\uses{ft:norm-field-action-profile,ft:norm-field-kummer-displacement,ft:finite-kummer-generator-order,ft:finite-ramification,ft:strict-apf,ft:total-ramification,ft:tau,ft:false-tate-laurent-coordinates}
+\lean{FalseTateExtension.falseTatePowerSeriesCoordinate_tau_pow_order, FalseTateExtension.kummerRamificationBreak_zero, FalseTateExtension.kummerRamificationBreak_mul, FalseTateExtension.kummerRamificationBreak_recurrence, FalseTateExtension.kummerRamificationBreak_growth, FalseTateExtension.kummerRamificationBreak_succ_dvd, FalseTateExtension.kummerRamificationBreak_tendsto_real, FalseTateExtension.kummerRamificationBreak_tendsto_padic}
+\leanok
+\source{false-tate-lift:page-0011}
+\dcref{Yuan, Proposition 5.1}
+Put $E=X_{\Qp}(\Qp^{\mathrm{FT}})$. For every uniformizer $u$ of $E$,
+write $f_{g,u}=\operatorname{ev}_u^{-1}(g(u))$ and set
+$d_k=v_T(f_{\tau^{p^k},u}-T)-1$. Then
+\[
+ d_k=\frac{2p^{2k+2}+p-1}{p+1},\qquad
+ d_0=2p-1,\qquad d_{k+1}=p^2d_k-(p-1)^2\geq(p+1)d_k.
+\]
+In particular $d_k\equiv-1\pmod p$, $d_k\longrightarrow+\infty$ in
+$\mathbb R$, and $d_k\longrightarrow(p-1)/(p+1)$ in $\Zp$.
+\end{proposition}
+\begin{proof}
+The preceding actual profile identifies the shifted order with the same
+integer $d_k$ computed in the finite Kummer-generator theorem.
+That theorem gives $(p+1)d_k=2p^{2k+2}+p-1$ and all the displayed
+recurrence, growth, divisibility and real and p-adic limit identities.
+Since $p+1\ne0$, dividing the closed identity gives the asserted formula.
+\end{proof}
+
+\begin{lemma}[The tame action in any coordinate]
+\label{ft:tame-action}\uses{fw:norm-field-action-continuity,ft:ramification-numbers,ft:delta}
+\lean{FalseTateExtension.continuous_falseTatePowerSeriesCoordinate_tauPadicPower_coeff, FalseTateExtension.falseTatePowerSeriesCoordinate_tauPadicPower_coeff_displacement, FalseTateExtension.falseTatePowerSeriesCoordinate_tameGenerator_coeff_one, FalseTateExtension.orderOf_falseTatePowerSeriesCoordinate_tameGenerator_linear, FalseTateExtension.orderOf_falseTatePowerSeriesCoordinate_tameGenerator_linear_unit}
+\leanok
+\source{false-tate-lift:page-0011,false-tate-lift:page-0012}
+\dcref{Yuan, Lemma 5.3}
+For every uniformizer $u$ of $E$,
+\[
+ f_{\delta,u}=\overline{\chi(\delta)}T+O(T^2).
+\]
+Its linear coefficient has order $p-1$ in $\Fp^\times$.
+\end{lemma}
+\begin{proof}
+Fix the original uniformizer $u$, and write $f=f_{\tau,u}$,
+$w=f_{\delta,u}$, $\lambda=w'(0)\in\mathbb F_p^\times$ and
+$N=d_0+1=2p$. The actual action profile gives
+$f=T+\alpha T^N+O(T^{N+1})$ with $\alpha\ne0$.
+We first record the finite coefficient calculation that will be used.
+If $g=T+\beta T^N+O(T^{N+1})$, then for every $i\geq1$,
+\[
+ g^i-T^i=(g-T)\sum_{j=0}^{i-1}g^jT^{i-1-j}
+       =O(T^{N+i-1}).
+\]
+Consequently $g^N=T^N+O(T^{N+1})$ because $N\geq2$, and substitution
+in $f$ gives
+$f\circ g=T+(\alpha+\beta)T^N+O(T^{N+1})$.
+Induction, including the identity iterate, gives
+\[
+ f^{\circ n}=T+\overline n\alpha T^N+O(T^{N+1})
+ \quad(n\in\mathbb N).
+\]
+
+For $a\in\mathbb Z_p$ let $h_a=f_{\tau^a,u}$, using the actual continuous
+Kummer powers in the original Galois group. The original orbit map at
+the same $u$ is continuous by the finite-fixer continuity theorem.
+Composing with the original continuous inverse Laurent coordinate map
+and each continuous Laurent coefficient map proves continuity of
+$a\mapsto[T^j]h_a$ for every $j$. For $a=n\in\mathbb N$, the actual
+power and anti-composition laws identify $h_n$ with $f^{\circ n}$.
+Natural numbers are dense in $\mathbb Z_p$. Equality of the continuous
+coefficient maps to the Hausdorff discrete field $\mathbb F_p$ therefore
+extends the preceding formula, coefficient by coefficient through degree
+$N$, to every $a$:
+\[
+ h_a=T+\overline a\alpha T^N+O(T^{N+1}).
+\]
+
+Take $a=\chi(\delta)$. The original Galois relation
+$\delta\tau\delta^{-1}=\tau^a$, equivalently
+$\delta\tau=\tau^a\delta$, and the actual anti-composition law give
+$w\circ h_a=f\circ w$.
+To compare their first changed coefficients, write
+$w=\lambda T+\sum_{i\geq2}c_iT^i$.
+The displayed factorization with $g=h_a$ shows that every
+$h_a^i-T^i$ with $i\geq2$ has order at least $N+1$. Hence
+\[
+ [T^N](w\circ h_a-w)=\lambda\overline a\alpha.
+\]
+On the other side,
+$f\circ w-w=\alpha w^N+O(T^{N+1})$, and
+$w^N=\lambda^NT^N+O(T^{N+1})$, so
+\[
+ [T^N](f\circ w-w)=\alpha\lambda^N.
+\]
+Cancelling the nonzero factors $\alpha$ and $\lambda$ yields
+$\lambda^{N-1}=\overline a$.
+Since $\lambda^{p-1}=1$ and $N-1=2(p-1)+1$, the left side is
+$\lambda$. Thus $\lambda=\overline{\chi(\delta)}$, as asserted.
+The actual prescribed tame generator has cyclotomic residue character
+of exact order $p-1$, so this same equality gives the asserted order of
+the linear coefficient.
+\end{proof}
+
+
+These results use the Galois structure from \cite{Liu2008}, the finite
+ramification calculation of \cite{Viviani2004}, and its correction in
+\cite{Yuan}. The strict APF criterion is taken from \cite{Wintenberger1983}
+and \cite{Sen1972}. The coefficient coordinate is always formed using the
+same uniformizer as the evaluation map.
