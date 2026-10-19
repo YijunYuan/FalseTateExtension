@@ -130,13 +130,6 @@ theorem cyclotomicExtensionCharacter_index_pos :
     0 < (cyclotomicExtensionCharacter (K := K) p).range.index :=
   Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
 
-/-- The actual character image has index between one and the base degree. -/
-theorem cyclotomicExtensionCharacter_index_bounds :
-    1 ≤ (cyclotomicExtensionCharacter (K := K) p).range.index ∧
-      (cyclotomicExtensionCharacter (K := K) p).range.index ≤ Module.finrank (ℚ_[p]) K :=
-  ⟨cyclotomicExtensionCharacter_index_pos p,
-    Nat.le_of_dvd Module.finrank_pos (cyclotomicExtensionCharacter_index_dvd p)⟩
-
 /-- The existing actual cyclotomic character image is open at every prime,
 by its proved finite index and its existing actual closed embedding. -/
 theorem isOpen_cyclotomicExtensionCharacter_range :

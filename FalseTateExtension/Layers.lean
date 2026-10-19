@@ -84,14 +84,6 @@ def kummerExtension (π : K) : IntermediateField K (AlgebraicClosure K) :=
 theorem radicalLayer_le_kummerExtension (π : K) (n : ℕ) :
     radicalLayer p π n ≤ kummerExtension p π := le_iSup _ n
 
-/-- Omitting the zeroth Kummer layer leaves the same infinite extension. -/
-theorem kummerExtension_eq_iSup_succ (π : K) :
-    kummerExtension p π = ⨆ n, radicalLayer p π (n + 1) := by
-  apply le_antisymm
-  · exact iSup_le fun n ↦ (radicalLayer_le_succ p π n).trans
-      (le_iSup (fun n ↦ radicalLayer p π (n + 1)) n)
-  · exact iSup_le fun n ↦ radicalLayer_le_kummerExtension p π (n + 1)
-
 /-- The supremum defining the Kummer extension is its ordinary directed union. -/
 theorem mem_kummerExtension_iff (π : K) (x : AlgebraicClosure K) :
     x ∈ kummerExtension p π ↔ ∃ n, x ∈ radicalLayer p π n :=
@@ -154,13 +146,6 @@ def cyclotomicExtension : IntermediateField K (AlgebraicClosure K) :=
 
 theorem cyclotomicLayer_le_cyclotomicExtension (n : ℕ) :
     cyclotomicLayer (K := K) p n ≤ cyclotomicExtension p := le_iSup _ n
-
-theorem cyclotomicExtension_eq_iSup_succ :
-    cyclotomicExtension (K := K) p = ⨆ n, cyclotomicLayer p (n + 1) := by
-  apply le_antisymm
-  · exact iSup_le fun n ↦ (cyclotomicLayer_le_succ p n).trans
-      (le_iSup (fun n ↦ cyclotomicLayer (K := K) p (n + 1)) n)
-  · exact iSup_le fun n ↦ cyclotomicLayer_le_cyclotomicExtension p (n + 1)
 
 /-- The cyclotomic extension is the ordinary union of its finite layers. -/
 theorem mem_cyclotomicExtension_iff (x : AlgebraicClosure K) :
@@ -248,29 +233,6 @@ theorem mem_falseTateExtension_iff (π : K) (x : AlgebraicClosure K) :
     obtain ⟨n, hn⟩ := (mem_falseTateExtension_iff_diagonal p π x).mp hx
     exact ⟨n, n, hn⟩
   · rintro ⟨m, n, hx⟩
-    exact falseTateLayer_le_falseTateExtension p π m n hx
-
-/-- Restricting both indices to positive integers leaves the same infinite field. -/
-theorem falseTateExtension_eq_iSup_succ (π : K) :
-    falseTateExtension p π = ⨆ m, ⨆ n, falseTateLayer p π (m + 1) (n + 1) := by
-  apply le_antisymm
-  · refine iSup_le fun m ↦ iSup_le fun n ↦ ?_
-    exact (falseTateLayer_mono p π (Nat.le_succ m) (Nat.le_succ n)).trans
-      ((le_iSup (fun n ↦ falseTateLayer p π (m + 1) (n + 1)) n).trans
-        (le_iSup (fun m ↦ ⨆ n, falseTateLayer p π (m + 1) (n + 1)) m))
-  · exact iSup_le fun m ↦ iSup_le fun n ↦
-      falseTateLayer_le_falseTateExtension p π (m + 1) (n + 1)
-
-/-- The ordinary union can equivalently be taken over strictly positive indices. -/
-theorem mem_falseTateExtension_iff_pos (π : K) (x : AlgebraicClosure K) :
-    x ∈ falseTateExtension p π ↔
-      ∃ m n, 0 < m ∧ 0 < n ∧ x ∈ falseTateLayer p π m n := by
-  constructor
-  · intro hx
-    obtain ⟨m, n, hmn⟩ := (mem_falseTateExtension_iff p π x).mp hx
-    exact ⟨m + 1, n + 1, Nat.succ_pos m, Nat.succ_pos n,
-      falseTateLayer_mono p π (Nat.le_succ m) (Nat.le_succ n) hmn⟩
-  · rintro ⟨m, n, _, _, hx⟩
     exact falseTateLayer_le_falseTateExtension p π m n hx
 
 /-- The false Tate extension is the compositum of the actual infinite Kummer
