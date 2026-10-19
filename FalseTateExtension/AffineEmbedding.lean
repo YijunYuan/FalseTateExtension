@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.PadicCoordinates
+public import FalseTateExtension.Coordinates.Padic
 public import Mathlib.FieldTheory.Galois.Profinite
 public import Mathlib.Algebra.Ring.AddAut
 public import Mathlib.GroupTheory.SemidirectProduct

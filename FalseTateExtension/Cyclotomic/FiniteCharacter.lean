@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.CyclotomicRamification
+public import FalseTateExtension.Cyclotomic.Ramification
 public import Mathlib.NumberTheory.Cyclotomic.Gal
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
 

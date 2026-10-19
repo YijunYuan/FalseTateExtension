@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.CyclotomicInertia
-public import FalseTateExtension.Padic.GeneralCharacter
+public import FalseTateExtension.Cyclotomic.Inertia
+public import FalseTateExtension.Cyclotomic.CharacterNaturality
 public import FontaineWintenberger.Ramification.Lower.SpectralMaps
 public import Mathlib.NumberTheory.Padics.ProperSpace
 

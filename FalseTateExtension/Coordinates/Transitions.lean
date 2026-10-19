@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.FiniteCoordinates
+public import FalseTateExtension.Coordinates.Finite
 public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 public import Mathlib.Data.ZMod.Units
 

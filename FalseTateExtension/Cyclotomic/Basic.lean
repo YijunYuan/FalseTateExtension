@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Layers
+public import FalseTateExtension.Layers.Basic
 public import FalseTateExtension.Padic.Basic
 public import FalseTateExtension.Mathlib.NumberTheory.Padics.Cyclotomic
 public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots

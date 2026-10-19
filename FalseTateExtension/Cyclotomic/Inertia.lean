@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.CyclotomicResidueBound
-public import FalseTateExtension.Padic.CyclotomicRestriction
+public import FalseTateExtension.Cyclotomic.ResidueBound
+public import FalseTateExtension.Cyclotomic.Restriction
 public import FontaineWintenberger.LocalField.Residue.Basic
 public import FontaineWintenberger.Ramification.Infinite.Restriction
 public import Mathlib.FieldTheory.IntermediateField.Adjoin.Algebra

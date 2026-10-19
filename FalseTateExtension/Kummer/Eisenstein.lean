@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Layers
-public import FalseTateExtension.Padic.CyclotomicRamification
+public import FalseTateExtension.Layers.Basic
+public import FalseTateExtension.Cyclotomic.Ramification
 public import FontaineWintenberger.Ramification.Norm.Valuation
 public import FontaineWintenberger.Ramification.Different.Monogenic
 public import FontaineWintenberger.Ramification.Lower.SpectralMaps

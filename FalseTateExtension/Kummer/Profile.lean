@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.RadicalRamification
+public import FalseTateExtension.Kummer.Eisenstein
 public import FontaineWintenberger.APF.Elementary.PrimeDegree
 public import FontaineWintenberger.APF.BaseChange.Basic
 public import FontaineWintenberger.APF.Strict

@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.FiniteCharacter
+public import FalseTateExtension.Cyclotomic.FiniteCharacter
 public import FontaineWintenberger.Ramification.Lower.Generator
 public import FontaineWintenberger.Ramification.Lower.Basic
 public import FontaineWintenberger.Ramification.Upper.Basic

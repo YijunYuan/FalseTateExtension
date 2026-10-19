@@ -5,10 +5,10 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.CyclotomicUpper
-public import FalseTateExtension.Padic.CyclotomicInertia
-public import FalseTateExtension.Padic.InfiniteCharacter
-public import FalseTateExtension.Padic.GeneralCharacter
+public import FalseTateExtension.Cyclotomic.Filtration
+public import FalseTateExtension.Cyclotomic.Inertia
+public import FalseTateExtension.Cyclotomic.InfiniteCharacter
+public import FalseTateExtension.Cyclotomic.CharacterNaturality
 public import FontaineWintenberger.Ramification.Infinite.Basic
 public import FontaineWintenberger.APF.Galois
 public import FontaineWintenberger.APF.Strict

@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.CoordinateTransitions
+public import FalseTateExtension.Coordinates.Transitions
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
 
 /-!

@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.Cyclotomic
-public import FalseTateExtension.GaloisLayers
+public import FalseTateExtension.Cyclotomic.Basic
+public import FalseTateExtension.Layers.Galois
 public import FontaineWintenberger.Ramification.Norm.Valuation
 public import FontaineWintenberger.Ramification.Lower.Basic
 public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots

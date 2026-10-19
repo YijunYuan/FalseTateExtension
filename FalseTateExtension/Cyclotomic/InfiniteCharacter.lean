@@ -5,9 +5,9 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.FiniteCharacter
+public import FalseTateExtension.Cyclotomic.FiniteCharacter
 public import FalseTateExtension.CyclotomicImage
-public import FalseTateExtension.Padic.CyclotomicRestriction
+public import FalseTateExtension.Cyclotomic.Restriction
 
 /-!
 # The actual infinite rational cyclotomic character

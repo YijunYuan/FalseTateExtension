@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.CompatibleRoots
+public import FalseTateExtension.Layers.CompatibleRoots
 public import FalseTateExtension.Mathlib.FieldTheory.IntermediateField.Supremum
 
 /-!

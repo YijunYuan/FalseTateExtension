@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Layers
+public import FalseTateExtension.Layers.Basic
 public import Mathlib.FieldTheory.KummerExtension
 public import Mathlib.FieldTheory.Normal.Basic
 public import FontaineWintenberger.Mathlib.FieldTheory.FiniteIntermediateField

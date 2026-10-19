@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.CyclotomicRamification
+public import FalseTateExtension.Cyclotomic.Ramification
 public import FontaineWintenberger.Ramification.Upper.Transport
 public import FontaineWintenberger.Ramification.Lower.Inertia
 public import FontaineWintenberger.APF.BaseChange.UpperGroups

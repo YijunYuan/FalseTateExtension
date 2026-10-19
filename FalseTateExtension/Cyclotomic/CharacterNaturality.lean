@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.InfiniteCharacter
+public import FalseTateExtension.Cyclotomic.InfiniteCharacter
 public import FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed

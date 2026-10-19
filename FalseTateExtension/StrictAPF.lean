@@ -6,9 +6,9 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.AffineIndex
-public import FalseTateExtension.Padic.CyclotomicAPF
-public import FalseTateExtension.Padic.CyclotomicInertiaCompletion
-public import FalseTateExtension.KummerProfile
+public import FalseTateExtension.Cyclotomic.APF
+public import FalseTateExtension.Cyclotomic.InertiaImage
+public import FalseTateExtension.Kummer.Profile
 public import FontaineWintenberger.APF.Galois
 public import FontaineWintenberger.APF.Galois.Restriction
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence

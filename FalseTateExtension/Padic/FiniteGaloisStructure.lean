@@ -6,8 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.GaloisStructure
-public import FalseTateExtension.Padic.InfiniteCharacter
-public import FalseTateExtension.Padic.CyclotomicUpper
+public import FalseTateExtension.Cyclotomic.InfiniteCharacter
+public import FalseTateExtension.Cyclotomic.Filtration
 public import FontaineWintenberger.Ramification.Lower.Inertia
 public import FontaineWintenberger.Ramification.Different.Subextension
 public import FontaineWintenberger.Ramification.Upper.ResidueEquiv

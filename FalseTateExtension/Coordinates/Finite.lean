@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.GaloisLayers
+public import FalseTateExtension.Layers.Galois
 
 /-!
 # Finite cyclotomic and Kummer coordinates

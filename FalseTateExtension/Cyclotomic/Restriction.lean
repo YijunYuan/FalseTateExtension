@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.GaloisLayers
+public import FalseTateExtension.Layers.Galois
 public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 public import Mathlib.FieldTheory.Galois.Profinite
 
