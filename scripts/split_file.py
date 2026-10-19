@@ -50,7 +50,8 @@ def main(spec_path):
     used = set()
     prev_modules = []
     for part in spec['parts']:
-        out = copyright + ['module', ''] + sorted(set(imports + ['public import ' + m for m in part.get('imports', []) + prev_modules]))
+        base = [l for l in imports if not l.startswith('public import ' + spec.get('lib_prefix', 'FalseTateExtension') + '.')] if part.get('drop_project_imports') else imports
+        out = copyright + ['module', ''] + sorted(set(base + ['public import ' + m for m in part.get('imports', []) + prev_modules]))
         out += ['', '/-!', '# ' + part['title'], '', part.get('doc', ''), '-/', '', '@[expose] public section'] + pre
         for s in part['sections']:
             if s == '_toplevel':

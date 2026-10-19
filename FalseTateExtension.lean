@@ -5,60 +5,14 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.GaloisStructure
-public import FalseTateExtension.Padic.FiniteGaloisStructure
-public import FontaineWintenberger
-
-public import FalseTateExtension.Layers.CompatibleRoots
-public import FalseTateExtension.Layers.Basic
-public import FalseTateExtension.Layers.Galois
-public import FalseTateExtension.Coordinates.Finite
-public import FalseTateExtension.Coordinates.Transitions
-public import FalseTateExtension.Coordinates.Padic
-
-public import FalseTateExtension.Mathlib.Topology.Algebra.SemidirectProduct
-public import FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity
-public import FalseTateExtension.Affine.Group
-public import FalseTateExtension.Coordinates.AffineEmbedding
-public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
-public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
-public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
-public import FalseTateExtension.Mathlib.FieldTheory.IntermediateField.Supremum
-public import FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality
-public import FalseTateExtension.Mathlib.NumberTheory.Padics.ClosedAddSubgroup
-public import FalseTateExtension.Mathlib.NumberTheory.Padics.Cyclotomic
-public import FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniformizer
-public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
-public import FalseTateExtension.Mathlib.Data.ZMod.UnitsMap
-
-public import FalseTateExtension.Coordinates.CyclotomicImage
-
-public import FalseTateExtension.Coordinates.AffineKernel
-
-public import FalseTateExtension.Padic.Basic
-public import FalseTateExtension.Padic.ClosedAddSubgroup
-public import FalseTateExtension.Affine.ClosedSubgroup
-public import FalseTateExtension.Affine.Index
-public import FalseTateExtension.Cyclotomic.Basic
-public import FalseTateExtension.Cyclotomic.Ramification
-public import FalseTateExtension.Cyclotomic.Filtration
-public import FalseTateExtension.Cyclotomic.FiniteCharacter
-public import FalseTateExtension.Cyclotomic.Restriction
-public import FalseTateExtension.Cyclotomic.InfiniteCharacter
-public import FalseTateExtension.Cyclotomic.CharacterNaturality
-public import FalseTateExtension.Cyclotomic.ResidueBound
-public import FalseTateExtension.Cyclotomic.Inertia
-public import FalseTateExtension.Cyclotomic.InertiaImage
-
-public import FalseTateExtension.Cyclotomic.APF
-public import FalseTateExtension.Kummer.Eisenstein
-public import FalseTateExtension.Kummer.StepProfile
-public import FalseTateExtension.Kummer.Breaks
-public import FalseTateExtension.Kummer.FiniteProfile
-public import FalseTateExtension.Kummer.APF
-public import FalseTateExtension.StrictAPF
-public import FalseTateExtension.Padic.Viviani
-public import FalseTateExtension.FalseTate.Viviani.TauRamification
+public import FalseTateExtension.Mathlib
+public import FalseTateExtension.Padic
+public import FalseTateExtension.Affine
+public import FalseTateExtension.Layers
+public import FalseTateExtension.Coordinates
+public import FalseTateExtension.Cyclotomic
+public import FalseTateExtension.Kummer
+public import FalseTateExtension.FalseTate
 
 /-!
 # False Tate, Kummer, and cyclotomic extensions

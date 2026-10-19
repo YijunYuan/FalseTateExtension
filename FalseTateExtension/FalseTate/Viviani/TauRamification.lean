@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Padic.Viviani
+public import FalseTateExtension.FalseTate.Viviani.Corollary
 public import FontaineWintenberger.Ramification.Lower.Generator
 public import Mathlib.Analysis.SpecificLimits.Normed
 

@@ -1,0 +1,238 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
+module
+
+public import FalseTateExtension.Coordinates.AffineKernel
+public import FalseTateExtension.Cyclotomic.CyclicLayers
+public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
+public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
+public import FalseTateExtension.FalseTate.StrictAPF
+public import Mathlib.FieldTheory.Galois.Abelian
+public import Mathlib.FieldTheory.LinearDisjoint
+public import Mathlib.RingTheory.ZMod.UnitsCyclic
+
+/-!
+# The first radical is not cyclotomic
+
+For `p ≠ 2` and a uniformizer `π` of a finite extension `K/ℚ_p`, `π^{1/p}` does not lie in
+`K(ζ_{p^∞})`: a power-basis eigenvector comparison shows that `K(π^{1/p})` is not a cyclotomic
+layer.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, Lemma 5.1.2.
+-/
+
+@[expose] public section
+
+noncomputable section
+
+namespace FalseTateExtension
+
+open Polynomial
+open FontaineWintenberger
+
+section RadicalNormality
+
+open Polynomial
+
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
+variable (p : ℕ) [Fact p.Prime]
+variable (π : 𝒪[K])
+
+omit [CharZero K] in
+theorem uniformizer_ne_pow_mul_torsion [hπ : Fact (Irreducible π)]
+    (a u : K) {N : ℕ} (hN : N ≠ 0) (hu : u ^ N = 1) : (π : K) ≠ a ^ p * u := by
+  intro heq
+  have hunorm : ‖u‖ = 1 := by
+    apply (pow_left_inj₀ (norm_nonneg u) zero_le_one hN).mp
+    simp only [← norm_pow, hu, norm_one, one_pow]
+  have hπnorm : ‖(π : K)‖ ≤ 1 := by
+    have hmem := π.property
+    change ‖(π : K)‖₊ ≤ 1 at hmem
+    exact_mod_cast hmem
+  have hanorm : ‖a‖ ≤ 1 := by
+    by_contra! h
+    have hpw := one_lt_pow₀ h (Fact.out : p.Prime).ne_zero
+    rw [heq, norm_mul, norm_pow, hunorm, mul_one] at hπnorm
+    exact (not_lt_of_ge hπnorm) hpw
+  let a₀ : 𝒪[K] :=
+    ⟨a, by change ‖a‖₊ ≤ 1; exact_mod_cast hanorm⟩
+  let u₀ : 𝒪[K] :=
+    ⟨u, by change ‖u‖₊ ≤ 1; exact_mod_cast hunorm.le⟩
+  have hu₀ : u₀ ^ N = 1 := Subtype.ext hu
+  have huunit : IsUnit u₀ := (Units.ofPowEqOne u₀ N hu₀ hN).isUnit
+  have heq₀ : π = a₀ ^ p * u₀ := Subtype.ext heq
+  have hv : p • IsDiscreteValuationRing.addVal _ a₀ = 1 := by
+    calc
+      _ = IsDiscreteValuationRing.addVal _ (a₀ ^ p * u₀) := by
+        rw [IsDiscreteValuationRing.addVal_mul, IsDiscreteValuationRing.addVal_pow,
+          IsDiscreteValuationRing.addVal_eq_zero_iff.mpr huunit, add_zero]
+      _ = IsDiscreteValuationRing.addVal _ π :=
+        congrArg (IsDiscreteValuationRing.addVal _) heq₀.symm
+      _ = 1 := IsDiscreteValuationRing.addVal_uniformizer hπ.out
+  have hnat := congrArg (fun v : ℕ∞ => v.toNat) hv
+  simp only [nsmul_eq_mul, ENat.toNat_mul, ENat.toNat_natCast, ENat.toNat_one] at hnat
+  exact (Fact.out : p.Prime).not_dvd_one ⟨_, hnat.symm⟩
+
+/-- If a radical layer is already Galois, its normality contains
+all the corresponding roots of unity in that same field. -/
+theorem cyclotomicLayer_le_radicalLayer_of_isGalois [hπ : Fact (Irreducible π)] (n : ℕ)
+    [IsGalois K (radicalLayer p (π : K) n)] :
+    cyclotomicLayer (K := K) p n ≤ radicalLayer p (π : K) n := by
+  let F := radicalLayer p (π : K) n
+  let f : K[X] := X ^ (p ^ n) - C (π : K)
+  have hsplit : (f.map (algebraMap K F)).Splits := by
+    have h := Normal.splits (inferInstance : Normal K F) (radicalLayerRoot p (π : K) n)
+    simpa only [minpoly_radicalLayerRoot p π n] using h
+  have hle : falseTateLayer p (π : K) n n ≤ F := by
+    rw [← adjoin_rootSet_eq_falseTateLayer p (π : K) n]
+    apply IntermediateField.adjoin_le_iff.mpr
+    rw [← hsplit.image_rootSet F.val]
+    rintro _ ⟨x, _, rfl⟩
+    exact x.property
+  exact (show cyclotomicLayer (K := K) p n ≤ falseTateLayer p (π : K) n n from
+    le_sup_right).trans hle
+
+/-- Normality of the first Eisenstein radical layer forces the first
+cyclotomic layer to be the base. -/
+theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p]) K]
+    [hπ : Fact (Irreducible π)]
+    [IsGalois K (radicalLayer p (π : K) 1)] :
+    cyclotomicLayer (K := K) p 1 = ⊥ := by
+  have hd : Module.finrank K (cyclotomicLayer (K := K) p 1) ∣ p := by
+    simpa only [finrank_radicalLayer p π 1, pow_one] using
+      IntermediateField.finrank_dvd_of_le_right
+        (cyclotomicLayer_le_radicalLayer_of_isGalois p π 1)
+  have hle : Module.finrank K (cyclotomicLayer (K := K) p 1) ≤ p - 1 := by
+    simpa only [pow_one, Nat.totient_prime (Fact.out : p.Prime)] using
+      finrank_cyclotomicLayer_le_totient (K := K) p 1
+  have hd₁ : Module.finrank K (cyclotomicLayer (K := K) p 1) = 1 := by
+    rcases (Nat.dvd_prime (Fact.out : p.Prime)).mp hd with h | h
+    · exact h
+    · have := (Fact.out : p.Prime).pos
+      omega
+  apply le_antisymm _ bot_le
+  exact IntermediateField.adjoin_simple_le_iff.mpr
+    (IntermediateField.finrank_adjoin_simple_eq_one_iff.mp hd₁)
+
+/-- The first radical cannot belong to the infinite
+cyclotomic extension at an odd prime. The proof uses finite cyclicity and
+the reverse eigenbasis comparison over the base. -/
+theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+    radical p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
+  intro hmem
+  obtain ⟨m, hm⟩ := (mem_cyclotomicExtension_iff p _).mp hmem
+  have hFm : radicalLayer p (π : K) 1 ≤ cyclotomicLayer p m :=
+    IntermediateField.adjoin_simple_le_iff.mpr hm
+  have := cyclotomicLayer_isAbelianGalois (K := K) p m
+  have : IsAbelianGalois K (radicalLayer p (π : K) 1) :=
+    IsAbelianGalois.of_algHom (IntermediateField.inclusion hFm)
+  have h₁ := cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois p π
+  obtain ⟨r, _, hprev, hnext, hF⟩ :=
+    exists_eq_first_cyclotomicLayer_of_finrank_prime p (radicalLayer p (π : K) 1)
+      hFm (by simpa only [pow_one] using finrank_radicalLayer p π 1) h₁
+  obtain ⟨u, hu, _⟩ := cyclotomicLayer_step_minpoly_of_eq_bot p r h₁ hprev hnext
+  let C := cyclotomicLayer (K := K) p (r + 1)
+  let B : PowerBasis K C := IntermediateField.adjoin.powerBasis
+    (show IsIntegral K (rootOfUnity (K := K) p (r + 1)) from Algebra.IsIntegral.isIntegral _)
+  have hdim : B.dim = p := B.finrank.symm.trans
+    (cyclotomicLayer_step_finrank_of_eq_bot p r h₁ hprev hnext)
+  have hβpow : B.gen ^ p = algebraMap K C u := by
+    apply C.val.injective
+    exact rootOfUnity_succ_pow (K := K) p r |>.trans hu.symm
+  have hβunity : B.gen ^ (p ^ (r + 1)) = 1 :=
+    Subtype.ext (rootOfUnity_pow (K := K) p (r + 1))
+  have hβ₀ : B.gen ≠ 0 := by
+    intro hz
+    rw [hz, zero_pow (pow_ne_zero (r + 1) (Fact.out : p.Prime).ne_zero)] at hβunity
+    exact zero_ne_one hβunity
+  have hαmem : radical p (π : K) 1 ∈ C := by
+    change radical p (π : K) 1 ∈ cyclotomicLayer p (r + 1)
+    rw [← hF]
+    exact radical_mem_radicalLayer p (π : K) 1
+  let α : C := ⟨radical p (π : K) 1, hαmem⟩
+  have hαpow : α ^ p = algebraMap K C (π : K) := by
+    apply C.val.injective
+    change radical p (π : K) 1 ^ p = algebraMap K (AlgebraicClosure K) (π : K)
+    simpa only [pow_one] using radical_pow p (π : K) 1
+  have hα₀ : α ≠ 0 := by
+    intro hz
+    exact radical_ne_zero p (π : K) 1
+      (congrArg Subtype.val hz)
+  have hζmem : rootOfUnity (K := K) p 1 ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
+    rw [← h₁]
+    exact rootOfUnity_mem_cyclotomicLayer p 1
+  obtain ⟨z, hz⟩ := hζmem
+  change algebraMap K (AlgebraicClosure K) z = rootOfUnity p 1 at hz
+  have hzprim : IsPrimitiveRoot z p := by
+    have hh : IsPrimitiveRoot (algebraMap K (AlgebraicClosure K) z) p := by
+      rw [hz]
+      simpa only [pow_one] using isPrimitiveRoot_rootOfUnity (K := K) p 1
+    exact hh.of_map_of_injective (f := algebraMap K (AlgebraicClosure K))
+      (algebraMap K (AlgebraicClosure K)).injective
+  have hzC : IsPrimitiveRoot (algebraMap K C z) p :=
+    hzprim.map_of_injective (algebraMap K C).injective
+  have hcard : Nat.card (C ≃ₐ[K] C) = p :=
+    (IsGalois.card_aut_eq_finrank K C).trans
+      (cyclotomicLayer_step_finrank_of_eq_bot p r h₁ hprev hnext)
+  have : Nontrivial (C ≃ₐ[K] C) :=
+    Finite.one_lt_card_iff_nontrivial.mp (hcard ▸ (Fact.out : p.Prime).one_lt)
+  obtain ⟨σ, hσ⟩ := exists_ne (1 : C ≃ₐ[K] C)
+  have hσβ : σ B.gen ≠ B.gen := by
+    intro hfix
+    apply hσ
+    have heq : σ.toAlgHom = (1 : C ≃ₐ[K] C).toAlgHom := by
+      apply IntermediateField.adjoin_algHom_ext
+      intro x hx
+      obtain rfl := Set.mem_singleton_iff.mp hx
+      exact hfix
+    exact AlgEquiv.ext (AlgHom.congr_fun heq)
+  have hratio {x : C} (hx₀ : x ≠ 0) {a : K} (hx : x ^ p = algebraMap K C a) :
+      (σ x / x) ^ p = 1 := by
+    rw [div_pow, ← map_pow, hx, σ.commutes, ← hx, div_self (pow_ne_zero p hx₀)]
+  obtain ⟨c, hc, hceq⟩ := hzC.eq_pow_of_pow_eq_one (hratio hβ₀ hβpow)
+  have hc₀ : c ≠ 0 := by
+    intro hc₀
+    apply hσβ
+    have hdiv : σ B.gen / B.gen = 1 := by simpa only [hc₀, pow_zero] using hceq.symm
+    exact (div_eq_one_iff_eq hβ₀).mp hdiv
+  have hcop : c.Coprime p := ((Fact.out : p.Prime).coprime_iff_not_dvd.mpr
+    (Nat.not_dvd_of_pos_of_lt (Nat.pos_of_ne_zero hc₀) hc)).symm
+  have hprimitive : IsPrimitiveRoot (z ^ c) B.dim := by
+    rw [hdim]
+    exact hzprim.pow_of_coprime c hcop
+  have hgen : σ B.gen = (z ^ c) • B.gen := by
+    rw [Algebra.smul_def]
+    rw [map_pow, hceq, div_mul_cancel₀ _ hβ₀]
+  obtain ⟨b, _, hbeq⟩ := hzC.eq_pow_of_pow_eq_one (hratio hα₀ hαpow)
+  have heigen : σ α = (z ^ b) • α := by
+    rw [Algebra.smul_def]
+    rw [map_pow, hbeq, div_mul_cancel₀ _ hα₀]
+  obtain ⟨i, a, ha⟩ := B.eigenvector_eq_smul_pow σ hprimitive hgen hα₀ heigen
+  have heq : (π : K) = a ^ p * u ^ (i : ℕ) := by
+    apply (algebraMap K C).injective
+    rw [map_mul, map_pow, map_pow]
+    calc
+      _ = α ^ p := hαpow.symm
+      _ = (a • B.gen ^ (i : ℕ)) ^ p := congrArg (fun x : C => x ^ p) ha
+      _ = algebraMap K C a ^ p * (B.gen ^ p) ^ (i : ℕ) := by
+        simp only [Algebra.smul_def, mul_pow]
+        congr 1
+        rw [← pow_mul, ← pow_mul, Nat.mul_comm (i : ℕ) p]
+      _ = _ := by rw [hβpow]
+  have hunity : (u ^ (i : ℕ)) ^ (p ^ r) = 1 := by
+    apply (algebraMap K (AlgebraicClosure K)).injective
+    rw [map_pow, map_pow, hu, ← pow_mul, Nat.mul_comm (i : ℕ) (p ^ r), pow_mul,
+      rootOfUnity_pow, one_pow, map_one]
+  exact uniformizer_ne_pow_mul_torsion p π a (u ^ (i : ℕ))
+    (pow_ne_zero r (Fact.out : p.Prime).ne_zero) hunity heq
+
+end RadicalNormality
+
+end FalseTateExtension
+end

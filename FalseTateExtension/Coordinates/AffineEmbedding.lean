@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Coordinates.Padic
-public import FalseTateExtension.Affine.Group
+public import FalseTateExtension.Affine.Padic
 public import FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity
 public import Mathlib.FieldTheory.Galois.Profinite
 public import Mathlib.Algebra.Ring.AddAut
@@ -32,25 +32,6 @@ namespace FalseTateExtension
 noncomputable section
 
 variable (p : ℕ) [Fact p.Prime]
-
-/-- `ℤ_[p]ˣ` acting on `ℤ_[p]` by multiplication. -/
-abbrev padicAffineAction : ℤ_[p]ˣ →* MulAut (Multiplicative ℤ_[p]) :=
-  affineAction ℤ_[p] (MonoidHom.id ℤ_[p]ˣ)
-
-/-- The affine group `ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
-abbrev PadicAffineGroup : Type := AffineGroup ℤ_[p] (MonoidHom.id ℤ_[p]ˣ)
-
-/-- The coordinates `ℤ_[p] ⋊ ℤ_[p]ˣ ≃ₜ ℤ_[p] × ℤ_[p]ˣ`. -/
-abbrev padicAffineHomeomorphProd : PadicAffineGroup p ≃ₜ ℤ_[p] × ℤ_[p]ˣ :=
-  AffineGroup.homeomorphProd _
-
-theorem continuous_padicAffine_left :
-    Continuous (fun x : PadicAffineGroup p ↦ x.left.toAdd) :=
-  AffineGroup.continuous_left _
-
-theorem continuous_padicAffine_right :
-    Continuous (fun x : PadicAffineGroup p ↦ x.right) :=
-  AffineGroup.continuous_right _
 
 variable {K : Type*} [Field K] [CharZero K] (π : K)
 

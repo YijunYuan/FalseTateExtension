@@ -18,7 +18,7 @@ LIB = ROOT_FILE.stem
 SRC = ROOT / LIB
 # Layers in import order (each may import only earlier ones). Filled in once the tree is
 # reorganized (refactor phase F8); empty means "only check reachability".
-LAYERS: list[str] = []
+LAYERS: list[str] = ['Mathlib', 'Padic', 'Affine', 'Layers', 'Coordinates', 'Cyclotomic', 'Kummer', 'FalseTate']
 LAYER_ORDER = {
     'Mathlib': 0, 'Padic': 1, 'Affine': 1, 'Layers': 2, 'Coordinates': 3,
     'Cyclotomic': 4, 'Kummer': 4, 'FalseTate': 5,
