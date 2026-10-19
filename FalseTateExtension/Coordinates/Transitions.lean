@@ -10,15 +10,28 @@ public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 public import Mathlib.Data.ZMod.Units
 
 /-!
-# Transition maps for finite false Tate coordinates
+# Compatibility of the coordinates under restriction
 
-Finite Galois restriction between the diagonal layers is
-compatible with reduction of the Kummer and cyclotomic coordinates. Iterated
-radical and root-of-unity power relations identify the smaller generators
-inside the larger fields.
+Let `K` be a field of characteristic zero, `p` a prime, `π ∈ K` nonzero and
+`L_n = K(π^{1/p^n}, ζ_{p^n})`. For `n ≤ m`, restriction `Gal(L_m/K) → Gal(L_n/K)` is a
+surjective homomorphism, and the cyclotomic character and Kummer exponent of the restriction
+are the reductions modulo `p^n` of those of the automorphism of `L_m`:
+`χ_n(g|_{L_n}) = χ_m(g) mod p^n` and `b_n(g|_{L_n}) = b_m(g) mod p^n`. This rests on the
+relations `(π^{1/p^m})^{p^{m-n}} = π^{1/p^n}` and `ζ_{p^m}^{p^{m-n}} = ζ_{p^n}`.
 
-This proves blueprint `ft:coordinate-transitions`, the compatible-root
-transition argument in Liu, Section 5.1, including the zeroth layer.
+## Main results
+
+* `finiteLayerRestriction`: the restriction homomorphism `Gal(L_m/K) → Gal(L_n/K)`.
+* `finiteLayerRestriction_surjective`, `finiteLayerRestriction_comp`: it is surjective and
+  transitive in the layers.
+* `radical_pow_sub`, `rootOfUnity_pow_sub`: `(π^{1/p^m})^{p^{m-n}} = π^{1/p^n}` and
+  `ζ_{p^m}^{p^{m-n}} = ζ_{p^n}`.
+* `finiteKummerExponent_restrict`: `b_n(g|_{L_n}) = b_m(g) mod p^n`.
+* `finiteCyclotomicCharacter_restrict`: `χ_n(g|_{L_n}) = χ_m(g) mod p^n`.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
 -/
 
 @[expose] public section
@@ -29,14 +42,14 @@ noncomputable section
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- Galois restriction between diagonal layers `n ≤ m`. -/
+/-- Restriction `Gal(L_m/K) → Gal(L_n/K)` between diagonal layers, for `n ≤ m`. -/
 def finiteLayerRestriction [hπ : NeZero π] {n m : ℕ} (h : n ≤ m) :
     (falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) →*
       (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :=
   haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE (falseTateLayer_mono p π h h)
 
-/-- Restriction commutes with the inclusion of the smaller layer into the larger one. -/
+/-- `g|_{L_n}(x) = g(x)` for `x ∈ L_n ⊆ L_m`. -/
 theorem finiteLayerRestriction_commutes [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m)
     (x : falseTateLayer p π n n) :
@@ -46,20 +59,21 @@ theorem finiteLayerRestriction_commutes [hπ : NeZero π] {n m : ℕ} (h : n ≤
   haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
-/-- Every automorphism of a smaller diagonal layer extends to a larger one. -/
+/-- Restriction `Gal(L_m/K) → Gal(L_n/K)` is surjective. -/
 theorem finiteLayerRestriction_surjective [hπ : NeZero π] {n m : ℕ} (h : n ≤ m) :
     Function.Surjective (finiteLayerRestriction p π h) :=
   haveI := falseTateLayer_isGalois p π n
   haveI := falseTateLayer_isGalois p π m
   IntermediateField.restrictNormalHomOfLE_surjective _
 
+/-- Restriction from `L_n` to itself is the identity. -/
 @[simp]
 theorem finiteLayerRestriction_refl [hπ : NeZero π] (n : ℕ) :
     finiteLayerRestriction p π (le_refl n) = MonoidHom.id _ :=
   haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE_refl
 
-/-- Restriction is transitive in the layers. -/
+/-- Restricting from `L_l` to `L_m` and then to `L_n` is restricting from `L_l` to `L_n`. -/
 theorem finiteLayerRestriction_comp [hπ : NeZero π] {n m l : ℕ}
     (hnm : n ≤ m) (hml : m ≤ l) :
     (finiteLayerRestriction p π hnm).comp (finiteLayerRestriction p π hml) =
@@ -69,8 +83,7 @@ theorem finiteLayerRestriction_comp [hπ : NeZero π] {n m l : ℕ}
   IntermediateField.restrictNormalHomOfLE_comp _ _
 
 omit [CharZero K] in
-/-- Iterating compatibility expresses a smaller radical as a power of a
-larger one. -/
+/-- `(π^{1/p^{n+k}})^{p^k} = π^{1/p^n}`. -/
 theorem radical_add_pow (n k : ℕ) : radical p π (n + k) ^ (p ^ k) = radical p π n := by
   induction k with
   | zero => simp
@@ -79,12 +92,13 @@ theorem radical_add_pow (n k : ℕ) : radical p π (n + k) ^ (p ^ k) = radical p
       rw [pow_succ', pow_mul, radical_succ_pow, ih]
 
 omit [CharZero K] in
+/-- `(π^{1/p^m})^{p^{m-n}} = π^{1/p^n}` for `n ≤ m`. -/
 theorem radical_pow_sub {n m : ℕ} (h : n ≤ m) :
     radical p π m ^ (p ^ (m - n)) = radical p π n := by
   have he : n + (m - n) = m := by omega
   simpa only [he] using radical_add_pow p π n (m - n)
 
-/-- Iterated compatibility of the roots of unity. -/
+/-- `ζ_{p^{n+k}}^{p^k} = ζ_{p^n}`. -/
 theorem rootOfUnity_add_pow (n k : ℕ) :
     rootOfUnity (K := K) p (n + k) ^ (p ^ k) = rootOfUnity p n := by
   induction k with
@@ -93,25 +107,27 @@ theorem rootOfUnity_add_pow (n k : ℕ) :
       change rootOfUnity (K := K) p (n + k + 1) ^ (p ^ (k + 1)) = rootOfUnity p n
       rw [pow_succ', pow_mul, rootOfUnity_succ_pow, ih]
 
+/-- `ζ_{p^m}^{p^{m-n}} = ζ_{p^n}` for `n ≤ m`. -/
 theorem rootOfUnity_pow_sub {n m : ℕ} (h : n ≤ m) :
     rootOfUnity (K := K) p m ^ (p ^ (m - n)) = rootOfUnity p n := by
   have he : n + (m - n) = m := by omega
   simpa only [he] using rootOfUnity_add_pow (K := K) p n (m - n)
 
+/-- In `L_m`, the element `π^{1/p^n}` of `L_n` is `(π^{1/p^m})^{p^{m-n}}`. -/
 theorem inclusion_layerRadical {n m : ℕ} (h : n ≤ m) :
     IntermediateField.inclusion (falseTateLayer_mono p π h h) (layerRadical p π n) =
       layerRadical p π m ^ (p ^ (m - n)) := by
   apply Subtype.ext
   exact (radical_pow_sub p π h).symm
 
+/-- In `L_m`, the element `ζ_{p^n}` of `L_n` is `ζ_{p^m}^{p^{m-n}}`. -/
 theorem inclusion_layerRootOfUnity {n m : ℕ} (h : n ≤ m) :
     IntermediateField.inclusion (falseTateLayer_mono p π h h) (layerRootOfUnity p π n) =
       layerRootOfUnity p π m ^ (p ^ (m - n)) := by
   apply Subtype.ext
   exact (rootOfUnity_pow_sub (K := K) p h).symm
 
-/-- Before reducing the exponent, restriction evaluates on the smaller
-radical using the Kummer coordinate of the larger layer. -/
+/-- `g|_{L_n}(π^{1/p^n}) = ζ_{p^n}^{b_m(g)} π^{1/p^n}` for `g ∈ Gal(L_m/K)`. -/
 theorem finiteLayerRestriction_radical [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteLayerRestriction p π h g (layerRadical p π n) =
@@ -125,8 +141,7 @@ theorem finiteLayerRestriction_radical [hπ : NeZero π] {n m : ℕ} (h : n ≤ 
   congr 1
   rw [← pow_mul, Nat.mul_comm, pow_mul]
 
-/-- Restriction evaluates on the smaller primitive root using the larger
-finite cyclotomic character. -/
+/-- `g|_{L_n}(ζ_{p^n}) = ζ_{p^n}^{χ_m(g)}` for `g ∈ Gal(L_m/K)`. -/
 theorem finiteLayerRestriction_rootOfUnity [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteLayerRestriction p π h g (layerRootOfUnity p π n) =
@@ -138,8 +153,7 @@ theorem finiteLayerRestriction_rootOfUnity [hπ : NeZero π] {n m : ℕ} (h : n 
     finiteCyclotomicCharacter_spec p π m g]
   rw [← pow_mul, Nat.mul_comm, pow_mul]
 
-/-- A power of the smaller primitive root depends only on reduction of an
-exponent from the larger residue ring. No nontriviality of `ZMod 1` is needed. -/
+/-- `ζ_{p^n}^{a mod p^n} = ζ_{p^n}^a` for `a ∈ ℤ/p^m`, `n ≤ m`. -/
 theorem layerRootOfUnity_pow_reduction {n m : ℕ} (h : n ≤ m) (a : ZMod (p ^ m)) :
     layerRootOfUnity p π n ^
         (ZMod.castHom (pow_dvd_pow p h) (ZMod (p ^ n)) a).val =
@@ -157,8 +171,7 @@ theorem layerRootOfUnity_pow_reduction {n m : ℕ} (h : n ≤ m) (a : ZMod (p ^ 
     simpa only [← (isPrimitiveRoot_layerRootUnit p π n).eq_orderOf] using hm
   simpa only [Units.val_pow_eq_pow_val, coe_layerRootUnit] using congrArg Units.val hu
 
-/-- The finite Kummer exponents are compatible under the finite Galois
-restriction and residue-ring reduction. -/
+/-- `b_n(g|_{L_n}) = b_m(g) mod p^n` for `g ∈ Gal(L_m/K)`. -/
 theorem finiteKummerExponent_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteKummerExponent p π n (finiteLayerRestriction p π h g) =
@@ -169,8 +182,7 @@ theorem finiteKummerExponent_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m
   exact congrArg (· * layerRadical p π n)
     (layerRootOfUnity_pow_reduction p π h (finiteKummerExponent p π m g)).symm
 
-/-- The finite cyclotomic characters are compatible with reduction
-on units. This includes transitions to the zeroth layer. -/
+/-- `χ_n(g|_{L_n}) = χ_m(g) mod p^n` for `g ∈ Gal(L_m/K)`. -/
 theorem finiteCyclotomicCharacter_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteCyclotomicCharacter p π n (finiteLayerRestriction p π h g) =

@@ -9,17 +9,32 @@ public import FalseTateExtension.Coordinates.Transitions
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
 
 /-!
-# P-adic cyclotomic and Kummer coordinates
+# The cyclotomic character and Kummer exponent of `Gal(K_FT/K)`
 
-The infinite false Tate extension contains the primitive roots of unity
-at every p-power order. Its cyclotomic character and a p-adic Kummer
-coordinate recover the previously constructed finite coordinates. The Kummer
-coordinate satisfies the cocycle identity, and the two coordinates determine
-the automorphism.
+Let `K` be a field of characteristic zero, `p` a prime, `π ∈ K` nonzero, and
+`K_FT = ⋃_n K(π^{1/p^n}, ζ_{p^n})`. Restriction to the diagonal layers gives surjective
+homomorphisms `Gal(K_FT/K) → Gal(K(π^{1/p^n}, ζ_{p^n})/K)` which are jointly injective.
+The finite coordinates of these restrictions are compatible, and their limits are the
+cyclotomic character `χ : Gal(K_FT/K) → ℤ_p^×`, with `g(ζ_{p^n}) = ζ_{p^n}^{χ(g)}`, and the
+Kummer exponent `b : Gal(K_FT/K) → ℤ_p`, with `g(π^{1/p^n}) = ζ_{p^n}^{b(g)} π^{1/p^n}` for
+every `n`. The exponent satisfies the cocycle rule `b(gh) = b(g) + χ(g) b(h)`, and
+`g ↦ (b(g), χ(g))` is injective.
 
-This proves blueprint `ft:padic-coordinates`, the compatible-coordinate
-construction in Liu, Section 5.1. No topology or semidirect-product assertion
-is made here.
+## Main results
+
+* `infiniteLayerRestriction`, `infiniteLayerRestriction_surjective`,
+  `infiniteLayerRestriction_jointly_injective`: restriction to the diagonal layers.
+* `padicCyclotomicCharacter`, `padicCyclotomicCharacter_toZModPow`: the character `χ` and its
+  reductions `χ mod p^n = χ_n`.
+* `padicKummerExponent`, `padicKummerExponent_toZModPow`: the exponent `b` and its reductions
+  `b mod p^n = b_n`.
+* `padicKummerExponent_mul`: the cocycle rule `b(gh) = b(g) + χ(g) b(h)`.
+* `padicCoordinates_injective`: `g ↦ (b(g), χ(g))` is injective.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1,
+  Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -30,14 +45,14 @@ noncomputable section
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- Galois restriction from `K_FT` to the diagonal layer `n`. -/
+/-- Restriction `Gal(K_FT/K) → Gal(K(π^{1/p^n}, ζ_{p^n})/K)`. -/
 def infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →*
       (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :=
   haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE (falseTateLayer_le_falseTateExtension p π n n)
 
-/-- Restriction commutes with the inclusion of the layer into `K_FT`. -/
+/-- `g|_{L_n}(x) = g(x)` for `x` in the diagonal layer `L_n ⊆ K_FT`. -/
 theorem infiniteLayerRestriction_commutes [hπ : NeZero π] (n : ℕ)
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π)
     (x : falseTateLayer p π n n) :
@@ -47,14 +62,14 @@ theorem infiniteLayerRestriction_commutes [hπ : NeZero π] (n : ℕ)
   haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
-/-- Every automorphism of a diagonal layer extends to `K_FT`. -/
+/-- Restriction `Gal(K_FT/K) → Gal(K(π^{1/p^n}, ζ_{p^n})/K)` is surjective. -/
 theorem infiniteLayerRestriction_surjective [hπ : NeZero π] (n : ℕ) :
     Function.Surjective (infiniteLayerRestriction p π n) :=
   haveI := falseTateLayer_isGalois p π n
   haveI := falseTateExtension_isGalois p π
   IntermediateField.restrictNormalHomOfLE_surjective _
 
-/-- Restriction to `K_FT` factors through restriction between layers. -/
+/-- Restricting from `K_FT` to `L_m` and then to `L_n` is restricting from `K_FT` to `L_n`. -/
 theorem infiniteLayerRestriction_comp [hπ : NeZero π] {n m : ℕ} (h : n ≤ m) :
     (finiteLayerRestriction p π h).comp (infiniteLayerRestriction p π m) =
       infiniteLayerRestriction p π n :=
@@ -62,8 +77,7 @@ theorem infiniteLayerRestriction_comp [hπ : NeZero π] {n m : ℕ} (h : n ≤ m
   haveI := falseTateLayer_isGalois p π m
   IntermediateField.restrictNormalHomOfLE_comp _ _
 
-/-- All finite restrictions together determine an automorphism, since their
-diagonal fields exhaust the infinite field. -/
+/-- Two automorphisms of `K_FT` with the same restriction to every diagonal layer are equal. -/
 theorem infiniteLayerRestriction_jointly_injective [hπ : NeZero π]
     {g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π}
     (heq : ∀ n, infiniteLayerRestriction p π n g = infiniteLayerRestriction p π n h) :
@@ -77,38 +91,38 @@ theorem infiniteLayerRestriction_jointly_injective [hπ : NeZero π]
   rw [← hx, ← infiniteLayerRestriction_commutes p π n g,
     ← infiniteLayerRestriction_commutes p π n h, heq n]
 
-/-- The primitive root of unity viewed in the infinite field. -/
+/-- `ζ_{p^n}` as an element of `K_FT`. -/
 def extensionRootOfUnity (n : ℕ) : falseTateExtension p π :=
   IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
     (layerRootOfUnity p π n)
 
+/-- `extensionRootOfUnity p π n` is `ζ_{p^n}` in the algebraic closure. -/
 @[simp]
 theorem coe_extensionRootOfUnity (n : ℕ) :
     (extensionRootOfUnity p π n : AlgebraicClosure K) = rootOfUnity p n := rfl
 
+/-- `ζ_{p^n}` is a primitive `p^n`-th root of unity in `K_FT`. -/
 theorem isPrimitiveRoot_extensionRootOfUnity (n : ℕ) :
     IsPrimitiveRoot (extensionRootOfUnity p π n) (p ^ n) :=
   (isPrimitiveRoot_layerRootOfUnity p π n).map_of_injective
     (f := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n))
     (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).injective
 
-/-- The infinite false Tate field contains enough roots at every
-p-power order, ruling out the cyclotomic character's missing-roots branch. -/
+/-- `K_FT` contains a primitive `p^n`-th root of unity for every `n`. -/
 instance falseTateExtension_hasEnoughRootsOfUnity (n : ℕ) :
     HasEnoughRootsOfUnity (falseTateExtension p π) (p ^ n) :=
   ⟨⟨extensionRootOfUnity p π n, isPrimitiveRoot_extensionRootOfUnity p π n⟩,
     rootsOfUnity.isCyclic _ _⟩
 
-/-- The Mathlib cyclotomic character of the infinite field,
-restricted to its K-algebra automorphisms. -/
+/-- The cyclotomic character `χ : Gal(K_FT/K) → ℤ_p^×`, given by `g(ζ) = ζ^{χ(g)}` for every
+`p`-power root of unity `ζ`. -/
 def padicCyclotomicCharacter :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* (ℤ_[p])ˣ :=
   (_root_.cyclotomicCharacter (falseTateExtension p π) p).comp
     (MulSemiringAction.toRingAut
       (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (falseTateExtension p π))
 
-/-- Every finite projection of the cyclotomic character is the
-finite cyclotomic coordinate of the corresponding restriction. -/
+/-- `χ(g) mod p^n = χ_n(g|_{L_n})`. -/
 theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     Units.map (PadicInt.toZModPow n).toMonoidHom (padicCyclotomicCharacter p π g) =
@@ -122,14 +136,13 @@ theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
   exact _root_.cyclotomicCharacter.spec p g.toRingEquiv (extensionRootOfUnity p π n)
     (isPrimitiveRoot_extensionRootOfUnity p π n).pow_eq_one
 
-/-- The nonnegative integer representative of a finite Kummer
-coordinate of an infinite-field automorphism. -/
+/-- The integer in `[0, p^n)` representing `b_n(g|_{L_n}) ∈ ℤ/p^n`. -/
 def kummerRepresentative [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) : ℤ :=
   (finiteKummerExponent p π n (infiniteLayerRestriction p π n g)).val
 
-/-- Successive integer representatives differ by a multiple of p^n, as a
-consequence of finite restriction compatibility. -/
+/-- The representatives of `b_{n+1}(g|_{L_{n+1}})` and `b_n(g|_{L_n})` are congruent modulo
+`p^n`. -/
 theorem kummerRepresentative_step [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     (p : ℤ) ^ n ∣ kummerRepresentative p π g (n + 1) - kummerRepresentative p π g n := by
@@ -147,16 +160,15 @@ theorem kummerRepresentative_step [hπ : NeZero π]
   have hd := (ZMod.intCast_eq_intCast_iff_dvd_sub ..).mp he
   simpa only [Nat.cast_pow] using hd
 
-/-- The p-adic Kummer coordinate is the limit of the compatible integer
-representatives supplied by the finite coordinates. -/
+/-- The Kummer exponent `b : Gal(K_FT/K) → ℤ_p`, the `p`-adic limit of the exponents
+`b_n(g|_{L_n})`; it satisfies `g(π^{1/p^n}) = ζ_{p^n}^{b(g)} π^{1/p^n}` for every `n`. -/
 def padicKummerExponent [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) : ℤ_[p] :=
   PadicInt.ofIntSeq (kummerRepresentative p π g)
     (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (kummerRepresentative p π g) p
       (kummerRepresentative_step p π g))
 
-/-- Every finite projection of the p-adic Kummer coordinate is the
-Kummer coordinate on the finite restriction. -/
+/-- `b(g) mod p^n = b_n(g|_{L_n})`. -/
 theorem padicKummerExponent_toZModPow [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     PadicInt.toZModPow n (padicKummerExponent p π g) =
@@ -166,8 +178,7 @@ theorem padicKummerExponent_toZModPow [hπ : NeZero π]
     (kummerRepresentative p π g) p (kummerRepresentative_step p π g) n]
   simp only [kummerRepresentative, Int.cast_natCast, ZMod.natCast_zmod_val]
 
-/-- The finite projection formulas uniquely determine the p-adic Kummer
-coordinate, hence make it independent of integer representative choices. -/
+/-- If `a ∈ ℤ_p` satisfies `a mod p^n = b_n(g|_{L_n})` for every `n`, then `b(g) = a`. -/
 theorem padicKummerExponent_unique [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (a : ℤ_[p])
     (ha : ∀ n, PadicInt.toZModPow n a =
@@ -177,8 +188,7 @@ theorem padicKummerExponent_unique [hπ : NeZero π]
   intro n
   rw [padicKummerExponent_toZModPow, ha n]
 
-/-- The finite cocycles pass to the p-adic coordinates through their
-projections. -/
+/-- The cocycle rule `b(gh) = b(g) + χ(g) b(h)`. -/
 theorem padicKummerExponent_mul [hπ : NeZero π]
     (g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     padicKummerExponent p π (g * h) = padicKummerExponent p π g +
@@ -192,8 +202,7 @@ theorem padicKummerExponent_mul [hπ : NeZero π]
   exact finiteKummerExponent_mul p π n
     (infiniteLayerRestriction p π n g) (infiniteLayerRestriction p π n h)
 
-/-- The p-adic Kummer and cyclotomic coordinates determine every
-automorphism of the infinite false Tate field. -/
+/-- `g ↦ (b(g), χ(g))` is injective on `Gal(K_FT/K)`. -/
 theorem padicCoordinates_injective [hπ : NeZero π] :
     Function.Injective (fun g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π ↦
       (padicKummerExponent p π g, padicCyclotomicCharacter p π g)) := by

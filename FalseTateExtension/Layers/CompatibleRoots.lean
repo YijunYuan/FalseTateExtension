@@ -8,15 +8,24 @@ module
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
-# Compatible radicals and primitive roots of unity
+# Compatible systems of radicals and roots of unity
 
-In an algebraically closed field of characteristic zero, every element admits
-a compatible sequence of p-power radicals, and primitive p-power roots of unity
-can be compatibly. The construction includes `p = 2` and a zero initial
-radicand.
+Let `Ω` be an algebraically closed field. Every `π ∈ Ω` is the first term of a sequence
+`(π_n)` with `π_{n+1}^p = π_n`, so that `π_n` is a `p^n`-th root of `π`. If moreover `Ω` has
+characteristic zero, there is a sequence `(ζ_n)` of primitive `p^n`-th roots of unity with
+`ζ_{n+1}^p = ζ_n` and `ζ_0 = 1`. These sequences are the roots adjoined to `K` in the
+false Tate extension `K(π^{1/p^∞}, ζ_{p^∞})`.
 
-This supplies the choices in blueprint `ft:compatible-roots`, following the
-setup of Liu, Section 5.1 (printed page 82).
+## Main results
+
+* `exists_pow_right_inverse`: `x ↦ x^p` has a right inverse on `Ω`.
+* `exists_compatible_radicals`: existence of a compatible system of `p`-power roots of `π`.
+* `exists_compatible_primitive_roots`: existence of a compatible system of primitive
+  `p`-power roots of unity.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
 -/
 
 @[expose] public section
@@ -27,14 +36,15 @@ noncomputable section
 
 variable {Ω : Type*} [Field Ω] [IsAlgClosed Ω]
 
+/-- In an algebraically closed field the map `x ↦ x^p`, `p > 0`, has a right inverse. -/
 theorem exists_pow_right_inverse (p : ℕ) (hp : 0 < p) :
     ∃ r : Ω → Ω, ∀ x, r x ^ p = x := by
   have hs : Function.Surjective (fun x : Ω ↦ x ^ p) :=
     fun x ↦ IsAlgClosed.exists_pow_nat_eq x hp
   exact ⟨Function.surjInv hs, Function.surjInv_eq hs⟩
 
-/-- Every element of an algebraically closed field of characteristic zero has
-a compatible system of p-power radicals. The initial element may be zero. -/
+/-- Every `π` in an algebraically closed field is the first term of a sequence `(π_n)` with
+`π_{n+1}^p = π_n`; then `π_n^{p^n} = π` for all `n`. -/
 theorem exists_compatible_radicals (p : ℕ) [Fact p.Prime] (π : Ω) :
     ∃ πSeq : ℕ → Ω, πSeq 0 = π ∧
       (∀ n, πSeq (n + 1) ^ p = πSeq n) ∧
@@ -53,9 +63,8 @@ theorem exists_compatible_radicals (p : ℕ) [Fact p.Prime] (π : Ω) :
 
 variable [CharZero Ω]
 
-/-- Primitive p-power roots of unity can be compatibly, with the
-zeroth root equal to one. The initial primitive pth root is separately
-before taking successive pth roots, ensuring primitivity at every level. -/
+/-- In an algebraically closed field of characteristic zero there is a sequence `(ζ_n)` with
+`ζ_0 = 1`, `ζ_{n+1}^p = ζ_n`, and `ζ_n` a primitive `p^n`-th root of unity for every `n`. -/
 theorem exists_compatible_primitive_roots (p : ℕ) [Fact p.Prime] :
     ∃ ζ : ℕ → Ω, ζ 0 = 1 ∧
       (∀ n, ζ (n + 1) ^ p = ζ n) ∧

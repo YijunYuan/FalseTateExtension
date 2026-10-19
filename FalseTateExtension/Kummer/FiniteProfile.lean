@@ -15,10 +15,32 @@ public import FontaineWintenberger.APF.Strict
 public import FontaineWintenberger.APF.Tower.TotallyRamified
 
 /-!
-# The APF profile of the finite radical layers
+# The ramification profile of the finite Kummer layers
 
-The APF index and inverse Herbrand function of `K(π^{1/p^n})/K` are computed at every real parameter
-by induction on `n`, together with the first ramification bound of one step.
+Let `K` be a complete discretely valued field of characteristic zero with perfect residue
+field, `π` a uniformizer, `e_K = v_K(p)` and `u_j = e_K (j + 1/(p-1))`. The APF index of
+`F_n = K(π^{1/p^n})` over `K` is `p^{min(n, j)}` on `(u_j, u_{j+1}]`, so it is `1` up to `u_1`
+and `p^n` beyond `u_n`; in particular it does not change with `n` once `n ≥ j` on
+`[0, u_{j+1}]`, and shifting `u` by `e_K` multiplies it by at most `p`. The inverse Herbrand
+function of `F_n/K` is affine of slope `p^n` beyond `u_n`. The step `F_n ⊆ F_{n+1}` has
+ramification bound `p^{n+1} e_K / (p - 1)`.
+
+## Main results
+
+* `radicalLayer_apfPsi_tail`: `ψ_{F_n/K}(u) = p^n e_K/(p-1) + p^n (u - u_n)` for `u ≥ u_n`.
+* `radicalLayer_apfIndex_succ_threshold`: the index of `F_{n+1}/K` is that of `F_n/K` times
+  `1` or `p` according as `u ≤ u_{n+1}` or not.
+* `radicalLayer_apfIndex_interval`: the index of `F_n/K` is `p^{min(n, j)}` on `(u_j, u_{j+1}]`.
+* `radicalLayer_apfIndex_stable`: the index of `F_m/K` on `[0, u_{n+1}]` is that of `F_n/K`
+  for `m ≥ n`.
+* `radicalLayer_apfIndex_growth`: the index at `u + e_K` is at most `p` times the index at `u`.
+* `radicalLayer_step_apfRamificationBound`: the ramification bound of `F_{n+1}/F_n` is
+  `p^{n+1} e_K / (p - 1)`.
+
+## References
+
+* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*, §1.2.3.
 -/
 
 @[expose] public section
@@ -36,8 +58,7 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[K])
 
-/-- Each finite radical Herbrand function is affine after its
-last base threshold, with its degree as slope. -/
+/-- `ψ_{F_n/K}(u) = p^n e_K/(p-1) + p^n (u - u_n)` for `u ≥ u_n`. -/
 theorem radicalLayer_apfPsi_tail [hπ : Fact (Irreducible π)] (n : ℕ) (u : ℝ)
     (hu : radicalUpperBreak (K := K) p n ≤ u) :
     apfPsi K (radicalLayer p (π : K) n) u =
@@ -84,7 +105,7 @@ theorem radicalLayer_apfPsi_tail [hπ : Fact (Irreducible π)] (n : ℕ) (u : �
       field_simp
       ring
 
-/-- The next relative break is attained at the next base threshold. -/
+/-- `ψ_{F_n/K}(u_{n+1}) = t_n = p^{n+1} e_K / (p - 1)`. -/
 theorem radicalLayer_apfPsi_next_break [hπ : Fact (Irreducible π)] (n : ℕ) :
     apfPsi K (radicalLayer p (π : K) n) (radicalUpperBreak (K := K) p (n + 1)) =
       radicalRelativeBreak (K := K) p n := by
@@ -92,8 +113,8 @@ theorem radicalLayer_apfPsi_next_break [hπ : Fact (Irreducible π)] (n : ℕ) :
     rw [radicalUpperBreak_succ]
     exact le_add_of_nonneg_right (Nat.cast_nonneg _)), radicalRelativeBreak_eq_affine]
 
-/-- The new index factor changes precisely at the next threshold
-in the normalization of the base field. -/
+/-- The APF index of `F_{n+1}/K` at `u ≥ 0` is that of `F_n/K` times `1` if `u ≤ u_{n+1}` and
+`p` otherwise. -/
 theorem radicalLayer_apfIndex_succ_threshold [hπ : Fact (Irreducible π)] (n : ℕ)
     {u : ℝ} (hu : 0 ≤ u) :
     apfIndex K (radicalLayer p (π : K) (n + 1)) u =
@@ -109,7 +130,7 @@ theorem radicalLayer_apfIndex_succ_threshold [hπ : Fact (Irreducible π)] (n : 
   · rw [ite_eq_left (hiff.mpr h), ite_eq_left h]
   · rw [ite_eq_right (fun hψ => h (hiff.mp hψ)), ite_eq_right h]
 
-/-- After its last threshold, the finite radical index is its degree. -/
+/-- The APF index of `F_n/K` is `p^n` for `u > u_n`. -/
 theorem radicalLayer_apfIndex_tail [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ}
     (hu : radicalUpperBreak (K := K) p n < u) :
     apfIndex K (radicalLayer p (π : K) n) u = p ^ n := by
@@ -123,7 +144,7 @@ theorem radicalLayer_apfIndex_tail [hπ : Fact (Irreducible π)] (n : ℕ) {u : 
       ((radicalUpperBreak_nonneg p (n + 1)).trans hu.le), ite_eq_right (not_le.mpr hu),
       ih ((radicalUpperBreak_mono p (Nat.le_succ n)).trans_lt hu), pow_succ]
 
-/-- A fixed upper parameter stops changing once its next threshold is reached. -/
+/-- For `n ≤ m` and `0 ≤ u ≤ u_{n+1}`, the APF indices of `F_m/K` and `F_n/K` at `u` agree. -/
 theorem radicalLayer_apfIndex_stable [hπ : Fact (Irreducible π)] {n m : ℕ} (hnm : n ≤ m)
     {u : ℝ} (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p (n + 1)) :
     apfIndex K (radicalLayer p (π : K) m) u =
@@ -135,8 +156,7 @@ theorem radicalLayer_apfIndex_stable [hπ : Fact (Irreducible π)] {n m : ℕ} (
       ite_eq_left (hb.trans (radicalUpperBreak_mono p (Nat.add_le_add_right hnm 1))),
       mul_one, ih]
 
-/-- The full finite radical profile on every interval between consecutive
-thresholds, including the right endpoint and finite-level truncation. -/
+/-- The APF index of `F_n/K` is `p^{min(n, j)}` on `(u_j, u_{j+1}]`. -/
 theorem radicalLayer_apfIndex_interval [hπ : Fact (Irreducible π)] (n j : ℕ) {u : ℝ}
     (hlo : radicalUpperBreak (K := K) p j < u)
     (hhi : u ≤ radicalUpperBreak (K := K) p (j + 1)) :
@@ -149,7 +169,7 @@ theorem radicalLayer_apfIndex_interval [hπ : Fact (Irreducible π)] (n j : ℕ)
       ((radicalUpperBreak_mono p (le_of_not_ge h)).trans_lt hlo),
       min_eq_left (le_of_not_ge h)]
 
-/-- The finite radical index stays one through the first threshold. -/
+/-- The APF index of `F_n/K` is `1` on `[0, u_1]`. -/
 theorem radicalLayer_apfIndex_initial [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ}
     (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p 1) :
     apfIndex K (radicalLayer p (π : K) n) u = 1 := by
@@ -157,8 +177,7 @@ theorem radicalLayer_apfIndex_initial [hπ : Fact (Irreducible π)] (n : ℕ) {u
     radicalLayer_zero, apfIndex_algEquiv K _ (IntermediateField.botEquiv K _),
     apfIndex_eq_one_of_bound_eq_top K K (apfRamificationBound_self K) hu]
 
-/-- Shifting the upper parameter by the base valuation of `p`
-crosses at most one jump, uniformly in the finite radical layer. -/
+/-- The APF index of `F_n/K` at `u + e_K` is at most `p` times the index at `u ≥ 0`. -/
 theorem radicalLayer_apfIndex_growth [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     apfIndex K (radicalLayer p (π : K) n) (u + absoluteRamificationIdx p K) ≤
       p * apfIndex K (radicalLayer p (π : K) n) u := by
@@ -207,8 +226,7 @@ attribute [local instance] kummerBaseNormedField kummerBaseNormedAlgebra kummerB
   kummerStepAlgebra kummerStepScalarTower
   kummerStepFinite kummerStepValuation kummerStepOwnValuation
 
-/-- The extended first bound of the consecutive radical
-step equals the break determined by its different, without normality. -/
+/-- The ramification bound of `F_{n+1}/F_n` is `p^{n+1} e_K / (p - 1)`. -/
 theorem radicalLayer_step_apfRamificationBound [hπ : Fact (Irreducible π)] (n : ℕ) :
     apfRamificationBound (radicalLayer p (π : K) n) (radicalLayer p (π : K) (n + 1)) =
       (((p : ℝ) ^ (n + 1) * (addVal 𝒪[K] (p : 𝒪[K])).toNat / ((p : ℝ) - 1) : ℝ) : EReal) := by

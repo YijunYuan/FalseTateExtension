@@ -18,13 +18,31 @@ public import FontaineWintenberger.APF.Tower.TotallyRamified
 /-!
 # The Kummer extension is strictly APF
 
-`K(π^{1/p^∞})/K` is strictly arithmetically profinite: its APF subgroups stabilize along the layers,
-and the indices grow by a factor `p` at every break.
+Let `K` be a complete discretely valued field of characteristic zero with perfect residue
+field, `π` a uniformizer, `e_K = v_K(p)` and `u_j = e_K (j + 1/(p-1))`. The APF index of
+`K(π^{1/p^∞})/K` at `u ∈ [0, u_{N+1}]` is that of the finite layer `K(π^{1/p^N})`; hence it
+is `1` on `[0, u_1]` and `p^j` on `(u_j, u_{j+1}]`, so `K(π^{1/p^∞})/K` is arithmetically
+profinite as soon as `e_K > 0`. Its inverse Herbrand function takes the value
+`p^j e_K / (p - 1)` at `u_j`, so the ratio `ψ(u) / (G_K^0 : G_K^u G_L)` is bounded below by
+`e_K / (p - 1)` for `u ≥ u_1`: the extension is strictly APF. Over a `p`-adic base, `e_K > 0`
+holds and both properties are instances.
+
+## Main results
+
+* `kummerExtension_apfIndex_eq_layer`: the index of `K(π^{1/p^∞})/K` on `[0, u_{N+1}]` is
+  that of `K(π^{1/p^N})/K`.
+* `kummerExtension_apfIndex_interval`: the index is `p^j` on `(u_j, u_{j+1}]`.
+* `isAPF_kummerExtension_of_addVal_p_pos`: `K(π^{1/p^∞})/K` is APF when `e_K > 0`.
+* `kummerExtension_apfPsi_break`: `ψ(u_j) = p^j e_K / (p - 1)`.
+* `isStrictlyAPF_kummerExtension_of_addVal_p_pos`: `K(π^{1/p^∞})/K` is strictly APF when
+  `e_K > 0`.
+* `isAPF_kummerExtension`, `isStrictlyAPF_kummerExtension`: the instances over a `p`-adic
+  base.
 
 ## References
 
 * Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
- applications*, 1.2.3.
+  applications*, §1.2.1, §1.2.3.
 -/
 
 @[expose] public section
@@ -45,26 +63,30 @@ local notation "G" => SeparableClosure K ≃ₐ[K] SeparableClosure K
 variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[K])
 
-/-- A fixed embedding of the algebraic closure into the separable closure. -/
+/-- A `K`-embedding of the algebraic closure of `K` into its separable closure. -/
 def radicalClosureEmbedding : AlgebraicClosure K →ₐ[K] SeparableClosure K :=
   IsSepClosed.lift
 
-/-- The image of the radical layer `n` in the separable closure. -/
+/-- The image of `K(π^{1/p^n})` in the separable closure of `K`. -/
 def radicalSeparableLayer (π : K) (n : ℕ) :
     IntermediateField K (SeparableClosure K) :=
   (radicalLayer p π n).map (radicalClosureEmbedding (K := K))
 
 omit [IsCompleteDiscreteValuedField K] [PerfectField (𝓀[K])] in
+/-- The images of the layers `K(π^{1/p^n})` in the separable closure increase with `n`. -/
 theorem radicalSeparableLayer_mono (π : K) :
     Monotone (radicalSeparableLayer p π) := fun _ _ hmn =>
   IntermediateField.map_mono (radicalClosureEmbedding (K := K)) (radicalLayer_mono p π hmn)
 
 omit [PerfectField (𝓀[K])] in
+/-- The image of `K(π^{1/p^n})` in the separable closure is finite over `K`. -/
 instance radicalSeparableLayer_finiteDimensional (π : K) (n : ℕ) :
     FiniteDimensional K (radicalSeparableLayer p π n) :=
   Module.Finite.equiv
     ((radicalLayer p π n).equivMap (radicalClosureEmbedding (K := K))).toLinearEquiv
 
+/-- The index of `G_K^u G_{F_n}` in `G_K` is the APF index of `F_n = K(π^{1/p^n})` over `K`
+at `u ≥ 0`. -/
 theorem radicalSeparable_apfSubgroup_index [hπ : Fact (Irreducible π)] (n : ℕ)
     {u : ℝ} (hu : 0 ≤ u) :
     (apfSubgroup K (radicalSeparableLayer p (π : K) n) u).index =
@@ -77,10 +99,13 @@ theorem radicalSeparable_apfSubgroup_index [hπ : Fact (Irreducible π)] (n : �
   apply apfSubgroup_fieldRange_index_eq_apfIndex_of_ramificationIdx_eq_finrank K _ j _ hu
   rw [radicalLayer_ramificationIdx p π n (spectralValuation K _), finrank_radicalLayer p π n]
 
+/-- `G_K^0 G_{F_n} = G_K` for `F_n = K(π^{1/p^n})`. -/
 theorem radicalSeparable_apfSubgroup_zero [hπ : Fact (Irreducible π)] (n : ℕ) :
     apfSubgroup K (radicalSeparableLayer p (π : K) n) 0 = ⊤ := by
   rw [← Subgroup.index_eq_one, radicalSeparable_apfSubgroup_index p π n le_rfl, apfIndex_zero]
 
+/-- For `0 ≤ u ≤ u_{N+1}`, `G_K^u G_L = G_K^u G_{F_N}` where `L = K(π^{1/p^∞})` and
+`F_N = K(π^{1/p^N})`. -/
 theorem radicalSeparable_apfSubgroup_eq_layer [hπ : Fact (Irreducible π)] (N : ℕ)
     {u : ℝ} (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p (N + 1)) :
     apfSubgroup K (⨆ n, radicalSeparableLayer p (π : K) n) u =
@@ -106,9 +131,8 @@ theorem radicalSeparable_apfSubgroup_eq_layer [hπ : Fact (Irreducible π)] (N :
   · rw [hstable n hn]
   · exact hanti hn
 
-/-- Every embedding of the infinite radical extension has full
-zero-level APF product. No positivity assumption on the valuation of `p`
-is needed for this assertion. -/
+/-- `G_K^0 G_L = G_K` for `L = K(π^{1/p^∞})` and every `K`-embedding of `L` into the separable
+closure. -/
 theorem apfSubgroup_kummerExtension_zero_eq_top [hπ : Fact (Irreducible π)]
     (j : kummerExtension p (π : K) →ₐ[K] SeparableClosure K) :
     apfSubgroup K j.fieldRange 0 = ⊤ := by
@@ -123,6 +147,7 @@ theorem apfSubgroup_kummerExtension_zero_eq_top [hπ : Fact (Irreducible π)]
     (radicalUpperBreak_nonneg p 1), radicalSeparable_apfSubgroup_zero p π 0]
 
 omit [PerfectField (𝓀[K])] [CharZero K] in
+/-- When `e_K > 0`, every real number is at most some break `u_{N+1}`. -/
 theorem exists_radicalUpperBreak_ge
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) (u : ℝ) :
     ∃ N : ℕ, u ≤ radicalUpperBreak (K := K) p (N + 1) := by
@@ -137,6 +162,8 @@ theorem exists_radicalUpperBreak_ge
   simp only [radicalUpperBreak, Nat.cast_add, Nat.cast_one]
   nlinarith
 
+/-- The image of `K(π^{1/p^∞})` in the separable closure is an APF subextension when
+`e_K > 0`. -/
 theorem radicalSeparable_isAPF [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) :
     IsAPFSubextension K (⨆ n, radicalSeparableLayer p (π : K) n) := by
@@ -155,8 +182,7 @@ theorem radicalSeparable_isAPF [hπ : Fact (Irreducible π)]
     rw [top_unique hle]
     exact isOpen_univ
 
-/-- The infinite radical extension is APF whenever the residue
-characteristic is `p`, expressed by the positive valuation of `p`. -/
+/-- `K(π^{1/p^∞})/K` is arithmetically profinite when `e_K = v_K(p) > 0`. -/
 theorem isAPF_kummerExtension_of_addVal_p_pos [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) : IsAPF K (kummerExtension p (π : K)) := by
   let j := (radicalClosureEmbedding (K := K)).comp (kummerExtension p (π : K)).val
@@ -169,8 +195,8 @@ theorem isAPF_kummerExtension_of_addVal_p_pos [hπ : Fact (Irreducible π)]
   rw [hr]
   exact radicalSeparable_isAPF p π he
 
-/-- At every fixed upper parameter before the next threshold, the
-infinite radical index is exactly its attained finite-layer index. -/
+/-- For `0 ≤ u ≤ u_{N+1}`, the APF index of `K(π^{1/p^∞})/K` at `u` is that of
+`K(π^{1/p^N})/K`. -/
 theorem kummerExtension_apfIndex_eq_layer [hπ : Fact (Irreducible π)] (N : ℕ)
     {u : ℝ} (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p (N + 1)) :
     apfIndex K (kummerExtension p (π : K)) u =
@@ -190,8 +216,8 @@ theorem kummerExtension_apfIndex_eq_layer [hπ : Fact (Irreducible π)] (N : ℕ
     apfInertiaSubgroup_eq_inf K _ u hu, apfInertiaSubgroup_eq_inf K _ u hu,
     radicalSeparable_apfSubgroup_eq_layer p π N hu hb]
 
-/-- The full APF-product index for any separable embedding equals
-the inertia index of the infinite radical extension. -/
+/-- The index of `G_K^u G_L` in `G_K` is the APF index of `L = K(π^{1/p^∞})` over `K` at
+`u ≥ 0`, for every `K`-embedding of `L` into the separable closure, when `e_K > 0`. -/
 theorem kummerExtension_apfSubgroup_fieldRange_index [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat)
     (j : kummerExtension p (π : K) →ₐ[K] SeparableClosure K)
@@ -209,15 +235,14 @@ theorem kummerExtension_apfSubgroup_fieldRange_index [hπ : Fact (Irreducible π
     radicalSeparable_apfSubgroup_index p π N hu,
     kummerExtension_apfIndex_eq_layer p π N hu hN]
 
-/-- The infinite radical index is one through the first threshold. -/
+/-- The APF index of `K(π^{1/p^∞})/K` is `1` on `[0, u_1]`. -/
 theorem kummerExtension_apfIndex_initial [hπ : Fact (Irreducible π)] {u : ℝ}
     (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p 1) :
     apfIndex K (kummerExtension p (π : K)) u = 1 := by
   rw [kummerExtension_apfIndex_eq_layer p π 0 hu hb,
     radicalLayer_apfIndex_initial p π 0 hu hb]
 
-/-- The infinite radical index on each interval between consecutive
-thresholds includes the right endpoint. -/
+/-- The APF index of `K(π^{1/p^∞})/K` is `p^j` on `(u_j, u_{j+1}]`. -/
 theorem kummerExtension_apfIndex_interval [hπ : Fact (Irreducible π)] (j : ℕ) {u : ℝ}
     (hlo : radicalUpperBreak (K := K) p j < u)
     (hhi : u ≤ radicalUpperBreak (K := K) p (j + 1)) :
@@ -226,8 +251,8 @@ theorem kummerExtension_apfIndex_interval [hπ : Fact (Irreducible π)] (j : ℕ
     ((radicalUpperBreak_nonneg p j).trans hlo.le) hhi,
     radicalLayer_apfIndex_tail p π j hlo]
 
-/-- Shifting by the positive base valuation of `p` crosses at most
-one jump in the infinite radical extension. -/
+/-- The APF index of `K(π^{1/p^∞})/K` at `u + e_K` is at most `p` times the index at
+`u ≥ 0`. -/
 theorem kummerExtension_apfIndex_growth [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) {u : ℝ} (hu : 0 ≤ u) :
     apfIndex K (kummerExtension p (π : K)) (u + (addVal 𝒪[K] (p : 𝒪[K])).toNat) ≤
@@ -240,8 +265,7 @@ theorem kummerExtension_apfIndex_growth [hπ : Fact (Irreducible π)]
       ((le_add_of_nonneg_right (Nat.cast_nonneg _)).trans hN)]
   exact radicalLayer_apfIndex_growth p π N hu
 
-/-- The inverse Herbrand integral of the infinite radical extension
-has the explicit geometric values at its affine upper thresholds. -/
+/-- `ψ_{L/K}(u_j) = p^j e_K / (p - 1)` for `L = K(π^{1/p^∞})`. -/
 theorem kummerExtension_apfPsi_break [hπ : Fact (Irreducible π)] (j : ℕ) :
     apfPsi K (kummerExtension p (π : K)) (radicalUpperBreak (K := K) p j) =
       (p : ℝ) ^ j * ((addVal 𝒪[K] (p : 𝒪[K])).toNat : ℝ) / ((p : ℝ) - 1) := by
@@ -257,8 +281,8 @@ theorem kummerExtension_apfPsi_break [hπ : Fact (Irreducible π)] (j : ℕ) :
         (hv.2.trans (radicalUpperBreak_mono p (Nat.le_succ j))))
   rw [heq, radicalLayer_apfPsi_tail p π j _ le_rfl, sub_self, mul_zero, add_zero]
 
-/-- The explicit radical profile gives the source strictness-ratio lower
-bound after the first upper threshold. -/
+/-- `ψ_{L/K}(u) / (G_K^0 : G_K^u G_L) ≥ e_K / (p - 1)` for `u ≥ u_1`, where
+`L = K(π^{1/p^∞})`. -/
 theorem kummerExtension_apfPsi_div_index_ge [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) {u : ℝ}
     (hu : radicalUpperBreak (K := K) p 1 ≤ u) :
@@ -298,8 +322,7 @@ theorem kummerExtension_apfPsi_div_index_ge [hπ : Fact (Irreducible π)]
   obtain ⟨N, hN⟩ := exists_radicalUpperBreak_ge p he u
   exact hratio N hN
 
-/-- The infinite radical extension is strictly APF at every prime
-when the base valuation of `p` is positive. -/
+/-- `K(π^{1/p^∞})/K` is strictly arithmetically profinite when `e_K = v_K(p) > 0`. -/
 theorem isStrictlyAPF_kummerExtension_of_addVal_p_pos [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) :
     IsStrictlyAPF K (kummerExtension p (π : K)) := by
@@ -321,19 +344,19 @@ variable [Algebra (ℚ_[p]) K]
     [(NormedField.valuation (K := ℚ_[p])).HasExtension (NormedField.valuation (K := K))]
 
 omit [PerfectField (𝓀[K])] [CharZero K] in
+/-- `e_K = v_K(p) > 0` for a finite extension `K` of `ℚ_p`. -/
 theorem addVal_p_toNat_pos_of_padicBase : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat := by
   rw [addVal_p_toNat_eq_padic_ramificationIdx p]
   exact local_ramificationIdx_pos
     𝒪[ℚ_[p]] 𝒪[K]
 
-/-- The infinite radical extension over a norm-compatible `p`-adic
-base is APF; positivity comes from its ramification index. -/
+/-- `K(π^{1/p^∞})/K` is arithmetically profinite for a finite extension `K` of `ℚ_p`. -/
 instance isAPF_kummerExtension [hπ : Fact (Irreducible π)] :
     IsAPF K (kummerExtension p (π : K)) :=
   isAPF_kummerExtension_of_addVal_p_pos p π (addVal_p_toNat_pos_of_padicBase p)
 
-/-- The infinite radical extension over a norm-compatible `p`-adic
-base is strictly APF, including the prime two. -/
+/-- `K(π^{1/p^∞})/K` is strictly arithmetically profinite for a finite extension `K` of
+`ℚ_p`. -/
 instance isStrictlyAPF_kummerExtension [hπ : Fact (Irreducible π)] :
     IsStrictlyAPF K (kummerExtension p (π : K)) :=
   isStrictlyAPF_kummerExtension_of_addVal_p_pos p π (addVal_p_toNat_pos_of_padicBase p)
