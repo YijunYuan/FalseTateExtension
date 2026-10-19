@@ -128,7 +128,7 @@ theorem inclusion_zetaLayer {n m : ℕ} (h : n ≤ m) :
   exact (zeta_pow_sub (K := K) p h).symm
 
 /-- `g|_{L_n}(π^{1/p^n}) = ζ_{p^n}^{b_m(g)} π^{1/p^n}` for `g ∈ Gal(L_m/K)`. -/
-theorem finiteLayerRestriction_radical [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
+theorem finiteLayerRestriction_pPowRoot [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteLayerRestriction p π h g (pPowRootLayer p π n) =
       zetaLayer p π n ^ (finiteKummerExponent p π m g).val *
@@ -142,7 +142,7 @@ theorem finiteLayerRestriction_radical [hπ : NeZero π] {n m : ℕ} (h : n ≤ 
   rw [← pow_mul, Nat.mul_comm, pow_mul]
 
 /-- `g|_{L_n}(ζ_{p^n}) = ζ_{p^n}^{χ_m(g)}` for `g ∈ Gal(L_m/K)`. -/
-theorem finiteLayerRestriction_rootOfUnity [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
+theorem finiteLayerRestriction_zeta [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteLayerRestriction p π h g (zetaLayer p π n) =
       zetaLayer p π n ^
@@ -178,7 +178,7 @@ theorem finiteKummerExponent_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m
       ZMod.castHom (pow_dvd_pow p h) (ZMod (p ^ n))
         (finiteKummerExponent p π m g) := by
   apply finiteKummerExponent_unique p π n
-  rw [finiteLayerRestriction_radical]
+  rw [finiteLayerRestriction_pPowRoot]
   exact congrArg (· * pPowRootLayer p π n)
     (zetaLayer_pow_reduction p π h (finiteKummerExponent p π m g)).symm
 
@@ -188,7 +188,7 @@ theorem finiteCyclotomicCharacter_restrict [hπ : NeZero π] {n m : ℕ} (h : n 
     finiteCyclotomicCharacter p π n (finiteLayerRestriction p π h g) =
       ZMod.unitsMap (pow_dvd_pow p h) (finiteCyclotomicCharacter p π m g) := by
   apply finiteCyclotomicCharacter_unique p π n
-  rw [finiteLayerRestriction_rootOfUnity]
+  rw [finiteLayerRestriction_zeta]
   exact (zetaLayer_pow_reduction p π h
     (finiteCyclotomicCharacter p π m g : ZMod (p ^ m))).symm
 

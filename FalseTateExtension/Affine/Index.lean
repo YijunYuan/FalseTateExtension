@@ -93,11 +93,11 @@ def affineTranslationStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subg
       ((affineTranslationKernel G).neg_mem hg)
 
 @[simp]
-theorem mem_affineZeroStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
+theorem mem_affineTranslationStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
     g ∈ affineTranslationStabilizer G ↔ g.val.left.toAdd ∈ affineTranslationKernel G := Iff.rfl
 
 /-- The zero stabilizer is the product of the full kernel and pure units. -/
-theorem affineZeroStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
+theorem affineTranslationStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
     affineTranslationStabilizer G = (affineProjection G).ker ⊔ affinePureUnits G := by
   apply le_antisymm
   · intro g hg
@@ -125,7 +125,7 @@ theorem affineZeroStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
       exact (affineTranslationKernel G).zero_mem
 
 /-- Congruence of translation coordinates is exactly the zero-stabilizer coset relation. -/
-theorem affineZeroStabilizer_inv_mul_mem_iff
+theorem affineTranslationStabilizer_inv_mul_mem_iff
     (G : ClosedSubgroup (PadicAffineGroup p)) (g h : G) :
     g⁻¹ * h ∈ affineTranslationStabilizer G ↔
       h.val.left.toAdd - g.val.left.toAdd ∈ affineTranslationKernel G := by
@@ -136,7 +136,7 @@ theorem affineZeroStabilizer_inv_mul_mem_iff
     change (g.val.right⁻¹ : (ℤ_[p])ˣ) * -g.val.left.toAdd +
       (g.val.right⁻¹ : (ℤ_[p])ˣ) * h.val.left.toAdd = _
     ring
-  rw [mem_affineZeroStabilizer, hcoord]
+  rw [mem_affineTranslationStabilizer, hcoord]
   constructor
   · intro hm
     have h := PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G)
@@ -154,7 +154,7 @@ def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup 
     rw [QuotientAddGroup.leftRel_apply]
     change -g.val.left.toAdd + h.val.left.toAdd ∈ affineTranslationKernel G
     simpa only [sub_eq_add_neg, add_comm] using
-      (affineZeroStabilizer_inv_mul_mem_iff G g h).mp hrel)
+      (affineTranslationStabilizer_inv_mul_mem_iff G g h).mp hrel)
   inj' := by
     intro x y
     refine Quotient.inductionOn₂ x y ?_
@@ -162,7 +162,7 @@ def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup 
     apply @Quotient.sound G (QuotientGroup.leftRel (affineTranslationStabilizer G)) g h
     change (QuotientGroup.leftRel (affineTranslationStabilizer G)) g h
     rw [QuotientGroup.leftRel_apply]
-    apply (affineZeroStabilizer_inv_mul_mem_iff G g h).mpr
+    apply (affineTranslationStabilizer_inv_mul_mem_iff G g h).mpr
     have hrel : (QuotientAddGroup.leftRel (affineTranslationKernel G).toAddSubgroup)
         g.val.left.toAdd h.val.left.toAdd := Quotient.exact heq
     rw [QuotientAddGroup.leftRel_apply] at hrel
@@ -170,7 +170,7 @@ def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup 
     simpa only [sub_eq_add_neg, add_comm] using hrel
 
 /-- A nonzero translation kernel makes the zero stabilizer have finite index. -/
-theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p))
+theorem affineTranslationStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
     (affineTranslationStabilizer G).FiniteIndex := by
   have hopen := PadicInt.isOpen_closedAddSubgroup_map_mulLeft
@@ -195,14 +195,14 @@ theorem affinePureUnits_image_index (G : ClosedSubgroup (PadicAffineGroup p)) :
     ρ.range_eq_top_of_surjective (affineProjection G).rangeRestrict_surjective
   have h := (affinePureUnits G).index_map ρ
   rw [hr, Subgroup.index_top, mul_one, MonoidHom.ker_rangeRestrict,
-    sup_comm, ← affineZeroStabilizer_eq_sup] at h
+    sup_comm, ← affineTranslationStabilizer_eq_sup] at h
   exact h
 
 /-- The pure-unit image has finite index when the translation kernel is nonzero. -/
 theorem affinePureUnits_image_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
     ((affinePureUnits G).map (affineProjection G).rangeRestrict).FiniteIndex := by
-  have := affineZeroStabilizer_finiteIndex G hM
+  have := affineTranslationStabilizer_finiteIndex G hM
   constructor
   rw [affinePureUnits_image_index]
   exact Subgroup.FiniteIndex.index_ne_zero
@@ -490,7 +490,7 @@ theorem affineIndex_comparison
     exact sub_eq_zero.mp ha
   let C := (AddMonoidHom.mulLeft a).range.index
   let D := (affineTranslationStabilizer G).index
-  have hDfinite := affineZeroStabilizer_finiteIndex G hM
+  have hDfinite := affineTranslationStabilizer_finiteIndex G hM
   have hD : 0 < D := Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero
   refine ⟨C, D, PadicInt.mulLeft_range_index_pos a ha, hD, ?_⟩
   intro I hIn hI hA hB
@@ -498,12 +498,12 @@ theorem affineIndex_comparison
   have := hB
   have hIfinite := affineIndex_finiteIndex_of_projectionIndices G hM I hI
   have hKfinite : (affinePureUnits G ⊔ (affineProjection G).ker).FiniteIndex := by
-    rw [sup_comm, ← affineZeroStabilizer_eq_sup]
+    rw [sup_comm, ← affineTranslationStabilizer_eq_sup]
     exact hDfinite
   have hlower := index_sup_le_index_sup_mul_relIndex
     (affinePureUnits G) (affineProjection G).ker I
   rw [sup_comm (affinePureUnits G) (affineProjection G).ker,
-    ← affineZeroStabilizer_eq_sup, affineTranslation_index] at hlower
+    ← affineTranslationStabilizer_eq_sup, affineTranslation_index] at hlower
   have hupper := (affinePureUnit_kernel_index_bound G I hI s₀ hs₀).2
   have : IsTopologicalGroup G := inferInstanceAs (IsTopologicalGroup G.toSubgroup)
   refine ⟨hIfinite, Subgroup.isOpen_of_isClosed_of_finiteIndex I hI, ?_, ?_⟩
@@ -527,8 +527,8 @@ theorem affineProjection_ker_eq_bot_of_translationKernel_eq_bot
   intro g hg
   have hr : g.val.right = 1 := hg
   have hm : g.val.left.toAdd ∈ affineTranslationKernel G := by
-    apply (mem_affineZeroStabilizer G g).mp
-    rw [affineZeroStabilizer_eq_sup]
+    apply (mem_affineTranslationStabilizer G g).mp
+    rw [affineTranslationStabilizer_eq_sup]
     exact (show (affineProjection G).ker ≤ (affineProjection G).ker ⊔ affinePureUnits G from
       le_sup_left) hg
   have hz : g.val.left.toAdd = 0 := by

@@ -148,7 +148,7 @@ variable (π : 𝒪[K])
 /-- The pure-unit product index is exactly the radical
 index. Total ramification of the radical tower removes its residue factor;
 no total ramification of the false Tate field is used. -/
-theorem falseTateAffine_upper_radical_index [hπ : Fact (Irreducible π)]
+theorem falseTateAffine_upper_pPowRoot_index [hπ : Fact (Irreducible π)]
     (he : 0 < (IsDiscreteValuationRing.addVal
       𝒪[K]
       (p : 𝒪[K])).toNat)
@@ -236,7 +236,7 @@ theorem exists_falseTate_upper_index_comparison [hπ : Fact (Irreducible π)]
     ((isCompact_upperRamificationGroupInfinite K (falseTateExtension p (π : K)) u).image
       e.continuous).isClosed
   have hA : (affinePureUnits G ⊔ I).index = apfIndex K (kummerExtension p (π : K)) u :=
-    falseTateAffine_upper_radical_index p π (falseTateBase_addVal_p_pos p) hu
+    falseTateAffine_upper_pPowRoot_index p π (falseTateBase_addVal_p_pos p) hu
   have hB : (I.map (affineProjection G).rangeRestrict).index =
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) u).index :=
     falseTateAffine_upper_projection_index p (π : K) (by linarith : -1 ≤ u)

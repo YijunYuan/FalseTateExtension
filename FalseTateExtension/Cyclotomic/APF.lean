@@ -277,7 +277,7 @@ def rationalCyclotomicEmbedding : Cyc →ₐ[ℚ_[p]] cyclotomicExtension (K := 
   exact hle hn
 
 /-- The root of unity `ζ_{p^n} ∈ K(ζ_{p^∞})` lies in the image of `ℚ_[p](ζ_{p^∞})`. -/
-theorem cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding (n : ℕ) :
+theorem zetaCycExt_mem_rationalCyclotomicEmbedding (n : ℕ) :
     zetaCycExt (K := K) p n ∈
       (rationalCyclotomicEmbedding (K := K) p).fieldRange := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
@@ -317,7 +317,7 @@ theorem rationalCyclotomicEmbedding_adjoin_base :
       algebraMap_mem' := fun k ↦ ⟨algebraMap K (cyclotomicExtension (K := K) p) k,
         IntermediateField.subset_adjoin Cyc _ ⟨k, rfl⟩, rfl⟩ }
   have hroots (n : ℕ) : zetaCycExt (K := K) p n ∈ A := by
-    obtain ⟨z, hz⟩ := cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding (K := K) p n
+    obtain ⟨z, hz⟩ := zetaCycExt_mem_rationalCyclotomicEmbedding (K := K) p n
     have hzA := A.algebraMap_mem z
     change rationalCyclotomicEmbedding p z ∈ A at hzA
     change rationalCyclotomicEmbedding p z = _ at hz

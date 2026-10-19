@@ -15,15 +15,30 @@ The library builds on [FontaineWintenberger](https://github.com/YijunYuan/Fontai
 
 | Target | Declaration (module) |
 |---|---|
-| 1. `K_{m,n}`, `K_FT`, `K_Kum`, `K_cyc` | `falseTateLayer`, `falseTateExtension`, `kummerExtension`, `cyclotomicExtension` (`Layers`) |
-| 2. `K_FT`, `K_Kum`, `K_cyc` are strictly APF | `isStrictlyAPF_falseTateExtension_of_finiteDimensional` (`StrictAPF`), `isStrictlyAPF_kummerExtension` (`KummerProfile`), `isStrictlyAPF_cyclotomicExtension` (`Padic.CyclotomicAPF`) |
-| 3. Liu, Lemma 5.1.2 (`p ≥ 3`): `K_Kum ∩ K_cyc = K`, `Gal(K_FT/K_cyc) ≅ ℤ_p`, `Gal(K_FT/K) ≅ ℤ_p ⋊ Gal(K_cyc/K)` | `kummerExtension_inf_cyclotomicExtension`, `cyclotomicRelativeGaloisEquiv`, `falseTateGaloisEquivSemidirectProduct` (`GaloisStructure`) |
-| 4. The topological generator `τ` of `Gal(K_FT/K_cyc)` with `τ(π^{1/p^m}) = ζ_{p^m} π^{1/p^m}` | `kummerGenerator`, `tau_extensionRadical`, `denseRange_tau_zpow` (`GaloisStructure`) |
-| 5. `K = ℚ_p`: `K_FT/ℚ_p` is totally ramified | `falseTateExtension_residueDegree_padic`, `finiteSubextension_falseTate_ramificationIdx_padic` (`Padic.FiniteGaloisStructure`) |
-| 6. Viviani, Corollary 6.10 (ramification filtration of `ℚ_p(π^{1/p^n}, ζ_{p^n})`, with the correction of FalseTateLift, Remark 5.2) | `Padic.Viviani` (upper groups `finiteUpperAffine_*`, Herbrand table `inverseHerbrandFunction_falseTate_*`, lower groups `lowerRamificationGroupReal_falseTate_*`) |
+| 1. `K_{m,n}`, `K_FT`, `K_Kum`, `K_cyc` | `falseTateLayer`, `falseTateExtension`, `kummerExtension`, `cyclotomicExtension` (`Layers/Basic`) |
+| 2. `K_FT`, `K_Kum`, `K_cyc` are strictly APF | instances `isStrictlyAPF_falseTateExtension_of_finiteDimensional` (`FalseTate/StrictAPF`), `isStrictlyAPF_kummerExtension` (`Kummer/APF`), `isStrictlyAPF_cyclotomicExtension` (`Cyclotomic/APF`) |
+| 3. Liu, Lemma 5.1.2 (`p ≥ 3`): `K_Kum ∩ K_cyc = K`, `Gal(K_FT/K_cyc) ≅ ℤ_p`, `Gal(K_FT/K) ≅ ℤ_p ⋊ Gal(K_cyc/K)` | `kummerExtension_inf_cyclotomicExtension`, `falseTateGaloisEquivSemidirectProduct` (`FalseTate/TranslationKernel`); `cyclotomicRelativeGaloisEquiv` (`FalseTate/LiuLemma`) |
+| 4. The topological generator `τ` of `Gal(K_FT/K_cyc)`, `τ(π^{1/p^m}) = ζ_{p^m} π^{1/p^m}` | `kummerGenerator` (notation `τ`), `kummerGenerator_pPowRootExt`, `denseRange_kummerGenerator_zpow` (`FalseTate/TranslationKernel`) |
+| 5. `K = ℚ_p`: `K_FT/ℚ_p` is totally ramified | `finiteSubextension_falseTate_residueDegree_padic`, `finiteSubextension_falseTate_ramificationIdx_padic`, `falseTateExtension_residueDegree_padic` (`FalseTate/TotalRamification`) |
+| 6. Viviani, Corollary 6.10 (corrected as in FalseTateLift, Remark 5.2) | `FalseTate/Viviani/Filtration` for a uniformizer `π`; `FalseTate/Viviani/Corollary` for an integer `a` with `v_p(a) = 1` (`finiteUpperAffine_integerParameter_interval`, `inverseHerbrandFunction_integerParameter_*`, `lowerRamificationGroupReal_integerParameter_*`) |
 
-The declaration names in this table are those of the current code; they change during the
-refactoring described in `docs/REFACTOR_PLAN.md` and the table is updated at its end.
+## Layout
+
+```
+<Lib>/
+  Mathlib/        upstream candidates (Mathlib names, no project imports)
+  Padic/          ℚ_[p] as a local field; scalar indices on closed subgroups of ℤ_[p]
+  Affine/         the affine group A ⋊ H and its closed subgroups
+  Layers/         compatible roots, finite layers, infinite extensions
+  Coordinates/    cyclotomic character, Kummer exponent, the closed affine embedding
+  Cyclotomic/     ℚ_p(ζ_{p^∞}) and K(ζ_{p^∞}): ramification, character, filtration, strict APF
+  Kummer/         K(π^{1/p^∞}): Eisenstein layers, APF profile, strict APF
+  FalseTate/      K_FT: Liu's lemma, τ, strict APF, total ramification, Viviani's filtration
+<Lib>.lean        imports one aggregate per layer
+```
+
+A layer imports only layers above it; `scripts/check_layers.py` (run in CI) checks this and
+that every file is imported by its layer's aggregate.
 
 ## Build
 

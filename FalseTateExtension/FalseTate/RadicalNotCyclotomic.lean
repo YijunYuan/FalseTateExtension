@@ -86,8 +86,8 @@ theorem cyclotomicLayer_le_radicalLayer_of_isGalois [hπ : Fact (Irreducible π)
   let F := radicalLayer p (π : K) n
   let f : K[X] := X ^ (p ^ n) - C (π : K)
   have hsplit : (f.map (algebraMap K F)).Splits := by
-    have h := Normal.splits (inferInstance : Normal K F) (pPowRootLayer' p (π : K) n)
-    simpa only [minpoly_radicalLayerRoot p π n] using h
+    have h := Normal.splits (inferInstance : Normal K F) (pPowRootKummerLayer p (π : K) n)
+    simpa only [minpoly_pPowRootKummerLayer p π n] using h
   have hle : falseTateLayer p (π : K) n n ≤ F := by
     rw [← adjoin_rootSet_eq_falseTateLayer p (π : K) n]
     apply IntermediateField.adjoin_le_iff.mpr
@@ -122,7 +122,7 @@ theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p
 /-- The first radical cannot belong to the infinite
 cyclotomic extension at an odd prime. The proof uses finite cyclicity and
 the reverse eigenbasis comparison over the base. -/
-theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
+theorem pPowRoot_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     pPowRoot p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
   intro hmem

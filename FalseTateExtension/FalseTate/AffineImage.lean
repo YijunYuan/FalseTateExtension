@@ -62,12 +62,12 @@ def falseTateGaloisEquivAffineImage [hπ : NeZero π] : Γ ≃ₜ* falseTateAffi
       continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 @[simp]
-theorem falseTateAffineEquiv_apply [hπ : NeZero π] (g : Γ) :
+theorem falseTateGaloisEquivAffineImage_apply [hπ : NeZero π] (g : Γ) :
     (falseTateGaloisEquivAffineImage p π g : PadicAffineGroup p) = affineGaloisHom p π g := rfl
 
 /-- Unit projection of the affine isomorphism is exactly the
 cyclotomic character. -/
-theorem falseTateAffineEquiv_projection [hπ : NeZero π] :
+theorem falseTateGaloisEquivAffineImage_projection [hπ : NeZero π] :
     (affineProjection (falseTateAffineImage p π)).comp
       (falseTateGaloisEquivAffineImage p π).toMonoidHom = padicCyclotomicCharacter p π := rfl
 
@@ -144,7 +144,7 @@ theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
     exact AlgHom.congr_fun heq ⟨y.val, hn⟩
 
 /-- Pure units in the affine image pull back to the radical fixer. -/
-theorem falseTateAffineEquiv_mem_pureUnits [hπ : NeZero π] (σ : Γ) :
+theorem falseTateGaloisEquivAffineImage_mem_pureUnits [hπ : NeZero π] (σ : Γ) :
     falseTateGaloisEquivAffineImage p π σ ∈ affinePureUnits (falseTateAffineImage p π) ↔
       σ ∈ falseTateKummerFixing p π := by
   rw [mem_affinePureUnits, mem_falseTateKummerFixing_iff p π]
@@ -161,9 +161,9 @@ theorem falseTateKummerFixing_map_affine [hπ : NeZero π] :
   · rintro ⟨τ, hτ, heq⟩
     have hτσ := (falseTateGaloisEquivAffineImage p π).injective heq
     subst τ
-    exact (falseTateAffineEquiv_mem_pureUnits p π σ).mpr hτ
+    exact (falseTateGaloisEquivAffineImage_mem_pureUnits p π σ).mpr hτ
   · intro hσ
-    exact ⟨σ, (falseTateAffineEquiv_mem_pureUnits p π σ).mp hσ, rfl⟩
+    exact ⟨σ, (falseTateGaloisEquivAffineImage_mem_pureUnits p π σ).mp hσ, rfl⟩
 
 variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
@@ -193,7 +193,7 @@ theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
       (falseTateGaloisEquivAffineImage p π).toMonoidHom) :=
     (affineProjection_injective_of_translationKernel_eq_bot _ hM).comp
       (falseTateGaloisEquivAffineImage p π).injective
-  rw [falseTateAffineEquiv_projection] at hi
+  rw [falseTateGaloisEquivAffineImage_projection] at hi
   exact hi
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in

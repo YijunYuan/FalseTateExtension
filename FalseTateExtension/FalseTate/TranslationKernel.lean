@@ -47,7 +47,7 @@ def pPowRootExt (n : ℕ) : falseTateExtension p π :=
     (pPowRootLayer p π n)
 
 @[simp]
-theorem coe_extensionRadical (n : ℕ) :
+theorem coe_pPowRootExt (n : ℕ) :
     (pPowRootExt p π n : AlgebraicClosure K) = pPowRoot p π n := rfl
 
 /-- The infinite Kummer coordinate evaluates on each radical. -/
@@ -87,7 +87,7 @@ theorem cyclotomicInclusion_fixingSubgroup :
     exact h.symm
 
 /-- Vanishing of the finite Kummer coordinate fixes the corresponding radical. -/
-theorem extensionRadical_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
+theorem pPowRootExt_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ)
     (hb : PadicInt.toZModPow n (padicKummerExponent p π g) = 0) :
     g (pPowRootExt p π n) = pPowRootExt p π n := by
@@ -96,7 +96,7 @@ theorem extensionRadical_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
 
 /-- Fixing by the character kernel places a radical in the
 cyclotomic subfield, by infinite Galois correspondence. -/
-theorem radical_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
+theorem pPowRoot_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
     (hf : ∀ g : (padicCyclotomicCharacter p π).ker,
       g.val (pPowRootExt p π n) = pPowRootExt p π n) :
     pPowRoot p π n ∈ cyclotomicExtension (K := K) p := by
@@ -174,14 +174,15 @@ theorem closedAddSubgroup_toZModPow_one_eq_zero
 
 /-- At an odd prime the closed translation kernel is the whole p-adic
 additive group, with the coordinate normalization fixed by the roots. -/
-theorem affineAdditiveKernel_eq_top [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+theorem affineAdditiveKernel_eq_top
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (affineAdditiveKernel p (π : K)).toAddSubgroup = ⊤ := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   by_contra hM
-  apply radical_one_not_mem_cyclotomicExtension p π
-  apply radical_mem_cyclotomicExtension_of_fixed p (π : K) 1
+  apply pPowRoot_one_not_mem_cyclotomicExtension p π
+  apply pPowRoot_mem_cyclotomicExtension_of_fixed p (π : K) 1
   intro g
-  apply extensionRadical_fixed_of_toZModPow_eq_zero p (π : K) g.val 1
+  apply pPowRootExt_fixed_of_toZModPow_eq_zero p (π : K) g.val 1
   exact closedAddSubgroup_toZModPow_one_eq_zero p
     (affineAdditiveKernel p (π : K)) hM
     (padicKummerExponent_mem_affineAdditiveKernel p (π : K) g)
@@ -220,7 +221,8 @@ def kummerKernelEquivPadicInt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible 
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 @[simp]
-theorem fullKummerKernelEquiv_apply [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem kummerKernelEquivPadicInt_apply
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : Additive (padicCyclotomicCharacter p (π : K)).ker) :
     kummerKernelEquivPadicInt p π g =
       padicKummerExponent p (π : K) g.toMul := rfl
@@ -232,24 +234,26 @@ def kummerGenerator [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
   ((kummerKernelEquivPadicInt p π).symm 1).toMul
 
 @[simp]
-theorem padicKummerExponent_tau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+theorem padicKummerExponent_kummerGenerator
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     padicKummerExponent p (π : K)
       (kummerGenerator p π).val = 1 :=
   (kummerKernelEquivPadicInt p π).apply_symm_apply 1
 
 /-- The generator acts on every positive-level radical
 by multiplication by the corresponding root of unity. -/
-theorem tau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
+theorem kummerGenerator_pPowRootExt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (kummerGenerator p π).val (pPowRootExt p (π : K) (n + 1)) =
       zetaExt p (π : K) (n + 1) * pPowRootExt p (π : K) (n + 1) := by
   rw [padicKummerExponent_spec p (π : K),
-    padicKummerExponent_tau, map_one]
+    padicKummerExponent_kummerGenerator, map_one]
   have hpow : 1 < p ^ (n + 1) := one_lt_pow₀ (Fact.out : p.Prime).one_lt (Nat.succ_ne_zero n)
   simp only [ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
 /-- Integral powers of the automorphism are dense in the
 cyclotomic-character kernel. -/
-theorem denseRange_tau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+theorem denseRange_kummerGenerator_zpow
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     DenseRange (fun n : ℤ => kummerGenerator p π ^ n) := by
   let e := kummerKernelEquivPadicInt p π
   have hd (a : ℤ_[p]) :
@@ -272,7 +276,8 @@ theorem denseRange_tau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π
 
 /-- Every translation coordinate and every cyclotomic unit coordinate
 occur together in the Galois group. -/
-theorem exists_padicCoordinates_eq [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem exists_padicCoordinates_eq
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (b : ℤ_[p]) (u : (ℤ_[p])ˣ)
     (hu : u ∈ (cyclotomicExtensionCharacter (K := K) p).range) :
     ∃ g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K),
@@ -299,7 +304,8 @@ theorem exists_padicCoordinates_eq [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreduc
 
 /-- The cyclotomic fixer and radical fixer generate the whole
 false Tate Galois group. -/
-theorem cyclotomicKernel_sup_kummerFixing [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+theorem cyclotomicKernel_sup_kummerFixing
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ⊔ falseTateKummerFixing p (π : K) = ⊤ := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   apply top_unique
@@ -318,7 +324,8 @@ theorem cyclotomicKernel_sup_kummerFixing [hp₂ : Fact (p ≠ 2)] [hπ : Fact (
 
 /-- The infinite radical and cyclotomic subfields meet exactly in
 the base field, for every odd prime and every uniformizer. -/
-theorem kummerExtension_inf_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+theorem kummerExtension_inf_cyclotomicExtension
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     kummerExtension p (π : K) ⊓ cyclotomicExtension (K := K) p = ⊥ := by
   have := falseTateExtension_isGalois p (π : K)
   apply IntermediateField.inf_eq_bot_of_inclusion_fixingSubgroup_sup_eq_top
@@ -355,20 +362,23 @@ def falseTateGaloisEquivSemidirectProduct [hp₂ : Fact (p ≠ 2)] [hπ : Fact (
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 /-- The semidirect isomorphism retains the Kummer coordinate. -/
-theorem falseTateGaloisEquiv_left [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem falseTateGaloisEquivSemidirectProduct_left
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     (falseTateGaloisEquivSemidirectProduct p π g).left.toAdd =
       padicKummerExponent p (π : K) g := rfl
 
 /-- The semidirect isomorphism retains the cyclotomic character. -/
-theorem falseTateGaloisEquiv_right [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem falseTateGaloisEquivSemidirectProduct_right
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     (falseTateGaloisEquivSemidirectProduct p π g).right.val =
       padicCyclotomicCharacter p (π : K) g := rfl
 
 /-- The cyclotomic fixer is exactly the translation factor under
 the topological semidirect isomorphism. -/
-theorem falseTateGaloisEquiv_mem_translations [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem falseTateGaloisEquivSemidirectProduct_mem_translations
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     falseTateGaloisEquivSemidirectProduct p π g ∈
       (SemidirectProduct.inl : Multiplicative (ℤ_[p]) →*
@@ -380,7 +390,8 @@ theorem falseTateGaloisEquiv_mem_translations [hp₂ : Fact (p ≠ 2)] [hπ : Fa
   · exact fun h => Subtype.ext h
 
 /-- The radical fixer is exactly the pure cyclotomic-unit factor. -/
-theorem falseTateGaloisEquiv_mem_units [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem falseTateGaloisEquivSemidirectProduct_mem_units
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     falseTateGaloisEquivSemidirectProduct p π g ∈
       (SemidirectProduct.inr : (cyclotomicExtensionCharacter (K := K) p).range →*
@@ -438,13 +449,15 @@ def kummerFixingEquivCyclotomicImage [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irred
 
 /-- On the radical fixer the factor isomorphism is the
 cyclotomic character, with its image as codomain. -/
-theorem kummerFixingEquivCyclotomicImage_apply [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem kummerFixingEquivCyclotomicImage_apply
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateKummerFixing p (π : K)) :
     (kummerFixingEquivCyclotomicImage p π g).val =
       padicCyclotomicCharacter p (π : K) g.val := rfl
 
 /-- The generator fixes the embedded cyclotomic field. -/
-theorem tau_fixes_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem kummerGenerator_fixes_cyclotomicExtension
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (x : cyclotomicExtension (K := K) p) :
     (kummerGenerator p π).val
       (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) x) =
@@ -458,7 +471,8 @@ theorem tau_fixes_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irre
 
 /-- Fixing the cyclotomic field and the actions on all compatible
 positive-level radicals uniquely specify the automorphism. -/
-theorem tau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem kummerGenerator_unique
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : (padicCyclotomicCharacter p (π : K)).ker)
     (hg : ∀ n : ℕ, g.val (pPowRootExt p (π : K) (n + 1)) =
       zetaExt p (π : K) (n + 1) * pPowRootExt p (π : K) (n + 1)) :
@@ -469,7 +483,7 @@ theorem tau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
   refine Prod.ext ?_ (g.property.trans (kummerGenerator p π).property.symm)
   change padicKummerExponent p (π : K) g.val =
     padicKummerExponent p (π : K) (kummerGenerator p π).val
-  rw [padicKummerExponent_tau]
+  rw [padicKummerExponent_kummerGenerator]
   apply PadicInt.ext_of_toZModPow.mp
   intro n
   rw [map_one]
