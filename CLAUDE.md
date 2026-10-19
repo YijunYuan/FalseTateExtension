@@ -53,6 +53,10 @@ variable [Fact (p ≠ 2)]                                                   -- o
 
 ## `local notation`
 
+- Never write a literal successor `(n + 1)` inside a `local notation`: the `1` elaborates to a
+  postponed `OfNat` metavariable, instance queries on towers built from the notation miss the
+  cache, and files slow down by an order of magnitude. Write `(n + (1 : ℕ))`.
+
 - Only inside a `section`, only for proof bodies: a public statement must not contain a
   `local notation`. (Scoped/global notations for named definitions — `τ`, `𝒪[K]`, `ℚ_[p]` — are
   display forms and are fine anywhere.)
@@ -76,8 +80,7 @@ variable [Fact (p ≠ 2)]                                                   -- o
 
 A layer imports only layers above it (`Mathlib < Padic, Affine < Layers < Coordinates <
 Cyclotomic, Kummer < FalseTate`); `scripts/check_layers.py` enforces this and that every file is
-imported by its layer's aggregate. (Until phase F8 of the refactor the tree is flat and the script
-only checks reachability.)
+imported by its layer's aggregate. 
 
 ## Naming
 
