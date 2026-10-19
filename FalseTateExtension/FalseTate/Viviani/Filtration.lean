@@ -57,6 +57,9 @@ and the lower numbering filtration `G_t = G^{φ(t)}` on the corresponding interv
   `lowerRamificationGroupReal_falseTate_first_layer_filtration`: both filtrations of
   `ℚ_p(π^{1/p}, ζ_p)/ℚ_p`.
 
+The correction: at the integer breaks the inverse Herbrand function is
+`(p-1)(p^{2i+1} + 1)/(p+1)`, with exponent `2i + 1` where Viviani's table prints `2i`.
+
 ## References
 
 * Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6 and

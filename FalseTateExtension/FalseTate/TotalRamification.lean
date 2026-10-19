@@ -88,10 +88,10 @@ theorem finiteDiagonal_translation_mem_inertia
   have := falseTateLayer_isGalois p (π : ℚ_[p]) n
   let e := finiteDiagonalGaloisEquiv_padic p π n
   let δ := e.symm (SemidirectProduct.inr (unitTwo p n))
-  let τ := e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b))
+  let t₀ := e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b))
   have h := commutatorElement_mem_lowerRamificationGroup_zero (ℚ_[p])
-    (falseTateLayer p (π : ℚ_[p]) n n) δ τ
-  have heq : ⁅δ, τ⁆ = τ := by
+    (falseTateLayer p (π : ℚ_[p]) n n) δ t₀
+  have heq : ⁅δ, t₀⁆ = t₀ := by
     apply e.injective
     rw [map_commutatorElement]
     change ⁅e (e.symm (SemidirectProduct.inr (unitTwo p n))),

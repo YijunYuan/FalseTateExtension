@@ -17,14 +17,29 @@ public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
-# Liu's Lemma 5.1.2: the relative Galois groups
+# Liu's Lemma 5.1.2: the relative Galois groups of `K_FT`
 
-`Gal(K_FT/K_cyc) ≅ ℤ_[p]` with generator `τ`, and `Gal(K_FT/K_Kum) ≅ Gal(K_cyc/K)`, as topological
-groups, for `p ≠ 2`.
+Let `K/ℚ_p` be finite with uniformizer `π`, `p ≠ 2`, `K_FT = K(π^{1/p^∞}, ζ_{p^∞})`,
+`K_Kum = K(π^{1/p^∞})` and `K_cyc = K(ζ_{p^∞})`. The Galois group `Gal(K_FT/K_cyc)` is the
+kernel of the cyclotomic character `χ` on `Gal(K_FT/K)`, and the Kummer exponent `b` is an
+isomorphism of topological groups `Gal(K_FT/K_cyc) ≃ₜ* ℤ_[p]`; the element `τ` with `b(τ) = 1`
+satisfies `τ(π^{1/p^n}) = ζ_{p^n} π^{1/p^n}` for all `n`, is determined by these equations, and
+its integer powers are dense. The Galois group `Gal(K_FT/K_Kum)` is isomorphic, through `χ`, to
+`χ(Gal(K_cyc/K)) ≅ Gal(K_cyc/K)` as a topological group.
+
+## Main results
+
+* `cyclotomicKernelRelativeEquiv`: `ker χ ≃ₜ* Gal(K_FT/K_cyc)`.
+* `cyclotomicRelativeGaloisEquiv`: `Gal(K_FT/K_cyc) ≃ₜ* ℤ_[p]`.
+* `kummerGeneratorRel`, `kummerGeneratorRel_pPowRootExt`, `kummerGeneratorRel_unique`,
+  `denseRange_kummerGeneratorRel_zpow`: `τ ∈ Gal(K_FT/K_cyc)`.
+* `cyclotomicRelativeGaloisEquiv_kummerGeneratorRel`: `τ ↦ 1` under `Gal(K_FT/K_cyc) ≃ₜ* ℤ_[p]`.
+* `kummerRelativeGaloisEquiv`: `Gal(K_FT/K_Kum) ≃ₜ* χ(Gal(K_cyc/K))`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, Lemma 5.1.2.
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
+  Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -42,17 +57,18 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
-/-- The inclusion defines the relative cyclotomic scalar action. -/
+/-- The `K_cyc`-algebra structure on `K_FT` given by the inclusion `K_cyc ⊆ K_FT`. -/
 local instance cyclotomicRelativeAlgebra :
     Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) :=
   IntermediateField.algebraOfLE (cyclotomicExtension_le_falseTateExtension p (π : K))
 
+/-- `K ⊆ K_cyc ⊆ K_FT` is a tower of algebras. -/
 local instance cyclotomicRelativeScalarTower :
     IsScalarTower K (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) :=
   IntermediateField.isScalarTower_of_le (cyclotomicExtension_le_falseTateExtension p (π : K))
 
 omit [Algebra (ℚ_[p]) K] in
-/-- The relative scalar homomorphism is exactly the cyclotomic inclusion. -/
+/-- The algebra map `K_cyc → K_FT` is the inclusion of intermediate fields. -/
 theorem cyclotomicRelative_scalarHom_eq :
     IsScalarTower.toAlgHom K (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) =
       IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) := by
@@ -60,8 +76,8 @@ theorem cyclotomicRelative_scalarHom_eq :
   intro x
   rfl
 
-/-- The character kernel is the relative cyclotomic Galois
-group, with its own Krull topology and inclusion of scalars. -/
+/-- The isomorphism of topological groups `ker χ ≃ₜ* Gal(K_FT/K_cyc)`, `Gal(K_FT/K_cyc)` with
+its Krull topology. -/
 def cyclotomicKernelRelativeEquiv [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ≃ₜ*
       (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
@@ -75,27 +91,26 @@ def cyclotomicKernelRelativeEquiv [hπ : Fact (Irreducible π)] :
   exact e.trans (AlgEquiv.fixingSubgroupContinuousMulEquiv K (cyclotomicExtension (K := K) p)
     (falseTateExtension p (π : K)) i (AlgHom.congr_fun (cyclotomicRelative_scalarHom_eq p π)))
 
-/-- The relative cyclotomic Galois group is the full p-adic
-translation factor, normalized by the roots. -/
+/-- For `p ≠ 2`, the Kummer exponent `b` is an isomorphism of topological groups
+`Gal(K_FT/K_cyc) ≃ₜ* Multiplicative ℤ_[p]`. -/
 def cyclotomicRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K)) ≃ₜ* Multiplicative (ℤ_[p]) :=
   (cyclotomicKernelRelativeEquiv p π).symm.trans (kummerKernelMulEquivPadicInt p π)
 
-/-- The generator as an automorphism over the
-cyclotomic field, rather than only as an element of its fixing subgroup. -/
+/-- The generator `τ` as an element of `Gal(K_FT/K_cyc)`. -/
 def kummerGeneratorRel [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K) :=
   cyclotomicKernelRelativeEquiv p π (kummerGenerator p π)
 
-/-- The relative generator has precisely the radical actions. -/
+/-- `τ(π^{1/p^{n+1}}) = ζ_{p^{n+1}} π^{1/p^{n+1}}` for `τ ∈ Gal(K_FT/K_cyc)`. -/
 theorem kummerGeneratorRel_pPowRootExt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     kummerGeneratorRel p π (pPowRootExt p (π : K) (n + 1)) =
       zetaExt p (π : K) (n + 1) * pPowRootExt p (π : K) (n + 1) :=
   kummerGenerator_pPowRootExt p π n
 
-/-- Integral powers are dense in the relative cyclotomic Galois group. -/
+/-- The powers `τ^n`, `n ∈ ℤ`, are dense in `Gal(K_FT/K_cyc)`. -/
 theorem denseRange_kummerGeneratorRel_zpow
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     DenseRange (fun n : ℤ => kummerGeneratorRel p π ^ n) := by
@@ -103,8 +118,7 @@ theorem denseRange_kummerGeneratorRel_zpow
     (denseRange_kummerGenerator_zpow p π) (cyclotomicKernelRelativeEquiv p π).continuous
   simpa only [Function.comp_def, map_zpow, kummerGeneratorRel] using hd
 
-/-- The relative generator corresponds to exactly one under the
-isomorphism normalized by the compatible roots. -/
+/-- `τ ↦ 1` under `Gal(K_FT/K_cyc) ≃ₜ* Multiplicative ℤ_[p]`. -/
 theorem cyclotomicRelativeGaloisEquiv_kummerGeneratorRel
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     cyclotomicRelativeGaloisEquiv p π (kummerGeneratorRel p π) =
@@ -115,8 +129,8 @@ theorem cyclotomicRelativeGaloisEquiv_kummerGeneratorRel
   rw [(cyclotomicKernelRelativeEquiv p π).symm_apply_apply]
   exact congrArg Multiplicative.ofAdd (padicKummerExponent_kummerGenerator p π)
 
-/-- The actions uniquely determine the generator in the
-relative cyclotomic Galois group. -/
+/-- An element `g ∈ Gal(K_FT/K_cyc)` with `g(π^{1/p^{n+1}}) = ζ_{p^{n+1}} π^{1/p^{n+1}}` for all
+`n` is `τ`. -/
 theorem kummerGeneratorRel_unique
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
@@ -140,17 +154,18 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
-/-- The inclusion defines the relative radical scalar action. -/
+/-- The `K_Kum`-algebra structure on `K_FT` given by the inclusion `K_Kum ⊆ K_FT`. -/
 local instance kummerRelativeAlgebra :
     Algebra (kummerExtension p (π : K)) (falseTateExtension p (π : K)) :=
   IntermediateField.algebraOfLE (kummerExtension_le_falseTateExtension p (π : K))
 
+/-- `K ⊆ K_Kum ⊆ K_FT` is a tower of algebras. -/
 local instance kummerRelativeScalarTower :
     IsScalarTower K (kummerExtension p (π : K)) (falseTateExtension p (π : K)) :=
   IntermediateField.isScalarTower_of_le (kummerExtension_le_falseTateExtension p (π : K))
 
 omit [Algebra (ℚ_[p]) K] in
-/-- The relative scalar homomorphism is exactly the radical inclusion. -/
+/-- The algebra map `K_Kum → K_FT` is the inclusion of intermediate fields. -/
 theorem kummerRelative_scalarHom_eq :
     IsScalarTower.toAlgHom K (kummerExtension p (π : K)) (falseTateExtension p (π : K)) =
       falseTateKummerInclusion p (π : K) := by
@@ -158,8 +173,8 @@ theorem kummerRelative_scalarHom_eq :
   intro x
   rfl
 
-/-- The Galois group over the radical field is the
-cyclotomic character image, with both of their topologies. -/
+/-- For `p ≠ 2`, `χ` induces an isomorphism of topological groups
+`Gal(K_FT/K_Kum) ≃ₜ* χ(Gal(K_cyc/K))`. -/
 def kummerRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[kummerExtension p (π : K)]
       falseTateExtension p (π : K)) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by

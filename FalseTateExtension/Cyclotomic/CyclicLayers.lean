@@ -15,9 +15,26 @@ public import Mathlib.RingTheory.ZMod.UnitsCyclic
 /-!
 # Cyclotomic layers at an odd prime
 
-For `p ≠ 2` and a field `K` of characteristic zero, `Gal(K(ζ_{p^n})/K)` is cyclic, and the first
-layer `K(ζ_{p^{n+1}})` strictly larger than `K` has a binomial minimal polynomial of degree `p` over
-`K`.
+Let `K` be a field of characteristic zero and `p ≠ 2`. The group `Gal(K(ζ_{p^n})/K)` embeds in
+`(ℤ/p^n)ˣ`, which is cyclic, so it is cyclic. If `ζ_p ∈ K` and `r` is the least index with
+`K(ζ_{p^{r+1}}) ≠ K`, then `ζ_{p^r} = a ∈ K` and the minimal polynomial of `ζ_{p^{r+1}}` over `K`
+is `X^p - a`, so `[K(ζ_{p^{r+1}}) : K] = p`; a subfield of degree `p` of some `K(ζ_{p^m})` is
+therefore `K(ζ_{p^{r+1}})`.
+
+## Main results
+
+* `cyclotomicLayer_isAbelianGalois`: `K(ζ_{p^n})/K` is abelian.
+* `cyclotomicLayer_isCyclic`: `Gal(K(ζ_{p^n})/K)` is cyclic for `p ≠ 2`.
+* `cyclotomicLayer_step_minpoly_of_eq_bot`: if `ζ_p ∈ K`, `K(ζ_{p^n}) = K` and
+  `K(ζ_{p^{n+1}}) ≠ K`, the minimal polynomial of `ζ_{p^{n+1}}` over `K` is `X^p - ζ_{p^n}`.
+* `cyclotomicLayer_step_finrank_of_eq_bot`: under the same hypotheses `[K(ζ_{p^{n+1}}) : K] = p`.
+* `exists_eq_first_cyclotomicLayer_of_finrank_prime`: for `p ≠ 2` and `ζ_p ∈ K`, a subfield of
+  degree `p` of `K(ζ_{p^m})` is the first layer `K(ζ_{p^{r+1}}) ≠ K`.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
+  Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -33,7 +50,7 @@ section FiniteCyclotomic
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
-/-- The cyclotomic layer over the base is abelian Galois. -/
+/-- `K(ζ_{p^n})/K` is an abelian Galois extension. -/
 theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
     IsAbelianGalois K (cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
@@ -41,8 +58,7 @@ theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
     (isPrimitiveRoot_zeta (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
   exact IsCyclotomicExtension.isAbelianGalois {p ^ n} K _
 
-/-- At an odd prime, the finite cyclotomic Galois group over any
-characteristic-zero base is cyclic, including level zero. -/
+/-- For `p ≠ 2`, `Gal(K(ζ_{p^n})/K)` is cyclic. -/
 theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
     IsCyclic (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
@@ -56,9 +72,8 @@ theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
   let := ZMod.isCyclic_units_of_prime_pow p (Fact.out : p.Prime) hp₂.out n
   exact isCyclic_of_injective (hζ.autToPow K) (hζ.autToPow_injective K)
 
-/-- If the preceding cyclotomic layer and the first roots of unity are
-already in the base, a new next root has its degree-`p`
-binomial minimal polynomial over the base. -/
+/-- If `ζ_p ∈ K`, `K(ζ_{p^n}) = K` and `K(ζ_{p^{n+1}}) ≠ K`, then `ζ_{p^n} = a` for some
+`a ∈ K` and the minimal polynomial of `ζ_{p^{n+1}}` over `K` is `X^p - a`. -/
 theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
     (h₁ : cyclotomicLayer (K := K) p 1 = ⊥)
     (hprev : cyclotomicLayer (K := K) p n = ⊥)
@@ -110,8 +125,7 @@ theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
       zeta_succ_pow, ha, sub_self]
   · exact Polynomial.monic_X_pow_sub_C a (Fact.out : p.Prime).ne_zero
 
-/-- A new cyclotomic layer immediately above the base has
-degree exactly `p` when the first roots of unity already lie in the base. -/
+/-- If `ζ_p ∈ K`, `K(ζ_{p^n}) = K` and `K(ζ_{p^{n+1}}) ≠ K`, then `[K(ζ_{p^{n+1}}) : K] = p`. -/
 theorem cyclotomicLayer_step_finrank_of_eq_bot (n : ℕ)
     (h₁ : cyclotomicLayer (K := K) p 1 = ⊥)
     (hprev : cyclotomicLayer (K := K) p n = ⊥)
@@ -123,8 +137,7 @@ theorem cyclotomicLayer_step_finrank_of_eq_bot (n : ℕ)
       IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral _)
     _ = p := by rw [hmin, natDegree_X_pow_sub_C]
 
-/-- Every nontrivial finite cyclotomic layer contains a first
-nontrivial layer immediately above a layer equal to the base. -/
+/-- If `K(ζ_{p^n}) ≠ K`, there is `r < n` with `K(ζ_{p^r}) = K` and `K(ζ_{p^{r+1}}) ≠ K`. -/
 theorem exists_first_nontrivial_cyclotomicLayer {n : ℕ}
     (hn : cyclotomicLayer (K := K) p n ≠ ⊥) :
     ∃ r : ℕ, r + 1 ≤ n ∧ cyclotomicLayer (K := K) p r = ⊥ ∧
@@ -143,9 +156,8 @@ theorem exists_first_nontrivial_cyclotomicLayer {n : ℕ}
   · exact not_not.mp (Nat.find_min h (by omega : r < Nat.find h))
   · simpa only [hr] using Nat.find_spec h
 
-/-- A degree-`p` subfield of a finite odd-prime cyclotomic layer
-is exactly the first nontrivial cyclotomic layer, if the first roots of
-unity lie in the base. -/
+/-- For `p ≠ 2` and `ζ_p ∈ K`, a subfield `F ⊆ K(ζ_{p^m})` with `[F : K] = p` equals
+`K(ζ_{p^{r+1}})`, where `r < m`, `K(ζ_{p^r}) = K` and `K(ζ_{p^{r+1}}) ≠ K`. -/
 theorem exists_eq_first_cyclotomicLayer_of_finrank_prime [hp₂ : Fact (p ≠ 2)]
     (F : IntermediateField K (AlgebraicClosure K)) [FiniteDimensional K F]
     {m : ℕ} (hFm : F ≤ cyclotomicLayer (K := K) p m)

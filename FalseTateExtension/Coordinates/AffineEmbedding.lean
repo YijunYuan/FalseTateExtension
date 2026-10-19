@@ -16,13 +16,26 @@ public import Mathlib.Topology.Algebra.Group.Units
 public import Mathlib.Topology.Instances.ZMod
 
 /-!
-# The closed affine embedding of the false Tate Galois group
+# The closed embedding of `Gal(K_FT/K)` into `ℤ_[p] ⋊ ℤ_[p]ˣ`
 
-The semidirect product of additive p-adic integers by their units is
-given its product topology. The Kummer cocycle and cyclotomic character
-define a continuous closed embedding of the Krull Galois group into it.
-This proves blueprint `ft:affine-closed-embedding`, the topological part of the
-compatible-coordinate realization in Liu, Section 5.1.
+Let `K` be a field of characteristic zero, `π ∈ K` nonzero and `K_FT = K(π^{1/p^∞}, ζ_{p^∞})`.
+The Kummer exponent `b : Gal(K_FT/K) → ℤ_[p]` and the cyclotomic character
+`χ : Gal(K_FT/K) → ℤ_[p]ˣ` are continuous for the Krull topology, and the cocycle rule
+`b(gh) = b(g) + χ(g) b(h)` makes `g ↦ (b(g), χ(g))` a homomorphism
+`affineGaloisHom : Gal(K_FT/K) →* ℤ_[p] ⋊ ℤ_[p]ˣ`. It is injective and continuous, hence a
+closed embedding of the compact group `Gal(K_FT/K)` into the Hausdorff group `ℤ_[p] ⋊ ℤ_[p]ˣ`.
+
+## Main results
+
+* `continuous_padicKummerExponent`, `continuous_padicCyclotomicCharacter`: `b` and `χ` are
+  continuous.
+* `affineGaloisHom`: the homomorphism `g ↦ (b(g), χ(g))`.
+* `affineGaloisHom_injective`, `continuous_affineGaloisHom`.
+* `isClosedEmbedding_affineGaloisHom`: `g ↦ (b(g), χ(g))` is a closed embedding.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
 -/
 
 @[expose] public section
@@ -35,9 +48,8 @@ variable (p : ℕ) [Fact p.Prime]
 
 variable {K : Type*} [Field K] [CharZero K] (π : K)
 
-/-- Restriction to each diagonal layer is continuous for the
-Krull topologies. The intermediate field inside the infinite field is the
-image of the inclusion. -/
+/-- Restriction `Gal(K_FT/K) → Gal(K(π^{1/p^n}, ζ_{p^n})/K)` is continuous for the Krull
+topology. -/
 theorem continuous_infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
     Continuous (infiniteLayerRestriction p π n) := by
   let i := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
@@ -61,7 +73,7 @@ theorem continuous_infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
   rw [he]
   exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
 
-/-- The Kummer coordinate is continuous for the Krull topology. -/
+/-- The Kummer exponent `b : Gal(K_FT/K) → ℤ_[p]` is continuous. -/
 theorem continuous_padicKummerExponent [hπ : NeZero π] :
     Continuous (padicKummerExponent p π) := by
   apply PadicInt.continuous_of_toZModPow
@@ -70,11 +82,11 @@ theorem continuous_padicKummerExponent [hπ : NeZero π] :
   exact (continuous_of_discreteTopology : Continuous (finiteKummerExponent p π n)).comp
     (continuous_infiniteLayerRestriction p π n)
 
-/-- The cyclotomic character is continuous for the Krull topology. -/
+/-- The cyclotomic character `χ : Gal(K_FT/K) → ℤ_[p]ˣ` is continuous. -/
 theorem continuous_padicCyclotomicCharacter : Continuous (padicCyclotomicCharacter p π) :=
   _root_.cyclotomicCharacter.continuous p K (falseTateExtension p π)
 
-/-- The Galois homomorphism into the affine semidirect product. -/
+/-- The homomorphism `Gal(K_FT/K) →* ℤ_[p] ⋊ ℤ_[p]ˣ`, `g ↦ (b(g), χ(g))`. -/
 def affineGaloisHom [hπ : NeZero π] :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* PadicAffineGroup p where
   toFun g := ⟨Multiplicative.ofAdd (padicKummerExponent p π g),
@@ -93,26 +105,27 @@ def affineGaloisHom [hπ : NeZero π] :
     · exact congrArg Multiplicative.ofAdd (padicKummerExponent_mul p π g h)
     · exact map_mul (padicCyclotomicCharacter p π) g h
 
-/-- The affine homomorphism has the previously constructed coordinates. -/
+/-- The coordinates of `affineGaloisHom g` are `(b(g), χ(g))`. -/
 theorem affineGaloisHom_coordinates [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     padicAffineHomeomorphProd p (affineGaloisHom p π g) =
       (padicKummerExponent p π g, padicCyclotomicCharacter p π g) := rfl
 
+/-- `g ↦ (b(g), χ(g))` is injective on `Gal(K_FT/K)`. -/
 theorem affineGaloisHom_injective [hπ : NeZero π] :
     Function.Injective (affineGaloisHom p π) := by
   intro g h heq
   apply padicCoordinates_injective p π
   exact congrArg (padicAffineHomeomorphProd p) heq
 
+/-- `g ↦ (b(g), χ(g))` is continuous on `Gal(K_FT/K)`. -/
 theorem continuous_affineGaloisHom [hπ : NeZero π] :
     Continuous (affineGaloisHom p π) := by
   apply continuous_induced_rng.mpr
   exact (continuous_padicKummerExponent p π).prodMk
     (continuous_padicCyclotomicCharacter p π)
 
-/-- The false Tate Galois group embeds as a closed subgroup of the
-Hausdorff topological affine group. -/
+/-- `g ↦ (b(g), χ(g))` is a closed embedding `Gal(K_FT/K) → ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
 theorem isClosedEmbedding_affineGaloisHom [hπ : NeZero π] :
     Topology.IsClosedEmbedding (affineGaloisHom p π) := by
   have := falseTateExtension_isGalois p π

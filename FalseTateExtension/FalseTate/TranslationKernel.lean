@@ -16,16 +16,38 @@ public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
-# The translation kernel and the generator τ
+# The translation kernel of `Gal(K_FT/K)` and the generator `τ`
 
-For `p ≠ 2`, the additive kernel of the affine image of `Gal(K_FT/K)` is all of `ℤ_[p]`: the kernel
-of the cyclotomic character is isomorphic to `ℤ_[p]` as a topological group, with the generator `τ`
-characterised by `τ(π^{1/p^n}) = ζ_{p^n} π^{1/p^n}`. Consequently `K_Kum ∩ K_cyc = K` and
-`Gal(K_FT/K) ≅ ℤ_[p] ⋊ Gal(K_cyc/K)`.
+Let `K/ℚ_p` be finite with uniformizer `π`, `p ≠ 2`, `K_FT = K(π^{1/p^∞}, ζ_{p^∞})`,
+`K_Kum = K(π^{1/p^∞})`, `K_cyc = K(ζ_{p^∞})`, and let `b`, `χ` be the Kummer exponent and the
+cyclotomic character on `Γ = Gal(K_FT/K)`. The translation kernel
+`{a ∈ ℤ_[p] | (a, 1) ∈ im (b, χ)}` of the affine image of `Γ` is all of `ℤ_[p]`: every closed
+subgroup of `ℤ_[p]` other than `ℤ_[p]` lies in `p ℤ_[p]`, and a translation kernel inside
+`p ℤ_[p]` would put `π^{1/p}` in `K_cyc`, contradicting `FalseTate/RadicalNotCyclotomic`.
+Hence `b : ker χ = Gal(K_FT/K_cyc) → ℤ_[p]` is an isomorphism of topological groups. The
+generator `τ = kummerGenerator p π` is the element of `ker χ` with `b(τ) = 1`; it satisfies
+`τ(π^{1/p^n}) = ζ_{p^n} π^{1/p^n}` for all `n`, is determined by these equations, and its
+integer powers are dense in `ker χ`. Moreover every pair `(a, u)` with `a ∈ ℤ_[p]` and
+`u ∈ χ(Gal(K_cyc/K))` is `(b(g), χ(g))` for some `g ∈ Γ`, so `Γ ≅ ℤ_[p] ⋊ χ(Gal(K_cyc/K))` as
+topological groups, `Γ = Gal(K_FT/K_cyc) · Gal(K_FT/K_Kum)`, and `K_Kum ∩ K_cyc = K`.
+
+## Main results
+
+* `padicKummerExponent_spec`: `g(π^{1/p^n}) = ζ_{p^n}^{b(g)} π^{1/p^n}`.
+* `cyclotomicInclusion_fixingSubgroup`: `Gal(K_FT/K_cyc) = ker χ`.
+* `affineAdditiveKernel_eq_top`: the translation kernel of the affine image is `ℤ_[p]`.
+* `kummerKernelEquivPadicInt`: `b : ker χ ≃ₜ+ ℤ_[p]`.
+* `kummerGenerator`, `kummerGenerator_pPowRootExt`, `kummerGenerator_unique`,
+  `denseRange_kummerGenerator_zpow`: the
+  generator `τ`.
+* `kummerExtension_inf_cyclotomicExtension`: `K_Kum ∩ K_cyc = K`.
+* `falseTateGaloisEquivSemidirectProduct`: `Gal(K_FT/K) ≃ₜ* ℤ_[p] ⋊ χ(Gal(K_cyc/K))`.
+* `kummerFixingEquivCyclotomicImage`: `Gal(K_FT/K_Kum) ≃ₜ* χ(Gal(K_cyc/K))`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, Lemma 5.1.2.
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
+  Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -41,16 +63,18 @@ section InfiniteCoordinates
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- The radical, viewed in the infinite false Tate field. -/
+/-- `π^{1/p^n}` as an element of `K_FT`. -/
 def pPowRootExt (n : ℕ) : falseTateExtension p π :=
   IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
     (pPowRootLayer p π n)
 
+/-- `pPowRootExt p π n` is `π^{1/p^n}` in the algebraic closure. -/
 @[simp]
 theorem coe_pPowRootExt (n : ℕ) :
     (pPowRootExt p π n : AlgebraicClosure K) = pPowRoot p π n := rfl
 
-/-- The infinite Kummer coordinate evaluates on each radical. -/
+/-- `g(π^{1/p^n}) = ζ_{p^n}^{b(g)} π^{1/p^n}` in `K_FT`, where `b(g) ∈ ℤ_[p]` is reduced
+modulo `p^n`. -/
 theorem padicKummerExponent_spec [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     g (pPowRootExt p π n) = zetaExt p π n ^
@@ -61,8 +85,7 @@ theorem padicKummerExponent_spec [hπ : NeZero π]
   rw [finiteKummerExponent_spec p π n, map_mul, map_pow]
   rfl
 
-/-- The cyclotomic subfield has precisely the character kernel
-as its fixing subgroup in the false Tate field. -/
+/-- The subgroup `Gal(K_FT/K_cyc)` of `Gal(K_FT/K)` fixing `K_cyc` is `ker χ`. -/
 theorem cyclotomicInclusion_fixingSubgroup :
     (IntermediateField.inclusion
       (cyclotomicExtension_le_falseTateExtension p π)).fieldRange.fixingSubgroup =
@@ -86,7 +109,7 @@ theorem cyclotomicInclusion_fixingSubgroup :
     rw [hg] at h
     exact h.symm
 
-/-- Vanishing of the finite Kummer coordinate fixes the corresponding radical. -/
+/-- If `b(g) ≡ 0 mod p^n`, then `g` fixes `π^{1/p^n}`. -/
 theorem pPowRootExt_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ)
     (hb : PadicInt.toZModPow n (padicKummerExponent p π g) = 0) :
@@ -94,8 +117,7 @@ theorem pPowRootExt_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
   rw [padicKummerExponent_spec p π, hb]
   simp
 
-/-- Fixing by the character kernel places a radical in the
-cyclotomic subfield, by infinite Galois correspondence. -/
+/-- If every `g ∈ ker χ` fixes `π^{1/p^n}`, then `π^{1/p^n} ∈ K_cyc`. -/
 theorem pPowRoot_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
     (hf : ∀ g : (padicCyclotomicCharacter p π).ker,
       g.val (pPowRootExt p π n) = pPowRootExt p π n) :
@@ -124,8 +146,7 @@ section RestrictedCoordinates
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- The affine coordinates, with unit coordinate in the
-cyclotomic character image rather than in the whole p-adic unit group. -/
+/-- The homomorphism `Gal(K_FT/K) →* ℤ_[p] ⋊ χ(Gal(K_cyc/K))`, `g ↦ (b(g), χ(g))`. -/
 def restrictedAffineGaloisHom [hπ : NeZero π] :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →*
       RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range where
@@ -144,7 +165,7 @@ def restrictedAffineGaloisHom [hπ : NeZero π] :
     · apply Subtype.ext
       exact map_mul (padicCyclotomicCharacter p π) g h
 
-/-- Restricting the unit coordinate retains continuity in the product topology. -/
+/-- `g ↦ (b(g), χ(g))` is continuous into `ℤ_[p] ⋊ χ(Gal(K_cyc/K))`. -/
 theorem continuous_restrictedAffineGaloisHom [hπ : NeZero π] :
     Continuous (restrictedAffineGaloisHom p π) := by
   apply continuous_induced_rng.mpr
@@ -159,6 +180,8 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
+/-- A closed additive subgroup `M ≠ ℤ_[p]` of `ℤ_[p]` lies in `p ℤ_[p]`: `a ≡ 0 mod p` for
+`a ∈ M`. -/
 theorem closedAddSubgroup_toZModPow_one_eq_zero
     (M : ClosedAddSubgroup (ℤ_[p])) (hM : M.toAddSubgroup ≠ ⊤)
     {a : ℤ_[p]} (ha : a ∈ M) : PadicInt.toZModPow 1 a = 0 := by
@@ -172,8 +195,8 @@ theorem closedAddSubgroup_toZModPow_one_eq_zero
     exact IsLocalRing.le_maximalIdeal hJ
   exact hle ha
 
-/-- At an odd prime the closed translation kernel is the whole p-adic
-additive group, with the coordinate normalization fixed by the roots. -/
+/-- For `p ≠ 2`, the translation kernel `{a | (a, 1) ∈ im (b, χ)}` of the affine image of
+`Gal(K_FT/K)` is all of `ℤ_[p]`. -/
 theorem affineAdditiveKernel_eq_top
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (affineAdditiveKernel p (π : K)).toAddSubgroup = ⊤ := by
@@ -187,8 +210,8 @@ theorem affineAdditiveKernel_eq_top
     (affineAdditiveKernel p (π : K)) hM
     (padicKummerExponent_mem_affineAdditiveKernel p (π : K) g)
 
-/-- The Kummer coordinate is a topological additive isomorphism onto
-all p-adic integers at an odd prime. -/
+/-- For `p ≠ 2`, the Kummer exponent `b` is an isomorphism of topological additive groups
+`ker χ ≃ₜ+ ℤ_[p]`. -/
 def kummerKernelEquivPadicInt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     Additive (padicCyclotomicCharacter p (π : K)).ker ≃ₜ+ ℤ_[p] := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -220,6 +243,7 @@ def kummerKernelEquivPadicInt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible 
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
+/-- `kummerKernelEquivPadicInt g = b(g)` for `g ∈ ker χ`. -/
 @[simp]
 theorem kummerKernelEquivPadicInt_apply
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
@@ -227,12 +251,14 @@ theorem kummerKernelEquivPadicInt_apply
     kummerKernelEquivPadicInt p π g =
       padicKummerExponent p (π : K) g.toMul := rfl
 
-/-- The character-kernel automorphism whose Kummer coordinate
-is exactly one. -/
+/-- The generator `τ` of `ker χ = Gal(K_FT/K_cyc)`: the element with `b(τ) = 1`. -/
 def kummerGenerator [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker :=
   ((kummerKernelEquivPadicInt p π).symm 1).toMul
 
+@[inherit_doc] scoped notation "τ" => kummerGenerator
+
+/-- `b(τ) = 1`. -/
 @[simp]
 theorem padicKummerExponent_kummerGenerator
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
@@ -240,8 +266,7 @@ theorem padicKummerExponent_kummerGenerator
       (kummerGenerator p π).val = 1 :=
   (kummerKernelEquivPadicInt p π).apply_symm_apply 1
 
-/-- The generator acts on every positive-level radical
-by multiplication by the corresponding root of unity. -/
+/-- `τ(π^{1/p^{n+1}}) = ζ_{p^{n+1}} π^{1/p^{n+1}}` in `K_FT`. -/
 theorem kummerGenerator_pPowRootExt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (kummerGenerator p π).val (pPowRootExt p (π : K) (n + 1)) =
       zetaExt p (π : K) (n + 1) * pPowRootExt p (π : K) (n + 1) := by
@@ -250,8 +275,7 @@ theorem kummerGenerator_pPowRootExt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irredu
   have hpow : 1 < p ^ (n + 1) := one_lt_pow₀ (Fact.out : p.Prime).one_lt (Nat.succ_ne_zero n)
   simp only [ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
-/-- Integral powers of the automorphism are dense in the
-cyclotomic-character kernel. -/
+/-- The powers `τ^n`, `n ∈ ℤ`, are dense in `ker χ = Gal(K_FT/K_cyc)`. -/
 theorem denseRange_kummerGenerator_zpow
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     DenseRange (fun n : ℤ => kummerGenerator p π ^ n) := by
@@ -274,8 +298,8 @@ theorem denseRange_kummerGenerator_zpow
   rw [e.symm_apply_apply] at hg
   exact hg
 
-/-- Every translation coordinate and every cyclotomic unit coordinate
-occur together in the Galois group. -/
+/-- For `p ≠ 2`, every `a ∈ ℤ_[p]` and `u ∈ χ(Gal(K_cyc/K))` are the coordinates
+`(b(g), χ(g))` of some `g ∈ Gal(K_FT/K)`. -/
 theorem exists_padicCoordinates_eq
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (b : ℤ_[p]) (u : (ℤ_[p])ˣ)
@@ -302,8 +326,7 @@ theorem exists_padicCoordinates_eq
     exact sub_add_cancel b _
   · rw [map_mul, htχ, one_mul]
 
-/-- The cyclotomic fixer and radical fixer generate the whole
-false Tate Galois group. -/
+/-- `Gal(K_FT/K) = Gal(K_FT/K_cyc) · Gal(K_FT/K_Kum)`, i.e. `ker χ ⊔ Gal(K_FT/K_Kum) = ⊤`. -/
 theorem cyclotomicKernel_sup_kummerFixing
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ⊔ falseTateKummerFixing p (π : K) = ⊤ := by
@@ -322,8 +345,7 @@ theorem cyclotomicKernel_sup_kummerFixing
   have h := Subgroup.mul_mem_sup ht hs
   simpa only [inv_mul_cancel_right] using h
 
-/-- The infinite radical and cyclotomic subfields meet exactly in
-the base field, for every odd prime and every uniformizer. -/
+/-- For `p ≠ 2`, `K_Kum ∩ K_cyc = K`. -/
 theorem kummerExtension_inf_cyclotomicExtension
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     kummerExtension p (π : K) ⊓ cyclotomicExtension (K := K) p = ⊥ := by
@@ -334,8 +356,8 @@ theorem kummerExtension_inf_cyclotomicExtension
   rw [cyclotomicInclusion_fixingSubgroup, sup_comm]
   exact cyclotomicKernel_sup_kummerFixing p π
 
-/-- The Krull Galois group is the affine semidirect product
-of all translations by the cyclotomic character image. -/
+/-- For `p ≠ 2`, `g ↦ (b(g), χ(g))` is an isomorphism of topological groups
+`Gal(K_FT/K) ≃ₜ* ℤ_[p] ⋊ χ(Gal(K_cyc/K))`. -/
 def falseTateGaloisEquivSemidirectProduct [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) ≃ₜ*
       RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range := by
@@ -361,22 +383,21 @@ def falseTateGaloisEquivSemidirectProduct [hp₂ : Fact (p ≠ 2)] [hπ : Fact (
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
-/-- The semidirect isomorphism retains the Kummer coordinate. -/
+/-- The translation coordinate of `falseTateGaloisEquivSemidirectProduct g` is `b(g)`. -/
 theorem falseTateGaloisEquivSemidirectProduct_left
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     (falseTateGaloisEquivSemidirectProduct p π g).left.toAdd =
       padicKummerExponent p (π : K) g := rfl
 
-/-- The semidirect isomorphism retains the cyclotomic character. -/
+/-- The unit coordinate of `falseTateGaloisEquivSemidirectProduct g` is `χ(g)`. -/
 theorem falseTateGaloisEquivSemidirectProduct_right
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     (falseTateGaloisEquivSemidirectProduct p π g).right.val =
       padicCyclotomicCharacter p (π : K) g := rfl
 
-/-- The cyclotomic fixer is exactly the translation factor under
-the topological semidirect isomorphism. -/
+/-- `(b(g), χ(g))` lies in the translation factor `ℤ_[p] ⋊ 1` if and only if `g ∈ ker χ`. -/
 theorem falseTateGaloisEquivSemidirectProduct_mem_translations
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
@@ -389,7 +410,8 @@ theorem falseTateGaloisEquivSemidirectProduct_mem_translations
   · exact fun h => congrArg Subtype.val h
   · exact fun h => Subtype.ext h
 
-/-- The radical fixer is exactly the pure cyclotomic-unit factor. -/
+/-- `(b(g), χ(g))` lies in the unit factor `0 ⋊ χ(Gal(K_cyc/K))` if and only if
+`g ∈ Gal(K_FT/K_Kum)`. -/
 theorem falseTateGaloisEquivSemidirectProduct_mem_units
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
@@ -407,8 +429,8 @@ theorem falseTateGaloisEquivSemidirectProduct_mem_units
     · exact congrArg Multiplicative.ofAdd hb.symm
     · rfl
 
-/-- Restriction of the cyclotomic character identifies the
-radical fixer with the cyclotomic character image. -/
+/-- For `p ≠ 2`, `χ` restricts to an isomorphism of topological groups
+`Gal(K_FT/K_Kum) ≃ₜ* χ(Gal(K_cyc/K))`. -/
 def kummerFixingEquivCyclotomicImage [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateKummerFixing p (π : K) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -447,15 +469,14 @@ def kummerFixingEquivCyclotomicImage [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irred
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
-/-- On the radical fixer the factor isomorphism is the
-cyclotomic character, with its image as codomain. -/
+/-- `kummerFixingEquivCyclotomicImage g = χ(g)` for `g ∈ Gal(K_FT/K_Kum)`. -/
 theorem kummerFixingEquivCyclotomicImage_apply
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateKummerFixing p (π : K)) :
     (kummerFixingEquivCyclotomicImage p π g).val =
       padicCyclotomicCharacter p (π : K) g.val := rfl
 
-/-- The generator fixes the embedded cyclotomic field. -/
+/-- `τ` fixes `K_cyc` pointwise. -/
 theorem kummerGenerator_fixes_cyclotomicExtension
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (x : cyclotomicExtension (K := K) p) :
@@ -469,8 +490,8 @@ theorem kummerGenerator_fixes_cyclotomicExtension
     exact (kummerGenerator p π).property
   exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hg _ ⟨x, rfl⟩
 
-/-- Fixing the cyclotomic field and the actions on all compatible
-positive-level radicals uniquely specify the automorphism. -/
+/-- An element `g ∈ ker χ` with `g(π^{1/p^{n+1}}) = ζ_{p^{n+1}} π^{1/p^{n+1}}` for all `n`
+is `τ`. -/
 theorem kummerGenerator_unique
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : (padicCyclotomicCharacter p (π : K)).ker)
@@ -506,8 +527,8 @@ theorem kummerGenerator_unique
       _ = i (zetaLayer p (π : K) (n + 1)) * i (pPowRootLayer p (π : K) (n + 1)) := hg n
       _ = _ := by rw [map_mul, map_pow, ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
-/-- Multiplicative notation for the topological Kummer-coordinate isomorphism
-on the character kernel. -/
+/-- For `p ≠ 2`, the Kummer exponent `b` as an isomorphism of topological groups
+`ker χ ≃ₜ* Multiplicative ℤ_[p]`. -/
 def kummerKernelMulEquivPadicInt [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ≃ₜ* Multiplicative (ℤ_[p]) := by
   let e := kummerKernelEquivPadicInt p π

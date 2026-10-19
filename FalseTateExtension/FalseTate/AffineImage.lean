@@ -14,12 +14,27 @@ public import FontaineWintenberger.APF.Galois
 public import FontaineWintenberger.APF.Galois.Restriction
 
 /-!
-# The affine image of the false Tate Galois group
+# The affine image of `Gal(K_FT/K)`
 
-The closed embedding of `Gal(K_FT/K)` into `ℤ_[p] ⋊ ℤ_[p]ˣ` identifies the Galois group with a
-closed subgroup `falseTateAffineImage`; the subgroup fixing the Kummer extension corresponds to the
-pure units of that image, and the unit projection has the image of the cyclotomic character as
-range.
+Let `K` be a field of characteristic zero, `π ∈ K` nonzero, `K_FT = K(π^{1/p^∞}, ζ_{p^∞})`,
+`K_Kum = K(π^{1/p^∞})` and `K_cyc = K(ζ_{p^∞})`. The map `g ↦ (b(g), χ(g))` identifies
+`Gal(K_FT/K)` with a closed subgroup `G = falseTateAffineImage p π` of `ℤ_[p] ⋊ ℤ_[p]ˣ`, as a
+topological group. Under this identification `Gal(K_FT/K_Kum)` is the subgroup `P(G)` of pure
+units `(0, u)`, and the unit projection `G → ℤ_[p]ˣ` is the cyclotomic character, with range
+`χ(Gal(K_cyc/K))`; when `K/ℚ_p` is finite this range is infinite. If the translation kernel
+`T(G) = {a | (a, 1) ∈ G}` is `0`, then `χ` is injective and `K_FT = K_cyc`.
+
+## Main results
+
+* `falseTateAffineImage`, `falseTateGaloisEquivAffineImage`: the closed subgroup `G` and
+  the isomorphism `Gal(K_FT/K) ≃ₜ* G`.
+* `falseTateAffineImage_projection_range`: the unit projection of `G` has range
+  `χ(Gal(K_cyc/K))`.
+* `falseTateKummerFixing`, `mem_falseTateKummerFixing_iff`: `Gal(K_FT/K_Kum)` is `{g | b(g) = 0}`.
+* `falseTateKummerFixing_map_affine`: `Gal(K_FT/K_Kum)` corresponds to `P(G)`.
+* `falseTateAffineImage_projection_infinite`: for `K/ℚ_p` finite, `χ(Gal(K_FT/K))` is infinite.
+* `falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot`: if `T(G) = 0`, then
+  `K_FT = K_cyc`.
 
 ## References
 
@@ -40,14 +55,13 @@ variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 local notation "Γ" => falseTateExtension p π ≃ₐ[K] falseTateExtension p π
 
-/-- The closed image of the false Tate Galois group under its
-Kummer and cyclotomic coordinates. -/
+/-- The image `G = {(b(g), χ(g)) | g ∈ Gal(K_FT/K)}`, a closed subgroup of
+`ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
 def falseTateAffineImage [hπ : NeZero π] : ClosedSubgroup (PadicAffineGroup p) where
   toSubgroup := (affineGaloisHom p π).range
   isClosed' := (isClosedEmbedding_affineGaloisHom p π).isClosed_range
 
-/-- The Krull Galois group is the closed affine image,
-with its group structure and topology. -/
+/-- The isomorphism of topological groups `Gal(K_FT/K) ≃ₜ* G`, `g ↦ (b(g), χ(g))`. -/
 def falseTateGaloisEquivAffineImage [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p π := by
   have := falseTateExtension_isGalois p π
   let f : Γ →* falseTateAffineImage p π := (affineGaloisHom p π).rangeRestrict
@@ -61,18 +75,18 @@ def falseTateGaloisEquivAffineImage [hπ : NeZero π] : Γ ≃ₜ* falseTateAffi
       continuous_toFun := hc
       continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
+/-- `falseTateGaloisEquivAffineImage g = (b(g), χ(g))`. -/
 @[simp]
 theorem falseTateGaloisEquivAffineImage_apply [hπ : NeZero π] (g : Γ) :
     (falseTateGaloisEquivAffineImage p π g : PadicAffineGroup p) = affineGaloisHom p π g := rfl
 
-/-- Unit projection of the affine isomorphism is exactly the
-cyclotomic character. -/
+/-- The unit projection of `G` composed with `Gal(K_FT/K) ≃ₜ* G` is the cyclotomic
+character `χ`. -/
 theorem falseTateGaloisEquivAffineImage_projection [hπ : NeZero π] :
     (affineProjection (falseTateAffineImage p π)).comp
       (falseTateGaloisEquivAffineImage p π).toMonoidHom = padicCyclotomicCharacter p π := rfl
 
-/-- The affine unit image is the cyclotomic character
-image on the cyclotomic subfield. -/
+/-- The range of the unit projection of `G` is `χ(Gal(K_cyc/K)) ⊆ ℤ_[p]ˣ`. -/
 theorem falseTateAffineImage_projection_range [hπ : NeZero π] :
     (affineProjection (falseTateAffineImage p π)).range =
       (cyclotomicExtensionCharacter (K := K) p).range := by
@@ -85,21 +99,20 @@ theorem falseTateAffineImage_projection_range [hπ : NeZero π] :
   · rintro ⟨σ, rfl⟩
     exact ⟨falseTateGaloisEquivAffineImage p π σ, rfl⟩
 
-/-- The infinite radical tower lies in the false Tate field. -/
+/-- `K_Kum ⊆ K_FT`. -/
 theorem kummerExtension_le_falseTateExtension :
     kummerExtension p π ≤ falseTateExtension p π := by
   rw [falseTateExtension_eq_sup]
   exact le_sup_left
 
-/-- The inclusion of the radical tower into the false Tate field. -/
+/-- The inclusion `K_Kum → K_FT`. -/
 def falseTateKummerInclusion : kummerExtension p π →ₐ[K] falseTateExtension p π :=
   IntermediateField.inclusion (kummerExtension_le_falseTateExtension p π)
 
-/-- The subgroup fixing the infinite radical tower. -/
+/-- The subgroup `Gal(K_FT/K_Kum)` of `Gal(K_FT/K)` fixing `K_Kum`. -/
 def falseTateKummerFixing : Subgroup Γ := (falseTateKummerInclusion p π).fieldRange.fixingSubgroup
 
-/-- Fixing every radical is equivalent to vanishing of the
-p-adic translation coordinate. -/
+/-- `σ ∈ Gal(K_FT/K_Kum)` if and only if `b(σ) = 0`. -/
 theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
     σ ∈ falseTateKummerFixing p π ↔ padicKummerExponent p π σ = 0 := by
   constructor
@@ -143,15 +156,15 @@ theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
       exact hh
     exact AlgHom.congr_fun heq ⟨y.val, hn⟩
 
-/-- Pure units in the affine image pull back to the radical fixer. -/
+/-- `(b(σ), χ(σ))` is a pure unit of `G` if and only if `σ ∈ Gal(K_FT/K_Kum)`. -/
 theorem falseTateGaloisEquivAffineImage_mem_pureUnits [hπ : NeZero π] (σ : Γ) :
     falseTateGaloisEquivAffineImage p π σ ∈ affinePureUnits (falseTateAffineImage p π) ↔
       σ ∈ falseTateKummerFixing p π := by
   rw [mem_affinePureUnits, mem_falseTateKummerFixing_iff p π]
   rfl
 
-/-- The radical fixer becomes exactly the pure-unit subgroup in
-the closed affine image. -/
+/-- The image of `Gal(K_FT/K_Kum)` under `Gal(K_FT/K) ≃ₜ* G` is the pure-unit subgroup
+`P(G)`. -/
 theorem falseTateKummerFixing_map_affine [hπ : NeZero π] :
     (falseTateKummerFixing p π).map (falseTateGaloisEquivAffineImage p π).toMonoidHom =
       affinePureUnits (falseTateAffineImage p π) := by
@@ -167,8 +180,8 @@ theorem falseTateKummerFixing_map_affine [hπ : NeZero π] :
 
 variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The affine unit projection has infinite image for every finite
-p-adic base, including the dyadic case. -/
+/-- For `K/ℚ_p` finite, the range `χ(Gal(K_FT/K))` of the unit projection of `G` is
+infinite. -/
 theorem falseTateAffineImage_projection_infinite [hπ : NeZero π] :
     Infinite (affineProjection (falseTateAffineImage p π)).range := by
   rw [falseTateAffineImage_projection_range]
@@ -184,7 +197,8 @@ theorem falseTateAffineImage_projection_infinite [hπ : NeZero π] :
   · exact hinf
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- The character is faithful when the translation kernel vanishes. -/
+/-- If the translation kernel `T(G)` is `0`, the cyclotomic character `χ` is injective on
+`Gal(K_FT/K)`. -/
 theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
     [hπ : NeZero π]
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
@@ -197,8 +211,7 @@ theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
   exact hi
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- The cyclotomic inclusion has trivial fixing subgroup when the
-translation kernel vanishes. -/
+/-- If `T(G) = 0`, the subgroup of `Gal(K_FT/K)` fixing `K_cyc` is trivial. -/
 theorem falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot
     [hπ : NeZero π]
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
@@ -222,8 +235,7 @@ theorem falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot
     _ = _ := (map_one _).symm
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- A vanishing translation kernel makes the false Tate
-field equal to its cyclotomic subfield, by infinite Galois correspondence. -/
+/-- If `T(G) = 0`, then `K_FT = K_cyc`. -/
 theorem falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot
     [hπ : NeZero π]
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
