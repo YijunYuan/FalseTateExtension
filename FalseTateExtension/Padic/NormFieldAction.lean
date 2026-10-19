@@ -1,8 +1,13 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.NormFieldCoordinates
 public import FalseTateExtension.Padic.TameGenerator
-public import FontaineWintenberger.FieldOfNorms.ActionContinuity
+public import FontaineWintenberger.FieldOfNorms.Galois.Action
 public import Mathlib.RingTheory.PowerSeries.Substitution
 public import Mathlib.Dynamics.PeriodicPts.Defs
 
@@ -177,45 +182,38 @@ open scoped Topology PowerSeries.WithPiTopology LaurentSeries
 
 variable (p : ℕ) [Fact p.Prime]
 
-local instance normFieldActionResidueCharP :
-    CharP (IsLocalRing.ResidueField
-      (NormedField.valuation (K := Padic p)).valuationSubring) p where
-  cast_eq_zero_iff n := by
-    rw [← (padicUnitBallResidueEquiv p).injective.eq_iff, map_natCast, map_zero]
-    exact CharP.cast_eq_zero_iff (ZMod p) p n
-
-local instance normFieldActionResiduePerfect :
-    PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := Padic p)).valuationSubring) :=
-  PerfectField.of_ringEquiv (padicUnitBallResidueEquiv p).symm
-
 variable {π : (NormedField.valuation (K := Padic p)).valuationSubring}
 variable (hp₂ : p ≠ 2) (hπ : Irreducible π)
 
 local notation "FT" => falseTateExtension p (π : Padic p)
-local notation "NX" => NormLimit (Padic p) FT
-local notation "hFT" => isAPF_falseTateExtension p hπ
-local notation "hInf" => not_finiteDimensional_falseTateExtension_padic p (π : Padic p)
+local notation "NX" => FieldOfNorms (Padic p) FT
+local instance normFieldActionInfinite : Fact (¬ Module.Finite (Padic p) FT) :=
+  ⟨not_finiteDimensional_falseTateExtension_padic p (π : Padic p)⟩
 
 /-- Every original coordinate has the literal Kummer displacement valuation. -/
 theorem falseTatePowerSeriesCoordinate_tau_pow_valuation (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) (k : ℕ) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) (k : ℕ) :
+    letI := isAPF_falseTateExtension p hπ
     (Valued.v
       ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu
         ((tau p hp₂ hπ).val ^ (p ^ k)) : LaurentSeries (ZMod p)) -
           HahnSeries.single (1 : ℤ) 1) : WithZero (Multiplicative ℤ)) =
       exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
-  let := normLimitField (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   exact (valuation_falseTatePowerSeriesCoordinate_displacement p hp₂ hπ u hu _).trans
     (normLimitValuation_tau_pow_displacement p hp₂ hπ u hu k)
 
 /-- The ordinary power-series order in every original coordinate is the
 unshifted finite Kummer ramification number. -/
 theorem falseTatePowerSeriesCoordinate_tau_pow_order (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) (k : ℕ) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) (k : ℕ) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu
       ((tau p hp₂ hπ).val ^ (p ^ k)) - PowerSeries.X).order =
         (↑(kummerRamificationBreak p k + 1) : ℕ∞) := by
+  have := isAPF_falseTateExtension p hπ
   let f := falseTatePowerSeriesCoordinate p hp₂ hπ u hu
     ((tau p hp₂ hπ).val ^ (p ^ k)) - PowerSeries.X
   have hv : (Valued.v (algebraMap (PowerSeries (ZMod p)) (LaurentSeries (ZMod p)) f) :
@@ -235,11 +233,14 @@ theorem falseTatePowerSeriesCoordinate_tau_pow_order (u : NX)
 
 /-- The original Kummer coordinate has no positive compositional period. -/
 theorem falseTatePowerSeriesCoordinate_tau_infiniteOrder (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     ∀ n : ℕ, 0 < n →
       (PowerSeries.subst (falseTatePowerSeriesCoordinate p hp₂ hπ u hu
         (tau p hp₂ hπ).val) : PowerSeries (ZMod p) → PowerSeries (ZMod p))^[n]
           PowerSeries.X ≠ PowerSeries.X := by
+  have := isAPF_falseTateExtension p hπ
   intro m hm hperiod
   let f := falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val
   let S := (PowerSeries.subst f : PowerSeries (ZMod p) → PowerSeries (ZMod p))
@@ -264,17 +265,18 @@ theorem falseTatePowerSeriesCoordinate_tau_infiniteOrder (u : NX)
 /-- Each coefficient of the actual continuous Kummer powers is continuous
 in the original p-adic parameter. -/
 theorem continuous_falseTatePowerSeriesCoordinate_tauPadicPower_coeff (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) (j : ℕ) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) (j : ℕ) :
+    letI := isAPF_falseTateExtension p hπ
     letI : UniformSpace (ZMod p) := ⊥
     Continuous (fun a : PadicInt p =>
       (falseTatePowerSeriesCoordinate p hp₂ hπ u hu
         (tauPadicPower p hp₂ hπ a).val).coeff j) := by
+  have := isAPF_falseTateExtension p hπ
   let : UniformSpace (ZMod p) := ⊥
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
   have hτ : Continuous (fun a : PadicInt p => (tauPadicPower p hp₂ hπ a).val) :=
     continuous_subtype_val.comp (continuous_tauPadicPower p hp₂ hπ)
-  have haction := continuous_normLimitAut_apply (Padic p) FT p hFT hInf u
+  have haction := FieldOfNorms.continuous_aut_apply (Padic p) FT u
   have he := (uniformContinuous_falseTateNormFieldLaurentEquiv_symm
     p hp₂ hπ u hu).continuous
   have hcoeff := (LaurentSeries.uniformContinuous_coeff (K := ZMod p) (j : ℤ)).continuous
@@ -282,7 +284,7 @@ theorem continuous_falseTatePowerSeriesCoordinate_tauPadicPower_coeff (u : NX)
   convert hcont using 1
   funext a
   have hback : (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu).symm
-      (normLimitAut (Padic p) p hFT hInf (tauPadicPower p hp₂ hπ a).val u) =
+      (FieldOfNorms.aut (Padic p) FT (tauPadicPower p hp₂ hπ a).val u) =
       (falseTatePowerSeriesCoordinate p hp₂ hπ u hu
         (tauPadicPower p hp₂ hπ a).val : LaurentSeries (ZMod p)) := by
     apply (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu).injective
@@ -293,9 +295,12 @@ theorem continuous_falseTatePowerSeriesCoordinate_tauPadicPower_coeff (u : NX)
   simp
 
 private theorem tau_first_order (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val -
       PowerSeries.X).order = (↑(2 * p) : ℕ∞) := by
+  have := isAPF_falseTateExtension p hπ
   have h := falseTatePowerSeriesCoordinate_tau_pow_order p hp₂ hπ u hu 0
   rw [pow_zero, pow_one, kummerRamificationBreak_zero p
     (by have := (Fact.out : p.Prime).two_le; omega)] at h
@@ -322,15 +327,18 @@ private theorem continuous_padicResidue :
 /-- The first finite jet of actual p-adic Kummer powers is scalar
 multiplication by the original residue character of the exponent. -/
 theorem falseTatePowerSeriesCoordinate_tauPadicPower_coeff_displacement (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (a : PadicInt p) (j : ℕ) (hj : j ≤ 2 * p) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu
       (tauPadicPower p hp₂ hπ a).val - PowerSeries.X).coeff j =
         PadicInt.toZMod a *
           (falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val -
             PowerSeries.X).coeff j := by
+  have := isAPF_falseTateExtension p hπ
   let : UniformSpace (ZMod p) := ⊥
-  let : DiscreteUniformity (ZMod p) := inferInstance
+  have : DiscreteUniformity (ZMod p) := inferInstance
   let f := falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val
   have horder : (f - PowerSeries.X).order = (↑(2 * p) : ℕ∞) :=
     tau_first_order p hp₂ hπ u hu
@@ -360,17 +368,23 @@ theorem falseTatePowerSeriesCoordinate_tauPadicPower_coeff_displacement (u : NX)
 
 /-- The actual wild coordinate is tangent to the identity. -/
 theorem falseTatePowerSeriesCoordinate_tau_coeff_one (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val).coeff 1 = 1 := by
+  have := isAPF_falseTateExtension p hπ
   have h := (PowerSeries.order_eq_nat.mp (tau_first_order p hp₂ hπ u hu)).2 1
     (by have := (Fact.out : p.Prime).two_le; omega)
   simpa [sub_eq_zero] using h
 
 /-- The first nonlinear coefficient of the actual wild coordinate is nonzero. -/
 theorem falseTatePowerSeriesCoordinate_tau_coeff_first_ne_zero (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val).coeff
       (2 * p) ≠ 0 := by
+  have := isAPF_falseTateExtension p hπ
   have h := (PowerSeries.order_eq_nat.mp (tau_first_order p hp₂ hπ u hu)).1
   have hN : 2 * p ≠ 1 := by have := (Fact.out : p.Prime).two_le; omega
   simpa [PowerSeries.coeff_X, hN] using h
@@ -378,23 +392,29 @@ theorem falseTatePowerSeriesCoordinate_tau_coeff_first_ne_zero (u : NX)
 /-- The exact profile holds for literal substitution iterates of the original
 wild coordinate, for every original uniformizer. -/
 theorem falseTatePowerSeriesCoordinate_tau_iterate_order (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) (k : ℕ) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) (k : ℕ) :
+    letI := isAPF_falseTateExtension p hπ
     (((PowerSeries.subst
       (falseTatePowerSeriesCoordinate p hp₂ hπ u hu (tau p hp₂ hπ).val) :
         PowerSeries (ZMod p) → PowerSeries (ZMod p))^[p ^ k] PowerSeries.X) -
           PowerSeries.X).order = (↑(kummerRamificationBreak p k + 1) : ℕ∞) := by
+  have := isAPF_falseTateExtension p hπ
   rw [← falseTatePowerSeriesCoordinate_pow]
   exact falseTatePowerSeriesCoordinate_tau_pow_order p hp₂ hπ u hu k
 
 /-- The actual tame conjugation relation determines the same original
 linear coefficient in every original norm-field coordinate. -/
 theorem falseTatePowerSeriesCoordinate_tameGenerator_coeff_one (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu
       (tameGenerator p hp₂ hπ).val).coeff 1 =
       PadicInt.toZMod
         (padicCyclotomicCharacter p (π : Padic p) (tameGenerator p hp₂ hπ).val :
           PadicInt p) := by
+  have := isAPF_falseTateExtension p hπ
   let δ := (tameGenerator p hp₂ hπ).val
   let t := (tau p hp₂ hπ).val
   let a : PadicInt p := padicCyclotomicCharacter p (π : Padic p) δ
@@ -457,9 +477,12 @@ theorem falseTatePowerSeriesCoordinate_tameGenerator_coeff_one (u : NX)
 /-- The actual tame linear coefficient has exact multiplicative order
 p - 1 in the original prime field. -/
 theorem orderOf_falseTatePowerSeriesCoordinate_tameGenerator_linear (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     orderOf ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu
       (tameGenerator p hp₂ hπ).val).coeff 1) = p - 1 := by
+  have := isAPF_falseTateExtension p hπ
   rw [falseTatePowerSeriesCoordinate_tameGenerator_coeff_one]
   change orderOf ((Units.map PadicInt.toZMod.toMonoidHom
     (padicCyclotomicCharacter p (π : Padic p) (tameGenerator p hp₂ hπ).val) :
@@ -470,12 +493,15 @@ theorem orderOf_falseTatePowerSeriesCoordinate_tameGenerator_linear (u : NX)
 /-- The same exact order holds for the original linear coefficient regarded
 as a unit, with its canonical inverse. -/
 theorem orderOf_falseTatePowerSeriesCoordinate_tameGenerator_linear_unit (u : NX)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     orderOf (Units.mk0
       ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu
         (tameGenerator p hp₂ hπ).val).coeff 1)
       (falseTatePowerSeriesCoordinate_linear_isUnit p hp₂ hπ u hu _).ne_zero) =
         p - 1 := by
+  have := isAPF_falseTateExtension p hπ
   rw [← orderOf_units]
   exact orderOf_falseTatePowerSeriesCoordinate_tameGenerator_linear p hp₂ hπ u hu
 

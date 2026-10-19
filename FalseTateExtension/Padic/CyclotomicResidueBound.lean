@@ -1,9 +1,14 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.CyclotomicRamification
-public import FontaineWintenberger.Ramification.FieldEquiv
-public import FontaineWintenberger.Ramification.Inertia
-public import FontaineWintenberger.APF.FiniteBaseChange
+public import FontaineWintenberger.Ramification.Upper.Transport
+public import FontaineWintenberger.Ramification.Lower.Inertia
+public import FontaineWintenberger.APF.BaseChange.UpperGroups
 public import Mathlib.NumberTheory.Padics.RingHoms
 
 /-!
@@ -35,6 +40,21 @@ instance padicUnitBall_residueFinite :
       (PadicInt.residueField (p := p)))
     ((IsLocalRing.ResidueField.mapEquiv (padicUnitBallEquiv p)).trans
       (PadicInt.residueField (p := p))).injective
+
+instance padicUnitBall_residueCharP :
+    CharP (IsLocalRing.ResidueField
+      (NormedField.valuation (K := Padic p)).valuationSubring) p where
+  cast_eq_zero_iff n := by
+    let e := (IsLocalRing.ResidueField.mapEquiv (padicUnitBallEquiv p)).trans
+      (PadicInt.residueField (p := p))
+    rw [← e.injective.eq_iff, map_natCast, map_zero]
+    exact CharP.cast_eq_zero_iff (ZMod p) p n
+
+instance padic_isPerfectResidueLocalField : IsPerfectResidueLocalField (Padic p) :=
+  IsPerfectResidueLocalField.of_charP (Padic p) p
+
+@[simp] theorem residueChar_padic : residueChar (Padic p) = p :=
+  residueChar_eq (Padic p) p
 
 /-- Rational cyclotomic layers have full inertia, by the proved actual
 ramification index and the actual inertia-cardinality theorem. -/
@@ -70,7 +90,8 @@ theorem rationalCyclotomic_ramificationIdx (n : ℕ)
   have h := spectralIntegerRing_card_lower_zero (Padic p) F
   rw [lowerRamificationGroup_zero, ← upperRamificationGroup_zero, ht,
     Subgroup.card_top, IsGalois.card_aut_eq_finrank] at h
-  exact h.symm.trans (e.toLinearEquiv.finrank_eq.symm.trans (finrank_cyclotomicLayer_padic p (n + 1)))
+  exact h.symm.trans
+    (e.toLinearEquiv.finrank_eq.symm.trans (finrank_cyclotomicLayer_padic p (n + 1)))
 
 section Fields
 
@@ -113,8 +134,8 @@ instance rationalCyclotomicSubfield_isCyclotomicExtension (m : ℕ) :
   have : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
   let : FiniteDimensional (Padic p) (cyclotomicLayer (K := K) p m) :=
     FiniteDimensional.trans (Padic p) K _
-  exact (isPrimitiveRoot_cyclotomicLayer_generator (K := K) p m).intermediateField_adjoin_isCyclotomicExtension
-    (Padic p)
+  have hζ := (isPrimitiveRoot_cyclotomicLayer_generator (K := K) p m)
+  exact hζ.intermediateField_adjoin_isCyclotomicExtension (Padic p)
 
 omit [FiniteDimensional (Padic p) K] in
 instance rationalCyclotomicSubfield_finiteDimensional (m : ℕ) :
@@ -137,6 +158,12 @@ theorem cyclotomicBase_unitBall_isDiscreteValuationRing :
     IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring :=
   normedAlgebra_unitBall_isDiscreteValuationRing (Padic p) K
 
+include p in
+omit [CharZero K] in
+/-- A finite compatible extension of the rational p-adic field is complete and discrete. -/
+theorem cyclotomicBase_isCompleteDiscreteValuedField : IsCompleteDiscreteValuedField K where
+  toIsDiscreteValuationRing := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+
 /-- The canonical spectral integer ring of the same actual finite layer
 has residue degree bounded by the actual base ramification index. -/
 theorem cyclotomicLayer_spectral_residueDegree_le (n : ℕ) :
@@ -145,6 +172,7 @@ theorem cyclotomicLayer_spectral_residueDegree_le (n : ℕ) :
         (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))) ≤
       (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
         (NormedField.valuation (K := Padic p)).valuationSubring := by
+  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let C := cyclotomicLayer (K := K) p (n + 1)
   let : NontriviallyNormedField C := spectralNorm.nontriviallyNormedField K C
   let : NormedAlgebra K C := spectralNorm.normedAlgebra K C
@@ -220,8 +248,7 @@ theorem cyclotomicLayer_extensionValuationSubring_eq (n : ℕ)
     (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
     [(NormedField.valuation (K := K)).HasExtension w] :
     spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)) = w.valuationSubring := by
-  let : IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring :=
-    cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   exact spectralIntegerRing_eq_extension_valuationSubring K _ w
 
 /-- Equal compatible valuation subrings are identified over the original

@@ -1,9 +1,14 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.FiniteCharacter
-public import FontaineWintenberger.Ramification.Generator
-public import FontaineWintenberger.Ramification.Real
-public import FontaineWintenberger.Ramification.Upper
+public import FontaineWintenberger.Ramification.Lower.Generator
+public import FontaineWintenberger.Ramification.Lower.Basic
+public import FontaineWintenberger.Ramification.Upper.Basic
 public import Mathlib.Data.ZMod.Units
 
 /-!
@@ -433,6 +438,7 @@ theorem lowerRamificationGroupReal_cyclotomic_card_on (n r : ℕ) (hr : r ≤ n)
   omega
 
 set_option maxHeartbeats 1000000 in
+-- The explicit ramification intervals require substantial integral and cardinality simplification.
 /-- Each consecutive cyclotomic lower interval has actual Herbrand
 length one, at every prime and including the first interval. -/
 theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
@@ -479,6 +485,7 @@ theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
     _ = _ := by rw [hpower]
 
 set_option maxHeartbeats 1000000 in
+-- The explicit ramification intervals require substantial integral and cardinality simplification.
 /-- The actual integral-defined Herbrand function sends every
 prime-power lower threshold to its integer upper threshold. -/
 theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
@@ -535,6 +542,7 @@ theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
     simpa only [Nat.cast_add, Nat.cast_one] using hadd.symm
 
 set_option maxHeartbeats 1000000 in
+-- The explicit ramification intervals require substantial integral and cardinality simplification.
 /-- The actual upper group on each unit upper interval is the preimage
 of the canonical finite-character principal-unit kernel. -/
 theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction

@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.AffineEmbedding
@@ -112,7 +117,8 @@ theorem affineProjection_index (G : ClosedSubgroup (PadicAffineGroup p))
     I.index = (I.map (affineProjection G).rangeRestrict).index *
       I.relIndex (affineProjection G).ker := by
   let ρ := (affineProjection G).rangeRestrict
-  have hr : ρ.range = ⊤ := ρ.range_eq_top_of_surjective (affineProjection G).rangeRestrict_surjective
+  have hr : ρ.range = ⊤ :=
+    ρ.range_eq_top_of_surjective (affineProjection G).rangeRestrict_surjective
   have hj := I.index_map ρ
   rw [hr, Subgroup.index_top, mul_one] at hj
   calc

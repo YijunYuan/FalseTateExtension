@@ -1,14 +1,19 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.StrictAPF
 public import FalseTateExtension.Padic.FiniteGaloisStructure
 public import FalseTateExtension.Padic.NormFieldRamification
-public import FontaineWintenberger.FieldOfNorms.Constants
-public import FontaineWintenberger.FieldOfNorms.Completeness
-public import FontaineWintenberger.FieldOfNorms.Isomorphism
-public import FontaineWintenberger.LocalField.AlgebraicResidue
-public import FontaineWintenberger.LocalField.LaurentCoordinates
-public import FontaineWintenberger.LocalField.LaurentSubstitution
+public import FontaineWintenberger.FieldOfNorms.Structure.ResidueEmbedding
+public import FontaineWintenberger.FieldOfNorms.Structure.Completeness
+public import FontaineWintenberger.FieldOfNorms.Functor.Map
+public import FontaineWintenberger.APF.Tower.AlgebraicResidue
+public import FontaineWintenberger.LocalField.Laurent.Coordinates
+public import FontaineWintenberger.Mathlib.Topology.LaurentSubstitution
 public import Mathlib.RingTheory.PowerSeries.Substitution
 
 /-!
@@ -37,18 +42,6 @@ def padicUnitBallResidueEquiv :
       ZMod p :=
   (IsLocalRing.ResidueField.mapEquiv (padicUnitBallEquiv p)).trans
     (PadicInt.residueField (p := p))
-
-local instance normFieldCoordinatesResidueCharP :
-    CharP (IsLocalRing.ResidueField
-      (NormedField.valuation (K := Padic p)).valuationSubring) p where
-  cast_eq_zero_iff n := by
-    rw [← (padicUnitBallResidueEquiv p).injective.eq_iff, map_natCast, map_zero]
-    exact CharP.cast_eq_zero_iff (ZMod p) p n
-
-local instance normFieldCoordinatesResiduePerfect :
-    PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := Padic p)).valuationSubring) :=
-  PerfectField.of_ringEquiv (padicUnitBallResidueEquiv p).symm
 
 variable {π : (NormedField.valuation (K := Padic p)).valuationSubring}
 
@@ -108,51 +101,50 @@ section OriginalCoordinates
 
 variable (hp₂ : p ≠ 2) (hπ : Irreducible π)
 
-local notation "NX" => NormLimit (Padic p) FT
-local notation "hFT" => isAPF_falseTateExtension p hπ
-local notation "hInf" => not_finiteDimensional_falseTateExtension_padic p (π : Padic p)
+local notation "NX" => FieldOfNorms (Padic p) FT
+local instance normFieldCoordinatesInfinite : Fact (¬ Module.Finite (Padic p) FT) :=
+  ⟨not_finiteDimensional_falseTateExtension_padic p (π : Padic p)⟩
 
 /-- The prime-field coefficients are the actual original source constants,
 under the proved intrinsic residue identification. -/
 def falseTateNormCoefficients :
-    letI := normLimitField (Padic p) FT p hFT hInf
-    ZMod p →+* (normLimitFieldValuation (Padic p) FT p hFT hInf).valuationSubring := by
-  letI := normLimitField (Padic p) FT p hFT hInf
-  exact (sourceResidueConstantsIntegerHom (Padic p) FT p hFT hInf).comp
+    letI := isAPF_falseTateExtension p hπ
+    ZMod p →+* (FieldOfNorms.fieldValuation (Padic p) FT).valuationSubring := by
+  have := isAPF_falseTateExtension p hπ
+  exact (residueConstantsIntegerHom (Padic p) FT).comp
     (falseTateResidueEquiv p hp₂ hπ).symm.toRingHom
 
 /-- The coefficient residue identification is induced by those same actual
 constants, including the source normalization. -/
 def falseTateNormCoefficientResidueEquiv :
-    letI := normLimitField (Padic p) FT p hFT hInf
+    letI := isAPF_falseTateExtension p hπ
     ZMod p ≃+* IsLocalRing.ResidueField
-      (normLimitFieldValuation (Padic p) FT p hFT hInf).valuationSubring := by
-  letI := normLimitField (Padic p) FT p hFT hInf
+      (FieldOfNorms.fieldValuation (Padic p) FT).valuationSubring := by
+  have := isAPF_falseTateExtension p hπ
   exact (falseTateResidueEquiv p hp₂ hπ).symm.trans
-    (sourceResidueConstantsResidueEquiv (Padic p) FT p hFT hInf)
+    (FieldOfNorms.residueEquiv (Padic p) FT)
 
 /-- Reduction of an actual prime coefficient is its actual residue image. -/
 @[simp]
 theorem falseTateNormCoefficientResidueEquiv_apply (a : ZMod p) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+    letI := isAPF_falseTateExtension p hπ
     falseTateNormCoefficientResidueEquiv p hp₂ hπ a =
       IsLocalRing.residue _ (falseTateNormCoefficients p hp₂ hπ a) := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  exact sourceResidueConstantsResidueEquiv_apply (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
+  exact FieldOfNorms.residueEquiv_apply (Padic p) FT
     ((falseTateResidueEquiv p hp₂ hπ).symm a)
 
 /-- Every original normalized norm-family uniformizer gives actual Laurent
 coordinates over the original prime field, with the source coefficients. -/
-def falseTateNormFieldLaurentEquiv (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+def falseTateNormFieldLaurentEquiv (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     LaurentSeries (ZMod p) ≃+* NX := by
-  letI := normLimitField (Padic p) FT p hFT hInf
-  letI := normLimitValued (Padic p) FT p hFT hInf
-  letI := normLimit_completeSpace (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   letI : UniformSpace (ZMod p) := ⊥
-  letI : DiscreteUniformity (ZMod p) := inferInstance
-  let ϖ : (normLimitFieldValuation (Padic p) FT p hFT hInf).valuationSubring :=
+  have : DiscreteUniformity (ZMod p) := inferInstance
+  let ϖ : (FieldOfNorms.fieldValuation (Padic p) FT).valuationSubring :=
     ⟨u, hu.le.trans (by simp)⟩
   exact laurentUniformizerEquiv NX (falseTateNormCoefficients p hp₂ hπ)
     (falseTateNormCoefficientResidueEquiv p hp₂ hπ)
@@ -160,81 +152,78 @@ def falseTateNormFieldLaurentEquiv (u : NormLimit (Padic p) FT)
 
 /-- The Laurent parameter is precisely the specified original norm family. -/
 @[simp]
-theorem falseTateNormFieldLaurentEquiv_X (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+theorem falseTateNormFieldLaurentEquiv_X (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
       (algebraMap (PowerSeries (ZMod p)) (LaurentSeries (ZMod p)) PowerSeries.X) = u := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
-  let := normLimit_completeSpace (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let : UniformSpace (ZMod p) := ⊥
-  let : DiscreteUniformity (ZMod p) := inferInstance
+  have : DiscreteUniformity (ZMod p) := inferInstance
   exact laurentUniformizerEquiv_X NX _ _ _ _ _
 
 /-- Laurent constants are the prescribed original source coefficients. -/
 @[simp]
-theorem falseTateNormFieldLaurentEquiv_C (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) (a : ZMod p) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+theorem falseTateNormFieldLaurentEquiv_C (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) (a : ZMod p) :
+    letI := isAPF_falseTateExtension p hπ
     falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
       (algebraMap (ZMod p) (LaurentSeries (ZMod p)) a) =
       (falseTateNormCoefficients p hp₂ hπ a : NX) := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
-  let := normLimit_completeSpace (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let : UniformSpace (ZMod p) := ⊥
-  let : DiscreteUniformity (ZMod p) := inferInstance
+  have : DiscreteUniformity (ZMod p) := inferInstance
   exact laurentUniformizerEquiv_C NX _ _ _ _ _ a
 
 /-- These coordinates preserve the actual stable valuation on every Laurent
 series, including zero and negative orders. -/
-theorem valuation_falseTateNormFieldLaurentEquiv (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem valuation_falseTateNormFieldLaurentEquiv (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (A : LaurentSeries (ZMod p)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
-    normLimitValuation (Padic p) FT hFT (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu A) =
+    letI := isAPF_falseTateExtension p hπ
+    FieldOfNorms.valuation (Padic p) FT (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu A) =
       (Valued.v A : WithZero (Multiplicative ℤ)) := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
-  let := normLimit_completeSpace (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let : UniformSpace (ZMod p) := ⊥
-  let : DiscreteUniformity (ZMod p) := inferInstance
+  have : DiscreteUniformity (ZMod p) := inferInstance
   exact valuation_laurentUniformizerEquiv NX _ _ _ _ _ A
 
 /-- Continuity uses the original valuation uniformity on the norm field. -/
-theorem uniformContinuous_falseTateNormFieldLaurentEquiv (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
-    letI := normLimitValued (Padic p) FT p hFT hInf
+theorem uniformContinuous_falseTateNormFieldLaurentEquiv (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     UniformContinuous (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu) := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   apply valuedRingEquiv_uniformContinuous
   exact valuation_falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
 
 /-- The inverse coordinate expansion preserves the same original uniformities. -/
-theorem uniformContinuous_falseTateNormFieldLaurentEquiv_symm (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
-    letI := normLimitValued (Padic p) FT p hFT hInf
+theorem uniformContinuous_falseTateNormFieldLaurentEquiv_symm (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     UniformContinuous (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu).symm := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let e := falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
   apply valuedRingEquiv_uniformContinuous
   intro x
   exact (valuation_falseTateNormFieldLaurentEquiv p hp₂ hπ u hu (e.symm x)).symm.trans
-    (congrArg (normLimitValuation (Padic p) FT hFT) (e.apply_symm_apply x))
+    (congrArg (FieldOfNorms.valuation (Padic p) FT) (e.apply_symm_apply x))
 
 /-- Conjugation transports the literal original norm-field action to the
 actual Laurent field. Multiplication is ordinary composition of automorphisms. -/
-def falseTateLaurentAction (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+def falseTateLaurentAction (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     (FT ≃ₐ[Padic p] FT) →* (LaurentSeries (ZMod p) ≃+* LaurentSeries (ZMod p)) := by
-  letI := normLimitField (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let e := falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
-  let a := normLimitAut (Padic p) p hFT hInf
+  let a := FieldOfNorms.aut (Padic p) FT
   exact {
     toFun := fun g => (e.trans (a g)).trans e.symm
     map_one' := by
@@ -252,50 +241,61 @@ def falseTateLaurentAction (u : NormLimit (Padic p) FT)
       rfl }
 
 /-- The Laurent action is exactly conjugation by the original evaluation map. -/
-theorem falseTateLaurentAction_apply (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTateLaurentAction_apply (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) (A : LaurentSeries (ZMod p)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+    letI := isAPF_falseTateExtension p hπ
     falseTateLaurentAction p hp₂ hπ u hu g A =
       (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu).symm
-        (normLimitAut (Padic p) p hFT hInf g
-          (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu A)) := rfl
+        (FieldOfNorms.aut (Padic p) FT g
+          (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu A)) := by
+  have := isAPF_falseTateExtension p hπ
+  rfl
 
 /-- Conjugating the original action preserves the original Laurent valuation. -/
-theorem valuation_falseTateLaurentAction (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem valuation_falseTateLaurentAction (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) (A : LaurentSeries (ZMod p)) :
+    letI := isAPF_falseTateExtension p hπ
     (Valued.v (falseTateLaurentAction p hp₂ hπ u hu g A) : WithZero (Multiplicative ℤ)) =
       Valued.v A := by
-  let := normLimitField (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let e := falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
   calc
-    _ = normLimitValuation (Padic p) FT hFT
+    _ = FieldOfNorms.valuation (Padic p) FT
         (e (falseTateLaurentAction p hp₂ hπ u hu g A)) :=
       (valuation_falseTateNormFieldLaurentEquiv p hp₂ hπ u hu _).symm
-    _ = normLimitValuation (Padic p) FT hFT
-        (normLimitAut (Padic p) p hFT hInf g (e A)) := by
+    _ = FieldOfNorms.valuation (Padic p) FT
+        (FieldOfNorms.aut (Padic p) FT g (e A)) := by
       rw [falseTateLaurentAction_apply, e.apply_symm_apply]
-    _ = normLimitValuation (Padic p) FT hFT (e A) :=
-      normLimitAut_valuation (Padic p) p hFT hInf g (e A)
+    _ = FieldOfNorms.valuation (Padic p) FT (e A) :=
+      FieldOfNorms.aut_valuation (Padic p) g (e A)
     _ = Valued.v A := valuation_falseTateNormFieldLaurentEquiv p hp₂ hπ u hu A
 
 /-- Each Laurent automorphism is continuous for the original valuation topology. -/
-theorem uniformContinuous_falseTateLaurentAction (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem uniformContinuous_falseTateLaurentAction (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
+    letI := isAPF_falseTateExtension p hπ
     UniformContinuous (falseTateLaurentAction p hp₂ hπ u hu g) := by
+  have := isAPF_falseTateExtension p hπ
   apply valuedRingEquiv_uniformContinuous
   exact valuation_falseTateLaurentAction p hp₂ hπ u hu g
 
 /-- Every actual automorphism fixes the original prime-field coefficients. -/
 @[simp]
-theorem falseTateLaurentAction_C (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTateLaurentAction_C (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) (a : ZMod p) :
+    letI := isAPF_falseTateExtension p hπ
     falseTateLaurentAction p hp₂ hπ u hu g
         (algebraMap (ZMod p) (LaurentSeries (ZMod p)) a) =
       algebraMap (ZMod p) (LaurentSeries (ZMod p)) a := by
+  have := isAPF_falseTateExtension p hπ
   exact DFunLike.congr_fun
     (Subsingleton.elim
       ((falseTateLaurentAction p hp₂ hπ u hu g).toRingHom.comp
@@ -304,13 +304,16 @@ theorem falseTateLaurentAction_C (u : NormLimit (Padic p) FT)
 
 /-- The actual image of the parameter is a power-series coordinate with
 zero constant coefficient and invertible linear coefficient. -/
-theorem exists_falseTatePowerSeriesCoordinate (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem exists_falseTatePowerSeriesCoordinate (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
+    letI := isAPF_falseTateExtension p hπ
     ∃ f : PowerSeries (ZMod p),
       (f : LaurentSeries (ZMod p)) = falseTateLaurentAction p hp₂ hπ u hu g
           (HahnSeries.single (1 : ℤ) 1) ∧
         f.constantCoeff = 0 ∧ IsUnit (f.coeff 1) := by
+  have := isAPF_falseTateExtension p hπ
   have hX : (Valued.v (HahnSeries.single (1 : ℤ) (1 : ZMod p)) :
       WithZero (Multiplicative ℤ)) = exp (-1 : ℤ) := by
     simpa using LaurentSeries.valuation_X_pow (ZMod p) 1
@@ -344,44 +347,58 @@ theorem exists_falseTatePowerSeriesCoordinate (u : NormLimit (Padic p) FT)
   exact ⟨f, hf, hzero, isUnit_iff_ne_zero.mpr hlinear⟩
 
 /-- The actual power-series coordinate of an original false Tate automorphism. -/
-def falseTatePowerSeriesCoordinate (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
-    (g : FT ≃ₐ[Padic p] FT) : PowerSeries (ZMod p) :=
-  (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose
+def falseTatePowerSeriesCoordinate (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
+    (g : FT ≃ₐ[Padic p] FT) :
+    letI := isAPF_falseTateExtension p hπ
+    PowerSeries (ZMod p) := by
+  have := isAPF_falseTateExtension p hπ
+  exact (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose
 
 /-- Its Laurent image is exactly the image of the original parameter under
 the original action in the original coordinates. -/
-theorem coe_falseTatePowerSeriesCoordinate (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem coe_falseTatePowerSeriesCoordinate (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
+    letI := isAPF_falseTateExtension p hπ
     (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g : LaurentSeries (ZMod p)) =
-      falseTateLaurentAction p hp₂ hπ u hu g (HahnSeries.single (1 : ℤ) 1) :=
-  (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose_spec.1
+      falseTateLaurentAction p hp₂ hπ u hu g (HahnSeries.single (1 : ℤ) 1) := by
+  have := isAPF_falseTateExtension p hπ
+  exact (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose_spec.1
 
 @[simp]
-theorem falseTatePowerSeriesCoordinate_constantCoeff (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTatePowerSeriesCoordinate_constantCoeff (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
-    (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).constantCoeff = 0 :=
-  (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose_spec.2.1
+    letI := isAPF_falseTateExtension p hπ
+    (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).constantCoeff = 0 := by
+  have := isAPF_falseTateExtension p hπ
+  exact (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose_spec.2.1
 
 /-- The linear coefficient is a unit in the original prime field. -/
-theorem falseTatePowerSeriesCoordinate_linear_isUnit (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTatePowerSeriesCoordinate_linear_isUnit (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
-    IsUnit ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).coeff 1) :=
-  (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose_spec.2.2
+    letI := isAPF_falseTateExtension p hπ
+    IsUnit ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).coeff 1) := by
+  have := isAPF_falseTateExtension p hπ
+  exact (exists_falseTatePowerSeriesCoordinate p hp₂ hπ u hu g).choose_spec.2.2
 
 /-- The actual coordinate represents precisely the original image of the
 specified norm-family uniformizer, as required in the lifting definition. -/
-theorem falseTateNormFieldLaurentEquiv_powerSeriesCoordinate (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTateNormFieldLaurentEquiv_powerSeriesCoordinate (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+    letI := isAPF_falseTateExtension p hπ
     falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
         (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g : LaurentSeries (ZMod p)) =
-      normLimitAut (Padic p) p hFT hInf g u := by
-  let := normLimitField (Padic p) FT p hFT hInf
+      FieldOfNorms.aut (Padic p) FT g u := by
+  have := isAPF_falseTateExtension p hπ
   let e := falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
   rw [coe_falseTatePowerSeriesCoordinate, falseTateLaurentAction_apply]
   rw [e.apply_symm_apply]
@@ -392,21 +409,27 @@ theorem falseTateNormFieldLaurentEquiv_powerSeriesCoordinate (u : NormLimit (Pad
 
 /-- The identity automorphism has exactly the original parameter as coordinate. -/
 @[simp]
-theorem falseTatePowerSeriesCoordinate_one (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
+theorem falseTatePowerSeriesCoordinate_one (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     falseTatePowerSeriesCoordinate p hp₂ hπ u hu 1 = PowerSeries.X := by
+  have := isAPF_falseTateExtension p hπ
   apply HahnSeries.ofPowerSeries_injective (Γ := ℤ)
   rw [coe_falseTatePowerSeriesCoordinate, map_one]
   exact (HahnSeries.ofPowerSeries_X).symm
 
 /-- On every power-series input, the original action is ordinary substitution
 at its actual parameter image. -/
-theorem falseTateLaurentAction_powerSeries (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTateLaurentAction_powerSeries (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) (A : PowerSeries (ZMod p)) :
+    letI := isAPF_falseTateExtension p hπ
     falseTateLaurentAction p hp₂ hπ u hu g (A : LaurentSeries (ZMod p)) =
       (A.subst (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g) :
         LaurentSeries (ZMod p)) := by
+  have := isAPF_falseTateExtension p hπ
   exact map_ofPowerSeries_eq_subst
     (falseTateLaurentAction p hp₂ hπ u hu g).toRingHom
     (uniformContinuous_falseTateLaurentAction p hp₂ hπ u hu g).continuous
@@ -419,12 +442,15 @@ theorem falseTateLaurentAction_powerSeries (u : NormLimit (Padic p) FT)
 
 /-- Ordinary composition of the actual automorphisms gives the reversed
 composition law for their original power-series coordinates. -/
-theorem falseTatePowerSeriesCoordinate_mul (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTatePowerSeriesCoordinate_mul (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g h : FT ≃ₐ[Padic p] FT) :
+    letI := isAPF_falseTateExtension p hπ
     falseTatePowerSeriesCoordinate p hp₂ hπ u hu (g * h) =
       (falseTatePowerSeriesCoordinate p hp₂ hπ u hu h).subst
         (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g) := by
+  have := isAPF_falseTateExtension p hπ
   apply HahnSeries.ofPowerSeries_injective (Γ := ℤ)
   rw [coe_falseTatePowerSeriesCoordinate, map_mul]
   change falseTateLaurentAction p hp₂ hπ u hu g
@@ -433,12 +459,15 @@ theorem falseTatePowerSeriesCoordinate_mul (u : NormLimit (Padic p) FT)
 
 /-- Every actual group power is represented by the ordinary iterate of the
 same actual power-series substitution. -/
-theorem falseTatePowerSeriesCoordinate_pow (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem falseTatePowerSeriesCoordinate_pow (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) (n : ℕ) :
+    letI := isAPF_falseTateExtension p hπ
     falseTatePowerSeriesCoordinate p hp₂ hπ u hu (g ^ n) =
       (PowerSeries.subst (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g) :
         PowerSeries (ZMod p) → PowerSeries (ZMod p))^[n] PowerSeries.X := by
+  have := isAPF_falseTateExtension p hπ
   induction n with
   | zero => simp
   | succ n ih =>
@@ -446,49 +475,48 @@ theorem falseTatePowerSeriesCoordinate_pow (u : NormLimit (Padic p) FT)
 
 /-- The original continuous field coordinate map is uniquely determined by
 the original source constants and chosen original uniformizer. -/
-theorem falseTateNormFieldLaurentEquiv_unique (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ)) :
-    letI := normLimitField (Padic p) FT p hFT hInf
-    letI := normLimitValued (Padic p) FT p hFT hInf
+theorem falseTateNormFieldLaurentEquiv_unique (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ)) :
+    letI := isAPF_falseTateExtension p hπ
     ∀ f : LaurentSeries (ZMod p) →+* NX, Continuous f →
       (∀ a, f (algebraMap (ZMod p) (LaurentSeries (ZMod p)) a) =
         (falseTateNormCoefficients p hp₂ hπ a : NX)) →
       f (algebraMap (PowerSeries (ZMod p)) (LaurentSeries (ZMod p)) PowerSeries.X) = u →
       f = (falseTateNormFieldLaurentEquiv p hp₂ hπ u hu).toRingHom := by
-  let := normLimitField (Padic p) FT p hFT hInf
-  let := normLimitValued (Padic p) FT p hFT hInf
-  let := normLimit_completeSpace (Padic p) FT p hFT hInf
+  have := isAPF_falseTateExtension p hπ
   let : UniformSpace (ZMod p) := ⊥
-  let : DiscreteUniformity (ZMod p) := inferInstance
+  have : DiscreteUniformity (ZMod p) := inferInstance
   intro f hf hC hX
   exact laurentUniformizerEquiv_unique NX _ _ _ _ _ f hf hC hX
 
 /-- The coordinate displacement has exactly the valuation of the actual
 original norm-field displacement, for every original automorphism. -/
-theorem valuation_falseTatePowerSeriesCoordinate_displacement (u : NormLimit (Padic p) FT)
-    (hu : normLimitValuation (Padic p) FT hFT u = exp (-1 : ℤ))
+theorem valuation_falseTatePowerSeriesCoordinate_displacement (u : FieldOfNorms (Padic p) FT)
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) FT u = exp (-1 : ℤ))
     (g : FT ≃ₐ[Padic p] FT) :
-    letI := normLimitField (Padic p) FT p hFT hInf
+    letI := isAPF_falseTateExtension p hπ
     (Valued.v ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu g : LaurentSeries (ZMod p)) -
       HahnSeries.single (1 : ℤ) 1) : WithZero (Multiplicative ℤ)) =
-      normLimitValuation (Padic p) FT hFT (normLimitAut (Padic p) p hFT hInf g u - u) := by
-  let := normLimitField (Padic p) FT p hFT hInf
+      FieldOfNorms.valuation (Padic p) FT (FieldOfNorms.aut (Padic p) FT g u - u) := by
+  have := isAPF_falseTateExtension p hπ
   let e := falseTateNormFieldLaurentEquiv p hp₂ hπ u hu
   have hX : e (HahnSeries.single (1 : ℤ) 1) = u := by
     simpa only [LaurentSeries.coe_algebraMap, HahnSeries.ofPowerSeries_X] using
       falseTateNormFieldLaurentEquiv_X p hp₂ hπ u hu
   have hf : e (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g : LaurentSeries (ZMod p)) =
-      normLimitAut (Padic p) p hFT hInf g u :=
+      FieldOfNorms.aut (Padic p) FT g u :=
     falseTateNormFieldLaurentEquiv_powerSeriesCoordinate p hp₂ hπ u hu g
   calc
-    _ = normLimitValuation (Padic p) FT hFT
+    _ = FieldOfNorms.valuation (Padic p) FT
         (e ((falseTatePowerSeriesCoordinate p hp₂ hπ u hu g : LaurentSeries (ZMod p)) -
           HahnSeries.single (1 : ℤ) 1)) :=
       (valuation_falseTateNormFieldLaurentEquiv p hp₂ hπ u hu _).symm
-    _ = normLimitValuation (Padic p) FT hFT
+    _ = FieldOfNorms.valuation (Padic p) FT
         (e (falseTatePowerSeriesCoordinate p hp₂ hπ u hu g : LaurentSeries (ZMod p)) -
           e (HahnSeries.single (1 : ℤ) 1)) := congrArg _ (map_sub e _ _)
-    _ = _ := congrArg (normLimitValuation (Padic p) FT hFT)
+    _ = _ := congrArg (FieldOfNorms.valuation (Padic p) FT)
       (congrArg₂ (fun x y : NX => x - y) hf hX)
 
 end OriginalCoordinates

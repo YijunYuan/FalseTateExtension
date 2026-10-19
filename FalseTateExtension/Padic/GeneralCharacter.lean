@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.InfiniteCharacter
@@ -167,7 +172,8 @@ instance cyclotomicExtensionCharacter_finiteIndex :
 theorem cyclotomicExtensionCharacter_index_dvd :
     (cyclotomicExtensionCharacter (K := K) p).range.index ∣ Module.finrank (Padic p) K := by
   rw [cyclotomicExtensionCharacter_range_eq_map]
-  have h := (AlgEquiv.restrictScalarsHom (Padic p) (S := K) (A := AlgebraicClosure K)).range.index_map_dvd
+  have h :=
+    (AlgEquiv.restrictScalarsHom (Padic p) (S := K) (A := AlgebraicClosure K)).range.index_map_dvd
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
   simpa only [index_range_restrictScalarsHom] using h
 

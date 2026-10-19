@@ -1,12 +1,17 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.GaloisStructure
 public import FalseTateExtension.Padic.InfiniteCharacter
 public import FalseTateExtension.Padic.CyclotomicUpper
-public import FontaineWintenberger.Ramification.Inertia
-public import FontaineWintenberger.Ramification.OrbitDifferent
-public import FontaineWintenberger.LocalField.ResidueEquiv
-public import FontaineWintenberger.APF.Residue
+public import FontaineWintenberger.Ramification.Lower.Inertia
+public import FontaineWintenberger.Ramification.Different.Subextension
+public import FontaineWintenberger.Ramification.Upper.ResidueEquiv
+public import FontaineWintenberger.APF.Tower.Residue
 public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.Data.ZMod.Units
 
@@ -675,7 +680,8 @@ theorem falseTateLayer_spectral_residueDegree
         (falseTateLayer p (π : Padic p) (n + 1) (n + 1)))) = 1 := by
   let D := falseTateLayer p (π : Padic p) (n + 1) (n + 1)
   have := falseTateLayer_isGalois p (π : Padic p) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
-  have h := fixingSubgroup_sup_inertia_index_eq_residueDegree_padic p D (⊤ : IntermediateField (Padic p) D)
+  have h := fixingSubgroup_sup_inertia_index_eq_residueDegree_padic p D
+    (⊤ : IntermediateField (Padic p) D)
   rw [lowerRamificationGroup_falseTateLayer_zero p hp₂ hπ n, sup_top_eq, Subgroup.index_top,
     spectral_residueDegree_algEquiv (Padic p) D (IntermediateField.topEquiv :
       (⊤ : IntermediateField (Padic p) D) ≃ₐ[Padic p] D).symm] at h
@@ -737,7 +743,8 @@ theorem exists_falseTateResidueFromLayer_preimage
       (falseTateExtension p (π : Padic p)) :=
     IsScalarTower.of_algebraMap_eq (fun r => (i.commutes r).symm)
   have hy : y ∈ spectralIntegerRing (Padic p) (falseTateLayer p (π : Padic p) (m + 1) (m + 1)) := by
-    rw [mem_spectralIntegerRing, spectralNorm.eq_of_tower (L := falseTateExtension p (π : Padic p)) y]
+    rw [mem_spectralIntegerRing,
+      spectralNorm.eq_of_tower (L := falseTateExtension p (π : Padic p)) y]
     change spectralNorm (Padic p) (falseTateExtension p (π : Padic p)) (i y) ≤ 1
     rw [hyi]
     exact (mem_spectralIntegerRing (Padic p) _ _).mp x.property

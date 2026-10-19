@@ -1,9 +1,14 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.RadicalRamification
-public import FontaineWintenberger.APF.PrimeDegree
-public import FontaineWintenberger.APF.HerbrandTower
-public import FontaineWintenberger.APF.Growth
+public import FontaineWintenberger.APF.Elementary.PrimeDegree
+public import FontaineWintenberger.APF.BaseChange.Basic
+public import FontaineWintenberger.APF.Strict
 
 /-!
 # Intrinsic APF profiles in the actual radical tower
@@ -23,8 +28,7 @@ open FontaineWintenberger IsDiscreteValuationRing
 
 section PrimeStep
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
@@ -48,6 +52,7 @@ local instance kummerBaseComplete : CompleteSpace F₀ := spectralNorm.completeS
 local instance kummerBaseDVR : IsDiscreteValuationRing
     (NormedField.valuation (K := F₀)).valuationSubring :=
   normedAlgebra_unitBall_isDiscreteValuationRing K F₀
+local instance kummerBaseCompleteDiscreteValuedField : IsCompleteDiscreteValuedField F₀ where
 local instance kummerBasePerfect : PerfectField (IsLocalRing.ResidueField
     (NormedField.valuation (K := F₀)).valuationSubring) :=
   Algebra.IsAlgebraic.perfectField (IsLocalRing.ResidueField OK)
@@ -145,8 +150,7 @@ end PrimeStep
 
 section SeparableTower
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
@@ -167,15 +171,14 @@ private instance radicalSeparableLayerFinite (π : K) (n : ℕ) :
     FiniteDimensional K (radicalSeparableLayer p π n) :=
   Module.Finite.equiv (radicalSeparableLayerEquiv p π n).toLinearEquiv
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
+omit [PerfectField (IsLocalRing.ResidueField
   (NormedField.valuation (K := K)).valuationSubring)] in
 private theorem radicalSeparableLayer_finrank (hπ : Irreducible π) (n : ℕ) :
     Module.finrank K (radicalSeparableLayer p (π : K) n) = p ^ n := by
   rw [← (radicalSeparableLayerEquiv p (π : K) n).toLinearEquiv.finrank_eq]
   exact finrank_radicalLayer p hπ n
 
-omit [CompleteSpace K] [IsUltrametricDist K]
-  [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+omit [IsCompleteDiscreteValuedField K]
   [PerfectField (IsLocalRing.ResidueField
     (NormedField.valuation (K := K)).valuationSubring)] in
 private theorem radicalSeparableLayer_mono (π : K) :
@@ -205,8 +208,6 @@ private theorem radicalSeparableLayer_different_order (hπ : Irreducible π) (n 
 
 section RelativeImage
 
-set_option synthInstance.maxHeartbeats 100000
-set_option maxHeartbeats 1000000
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra
 
 variable (hπ : Irreducible π) (n : ℕ)
@@ -228,13 +229,22 @@ private local instance imageBaseComplete : CompleteSpace M₀ := spectralNorm.co
 private local instance imageBaseDVR : IsDiscreteValuationRing
     (NormedField.valuation (K := M₀)).valuationSubring :=
   normedAlgebra_unitBall_isDiscreteValuationRing K M₀
+private local instance imageBaseCompleteDiscreteValuedField :
+    IsCompleteDiscreteValuedField M₀ where
 private local instance imageBasePerfect : PerfectField (IsLocalRing.ResidueField
     (NormedField.valuation (K := M₀)).valuationSubring) :=
   Algebra.IsAlgebraic.perfectField (IsLocalRing.ResidueField A)
 private local instance imageStepAlgebra : Algebra M₀ M₁ :=
-  (IntermediateField.inclusion (radicalSeparableLayer_mono p (π : K) (Nat.le_succ n))).toRingHom.toAlgebra
+  (IntermediateField.inclusion
+    (radicalSeparableLayer_mono p (π : K) (Nat.le_succ n))).toRingHom.toAlgebra
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 private local instance imageStepScalarTower : IsScalarTower K M₀ M₁ :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 private local instance imageStepFinite : FiniteDimensional M₀ M₁ := Module.Finite.right K M₀ M₁
 private local instance imageStepValuation :
     (spectralValuation K M₀).HasExtension (spectralValuation K M₁) :=
@@ -249,7 +259,10 @@ private local instance imageStepOwnValuation :
 
 include hπ n
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
+omit [PerfectField (IsLocalRing.ResidueField
   (NormedField.valuation (K := K)).valuationSubring)] in
 private theorem radicalSeparableLayer_step_finrank : Module.finrank M₀ M₁ = p := by
   have h := Module.finrank_mul_finrank K M₀ M₁
@@ -257,6 +270,9 @@ private theorem radicalSeparableLayer_step_finrank : Module.finrank M₀ M₁ = 
     radicalSeparableLayer_finrank p hπ (n + 1), pow_succ] at h
   exact Nat.eq_of_mul_eq_mul_left (pow_pos (Fact.out : p.Prime).pos n) h
 
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 omit [PerfectField (IsLocalRing.ResidueField
   (NormedField.valuation (K := K)).valuationSubring)] in
 private theorem radicalSeparableLayer_step_ramificationIdx :
@@ -270,6 +286,7 @@ private theorem radicalSeparableLayer_step_ramificationIdx :
   exact Nat.eq_of_mul_eq_mul_left (pow_pos (Fact.out : p.Prime).pos n) h.symm
 
 set_option synthInstance.maxHeartbeats 100000 in
+-- Comparing the two spectral integer rings requires extra dependent instance synthesis.
 set_option maxHeartbeats 1000000 in
 private theorem radicalSeparableLayer_step_different_order :
     (emultiplicity (IsLocalRing.maximalIdeal B₁) (differentIdeal B₀ B₁)).toNat =
@@ -291,6 +308,9 @@ private theorem radicalSeparableLayer_step_different_order :
   rw [pow_succ] at hd hsub₁ ⊢
   nlinarith [hsubmul, hsub₁, hsubp]
 
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 private theorem radicalSeparableLayer_step_apfIndex {u : ℝ} (hu : 0 ≤ u) :
     apfIndex M₀ M₁ u =
       if u ≤ (p : ℝ) ^ (n + 1) * (addVal A (p : A)).toNat / ((p : ℝ) - 1)
@@ -325,6 +345,9 @@ private theorem radicalSeparableLayer_step_apfIndex {u : ℝ} (hu : 0 ≤ u) :
   rw [hb] at h
   exact h.2 u hu
 
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 private theorem radicalSeparableLayer_step_apfPsi (u : ℝ) :
     let t := (p : ℝ) ^ (n + 1) * (addVal A (p : A)).toNat / ((p : ℝ) - 1)
     apfPsi M₀ M₁ u = if u ≤ t then u else t + (p : ℝ) * (u - t) := by
@@ -341,6 +364,9 @@ private theorem radicalSeparableLayer_step_apfPsi (u : ℝ) :
   simpa only [radicalSeparableLayer_step_finrank p hπ n] using
     apfPsi_eq_of_index_profile M₀ M₁ ht hprofile u
 
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 private theorem radicalSeparableLayer_apfIndex_succ {u : ℝ} (hu : 0 ≤ u) :
     apfIndex K M₁ u = apfIndex K M₀ u *
       if apfPsi K M₀ u ≤
@@ -348,14 +374,17 @@ private theorem radicalSeparableLayer_apfIndex_succ {u : ℝ} (hu : 0 ≤ u) :
         then 1 else p := by
   rw [apfIndex_eq_mul_finiteBase K M₀ (N := M₁) hu,
     radicalSeparableLayer_step_apfIndex p hπ n
-      (hu.trans (IsAPF.le_apfPsi K M₀ (isAPF_of_finite K M₀) u))]
+      (hu.trans (IsAPF.le_apfPsi K M₀ u))]
 
+set_option synthInstance.maxHeartbeats 100000 in
+-- The mapped radical tower requires extra dependent instance synthesis.
+set_option maxHeartbeats 1000000 in
 private theorem radicalSeparableLayer_apfPsi_succ (u : ℝ) :
     let t := (p : ℝ) ^ (n + 1) * (addVal A (p : A)).toNat / ((p : ℝ) - 1)
     apfPsi K M₁ u =
       if apfPsi K M₀ u ≤ t then apfPsi K M₀ u
         else t + (p : ℝ) * (apfPsi K M₀ u - t) := by
-  rw [← IsAPF.apfPsi_finiteBase_comp K M₀ M₁ (isAPF_of_finite K M₁) u]
+  rw [← IsAPF.apfPsi_finiteBase_comp K M₀ M₁ u]
   exact radicalSeparableLayer_step_apfPsi p hπ n _
 
 end RelativeImage
@@ -392,14 +421,11 @@ theorem radicalLayer_apfPsi_succ (hπ : Irreducible π) (n : ℕ) (u : ℝ) :
 
 end SeparableTower
 
-section FiniteProfiles
+section Breaks
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K]
     [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
-    [PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
-variable {π : Valuation.valuationSubring (NormedField.valuation (K := K))}
 
 local notation "OK" => Valuation.valuationSubring (NormedField.valuation (K := K))
 local notation "eK" => ENat.toNat (addVal OK (p : OK))
@@ -413,15 +439,12 @@ def radicalUpperBreak (j : ℕ) : ℝ :=
 def radicalRelativeBreak (n : ℕ) : ℝ :=
   (p : ℝ) ^ (n + 1) * (eK : ℝ) / ((p : ℝ) - 1)
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := K)).valuationSubring)] [CharZero K] [Fact p.Prime] in
+omit [Fact p.Prime] in
 private theorem radicalUpperBreak_succ (n : ℕ) :
     radicalUpperBreak (K := K) p (n + 1) = radicalUpperBreak (K := K) p n + eK := by
   simp only [radicalUpperBreak, Nat.cast_add, Nat.cast_one]
   ring
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := K)).valuationSubring)] [CharZero K] in
 private theorem radicalRelativeBreak_eq_affine (n : ℕ) :
     radicalRelativeBreak (K := K) p n =
       (p : ℝ) ^ n * (eK : ℝ) / ((p : ℝ) - 1) +
@@ -435,6 +458,33 @@ private theorem radicalRelativeBreak_eq_affine (n : ℕ) :
   rw [pow_succ]
   field_simp
   ring
+
+private theorem radicalUpperBreak_nonneg (n : ℕ) : 0 ≤ radicalUpperBreak (K := K) p n := by
+  have hp : 0 < (p : ℝ) - 1 := by
+    have : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
+    linarith
+  exact mul_nonneg (Nat.cast_nonneg _) (add_nonneg (Nat.cast_nonneg _)
+    (div_nonneg zero_le_one hp.le))
+
+omit [Fact p.Prime] in
+private theorem radicalUpperBreak_mono : Monotone (radicalUpperBreak (K := K) p) := by
+  apply monotone_nat_of_le_succ
+  intro n
+  rw [radicalUpperBreak_succ]
+  exact le_add_of_nonneg_right (Nat.cast_nonneg _)
+
+end Breaks
+
+section FiniteProfiles
+
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
+    [PerfectField (IsLocalRing.ResidueField
+      (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
+variable (p : ℕ) [Fact p.Prime]
+variable {π : Valuation.valuationSubring (NormedField.valuation (K := K))}
+
+local notation "OK" => Valuation.valuationSubring (NormedField.valuation (K := K))
+local notation "eK" => ENat.toNat (addVal OK (p : OK))
 
 /-- Each actual finite radical Herbrand function is affine after its
 last original-base threshold, with its true degree as slope. -/
@@ -470,7 +520,7 @@ theorem radicalLayer_apfPsi_tail (hπ : Irreducible π) (n : ℕ) (u : ℝ)
     · have hψgt : ¬ apfPsi K (radicalLayer p (π : K) n) u ≤
           radicalRelativeBreak (K := K) p n := by
         rw [← hψb]
-        exact not_le.mpr ((IsAPF.strictMono_apfPsi K _ (isAPF_of_finite K _))
+        exact not_le.mpr ((IsAPF.strictMono_apfPsi K _)
           (lt_of_not_ge hub))
       rw [radicalLayer_apfPsi_succ p hπ n]
       change (if apfPsi K (radicalLayer p (π : K) n) u ≤
@@ -502,29 +552,12 @@ theorem radicalLayer_apfIndex_succ_threshold (hπ : Irreducible π) (n : ℕ)
   have hiff : apfPsi K (radicalLayer p (π : K) n) u ≤ radicalRelativeBreak (K := K) p n ↔
       u ≤ radicalUpperBreak (K := K) p (n + 1) := by
     rw [← radicalLayer_apfPsi_next_break p hπ n]
-    exact (IsAPF.strictMono_apfPsi K _ (isAPF_of_finite K _)).le_iff_le
+    exact (IsAPF.strictMono_apfPsi K _).le_iff_le
   rw [radicalLayer_apfIndex_succ p hπ n hu]
   dsimp only [radicalRelativeBreak] at hiff
   by_cases h : u ≤ radicalUpperBreak (K := K) p (n + 1)
   · rw [ite_eq_left (hiff.mpr h), ite_eq_left h]
   · rw [ite_eq_right (fun hψ => h (hiff.mp hψ)), ite_eq_right h]
-
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := K)).valuationSubring)] [CharZero K] in
-private theorem radicalUpperBreak_nonneg (n : ℕ) : 0 ≤ radicalUpperBreak (K := K) p n := by
-  have hp : 0 < (p : ℝ) - 1 := by
-    have : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
-    linarith
-  exact mul_nonneg (Nat.cast_nonneg _) (add_nonneg (Nat.cast_nonneg _)
-    (div_nonneg zero_le_one hp.le))
-
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := K)).valuationSubring)] [CharZero K] [Fact p.Prime] in
-private theorem radicalUpperBreak_mono : Monotone (radicalUpperBreak (K := K) p) := by
-  apply monotone_nat_of_le_succ
-  intro n
-  rw [radicalUpperBreak_succ]
-  exact le_add_of_nonneg_right (Nat.cast_nonneg _)
 
 /-- After its last threshold, the actual finite radical index is its degree. -/
 theorem radicalLayer_apfIndex_tail (hπ : Irreducible π) (n : ℕ) {u : ℝ}
@@ -643,8 +676,7 @@ end CompactProducts
 
 section InfiniteProfiles
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 
@@ -670,6 +702,7 @@ private theorem apfSubgroup_iSup_eq_iInf
     (isCompact_upperRamificationGroupInfinite K (SeparableClosure K) u).isClosed
 
 set_option synthInstance.maxHeartbeats 100000 in
+-- Comparing the two spectral integer rings requires extra dependent instance synthesis.
 set_option maxHeartbeats 1000000 in
 private theorem finite_totalRam_apfSubgroup_index
     (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra.IsSeparable K L]
@@ -751,7 +784,7 @@ private theorem radicalSeparable_apfSubgroup_eq_layer (hπ : Irreducible π) (N 
     (IntermediateField.fixingSubgroup_le (radicalSeparableLayer_mono p (π : K) hmn)) _
   have hfin (n : ℕ) : (S n).FiniteIndex :=
     (isOpen_apfSubgroup_iff_finiteIndex K _ u).mp
-      (isAPFSubextension_of_finite K _ u (by linarith : -1 ≤ u))
+      ((isAPFSubextension_of_finite K _).isOpen_apfSubgroup u (by linarith : -1 ≤ u))
   have hstable (n : ℕ) (hn : N ≤ n) : S n = S N := by
     let := hfin N
     apply Subgroup.eq_of_index_dvd_index (hanti hn)
@@ -783,7 +816,7 @@ theorem apfSubgroup_kummerExtension_zero_eq_top (hπ : Irreducible π)
   rw [hr, radicalSeparable_apfSubgroup_eq_layer p hπ 0 le_rfl
     (radicalUpperBreak_nonneg p 1), radicalSeparable_apfSubgroup_zero p hπ 0]
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
+omit [PerfectField (IsLocalRing.ResidueField
   (NormedField.valuation (K := K)).valuationSubring)] [CharZero K] in
 private theorem exists_radicalUpperBreak_ge
     (he : 0 < (addVal A (p : A)).toNat) (u : ℝ) :
@@ -802,11 +835,12 @@ private theorem exists_radicalUpperBreak_ge
 private theorem radicalSeparable_isAPF (hπ : Irreducible π)
     (he : 0 < (addVal A (p : A)).toNat) :
     IsAPFSubextension K (⨆ n, radicalSeparableLayer p (π : K) n) := by
+  constructor
   intro u hu
   by_cases h0 : 0 ≤ u
   · obtain ⟨N, hN⟩ := exists_radicalUpperBreak_ge p he u
     rw [radicalSeparable_apfSubgroup_eq_layer p hπ N h0 hN]
-    exact isAPFSubextension_of_finite K _ u hu
+    exact (isAPFSubextension_of_finite K _).isOpen_apfSubgroup u hu
   · have hz : apfSubgroup K (⨆ n, radicalSeparableLayer p (π : K) n) 0 = ⊤ := by
       rw [radicalSeparable_apfSubgroup_eq_layer p hπ 0 le_rfl (radicalUpperBreak_nonneg p 1),
         radicalSeparable_apfSubgroup_zero p hπ 0]
@@ -942,12 +976,13 @@ theorem kummerExtension_apfPsi_div_index_ge (hπ : Irreducible π)
             div_eq_mul_inv, one_mul]
           exact le_add_of_nonneg_left (Nat.cast_nonneg _)
         _ ≤ u := hu
-        _ ≤ apfPsi K (kummerExtension p (π : K)) u := IsAPF.le_apfPsi K _ hAPF u
+        _ ≤ apfPsi K (kummerExtension p (π : K)) u :=
+          IsAPF.le_apfPsi K (kummerExtension p (π : K)) u
     | succ N ih =>
       by_cases h : u ≤ radicalUpperBreak (K := K) p (N + 1)
       · exact ih h
       · have hlo : radicalUpperBreak (K := K) p (N + 1) < u := lt_of_not_ge h
-        have hPsi := (IsAPF.strictMono_apfPsi K _ hAPF).monotone hlo.le
+        have hPsi := (IsAPF.strictMono_apfPsi K (kummerExtension p (π : K))).monotone hlo.le
         rw [kummerExtension_apfPsi_break p hπ (N + 1)] at hPsi
         rw [kummerExtension_apfIndex_interval p hπ (N + 1) hlo hN, Nat.cast_pow]
         apply (le_div_iff₀ (pow_pos hp (N + 1))).mpr
@@ -971,15 +1006,16 @@ theorem isStrictlyAPF_kummerExtension_of_addVal_p_pos (hπ : Irreducible π)
     apply Filter.le_liminf_of_le (h := ?_)
     exact Filter.eventually_atTop.mpr ⟨radicalUpperBreak (K := K) p 1,
       fun u hu => ENNReal.ofReal_le_ofReal (kummerExtension_apfPsi_div_index_ge p hπ he hu)⟩
-  exact ⟨isAPF_kummerExtension_of_addVal_p_pos p hπ he,
-    (ENNReal.ofReal_pos.mpr (div_pos (Nat.cast_pos.mpr he) hp)).trans_le hlower⟩
+  exact {
+    toIsAPF := isAPF_kummerExtension_of_addVal_p_pos p hπ he
+    liminf_pos := (ENNReal.ofReal_pos.mpr (div_pos (Nat.cast_pos.mpr he) hp)).trans_le hlower }
 
 section PadicBase
 
 variable [Algebra (Padic p) K]
     [(NormedField.valuation (K := Padic p)).HasExtension (NormedField.valuation (K := K))]
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
+omit [PerfectField (IsLocalRing.ResidueField
   (NormedField.valuation (K := K)).valuationSubring)] [CharZero K] in
 private theorem addVal_p_toNat_pos_of_padicBase : 0 < (addVal A (p : A)).toNat := by
   rw [addVal_p_toNat_eq_padic_ramificationIdx p]
@@ -1004,15 +1040,15 @@ end InfiniteProfiles
 
 section PrimeStepFirstBound
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
 variable {π : Valuation.valuationSubring (NormedField.valuation (K := K))}
 
 attribute [local instance] kummerBaseNormedField kummerBaseNormedAlgebra kummerBaseUltrametric
-  kummerBaseComplete kummerBaseDVR kummerBasePerfect kummerStepAlgebra kummerStepScalarTower
+  kummerBaseComplete kummerBaseDVR kummerBaseCompleteDiscreteValuedField kummerBasePerfect
+  kummerStepAlgebra kummerStepScalarTower
   kummerStepFinite kummerStepValuation kummerStepOwnValuation
 
 local notation "OK" => Valuation.valuationSubring (NormedField.valuation (K := K))

@@ -1,10 +1,15 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.KummerRamification
 public import FalseTateExtension.StrictAPF
-public import FontaineWintenberger.FieldOfNorms.Displacement
-public import FontaineWintenberger.FieldOfNorms.Isomorphism
-public import FontaineWintenberger.FieldOfNorms.Uniformizer
+public import FontaineWintenberger.FieldOfNorms.Basic.Ring
+public import FontaineWintenberger.FieldOfNorms.Functor.Map
+public import FontaineWintenberger.FieldOfNorms.Structure.Uniformizer
 
 /-!
 # Actual Kummer displacement on the original field of norms
@@ -33,7 +38,7 @@ variable (π : Padic p)
 
 /-- The original diagonal field inside the original infinite false Tate field. -/
 def falseTateNormFiniteLayer (N : ℕ) :
-    FiniteLayer (Padic p) (falseTateExtension p π) := by
+    FiniteIntermediateField (Padic p) (falseTateExtension p π) := by
   let i := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π N N)
   exact ⟨i.fieldRange, Module.Finite.equiv i.equivFieldRange.toLinearEquiv⟩
 
@@ -44,7 +49,7 @@ def falseTateNormFiniteLayerEquiv (N : ℕ) :
 
 /-- The diagonal fields are cofinal among all original finite subfields. -/
 theorem exists_le_falseTateNormFiniteLayer
-    (E : FiniteLayer (Padic p) (falseTateExtension p π)) :
+    (E : FiniteIntermediateField (Padic p) (falseTateExtension p π)) :
     ∃ N, E ≤ falseTateNormFiniteLayer p π N := by
   classical
   have hfg : E.val.FG := IntermediateField.essFiniteType_iff.mp inferInstance
@@ -91,13 +96,13 @@ theorem falseTateNormFiniteLayer_isGalois (hπ : π ≠ 0) (N : ℕ) :
 /-- At a normal original finite field the literal norm action is the
 ordinary finite restriction, under its original inclusion. -/
 theorem coe_normLimitEval_normLimitMap_of_normal
-    (E : FiniteLayer (Padic p) (falseTateExtension p π)) [Normal (Padic p) E.val]
+    (E : FiniteIntermediateField (Padic p) (falseTateExtension p π)) [Normal (Padic p) E.val]
     (g : falseTateExtension p π ≃ₐ[Padic p] falseTateExtension p π)
-    (x : NormLimit (Padic p) (falseTateExtension p π)) :
-    (normLimitEval (Padic p) (falseTateExtension p π) E (normLimitMap g x) :
+    (x : FieldOfNorms (Padic p) (falseTateExtension p π)) :
+    (FieldOfNorms.coord (Padic p) (falseTateExtension p π) E (FieldOfNorms.mapFun g x) :
       falseTateExtension p π) =
-      g (normLimitEval (Padic p) (falseTateExtension p π) E x) := by
-  have hmap : FiniteLayer.map g.symm.toAlgHom E = E := by
+      g (FieldOfNorms.coord (Padic p) (falseTateExtension p π) E x) := by
+  have hmap : FiniteIntermediateField.map g.symm.toAlgHom E = E := by
     apply Subtype.ext
     ext y
     constructor
@@ -110,22 +115,22 @@ theorem coe_normLimitEval_normLimitMap_of_normal
       change g y ∈ E.val
       simpa only [AlgEquiv.restrictNormal_apply] using
         (g.restrictNormal E.val ⟨y, hy⟩).property
-  rw [coe_normLimitEval_normLimitMap]
+  rw [FieldOfNorms.coe_coord_mapFun]
   exact congrArg g (congrArg
-    (fun D : FiniteLayer (Padic p) (falseTateExtension p π) =>
-      (normLimitEval (Padic p) (falseTateExtension p π) D x : falseTateExtension p π)) hmap)
+    (fun D : FiniteIntermediateField (Padic p) (falseTateExtension p π) =>
+      (FieldOfNorms.coord (Padic p) (falseTateExtension p π) D x : falseTateExtension p π)) hmap)
 
 /-- Original diagonal coordinates intertwine the actual infinite action
 and the ordinary finite restriction. -/
 theorem normLimitEval_normLimitMap_diagonal (hπ : π ≠ 0) (N : ℕ)
     (g : falseTateExtension p π ≃ₐ[Padic p] falseTateExtension p π)
-    (x : NormLimit (Padic p) (falseTateExtension p π)) :
+    (x : FieldOfNorms (Padic p) (falseTateExtension p π)) :
     (falseTateNormFiniteLayerEquiv p π N).symm
-        (normLimitEval (Padic p) (falseTateExtension p π)
-          (falseTateNormFiniteLayer p π N) (normLimitMap g x)) =
+        (FieldOfNorms.coord (Padic p) (falseTateExtension p π)
+          (falseTateNormFiniteLayer p π N) (FieldOfNorms.mapFun g x)) =
       infiniteLayerRestriction p π hπ N g
         ((falseTateNormFiniteLayerEquiv p π N).symm
-          (normLimitEval (Padic p) (falseTateExtension p π)
+          (FieldOfNorms.coord (Padic p) (falseTateExtension p π)
             (falseTateNormFiniteLayer p π N) x)) := by
   let := falseTateNormFiniteLayer_isGalois p π hπ N
   let e := falseTateNormFiniteLayerEquiv p π N
@@ -136,12 +141,12 @@ theorem normLimitEval_normLimitMap_diagonal (hπ : π ≠ 0) (N : ℕ)
     rw [e.apply_symm_apply]
   apply i.injective
   calc
-    _ = (normLimitEval (Padic p) (falseTateExtension p π)
-        (falseTateNormFiniteLayer p π N) (normLimitMap g x) : falseTateExtension p π) := hi _
-    _ = g (normLimitEval (Padic p) (falseTateExtension p π)
+    _ = (FieldOfNorms.coord (Padic p) (falseTateExtension p π)
+        (falseTateNormFiniteLayer p π N) (FieldOfNorms.mapFun g x) : falseTateExtension p π) := hi _
+    _ = g (FieldOfNorms.coord (Padic p) (falseTateExtension p π)
         (falseTateNormFiniteLayer p π N) x) :=
       coe_normLimitEval_normLimitMap_of_normal p π _ g x
-    _ = g (i (e.symm (normLimitEval (Padic p) (falseTateExtension p π)
+    _ = g (i (e.symm (FieldOfNorms.coord (Padic p) (falseTateExtension p π)
         (falseTateNormFiniteLayer p π N) x))) := congrArg g (hi _).symm
     _ = _ := (infiniteLayerRestriction_commutes p π hπ N g _).symm
 
@@ -171,48 +176,39 @@ private theorem irreducible_of_normalizedValuation_eq_exp_neg_one
 
 section ActualNormField
 
-local instance padicUnitBall_residueCharP :
-    CharP (IsLocalRing.ResidueField
-      (NormedField.valuation (K := Padic p)).valuationSubring) p where
-  cast_eq_zero_iff n := by
-    let e := (IsLocalRing.ResidueField.mapEquiv (padicUnitBallEquiv p)).trans
-      (PadicInt.residueField (p := p))
-    rw [← e.injective.eq_iff, map_natCast, map_zero]
-    exact CharP.cast_eq_zero_iff (ZMod p) p n
-
 variable (hp₂ : p ≠ 2) (hπ : Irreducible π)
 
 local notation "L" => falseTateExtension p (π : Padic p)
-local notation "X" => NormLimit (Padic p) L
-local notation "hAPF" => isAPF_falseTateExtension p hπ
-local notation "hInf" => not_finiteDimensional_falseTateExtension_padic p (π : Padic p)
+local notation "X" => FieldOfNorms (Padic p) L
+local instance normFieldRamificationInfinite : Fact (¬ Module.Finite (Padic p) L) :=
+  ⟨not_finiteDimensional_falseTateExtension_padic p (π : Padic p)⟩
 
 /-- The ordinary diagonal-coordinate difference has its finite Kummer order
 whenever that coordinate is an original uniformizer. -/
 theorem normalizedValuation_normLimitMap_tau_diagonal (N k : ℕ) (hk : k + 2 ≤ N)
     (u : X)
-    (hu : normLimitCoordinateValuation (Padic p) L
+    (hu : FieldOfNorms.coordinateValuation (Padic p) L
       (falseTateNormFiniteLayer p (π : Padic p) N) u = WithZero.exp (-1 : ℤ)) :
     (maximalIdeal (spectralIntegerRing (Padic p)
       (falseTateNormFiniteLayer p (π : Padic p) N).val)).valuation
         (falseTateNormFiniteLayer p (π : Padic p) N).val
-        (normLimitEval (Padic p) L (falseTateNormFiniteLayer p (π : Padic p) N)
-          (normLimitMap ((tau p hp₂ hπ).val ^ (p ^ k)) u) -
-          normLimitEval (Padic p) L (falseTateNormFiniteLayer p (π : Padic p) N) u) =
+        (FieldOfNorms.coord (Padic p) L (falseTateNormFiniteLayer p (π : Padic p) N)
+          (FieldOfNorms.mapFun ((tau p hp₂ hπ).val ^ (p ^ k)) u) -
+          FieldOfNorms.coord (Padic p) L (falseTateNormFiniteLayer p (π : Padic p) N) u) =
       WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
   let E := falseTateNormFiniteLayer p (π : Padic p) N
   let e := falseTateNormFiniteLayerEquiv p (π : Padic p) N
   let v := (maximalIdeal (spectralIntegerRing (Padic p) E.val)).valuation E.val
-  have hule : v (normLimitEval (Padic p) L E u) ≤ 1 := by
-    change normLimitCoordinateValuation (Padic p) L E u ≤ 1
+  have hule : v (FieldOfNorms.coord (Padic p) L E u) ≤ 1 := by
+    change FieldOfNorms.coordinateValuation (Padic p) L E u ≤ 1
     rw [hu]
     change WithZero.exp (-1 : ℤ) ≤ WithZero.exp (0 : ℤ)
     exact WithZero.exp_le_exp.mpr (by omega)
-  have hmem : normLimitEval (Padic p) L E u ∈ spectralIntegerRing (Padic p) E.val := by
+  have hmem : FieldOfNorms.coord (Padic p) L E u ∈ spectralIntegerRing (Padic p) E.val := by
     rw [← ValuationSubring.normalizedValuation_valuationSubring
       (spectralIntegerRing (Padic p) E.val)]
     exact hule
-  let zE : spectralIntegerRing (Padic p) E.val := ⟨normLimitEval (Padic p) L E u, hmem⟩
+  let zE : spectralIntegerRing (Padic p) E.val := ⟨FieldOfNorms.coord (Padic p) L E u, hmem⟩
   let zD := spectralIntegerRingEquiv (Padic p) e.symm zE
   have hzD : (maximalIdeal (spectralIntegerRing (Padic p)
       (falseTateLayer p (π : Padic p) N N))).valuation
@@ -224,42 +220,46 @@ theorem normalizedValuation_normLimitMap_tau_diagonal (N k : ℕ) (hk : k + 2 �
   have hirr := irreducible_of_normalizedValuation_eq_exp_neg_one _ zD hzD
   have hfin := normalizedValuation_kummerTauFinite_displacement p hp₂ hπ N k hk hirr
   have hv := spectral_normalizedValuation_algEquiv (Padic p) e.symm
-    (normLimitEval (Padic p) L E (normLimitMap ((tau p hp₂ hπ).val ^ (p ^ k)) u) -
-      normLimitEval (Padic p) L E u)
+    (FieldOfNorms.coord (Padic p) L E (FieldOfNorms.mapFun ((tau p hp₂ hπ).val ^ (p ^ k)) u) -
+      FieldOfNorms.coord (Padic p) L E u)
   rw [map_sub e.symm] at hv
   rw [normLimitEval_normLimitMap_diagonal p (π : Padic p)
     (fun h => hπ.ne_zero (Subtype.ext h))] at hv
   have hzcoe : (zD : falseTateLayer p (π : Padic p) N N) =
-      e.symm (normLimitEval (Padic p) L E u) :=
+      e.symm (FieldOfNorms.coord (Padic p) L E u) :=
     coe_spectralIntegerRingEquiv (Padic p) e.symm zE
   change (maximalIdeal (spectralIntegerRing (Padic p)
       (falseTateLayer p (π : Padic p) N N))).valuation
         (falseTateLayer p (π : Padic p) N N)
         (kummerTauFinite p hp₂ hπ N k
-          (e.symm (normLimitEval (Padic p) L E u)) -
-            e.symm (normLimitEval (Padic p) L E u)) = _ at hv
+          (e.symm (FieldOfNorms.coord (Padic p) L E u)) -
+            e.symm (FieldOfNorms.coord (Padic p) L E u)) = _ at hv
   rw [hzcoe] at hfin
   exact hv.symm.trans hfin
 
 /-- Cofinal ordinary diagonal-coordinate differences have their exact
 Kummer values, obtained from the actual stable valuation of a uniformizer. -/
 theorem exists_normLimitMap_tau_coordinate_displacement (u : X)
-    (hu : normLimitValuation (Padic p) L hAPF u = WithZero.exp (-1 : ℤ))
-    (k : ℕ) (T : FiniteLayer (Padic p) L) :
-    ∃ E : FiniteLayer (Padic p) L, T ≤ E ∧
+    (hu : letI := isAPF_falseTateExtension p hπ
+      FieldOfNorms.valuation (Padic p) L u = WithZero.exp (-1 : ℤ))
+    (k : ℕ) (T : FiniteIntermediateField (Padic p) L) :
+    letI := isAPF_falseTateExtension p hπ
+    ∃ E : FiniteIntermediateField (Padic p) L, T ≤ E ∧
       (maximalIdeal (spectralIntegerRing (Padic p) E.val)).valuation E.val
-        (normLimitEval (Padic p) L E
-          (normLimitMap ((tau p hp₂ hπ).val ^ (p ^ k)) u) -
-          normLimitEval (Padic p) L E u) =
+        (FieldOfNorms.coord (Padic p) L E
+          (FieldOfNorms.mapFun ((tau p hp₂ hπ).val ^ (p ^ k)) u) -
+          FieldOfNorms.coord (Padic p) L E u) =
         WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
-  obtain ⟨S, hS⟩ := IsAPF.exists_normLimitValuation_eq_coordinate (Padic p) L hAPF
-  obtain ⟨M, hM⟩ := exists_le_falseTateNormFiniteLayer p (π : Padic p) (FiniteLayer.sup T S)
+  have := isAPF_falseTateExtension p hπ
+  obtain ⟨S, hS⟩ := FieldOfNorms.exists_valuation_eq_coordinateValuation (Padic p) L
+  obtain ⟨M, hM⟩ := exists_le_falseTateNormFiniteLayer p (π : Padic p)
+    (FiniteIntermediateField.sup T S)
   let N := max M (k + 2)
   let E := falseTateNormFiniteLayer p (π : Padic p) N
   have hME : falseTateNormFiniteLayer p (π : Padic p) M ≤ E :=
     falseTateNormFiniteLayer_mono p (π : Padic p) (Nat.le_max_left _ _)
-  have hTE : T ≤ E := (FiniteLayer.le_sup_left T S).trans (hM.trans hME)
-  have hSE : S ≤ E := (FiniteLayer.le_sup_right T S).trans (hM.trans hME)
+  have hTE : T ≤ E := (FiniteIntermediateField.le_sup_left T S).trans (hM.trans hME)
+  have hSE : S ≤ E := (FiniteIntermediateField.le_sup_right T S).trans (hM.trans hME)
   refine ⟨E, hTE, ?_⟩
   have hcoord := (hS E hSE u).symm.trans hu
   exact normalizedValuation_normLimitMap_tau_diagonal p hp₂ hπ N k
@@ -268,45 +268,45 @@ theorem exists_normLimitMap_tau_coordinate_displacement (u : X)
 /-- Every actual norm-family uniformizer has the exact displacement of the
 prescribed Kummer power, on the same original norm-field carrier. -/
 theorem normLimitValuation_tau_pow_displacement :
-    letI := normLimitField (Padic p) L p hAPF hInf
-    ∀ (u : X), normLimitValuation (Padic p) L hAPF u = WithZero.exp (-1 : ℤ) →
-      ∀ k : ℕ, normLimitValuation (Padic p) L hAPF
-        (normLimitAut (Padic p) p hAPF hInf ((tau p hp₂ hπ).val ^ (p ^ k)) u - u) =
+    letI := isAPF_falseTateExtension p hπ
+    ∀ (u : X), FieldOfNorms.valuation (Padic p) L u = WithZero.exp (-1 : ℤ) →
+      ∀ k : ℕ, FieldOfNorms.valuation (Padic p) L
+        (FieldOfNorms.aut (Padic p) L ((tau p hp₂ hπ).val ^ (p ^ k)) u - u) =
           WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
-  let := normLimitField (Padic p) L p hAPF hInf
+  have := isAPF_falseTateExtension p hπ
   intro u hu k
-  apply normLimitValuation_sub_eq_of_cofinal_coordinate (Padic p) L p hAPF hInf
+  apply FieldOfNorms.valuation_sub_eq_of_cofinal_coordinate (Padic p) L
   intro T
   obtain ⟨E, hE, hv⟩ := exists_normLimitMap_tau_coordinate_displacement p hp₂ hπ u hu k T
   refine ⟨E, hE, ?_⟩
-  have heq := normLimitAut_apply (Padic p) p hAPF hInf
+  have heq := FieldOfNorms.aut_apply
     ((tau p hp₂ hπ).val ^ (p ^ k)) u
   exact (congrArg (fun z : X =>
     (maximalIdeal (spectralIntegerRing (Padic p) E.val)).valuation E.val
-      (normLimitEval (Padic p) L E z - normLimitEval (Padic p) L E u)) heq).trans hv
+      (FieldOfNorms.coord (Padic p) L E z - FieldOfNorms.coord (Padic p) L E u)) heq).trans hv
 
 /-- Dividing the actual displacement by any original uniformizer gives the
 source's shifted lower break. -/
 theorem normLimitValuation_tau_pow_div_sub_one :
-    letI := normLimitField (Padic p) L p hAPF hInf
-    ∀ (u : X), normLimitValuation (Padic p) L hAPF u = WithZero.exp (-1 : ℤ) →
-      ∀ k : ℕ, normLimitValuation (Padic p) L hAPF
-        (normLimitAut (Padic p) p hAPF hInf ((tau p hp₂ hπ).val ^ (p ^ k)) u / u - 1) =
+    letI := isAPF_falseTateExtension p hπ
+    ∀ (u : X), FieldOfNorms.valuation (Padic p) L u = WithZero.exp (-1 : ℤ) →
+      ∀ k : ℕ, FieldOfNorms.valuation (Padic p) L
+        (FieldOfNorms.aut (Padic p) L ((tau p hp₂ hπ).val ^ (p ^ k)) u / u - 1) =
           WithZero.exp (-(kummerRamificationBreak p k : ℤ)) := by
-  let := normLimitField (Padic p) L p hAPF hInf
+  have := isAPF_falseTateExtension p hπ
   intro u hu k
   have hne : u ≠ 0 := by
     intro h
     rw [h, map_zero] at hu
     exact WithZero.exp_ne_zero hu.symm
-  have heq : normLimitAut (Padic p) p hAPF hInf
+  have heq : FieldOfNorms.aut (Padic p) L
       ((tau p hp₂ hπ).val ^ (p ^ k)) u / u - 1 =
-      (normLimitAut (Padic p) p hAPF hInf
+      (FieldOfNorms.aut (Padic p) L
         ((tau p hp₂ hπ).val ^ (p ^ k)) u - u) / u := by field_simp
-  change normLimitFieldValuation (Padic p) L p hAPF hInf _ = _
+  change FieldOfNorms.fieldValuation (Padic p) L _ = _
   rw [heq, map_div₀]
-  change normLimitValuation (Padic p) L hAPF _ /
-    normLimitValuation (Padic p) L hAPF u = _
+  change FieldOfNorms.valuation (Padic p) L _ /
+    FieldOfNorms.valuation (Padic p) L u = _
   rw [normLimitValuation_tau_pow_displacement p hp₂ hπ u hu k, hu,
     ← WithZero.exp_sub]
   congr 1
@@ -316,20 +316,20 @@ theorem normLimitValuation_tau_pow_div_sub_one :
 /-- Distinct prescribed prime-power iterates remain distinct under the
 literal action on the same original norm field. -/
 theorem normLimitTau_primePower_injective :
-    letI := normLimitField (Padic p) L p hAPF hInf
+    letI := isAPF_falseTateExtension p hπ
     Function.Injective (fun k : ℕ =>
-      (normLimitAut (Padic p) p hAPF hInf (tau p hp₂ hπ).val) ^ (p ^ k)) := by
-  let := normLimitField (Padic p) L p hAPF hInf
+      (FieldOfNorms.aut (Padic p) L (tau p hp₂ hπ).val) ^ (p ^ k)) := by
+  have := isAPF_falseTateExtension p hπ
   intro i j hij
-  let u := normLimitUniformizer (Padic p) L p hAPF hInf
-  have hu := normLimitValuation_normLimitUniformizer (Padic p) L p hAPF hInf
+  let u := FieldOfNorms.uniformizer (Padic p) L
+  have hu := FieldOfNorms.valuation_uniformizer (Padic p) L
   have hi := normLimitValuation_tau_pow_displacement p hp₂ hπ u hu i
   have hj := normLimitValuation_tau_pow_displacement p hp₂ hπ u hu j
-  have hpow : normLimitAut (Padic p) p hAPF hInf ((tau p hp₂ hπ).val ^ (p ^ i)) =
-      normLimitAut (Padic p) p hAPF hInf ((tau p hp₂ hπ).val ^ (p ^ j)) := by
+  have hpow : FieldOfNorms.aut (Padic p) L ((tau p hp₂ hπ).val ^ (p ^ i)) =
+      FieldOfNorms.aut (Padic p) L ((tau p hp₂ hπ).val ^ (p ^ j)) := by
     simpa only [map_pow] using hij
   have hv := congrArg (fun a : X ≃+* X =>
-    normLimitValuation (Padic p) L hAPF (a u - u)) hpow
+    FieldOfNorms.valuation (Padic p) L (a u - u)) hpow
   have hd : kummerRamificationBreak p i = kummerRamificationBreak p j := by
     have he := WithZero.exp_injective (hi.symm.trans (hv.trans hj))
     change -((kummerRamificationBreak p i + 1 : ℕ) : ℤ) =
@@ -339,9 +339,9 @@ theorem normLimitTau_primePower_injective :
 
 /-- The actual Kummer action on the original norm field has infinite order. -/
 theorem normLimitTau_infiniteOrder :
-    letI := normLimitField (Padic p) L p hAPF hInf
-    ¬ IsOfFinOrder (normLimitAut (Padic p) p hAPF hInf (tau p hp₂ hπ).val) := by
-  let := normLimitField (Padic p) L p hAPF hInf
+    letI := isAPF_falseTateExtension p hπ
+    ¬ IsOfFinOrder (FieldOfNorms.aut (Padic p) L (tau p hp₂ hπ).val) := by
+  have := isAPF_falseTateExtension p hπ
   intro h
   apply h.finite_powers.not_infinite
   apply Set.infinite_of_injective_forall_mem (normLimitTau_primePower_injective p hp₂ hπ)

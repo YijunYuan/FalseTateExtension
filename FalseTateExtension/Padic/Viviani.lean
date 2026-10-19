@@ -1,8 +1,13 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.FiniteGaloisStructure
 public import FalseTateExtension.KummerProfile
-public import FontaineWintenberger.Ramification.FiniteRestriction
+public import FontaineWintenberger.Ramification.Upper.Transport
 public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
@@ -624,8 +629,8 @@ private theorem viviani_inverse_affine (n : ℕ) {a b : ℝ} (ha : 0 ≤ a) (hab
     Ψ(n) b - Ψ(n) a = (b - a) * c := by
   have := falseTateLayer_isGalois p (π : Qp) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
   have hadd := intervalIntegral.integral_add_adjacent_intervals
-    (IsAPF.intervalIntegrable_apfHerbrandSlope Qp D(n) (isAPF_of_finite Qp D(n)) 0 a)
-    (IsAPF.intervalIntegrable_apfHerbrandSlope Qp D(n) (isAPF_of_finite Qp D(n)) a b)
+    (IsAPF.intervalIntegrable_apfHerbrandSlope Qp D(n) 0 a)
+    (IsAPF.intervalIntegrable_apfHerbrandSlope Qp D(n) a b)
   have heq : (∫ u in a..b, apfHerbrandSlope Qp D(n) u) = ∫ _u in a..b, (c : ℝ) := by
     apply intervalIntegral.integral_congr_ae
     filter_upwards [] with u hu
@@ -1055,7 +1060,8 @@ factor, through and including p/(p-1). -/
 theorem finiteUpperAffine_first_layer {u : ℝ}
     (hu : 0 < u) (hu1 : u ≤ (p : ℝ) / ((p : ℝ) - 1)) :
     finiteUpperAffineGroup hp₂ hπ 0 u =
-      (SemidirectProduct.inl : Multiplicative (ZMod (p ^ 1)) →* FullFiniteAffineGroup p 1).range := by
+      (SemidirectProduct.inl :
+        Multiplicative (ZMod (p ^ 1)) →* FullFiniteAffineGroup p 1).range := by
   have hb : u ≤ 1 + δ := by rw [viviani_first_break]; exact hu1
   rw [finiteUpperAffine_eq_tail hp₂ hπ 0 (by simpa using hu),
     radicalTranslationDepth_initial p 1 hb, finiteAffineSubgroup_zero_bot]
@@ -1104,7 +1110,8 @@ theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
     (ht : 0 < t) (ht1 : t ≤ p) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
       (finiteDiagonalGaloisEquiv_padic p hp₂ hπ 1).toMonoidHom =
-      (SemidirectProduct.inl : Multiplicative (ZMod (p ^ 1)) →* FullFiniteAffineGroup p 1).range := by
+      (SemidirectProduct.inl :
+        Multiplicative (ZMod (p ^ 1)) →* FullFiniteAffineGroup p 1).range := by
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   have h := viviani_lower_parameter (π := π) 0 (a := 0)
     (b := (p : ℝ) / ((p : ℝ) - 1)) (by norm_num)
@@ -1185,7 +1192,8 @@ theorem inverseHerbrandFunction_falseTate_integerParameter (hp₂ : p ≠ 2) (a 
       ψ ((n : ℝ) + 1 + 1 / ((p : ℝ) - 1)) =
         ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
           ((p : ℝ) + 1) := by
-  exact ⟨inverseHerbrandFunction_falseTate_fractional hp₂ (irreducible_integerParameter p a ha) n i hi,
+  exact ⟨inverseHerbrandFunction_falseTate_fractional hp₂
+    (irreducible_integerParameter p a ha) n i hi,
     inverseHerbrandFunction_falseTate_integer hp₂ (irreducible_integerParameter p a ha) n i hi,
     inverseHerbrandFunction_falseTate_final hp₂ (irreducible_integerParameter p a ha) n⟩
 

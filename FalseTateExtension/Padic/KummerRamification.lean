@@ -1,7 +1,12 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.Viviani
-public import FontaineWintenberger.Ramification.Generator
+public import FontaineWintenberger.Ramification.Lower.Generator
 public import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!

@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.AffineIndex
@@ -247,8 +252,7 @@ end AffineImage
 
 section UpperProducts
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 
@@ -379,8 +383,7 @@ end UpperProducts
 
 section RadicalIndex
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
@@ -433,15 +436,14 @@ end RadicalIndex
 
 section FiniteBase
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsDiscreteValuationRing (NormedField.valuation (K := K)).valuationSubring]
+variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 variable (p : ℕ) [Fact p.Prime] [NormedAlgebra (Padic p) K]
     [FiniteDimensional (Padic p) K]
 variable {π : (NormedField.valuation (K := K)).valuationSubring}
 
-omit [CompleteSpace K] [PerfectField (IsLocalRing.ResidueField
+omit [PerfectField (IsLocalRing.ResidueField
   (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
   [FiniteDimensional (Padic p) K] in
 private theorem falseTateBase_addVal_p_pos :
@@ -488,7 +490,8 @@ theorem exists_falseTate_upper_index_comparison (hπ : Irreducible π)
     falseTateAffine_upper_projection_index p (π : K) hπ₀ (by linarith : -1 ≤ u)
   have hAfin : (affinePureUnits G ⊔ I).FiniteIndex := by
     rw [Subgroup.finiteIndex_iff, hA]
-    exact Nat.ne_of_gt (IsAPF.apfIndex_pos K _ (isAPF_kummerExtension p hπ) hu)
+    have := isAPF_kummerExtension p hπ
+    exact Nat.ne_of_gt (IsAPF.apfIndex_pos K (kummerExtension p (π : K)) hu)
   have hBfin : (I.map (affineProjection G).rangeRestrict).FiniteIndex := by
     rw [Subgroup.finiteIndex_iff, hB]
     let := (isAPF_iff_upperInfinite_finiteIndex K _).mp
@@ -637,7 +640,8 @@ residue extension. -/
 theorem isStrictlyAPF_falseTateExtension (hπ : Irreducible π) :
     IsStrictlyAPF K (falseTateExtension p (π : K)) := by
   obtain ⟨Q, hQ, V, _, hgrowth⟩ := exists_falseTate_apfIndex_boundedGrowth p hπ
-  apply isStrictlyAPF_of_apfIndex_boundedGrowth K _ (isAPF_falseTateExtension p hπ)
+  have := isAPF_falseTateExtension p hπ
+  apply isStrictlyAPF_of_apfIndex_boundedGrowth K _ (U := V)
     (Nat.cast_pos.mpr (falseTateBase_addVal_p_pos (K := K) p)) (Nat.cast_pos.mpr hQ)
   intro u hu
   exact_mod_cast hgrowth u hu
@@ -655,19 +659,19 @@ variable (π : (NormedField.valuation (K := K)).valuationSubring)
 unit-ball DVR structure and its actual perfect residue field supply every
 valued-field hypothesis of false Tate strictness. -/
 theorem isStrictlyAPF_falseTateExtension_of_finiteDimensional (hπ : Irreducible π) :
-    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsStrictlyAPF K (falseTateExtension p (π : K)) := by
-  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let := normedAlgebra_residueField_perfectField (Padic p) K
   exact isStrictlyAPF_falseTateExtension p hπ
 
 /-- Canonical public APF over every finite norm-compatible `p`-adic base,
 without a separate chosen DVR or perfect-residue hypothesis. -/
 theorem isAPF_falseTateExtension_of_finiteDimensional (hπ : Irreducible π) :
-    letI := cyclotomicBase_unitBall_isDiscreteValuationRing p K
+    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsAPF K (falseTateExtension p (π : K)) := by
-  let := cyclotomicBase_unitBall_isDiscreteValuationRing p K
-  exact (isStrictlyAPF_falseTateExtension_of_finiteDimensional p K π hπ).1
+  let := cyclotomicBase_isCompleteDiscreteValuedField p K
+  exact (isStrictlyAPF_falseTateExtension_of_finiteDimensional p K π hπ).toIsAPF
 
 end CanonicalFiniteBase
 

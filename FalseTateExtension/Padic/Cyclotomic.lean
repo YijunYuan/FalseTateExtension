@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Layers
@@ -64,8 +69,9 @@ p-adic integers, for every positive level and every prime. -/
 theorem cyclotomic_prime_pow_comp_X_add_one_isEisensteinAt (n : ℕ) :
     ((cyclotomic (p ^ (n + 1)) (PadicInt p)).comp (X + 1)).IsEisensteinAt
       (Ideal.span {(p : PadicInt p)}) := by
-  have hweak := (_root_.cyclotomic_prime_pow_comp_X_add_one_isEisensteinAt p n).isWeaklyEisensteinAt.map
-    (Int.castRingHom (PadicInt p))
+  have hweak :=
+    (_root_.cyclotomic_prime_pow_comp_X_add_one_isEisensteinAt p n).isWeaklyEisensteinAt.map
+      (Int.castRingHom (PadicInt p))
   have hprime : (Ideal.span {(p : PadicInt p)} : Ideal (PadicInt p)).IsPrime :=
     (Ideal.span_singleton_prime (by exact_mod_cast (Fact.out : p.Prime).ne_zero)).mpr prime_p
   apply (monic_cyclotomic_prime_pow_comp_X_add_one p n).isEisensteinAt_of_mem_of_notMem

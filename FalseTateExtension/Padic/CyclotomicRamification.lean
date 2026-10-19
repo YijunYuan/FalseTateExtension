@@ -1,9 +1,14 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.Padic.Cyclotomic
 public import FalseTateExtension.GaloisLayers
-public import FontaineWintenberger.Ramification.NormValuation
-public import FontaineWintenberger.Ramification.NormalizedValuation
+public import FontaineWintenberger.Ramification.Norm.Valuation
+public import FontaineWintenberger.Ramification.Lower.Basic
 public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 
 /-!
@@ -41,6 +46,9 @@ instance padicUnitBall_isDiscreteValuationRing :
     IsDiscreteValuationRing (NormedField.valuation (K := Padic p)).valuationSubring :=
   RingEquivClass.isDiscreteValuationRing (padicUnitBallEquiv p).symm
 
+instance padic_isCompleteDiscreteValuedField :
+    FontaineWintenberger.IsCompleteDiscreteValuedField (Padic p) where
+
 local notation "OK" => Valuation.valuationSubring (NormedField.valuation (K := Padic p))
 
 /-- The actual normalized base valuation sends `p` to `exp(-1)`, independently
@@ -66,8 +74,8 @@ theorem isPrimitiveRoot_cyclotomicLayerRoot (m : ℕ) :
 instance cyclotomicLayer_padic_isCyclotomicExtension (m : ℕ) :
     IsCyclotomicExtension {p ^ m} (Padic p) (cyclotomicLayer (K := Padic p) p m) := by
   have : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
-  exact (isPrimitiveRoot_rootOfUnity (K := Padic p) p m).intermediateField_adjoin_isCyclotomicExtension
-    (Padic p)
+  have hζ := (isPrimitiveRoot_rootOfUnity (K := Padic p) p m)
+  exact hζ.intermediateField_adjoin_isCyclotomicExtension (Padic p)
 
 /-- The norm of the actual cyclotomic uniformizer candidate, with its sign
 retained also for `p = 2` at the first level. -/
@@ -116,7 +124,8 @@ theorem cyclotomicLayer_residueDegree (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := Padic p) p (n + 1)) Γ)
     [(NormedField.valuation (K := Padic p)).HasExtension w] :
-    Module.finrank (IsLocalRing.ResidueField OK) (IsLocalRing.ResidueField w.valuationSubring) = 1 := by
+    Module.finrank (IsLocalRing.ResidueField OK)
+      (IsLocalRing.ResidueField w.valuationSubring) = 1 := by
   have hl := congrArg WithZero.log (cyclotomicLayer_normalizedValuation_pow p n w)
   simp only [WithZero.log_pow, WithZero.log_exp, nsmul_eq_mul] at hl
   have hd : (Module.finrank (IsLocalRing.ResidueField OK)

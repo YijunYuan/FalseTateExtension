@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yijun Yuan
+-/
 module
 
 public import FalseTateExtension.StrictAPF
@@ -277,7 +282,8 @@ private theorem uniformizer_ne_pow_mul_torsion (hπ : Irreducible π)
       _ = IsDiscreteValuationRing.addVal _ (a₀ ^ p * u₀) := by
         rw [IsDiscreteValuationRing.addVal_mul, IsDiscreteValuationRing.addVal_pow,
           IsDiscreteValuationRing.addVal_eq_zero_iff.mpr huunit, add_zero]
-      _ = IsDiscreteValuationRing.addVal _ π := congrArg (IsDiscreteValuationRing.addVal _) heq₀.symm
+      _ = IsDiscreteValuationRing.addVal _ π :=
+        congrArg (IsDiscreteValuationRing.addVal _) heq₀.symm
       _ = 1 := IsDiscreteValuationRing.addVal_uniformizer hπ
   have hnat := congrArg (fun v : ℕ∞ => v.toNat) hv
   simp only [nsmul_eq_mul, ENat.toNat_mul, ENat.toNat_natCast, ENat.toNat_one] at hnat
@@ -459,15 +465,17 @@ theorem padicKummerExponent_spec (hπ : π ≠ 0)
     g (extensionRadical p π n) = extensionRootOfUnity p π n ^
       (PadicInt.toZModPow n (padicKummerExponent p π hπ g)).val *
         extensionRadical p π n := by
-  rw [padicKummerExponent_toZModPow]
-  rw [extensionRadical, ← infiniteLayerRestriction_commutes]
-  rw [finiteKummerExponent_spec, map_mul, map_pow]
+  rw [padicKummerExponent_toZModPow p π hπ]
+  rw [extensionRadical, ← infiniteLayerRestriction_commutes p π hπ]
+  rw [finiteKummerExponent_spec p π n hπ, map_mul, map_pow]
   rfl
 
 /-- The original cyclotomic subfield has precisely the actual character kernel
 as its fixing subgroup in the original false Tate field. -/
 theorem cyclotomicInclusion_fixingSubgroup :
-    (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π)).fieldRange.fixingSubgroup = (padicCyclotomicCharacter p π).ker := by
+    (IntermediateField.inclusion
+      (cyclotomicExtension_le_falseTateExtension p π)).fieldRange.fixingSubgroup =
+        (padicCyclotomicCharacter p π).ker := by
   rw [padicCyclotomicCharacter_ker]
   let i := IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π)
   ext g
@@ -575,7 +583,8 @@ instance restrictedPadicAffineIsTopologicalGroup :
     apply continuous_induced_rng.mpr
     change Continuous (fun x : RestrictedPadicAffineGroup p H =>
       (((x.right⁻¹).val : PadicInt p) * (-x.left.toAdd), x.right⁻¹))
-    exact ((Units.continuous_val.comp (continuous_subtype_val.comp hr.inv)).mul hl.neg).prodMk hr.inv
+    exact ((Units.continuous_val.comp
+      (continuous_subtype_val.comp hr.inv)).mul hl.neg).prodMk hr.inv
 
 end RestrictedAffineGroup
 
@@ -1002,7 +1011,8 @@ theorem tau_fixes_cyclotomicExtension (hp₂ : p ≠ 2) (hπ : Irreducible π)
       (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) x) =
       IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) x := by
   have hg : (tau p hp₂ hπ).val ∈
-      (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K))).fieldRange.fixingSubgroup := by
+      (IntermediateField.inclusion
+        (cyclotomicExtension_le_falseTateExtension p (π : K))).fieldRange.fixingSubgroup := by
     rw [cyclotomicInclusion_fixingSubgroup]
     exact (tau p hp₂ hπ).property
   exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hg _ ⟨x, rfl⟩
