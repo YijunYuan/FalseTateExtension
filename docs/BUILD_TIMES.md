@@ -90,3 +90,28 @@ through `IntermediateField.restrictNormalHomOfLE` instead of the categorical `fi
 | FalseTateExtension.Padic.Cyclotomic | 1.6 |
 | FalseTateExtension | 1.3 |
 | FalseTateExtension.Padic.ClosedAddSubgroup | 1.0 |
+
+## After F2 (scope: NormField*, TameUnits, TameGenerator removed)
+
+Total: 4 min 58 s wall, 769 s CPU, 30 modules.
+
+| module | seconds |
+|---|---|
+| FalseTateExtension.KummerProfile | 107.0 |
+| FalseTateExtension.Padic.Viviani | 78.0 |
+| FalseTateExtension.Padic.CyclotomicUpper | 62.0 |
+| FalseTateExtension.RadicalRamification | 36.0 |
+| FalseTateExtension.Padic.FiniteGaloisStructure | 19.0 |
+| FalseTateExtension.Padic.CyclotomicInertia | 18.0 |
+| FalseTateExtension.Padic.CyclotomicAPF | 16.0 |
+| FalseTateExtension.Padic.CyclotomicRamification | 15.0 |
+| FalseTateExtension.Padic.CyclotomicResidueBound | 14.0 |
+| FalseTateExtension.Padic.CyclotomicInertiaCompletion | 12.0 |
+| FalseTateExtension.Padic.KummerRamification | 8.9 |
+| FalseTateExtension.GaloisStructure | 8.6 |
+| FalseTateExtension.StrictAPF | 6.5 |
+| FalseTateExtension.Padic.InfiniteCharacter | 5.7 |
+| FalseTateExtension.Padic.GeneralCharacter | 2.9 |
+| FalseTateExtension.Padic.FiniteCharacter | 1.9 |
+| FalseTateExtension.Padic.Cyclotomic | 1.4 |
+| FalseTateExtension | 1.3 |

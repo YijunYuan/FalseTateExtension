@@ -7,7 +7,6 @@ module
 
 public import FalseTateExtension.GaloisStructure
 public import FalseTateExtension.Padic.FiniteGaloisStructure
-public import FalseTateExtension.Padic.TameUnits
 public import FontaineWintenberger
 
 public import FalseTateExtension.CompatibleRoots
@@ -41,12 +40,8 @@ public import FalseTateExtension.Padic.CyclotomicAPF
 public import FalseTateExtension.RadicalRamification
 public import FalseTateExtension.KummerProfile
 public import FalseTateExtension.StrictAPF
-public import FalseTateExtension.Padic.TameGenerator
 public import FalseTateExtension.Padic.Viviani
 public import FalseTateExtension.Padic.KummerRamification
-public import FalseTateExtension.Padic.NormFieldRamification
-public import FalseTateExtension.Padic.NormFieldCoordinates
-public import FalseTateExtension.Padic.NormFieldAction
 
 /-!
 # False Tate, Kummer, and cyclotomic extensions

@@ -212,6 +212,15 @@ theorem not_finiteDimensional_cyclotomicExtension_padic :
   exact (not_lt_of_ge (IntermediateField.finrank_le_of_le_right
     (cyclotomicLayer_le_cyclotomicExtension p m))) hm
 
-end FalseTateExtension
+/-- `K_FT/ℚ_p` is not a finite extension. -/
+theorem not_finiteDimensional_falseTateExtension_padic (π : Padic p) :
+    ¬ Module.Finite (Padic p) (falseTateExtension p π) := by
+  intro h
+  let := h
+  obtain ⟨m, hm⟩ := cyclotomicLayer_padic_degrees_unbounded p
+    (Module.finrank (Padic p) (falseTateExtension p π))
+  exact (not_lt_of_ge (IntermediateField.finrank_le_of_le_right
+    ((show cyclotomicLayer p m ≤ falseTateLayer p π m m from le_sup_right).trans
+      (falseTateLayer_le_falseTateExtension p π m m)))) hm
 
-end
+end FalseTateExtension

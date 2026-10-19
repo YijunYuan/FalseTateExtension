@@ -42,6 +42,13 @@ theorem padic_valuationSubring_toSubring :
 def padicUnitBallEquiv : (NormedField.valuation (K := Padic p)).valuationSubring ≃+* PadicInt p :=
   RingEquiv.subringCongr (padic_valuationSubring_toSubring p)
 
+/-- The residue field of `𝒪[ℚ_p]` is the prime field. -/
+def padicUnitBallResidueEquiv :
+    IsLocalRing.ResidueField (NormedField.valuation (K := Padic p)).valuationSubring ≃+*
+      ZMod p :=
+  (IsLocalRing.ResidueField.mapEquiv (padicUnitBallEquiv p)).trans
+    (PadicInt.residueField (p := p))
+
 instance padicUnitBall_isDiscreteValuationRing :
     IsDiscreteValuationRing (NormedField.valuation (K := Padic p)).valuationSubring :=
   RingEquivClass.isDiscreteValuationRing (padicUnitBallEquiv p).symm

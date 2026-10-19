@@ -7,6 +7,7 @@ module
 
 public import FalseTateExtension.Layers
 public import Mathlib.NumberTheory.Padics.PadicIntegers
+public import Mathlib.NumberTheory.Padics.RingHoms
 public import Mathlib.RingTheory.Polynomial.Eisenstein.IsIntegral
 public import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
 public import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots

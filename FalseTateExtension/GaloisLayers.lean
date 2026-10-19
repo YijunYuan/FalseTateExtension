@@ -8,6 +8,7 @@ module
 public import FalseTateExtension.Layers
 public import Mathlib.FieldTheory.KummerExtension
 public import Mathlib.FieldTheory.Normal.Basic
+public import FontaineWintenberger.Mathlib.FieldTheory.FiniteIntermediateField
 
 /-!
 # Galois finite layers and infinite false Tate extensions
@@ -26,7 +27,7 @@ namespace FalseTateExtension
 
 noncomputable section
 
-open Polynomial
+open Polynomial FontaineWintenberger
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
@@ -127,6 +128,51 @@ theorem falseTateExtension_isGalois (π : K) (hπ : π ≠ 0) :
     rw [falseTateExtension_eq_iSup_diagonal]
     infer_instance
   exact {}
+
+/-- The diagonal layer `n` as a finite intermediate field of `K_FT`. -/
+def falseTateDiagonalSubfield (π : K) (n : ℕ) :
+    FiniteIntermediateField K (falseTateExtension p π) :=
+  ⟨(IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).fieldRange,
+    Module.Finite.equiv (IntermediateField.inclusion
+      (falseTateLayer_le_falseTateExtension p π n n)).equivFieldRange.toLinearEquiv⟩
+
+/-- The diagonal layer `n` is isomorphic to its image in `K_FT`. -/
+def falseTateDiagonalSubfieldEquiv (π : K) (n : ℕ) :
+    falseTateLayer p π n n ≃ₐ[K] (falseTateDiagonalSubfield p π n).val :=
+  (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).equivFieldRange
+
+/-- Every finite subextension of `K_FT/K` lies in a diagonal layer. -/
+theorem exists_le_falseTateDiagonalSubfield (π : K)
+    (E : FiniteIntermediateField K (falseTateExtension p π)) :
+    ∃ n, E ≤ falseTateDiagonalSubfield p π n := by
+  classical
+  have hfg : E.val.FG := IntermediateField.essFiniteType_iff.mp inferInstance
+  obtain ⟨s, hs⟩ := hfg
+  have hx (x : falseTateExtension p π) :
+      ∃ n, (x : AlgebraicClosure K) ∈ falseTateLayer p π n n :=
+    (mem_falseTateExtension_iff_diagonal p π (x : AlgebraicClosure K)).mp x.property
+  choose level hlevel using hx
+  refine ⟨s.sup level, ?_⟩
+  change E.val ≤ (falseTateDiagonalSubfield p π (s.sup level)).val
+  rw [← hs]
+  apply IntermediateField.adjoin_le_iff.mpr
+  intro x hx
+  have hmem : (x : AlgebraicClosure K) ∈ falseTateLayer p π (s.sup level) (s.sup level) :=
+    falseTateLayer_mono p π (Finset.le_sup (f := level) hx)
+      (Finset.le_sup (f := level) hx) (hlevel x)
+  change ∃ y : falseTateLayer p π (s.sup level) (s.sup level),
+    IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π _ _) y = x
+  exact ⟨⟨x, hmem⟩, Subtype.ext rfl⟩
+
+theorem falseTateDiagonalSubfield_mono (π : K) {m n : ℕ} (h : m ≤ n) :
+    falseTateDiagonalSubfield p π m ≤ falseTateDiagonalSubfield p π n := by
+  rintro x ⟨y, rfl⟩
+  exact ⟨IntermediateField.inclusion (falseTateLayer_mono p π h h) y, rfl⟩
+
+theorem falseTateDiagonalSubfield_isGalois (π : K) (hπ : π ≠ 0) (n : ℕ) :
+    IsGalois K (falseTateDiagonalSubfield p π n).val :=
+  haveI := falseTateLayer_isGalois p π hπ n
+  IsGalois.of_algEquiv (falseTateDiagonalSubfieldEquiv p π n)
 
 end
 
