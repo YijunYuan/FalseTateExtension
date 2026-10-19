@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.AffineEmbedding
+public import FalseTateExtension.Coordinates.AffineEmbedding
 public import Mathlib.Topology.Algebra.Group.ClosedSubgroup
 
 /-!

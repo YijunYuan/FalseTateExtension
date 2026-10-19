@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.AffineEmbedding
+public import FalseTateExtension.Coordinates.AffineEmbedding
 public import FalseTateExtension.Padic.ClosedAddSubgroup
 public import Mathlib.GroupTheory.Commutator.Basic
 

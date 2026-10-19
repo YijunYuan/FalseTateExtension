@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.AffineIndex
+public import FalseTateExtension.Affine.Index
 public import FalseTateExtension.Cyclotomic.APF
 public import FalseTateExtension.Cyclotomic.InertiaImage
 public import FalseTateExtension.Kummer.APF

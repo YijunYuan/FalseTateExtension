@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Cyclotomic.FiniteCharacter
-public import FalseTateExtension.CyclotomicImage
+public import FalseTateExtension.Coordinates.CyclotomicImage
 public import FalseTateExtension.Cyclotomic.Restriction
 
 /-!

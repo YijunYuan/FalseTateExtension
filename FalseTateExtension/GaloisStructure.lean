@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.StrictAPF
-public import FalseTateExtension.AffineKernel
+public import FalseTateExtension.Coordinates.AffineKernel
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic

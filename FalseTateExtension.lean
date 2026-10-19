@@ -19,7 +19,7 @@ public import FalseTateExtension.Coordinates.Padic
 public import FalseTateExtension.Mathlib.Topology.Algebra.SemidirectProduct
 public import FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity
 public import FalseTateExtension.Affine.Group
-public import FalseTateExtension.AffineEmbedding
+public import FalseTateExtension.Coordinates.AffineEmbedding
 public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
@@ -31,14 +31,14 @@ public import FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniform
 public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
 public import FalseTateExtension.Mathlib.Data.ZMod.UnitsMap
 
-public import FalseTateExtension.CyclotomicImage
+public import FalseTateExtension.Coordinates.CyclotomicImage
 
-public import FalseTateExtension.AffineKernel
+public import FalseTateExtension.Coordinates.AffineKernel
 
 public import FalseTateExtension.Padic.Basic
 public import FalseTateExtension.Padic.ClosedAddSubgroup
-public import FalseTateExtension.AffineCommutator
-public import FalseTateExtension.AffineIndex
+public import FalseTateExtension.Affine.ClosedSubgroup
+public import FalseTateExtension.Affine.Index
 public import FalseTateExtension.Cyclotomic.Basic
 public import FalseTateExtension.Cyclotomic.Ramification
 public import FalseTateExtension.Cyclotomic.Filtration
