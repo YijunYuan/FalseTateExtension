@@ -38,13 +38,13 @@ namespace FalseTateExtension
 section CyclotomicResidues
 
 variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
+    [IsCompleteDiscreteValuedField K]
 
 /-- The actual base-residue algebra map from a positive chosen layer to
 the residue field of the actual infinite spectral integer ring. -/
 def cyclotomicResidueToExtension (n : ℕ) :
     IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) →ₐ[
-      IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring]
+      𝓀[K]]
         IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicExtension (K := K) p)) :=
   spectralResidueInclusion K (IntermediateField.inclusion
     (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1)))
@@ -52,7 +52,7 @@ def cyclotomicResidueToExtension (n : ℕ) :
 /-- The actual residue inclusion between two positive chosen layers. -/
 def cyclotomicResidueBetweenLayers {n m : ℕ} (h : n ≤ m) :
     IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) →ₐ[
-      IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring]
+      𝓀[K]]
         IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (m + 1))) :=
   spectralResidueInclusion K
     (IntermediateField.inclusion (cyclotomicLayer_mono (K := K) p (Nat.add_le_add_right h 1)))
@@ -92,13 +92,13 @@ theorem exists_cyclotomicResidueToExtension_preimage
   rw [spectralResidueInclusion_residue]
   congr 1
 
-variable [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
+variable [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
+omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
 theorem cyclotomicResidue_degree_monotone :
     Monotone (fun n ↦ Module.finrank
-      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (𝓀[K])
       (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   intro n m h
   exact LinearMap.finrank_le_finrank_of_injective
     (f := (cyclotomicResidueBetweenLayers p K h).toLinearMap)
@@ -108,7 +108,6 @@ theorem cyclotomicResidue_degree_monotone :
 positive chosen layer bijective onto the actual infinite residue field. -/
 theorem exists_cyclotomicResidueToExtension_bijective :
     ∃ N, Function.Bijective (cyclotomicResidueToExtension p K N) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   obtain ⟨b, N, hN⟩ := converges_of_monotone_of_bounded
     (cyclotomicResidue_degree_monotone p K) (cyclotomicLayer_spectral_residueDegree_le p K)
   have hsur (m : ℕ) (hm : N ≤ m) :
@@ -139,7 +138,7 @@ actual infinite residue field, with its original residue-map evaluation. -/
 theorem exists_cyclotomicResidueEquiv :
     ∃ N, ∃ e : IsLocalRing.ResidueField
         (spectralIntegerRing K (cyclotomicLayer (K := K) p (N + 1))) ≃ₐ[
-          IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring]
+          𝓀[K]]
             IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicExtension (K := K) p)),
       ∀ x, e x = cyclotomicResidueToExtension p K N x := by
   obtain ⟨N, hN⟩ := exists_cyclotomicResidueToExtension_bijective p K
@@ -149,9 +148,8 @@ theorem exists_cyclotomicResidueEquiv :
 proved before using a natural-number finrank bound for that extension. -/
 theorem cyclotomicExtension_residue_finiteDimensional :
     FiniteDimensional
-      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (𝓀[K])
       (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicExtension (K := K) p))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   obtain ⟨N, e, _⟩ := exists_cyclotomicResidueEquiv p K
   exact Module.Finite.equiv e.toLinearEquiv
 
@@ -159,10 +157,10 @@ theorem cyclotomicExtension_residue_finiteDimensional :
 original base ramification index. -/
 theorem cyclotomicExtension_residue_degree_le :
     Module.finrank
-      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (𝓀[K])
       (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicExtension (K := K) p))) ≤
-        (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
-          (NormedField.valuation (K := Padic p)).valuationSubring := by
+        (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx
+          𝒪[ℚ_[p]] := by
   let := cyclotomicExtension_residue_finiteDimensional p K
   obtain ⟨N, e, _⟩ := exists_cyclotomicResidueEquiv p K
   exact e.toLinearEquiv.finrank_eq.symm.trans_le (cyclotomicLayer_spectral_residueDegree_le p K N)
@@ -172,13 +170,12 @@ end CyclotomicResidues
 section InertiaImage
 
 variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
-    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
+    [IsCompleteDiscreteValuedField K]
+    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 /-- The character image of actual absolute zero upper inertia, through
 ordinary restriction to the original infinite cyclotomic field. -/
-def cyclotomicInertiaCharacterImage : Subgroup (PadicInt p)ˣ := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
+def cyclotomicInertiaCharacterImage : Subgroup (ℤ_[p])ˣ := by
   exact (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
     ((cyclotomicExtensionCharacter (K := K) p).comp
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)))
@@ -186,24 +183,21 @@ def cyclotomicInertiaCharacterImage : Subgroup (PadicInt p)ˣ := by
 /-- Full infinite upper restriction identifies the absolute inertia image
 with the character image of the actual infinite cyclotomic zero upper group. -/
 theorem cyclotomicInertiaCharacterImage_eq_map :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     cyclotomicInertiaCharacterImage p K =
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).map
         (cyclotomicExtensionCharacter p) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   unfold cyclotomicInertiaCharacterImage
   rw [← Subgroup.map_map, cyclotomic_inertia_eq_absolute_image p K]
 
+omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
 /-- Naturality identifies the same image with the original canonical
 character acting on the actual algebraic closure. -/
 theorem cyclotomicInertiaCharacterImage_eq_absolute_character :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     cyclotomicInertiaCharacterImage p K =
       (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
         ((_root_.cyclotomicCharacter (AlgebraicClosure K) p).comp
           (MulSemiringAction.toRingAut
             (AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) (AlgebraicClosure K))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   unfold cyclotomicInertiaCharacterImage
   have hc : (cyclotomicExtensionCharacter (K := K) p).comp
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)) =
@@ -215,7 +209,7 @@ theorem cyclotomicInertiaCharacterImage_eq_absolute_character :
     exact cyclotomicCharacter_restrict_cyclotomicExtension p g
   rw [hc]
 
-omit [IsUltrametricDist K] [CompleteSpace K] in
+omit [IsCompleteDiscreteValuedField K] in
 /-- The existing canonical character is an open embedding because its
 actual closed image has already been proved open. -/
 theorem isOpenEmbedding_cyclotomicExtensionCharacter :
@@ -225,8 +219,7 @@ theorem isOpenEmbedding_cyclotomicExtensionCharacter :
 
 /-- Actual absolute inertia has open character image in the p-adic units. -/
 theorem isOpen_cyclotomicInertiaCharacterImage :
-    IsOpen (cyclotomicInertiaCharacterImage p K : Set (PadicInt p)ˣ) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
+    IsOpen (cyclotomicInertiaCharacterImage p K : Set (ℤ_[p])ˣ) := by
   rw [cyclotomicInertiaCharacterImage_eq_map]
   exact (isOpenEmbedding_cyclotomicExtensionCharacter p K).isOpenMap _
     (isOpen_cyclotomic_inertia p K)
@@ -239,32 +232,12 @@ theorem cyclotomicInertiaCharacterImage_finiteIndex :
 
 end InertiaImage
 
-/-- The distinct principal units `1+p*n` prove infinitude at every prime,
-including two. -/
-theorem padicUnits_infinite (p : ℕ) [Fact p.Prime] : Infinite (PadicInt p)ˣ := by
-  have hu (n : ℕ) : IsUnit (1 + (p : PadicInt p) * n) := by
-    have hp : ‖(p : PadicInt p)‖ < 1 := PadicInt.mem_nonunits.mp PadicInt.p_nonunit
-    have hn : ‖(p : PadicInt p) * n‖ < 1 := by
-      rw [mul_comm]
-      exact PadicInt.norm_lt_one_mul hp
-    apply PadicInt.isUnit_iff.mpr
-    rw [PadicInt.norm_add_eq_max_of_ne (by simpa only [norm_one] using ne_of_gt hn)]
-    simp only [norm_one, max_eq_left hn.le]
-  let f : ℕ → (PadicInt p)ˣ := fun n ↦ (hu n).unit
-  apply Infinite.of_injective f
-  intro n m h
-  have hv : 1 + (p : PadicInt p) * n = 1 + (p : PadicInt p) * m := by
-    simpa only [f, IsUnit.unit_spec] using congrArg Units.val h
-  have hnm : (n : PadicInt p) = m :=
-    mul_left_cancel₀ (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero) (add_left_cancel hv)
-  exact_mod_cast hnm
-
 /-- The actual cyclotomic inertia character image contains a unit different
 from one; it cannot be the trivial finite-index subgroup of an infinite group. -/
 theorem exists_ne_one_mem_cyclotomicInertiaCharacterImage
     (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
-    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K] :
+    [IsCompleteDiscreteValuedField K]
+    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] :
     ∃ h ∈ cyclotomicInertiaCharacterImage p K, h ≠ 1 := by
   let := padicUnits_infinite p
   let := cyclotomicInertiaCharacterImage_finiteIndex p K

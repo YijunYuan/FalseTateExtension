@@ -191,32 +191,30 @@ end Fields
 section Valued
 
 variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
-    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
+    [IsCompleteDiscreteValuedField K]
+    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 include p in
-omit [CharZero K] [CompleteSpace K] in
+omit [CharZero K] in
 /-- The original residue field of a finite compatible extension of the
 p-adic rationals is finite. -/
 theorem cyclotomicBase_residueFinite :
-    Finite (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring) := by
-  have := normedAlgebra_residueField_finiteDimensional (Padic p) K
+    Finite (𝓀[K]) := by
+  have := normedAlgebra_residueField_finiteDimensional (ℚ_[p]) K
   exact Module.finite_of_finite
-    (IsLocalRing.ResidueField (NormedField.valuation (K := Padic p)).valuationSubring)
+    (𝓀[ℚ_[p]])
 
 /-- The actual finite Galois quotient by zero upper inertia has order the
 actual residue degree, via the actual residue automorphism group. -/
 theorem cyclotomicLayer_inertia_index (n : ℕ) :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     (upperRamificationGroup
       (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
       (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0).index =
     Module.finrank
-      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (𝓀[K])
       (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let := cyclotomicBase_residueFinite p K
-  let R := (NormedField.valuation (K := K)).valuationSubring
+  let R := 𝒪[K]
   let S := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))
   let G := cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)
   rw [upperRamificationGroup_zero, ← lowerRamificationGroup_zero]
@@ -227,7 +225,6 @@ theorem cyclotomicLayer_inertia_index (n : ℕ) :
 cyclotomic Galois group. Its index is numbered by the positive level `n+1`. -/
 def cyclotomicInertiaPreimage (n : ℕ) :
     Subgroup (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   exact (upperRamificationGroup
     (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
     (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0).comap
@@ -235,41 +232,37 @@ def cyclotomicInertiaPreimage (n : ℕ) :
 
 instance cyclotomicInertiaPreimage_finiteIndex (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).FiniteIndex := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   unfold cyclotomicInertiaPreimage
   infer_instance
 
 instance cyclotomicInertiaPreimage_normal (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).Normal := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   unfold cyclotomicInertiaPreimage
   infer_instance
 
+omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
 theorem isOpen_cyclotomicInertiaPreimage (n : ℕ) :
     IsOpen (cyclotomicInertiaPreimage p K n :
       Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   exact (isOpen_discrete _).preimage (continuous_cyclotomicRestrictionToLayer p (n + 1))
 
 theorem cyclotomicInertiaPreimage_index (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).index = Module.finrank
-      (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
+      (𝓀[K])
       (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   rw [cyclotomicInertiaPreimage, Subgroup.index_comap_of_surjective _
     (cyclotomicRestrictionToLayer_surjective p (n + 1))]
   exact cyclotomicLayer_inertia_index p K n
 
 theorem cyclotomicInertiaPreimage_index_le (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).index ≤
-      (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
-        (NormedField.valuation (K := Padic p)).valuationSubring := by
+      (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx
+        𝒪[ℚ_[p]] := by
   rw [cyclotomicInertiaPreimage_index]
   exact cyclotomicLayer_spectral_residueDegree_le p K n
 
 /-- Finite upper restriction makes the actual inertia preimages decrease. -/
 theorem cyclotomicInertiaPreimage_antitone : Antitone (cyclotomicInertiaPreimage p K) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let := cyclotomicBase_residueFinite p K
   intro m n h g hg
   let : Algebra (cyclotomicLayer (K := K) p (m + 1)) (cyclotomicLayer (K := K) p (n + 1)) :=
@@ -313,10 +306,8 @@ theorem exists_cyclotomicInertiaPreimage_stable :
 /-- Cofinality of the chosen positive layers identifies the actual infinite
 zero upper group with the intersection of the actual inertia preimages. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
       ⨅ n, cyclotomicInertiaPreimage p K n := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let := cyclotomicBase_residueFinite p K
   ext g
   rw [mem_upperRamificationGroupInfinite]
@@ -357,29 +348,23 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
 /-- The actual infinite inertia group is already an attained finite-layer
 inertia preimage, and all subsequent preimages are the same subgroup. -/
 theorem exists_cyclotomic_inertia_eq_preimage :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     ∃ N, upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
         cyclotomicInertiaPreimage p K N ∧
       ∀ n, N ≤ n → cyclotomicInertiaPreimage p K n = cyclotomicInertiaPreimage p K N := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   obtain ⟨N, hstable, hinf⟩ := exists_cyclotomicInertiaPreimage_stable p K
   exact ⟨N, (upperRamificationGroupInfinite_cyclotomic_eq_iInf p K).trans hinf, hstable⟩
 
 theorem cyclotomic_inertia_finiteIndex :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).FiniteIndex := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
   rw [hN]
   infer_instance
 
 /-- The actual infinite inertia index retains the sharp finite-layer bound. -/
 theorem cyclotomic_inertia_index_le :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).index ≤
-      (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
-        (NormedField.valuation (K := Padic p)).valuationSubring := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
+      (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx
+        𝒪[ℚ_[p]] := by
   obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
   rw [hN]
   exact cyclotomicInertiaPreimage_index_le p K N
@@ -387,10 +372,8 @@ theorem cyclotomic_inertia_index_le :
 /-- The actual zero upper group is open in the Krull Galois group of the
 infinite cyclotomic extension. -/
 theorem isOpen_cyclotomic_inertia :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsOpen (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 :
       Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
   rw [hN]
   exact isOpen_cyclotomicInertiaPreimage p K N
@@ -398,11 +381,9 @@ theorem isOpen_cyclotomic_inertia :
 /-- Full ordinary infinite restriction identifies the actual cyclotomic
 inertia with the image of the actual algebraic closure's zero upper group. -/
 theorem cyclotomic_inertia_eq_absolute_image :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)) =
         upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let := cyclotomicBase_residueFinite p K
   exact restrictNormalHom_map_upperRamificationGroupInfinite K (AlgebraicClosure K)
     (cyclotomicExtension (K := K) p) 0 (by norm_num : (-1 : ℝ) ≤ 0)

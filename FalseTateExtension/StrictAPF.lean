@@ -181,7 +181,7 @@ theorem falseTateKummerFixing_map_affine (hπ : π ≠ 0) :
   · intro hσ
     exact ⟨σ, (falseTateAffineEquiv_mem_pureUnits p π hπ σ).mp hσ, rfl⟩
 
-variable [Algebra (Padic p) K] [FiniteDimensional (Padic p) K]
+variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 /-- The actual affine unit projection has infinite image for every finite
 p-adic base, including the dyadic case. -/
@@ -193,13 +193,13 @@ theorem falseTateAffineImage_projection_infinite (hπ : π ≠ 0) :
   rcases finite_or_infinite H with hfin | hinf
   · let := hfin
     have hprod := H.card_mul_index
-    rw [show Nat.card ((PadicInt p)ˣ) = 0 from Nat.card_eq_zero_of_infinite] at hprod
+    rw [show Nat.card ((ℤ_[p])ˣ) = 0 from Nat.card_eq_zero_of_infinite] at hprod
     have hpos : 0 < Nat.card H * H.index :=
       Nat.mul_pos Nat.card_pos (cyclotomicExtensionCharacter_index_pos p)
     exact False.elim (hpos.ne' hprod)
   · exact hinf
 
-omit [Algebra (Padic p) K] [FiniteDimensional (Padic p) K] in
+omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
 /-- The actual character is faithful when the actual translation kernel vanishes. -/
 theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
     (hπ : π ≠ 0)
@@ -212,7 +212,7 @@ theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
   rw [falseTateAffineEquiv_projection] at hi
   exact hi
 
-omit [Algebra (Padic p) K] [FiniteDimensional (Padic p) K] in
+omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
 /-- The original cyclotomic inclusion has trivial fixing subgroup when the
 actual translation kernel vanishes. -/
 theorem falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot
@@ -237,7 +237,7 @@ theorem falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot
     _ = 1 := by rw [hρ, map_one]
     _ = _ := (map_one _).symm
 
-omit [Algebra (Padic p) K] [FiniteDimensional (Padic p) K] in
+omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
 /-- A vanishing actual translation kernel makes the original false Tate
 field equal to its actual cyclotomic subfield, by infinite Galois correspondence. -/
 theorem falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot
@@ -254,8 +254,7 @@ end AffineImage
 section UpperProducts
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
-    [PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
+    [PerfectField (𝓀[K])] [CharZero K]
 
 variable (p : ℕ) [Fact p.Prime] (π : K)
 
@@ -314,7 +313,7 @@ theorem cyclotomicRestriction_map_upperRamificationGroupInfinite
     ((Subgroup.map_le_map_iff_of_injective (cyclotomicExtensionCharacter_injective p)).mp h.le)
     ((Subgroup.map_le_map_iff_of_injective (cyclotomicExtensionCharacter_injective p)).mp h.ge)
 
-variable [Algebra (Padic p) K] [FiniteDimensional (Padic p) K]
+variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 /-- The unit projection index of the actual affine upper group equals
 the full upper index of the original cyclotomic extension. -/
@@ -346,7 +345,7 @@ theorem falseTateAffine_upper_projection_index (hπ : π ≠ 0) {u : ℝ} (hu : 
     J.index * (cyclotomicExtensionCharacter (K := K) p).range.index =
         J.index * q.range.index :=
       congrArg (fun n : ℕ => J.index * n)
-        (congrArg (fun H : Subgroup ((PadicInt p)ˣ) => H.index)
+        (congrArg (fun H : Subgroup ((ℤ_[p])ˣ) => H.index)
           (falseTateAffineImage_projection_range p π hπ)).symm
     _ = (J.map q.range.subtype).index := hJi.symm
     _ = (V.map (cyclotomicExtensionCharacter p)).index := by rw [hJ, hχ]
@@ -357,18 +356,17 @@ end UpperProducts
 section RadicalIndex
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
-    [PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
+    [PerfectField (𝓀[K])] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
-variable {π : (NormedField.valuation (K := K)).valuationSubring}
+variable {π : 𝒪[K]}
 
 /-- The actual pure-unit product index is exactly the intrinsic radical
 index. Total ramification of the radical tower removes its residue factor;
 no total ramification of the false Tate field is used. -/
 theorem falseTateAffine_upper_radical_index (hπ : Irreducible π)
     (he : 0 < (IsDiscreteValuationRing.addVal
-      (NormedField.valuation (K := K)).valuationSubring
-      (p : (NormedField.valuation (K := K)).valuationSubring)).toNat)
+      𝒪[K]
+      (p : 𝒪[K])).toNat)
     {u : ℝ} (hu : 0 ≤ u) :
     let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
     (affinePureUnits (falseTateAffineImage p (π : K) hπ₀) ⊔
@@ -410,23 +408,21 @@ end RadicalIndex
 section FiniteBase
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
-    [PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
-variable (p : ℕ) [Fact p.Prime] [NormedAlgebra (Padic p) K]
-    [FiniteDimensional (Padic p) K]
-variable {π : (NormedField.valuation (K := K)).valuationSubring}
+    [PerfectField (𝓀[K])] [CharZero K]
+variable (p : ℕ) [Fact p.Prime] [NormedAlgebra (ℚ_[p]) K]
+    [FiniteDimensional (ℚ_[p]) K]
+variable {π : 𝒪[K]}
 
-omit [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
-  [FiniteDimensional (Padic p) K] in
+omit [PerfectField (𝓀[K])] [CharZero K]
+  [FiniteDimensional (ℚ_[p]) K] in
 private theorem falseTateBase_addVal_p_pos :
     0 < (IsDiscreteValuationRing.addVal
-      (NormedField.valuation (K := K)).valuationSubring
-      (p : (NormedField.valuation (K := K)).valuationSubring)).toNat := by
+      𝒪[K]
+      (p : 𝒪[K])).toNat := by
   rw [addVal_p_toNat_eq_padic_ramificationIdx p]
   exact local_ramificationIdx_pos
-    (NormedField.valuation (K := Padic p)).valuationSubring
-    (NormedField.valuation (K := K)).valuationSubring
+    𝒪[ℚ_[p]]
+    𝒪[K]
 
 /-- If the actual translation kernel is nonzero, the full false Tate upper
 index is finite and uniformly comparable with the original radical and
@@ -527,13 +523,13 @@ theorem exists_falseTate_upper_index_boundedGrowth (hπ : Irreducible π) :
     ∃ Q : ℕ, 0 < Q ∧ ∃ V : ℝ, 0 ≤ V ∧ ∀ u : ℝ, V ≤ u →
       (upperRamificationGroupInfinite K (falseTateExtension p (π : K))
         (u + ((IsDiscreteValuationRing.addVal
-          (NormedField.valuation (K := K)).valuationSubring
-          (p : (NormedField.valuation (K := K)).valuationSubring)).toNat : ℝ))).index ≤
+          𝒪[K]
+          (p : 𝒪[K])).toNat : ℝ))).index ≤
         Q * (upperRamificationGroupInfinite K (falseTateExtension p (π : K)) u).index := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
   let a := (IsDiscreteValuationRing.addVal
-    (NormedField.valuation (K := K)).valuationSubring
-    (p : (NormedField.valuation (K := K)).valuationSubring)).toNat
+    𝒪[K]
+    (p : 𝒪[K])).toNat
   obtain ⟨V, hV, hcyc⟩ :=
     exists_upperRamificationGroupInfinite_cyclotomic_index_add_ramificationIdx p K
   have hB (u : ℝ) (hu : V ≤ u) :
@@ -568,7 +564,7 @@ theorem exists_falseTate_upper_index_boundedGrowth (hπ : Irreducible π) :
         Nat.mul_le_mul_left _ (hcomp u hu₀).2.1
       _ = _ := by ring
 
-omit [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K] in
+omit [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
 /-- The actual full upper index retains the fixed inertia index as a
 factor. This identity allows a finite initial residue extension. -/
 theorem falseTate_upper_index_eq_apfIndex_mul_inertia_index (hπ : Irreducible π)
@@ -589,8 +585,8 @@ theorem exists_falseTate_apfIndex_boundedGrowth (hπ : Irreducible π) :
     ∃ Q : ℕ, 0 < Q ∧ ∃ V : ℝ, 0 ≤ V ∧ ∀ u : ℝ, V ≤ u →
       apfIndex K (falseTateExtension p (π : K))
         (u + ((IsDiscreteValuationRing.addVal
-          (NormedField.valuation (K := K)).valuationSubring
-          (p : (NormedField.valuation (K := K)).valuationSubring)).toNat : ℝ)) ≤
+          𝒪[K]
+          (p : 𝒪[K])).toNat : ℝ)) ≤
         Q * apfIndex K (falseTateExtension p (π : K)) u := by
   have := falseTateExtension_isGalois p (π : K)
     (fun h => hπ.ne_zero (Subtype.ext h))
@@ -624,26 +620,22 @@ end FiniteBase
 section CanonicalFiniteBase
 
 variable (p : ℕ) [Fact p.Prime]
-variable (K : Type*) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [CharZero K] [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
-variable (π : (NormedField.valuation (K := K)).valuationSubring)
+variable (K : Type*) [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
+    [CharZero K] [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
+variable (π : 𝒪[K])
 
 /-- Over an arbitrary finite norm-compatible `p`-adic base, the canonical
 unit-ball DVR structure and its actual perfect residue field supply every
 valued-field hypothesis of false Tate strictness. -/
 theorem isStrictlyAPF_falseTateExtension_of_finiteDimensional (hπ : Irreducible π) :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsStrictlyAPF K (falseTateExtension p (π : K)) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
-  let := normedAlgebra_residueField_perfectField (Padic p) K
+  let := normedAlgebra_residueField_perfectField (ℚ_[p]) K
   exact isStrictlyAPF_falseTateExtension p hπ
 
 /-- Canonical public APF over every finite norm-compatible `p`-adic base,
 without a separate chosen DVR or perfect-residue hypothesis. -/
 theorem isAPF_falseTateExtension_of_finiteDimensional (hπ : Irreducible π) :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsAPF K (falseTateExtension p (π : K)) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   exact (isStrictlyAPF_falseTateExtension_of_finiteDimensional p K π hπ).toIsAPF
 
 end CanonicalFiniteBase

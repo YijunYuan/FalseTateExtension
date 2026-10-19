@@ -25,16 +25,16 @@ noncomputable section
 namespace FalseTateExtension
 
 open Polynomial IsDiscreteValuationRing
+open FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
 
-local notation "Qp" => Padic p
-local notation "L(" n ")" => cyclotomicLayer (K := Padic p) p (n + 1)
-local notation "O(" n ")" => FontaineWintenberger.spectralIntegerRing (Padic p) L(n)
+local notation "L(" n ")" => cyclotomicLayer (K := ℚ_[p]) p (n + 1)
+local notation "O(" n ")" => FontaineWintenberger.spectralIntegerRing (ℚ_[p]) L(n)
 
 local instance (n : ℕ) : IsDiscreteValuationRing O(n) :=
   cyclotomicValuationSubring_isDiscreteValuationRing p (n + 1)
-    (FontaineWintenberger.spectralValuation Qp L(n))
+    (FontaineWintenberger.spectralValuation ℚ_[p] L(n))
 
 local notation "v(" n ")" =>
   IsDedekindDomain.HeightOneSpectrum.valuation L(n) (maximalIdeal O(n))
@@ -43,9 +43,9 @@ local notation "v(" n ")" =>
 norm; the sign is retained at the first dyadic level. -/
 theorem norm_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
     (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) :
-    Algebra.norm Qp (ζ - 1) = (-1 : Qp) ^ (p ^ (n + 1)).totient * p := by
+    Algebra.norm ℚ_[p] (ζ - 1) = (-1 : ℚ_[p]) ^ (p ^ (n + 1)).totient * p := by
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  let pb := hζ.subOnePowerBasis Qp
+  let pb := hζ.subOnePowerBasis ℚ_[p]
   have hdim : pb.dim = (p ^ (n + 1)).totient := by
     rw [← pb.finrank, finrank_cyclotomicLayer_padic]
   have hn := Algebra.PowerBasis.norm_gen_eq_coeff_zero_minpoly pb
@@ -60,7 +60,7 @@ theorem normalizedValuation_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
     (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) :
     v(n) (ζ - 1) = WithZero.exp (-1 : ℤ) := by
   have hn := FontaineWintenberger.extensionValuationSubring_normalizedValuation_norm
-    Qp L(n) (FontaineWintenberger.spectralValuation Qp L(n)) (ζ - 1)
+    ℚ_[p] L(n) (FontaineWintenberger.spectralValuation ℚ_[p] L(n)) (ζ - 1)
   rw [norm_primitive_cyclotomic_sub_one p n hζ, cyclotomicLayer_spectral_residueDegree,
     pow_one] at hn
   simpa only [map_mul, map_pow, Valuation.map_neg, map_one, one_pow, one_mul,
@@ -79,7 +79,7 @@ theorem normalizedValuation_primitive_cyclotomic_pow_sub_one
     simpa only [pow_zero, pow_one, Nat.cast_one] using
       normalizedValuation_primitive_cyclotomic_sub_one p 0 hζ
   · have hv := FontaineWintenberger.extensionValuationSubring_normalizedValuation_norm
-      Qp L(n) (FontaineWintenberger.spectralValuation Qp L(n)) (ζ ^ (p ^ s) - 1)
+      ℚ_[p] L(n) (FontaineWintenberger.spectralValuation ℚ_[p] L(n)) (ζ ^ (p ^ s) - 1)
     rw [hζ.norm_pow_sub_one_eq_prime_pow_of_ne_zero
       (Padic.irreducible_cyclotomic_prime_pow p (n + 1)) hs hn,
       cyclotomicLayer_spectral_residueDegree, pow_one, map_pow,
@@ -130,7 +130,7 @@ theorem normalizedValuation_primitive_cyclotomic_root (n : ℕ) {ζ : L(n)}
 of the chosen cyclotomic root in its original field. -/
 theorem normalizedValuation_cyclotomic_displacement_of_exponent
     (n s b : ℕ) (hs : s ≤ n) (hb : ¬ p ∣ b)
-    (g : L(n) ≃ₐ[Qp] L(n))
+    (g : L(n) ≃ₐ[ℚ_[p]] L(n))
     (ha : (cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val =
       1 + p ^ s * b) :
     v(n) (g (cyclotomicLayerRoot p (n + 1)) - cyclotomicLayerRoot p (n + 1)) =
@@ -151,7 +151,7 @@ theorem normalizedValuation_cyclotomic_displacement_of_exponent
 /-- Every nonidentity automorphism has an actual cyclotomic displacement
 with a prime-power order below the level. -/
 theorem normalizedValuation_cyclotomic_displacement
-    (n : ℕ) (g : L(n) ≃ₐ[Qp] L(n)) (hg : g ≠ 1) :
+    (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (hg : g ≠ 1) :
     ∃ s : ℕ, s ≤ n ∧
       v(n) (g (cyclotomicLayerRoot p (n + 1)) - cyclotomicLayerRoot p (n + 1)) =
         WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
@@ -165,10 +165,10 @@ theorem normalizedValuation_cyclotomic_displacement
 /-- The chosen cyclotomic uniformizer generates the original spectral
 integer ring over the actual p-adic base integers. -/
 theorem cyclotomicUniformizer_adjoin_spectral (n : ℕ) :
-    Algebra.adjoin (NormedField.valuation (K := Qp)).valuationSubring
-      {cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation Qp L(n))} = ⊤ :=
+    Algebra.adjoin 𝒪[ℚ_[p]]
+      {cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation ℚ_[p] L(n))} = ⊤ :=
   FontaineWintenberger.extensionValuationSubring_adjoin_uniformizer_eq_top
-    Qp L(n) (FontaineWintenberger.spectralValuation Qp L(n))
+    ℚ_[p] L(n) (FontaineWintenberger.spectralValuation ℚ_[p] L(n))
     (cyclotomicLayer_ramificationIdx p n _)
     (irreducible_cyclotomicUniformizer_spectral p n)
 
@@ -176,12 +176,12 @@ theorem cyclotomicUniformizer_adjoin_spectral (n : ℕ) :
 read from the original finite character. -/
 theorem ramificationOrder_cyclotomic_of_exponent
     (n s b : ℕ) (hs : s ≤ n) (hb : ¬ p ∣ b)
-    (g : L(n) ≃ₐ[Qp] L(n))
+    (g : L(n) ≃ₐ[ℚ_[p]] L(n))
     (ha : (cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val =
       1 + p ^ s * b) :
-    FontaineWintenberger.ramificationOrder (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) g =
+    FontaineWintenberger.ramificationOrder (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) g =
       (p ^ s : ℕ) := by
-  let π := cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation Qp L(n))
+  let π := cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation ℚ_[p] L(n))
   rw [FontaineWintenberger.ramificationOrder_eq_generator _
     (cyclotomicUniformizer_adjoin_spectral p n)]
   have hv : v(n) ((g • π - π : O(n)) : L(n)) = WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
@@ -206,8 +206,8 @@ theorem ramificationOrder_cyclotomic_of_exponent
 
 /-- The intrinsic ramification order of a nonidentity automorphism is the
 prime power specified by the p-adic order of its actual character minus one. -/
-theorem ramificationOrder_cyclotomic (n : ℕ) (g : L(n) ≃ₐ[Qp] L(n)) (hg : g ≠ 1) :
-    FontaineWintenberger.ramificationOrder (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) g =
+theorem ramificationOrder_cyclotomic (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (hg : g ≠ 1) :
+    FontaineWintenberger.ramificationOrder (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) g =
       (p ^ padicValNat p
         ((cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val - 1) : ℕ) := by
   have ha : cyclotomicLayerCharacter p (n + 1) g ≠ 1 := by
@@ -220,9 +220,9 @@ theorem ramificationOrder_cyclotomic (n : ℕ) (g : L(n) ≃ₐ[Qp] L(n)) (hg : 
 /-- The actual integer lower groups, expressed by the original finite
 cyclotomic character, with the identity handled separately. -/
 theorem mem_lowerRamificationGroup_cyclotomic_iff
-    (n : ℕ) (m : ℤ) (g : L(n) ≃ₐ[Qp] L(n)) :
+    (n : ℕ) (m : ℤ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) :
     g ∈ FontaineWintenberger.lowerRamificationGroup
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) m ↔
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) m ↔
       g = 1 ∨ (m + 1).toNat ≤
         p ^ padicValNat p
           ((cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val - 1) := by
@@ -236,9 +236,9 @@ theorem mem_lowerRamificationGroup_cyclotomic_iff
 /-- The actual real lower groups, with their closed break endpoints, are
 computed by the original finite cyclotomic character. -/
 theorem mem_lowerRamificationGroupReal_cyclotomic_iff
-    (n : ℕ) (t : ℝ) (g : L(n) ≃ₐ[Qp] L(n)) :
+    (n : ℕ) (t : ℝ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) :
     g ∈ FontaineWintenberger.lowerRamificationGroupReal
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) t ↔
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) t ↔
       g = 1 ∨ t + 1 ≤
         ((p ^ padicValNat p
           ((cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val - 1) : ℕ) : ℝ) := by
@@ -312,7 +312,7 @@ the preimage of the canonical finite-unit reduction kernel. -/
 theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
     (n r : ℕ) (hr : r ≤ n + 1) :
     FontaineWintenberger.lowerRamificationGroup
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1) =
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1) =
       (ZMod.unitsMap (pow_dvd_pow p hr)).ker.comap
         (cyclotomicLayerCharacter p (n + 1)) := by
   have hN : 1 < p ^ (n + 1) := one_lt_pow₀ (Fact.out : p.Prime).one_lt (by omega)
@@ -343,7 +343,7 @@ theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
 prime-power threshold. -/
 theorem lowerRamificationGroup_cyclotomic_index (n r : ℕ) (hr : r ≤ n + 1) :
     (FontaineWintenberger.lowerRamificationGroup
-      (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).index =
+      (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).index =
         (p ^ r).totient := by
   rw [lowerRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr,
     Subgroup.index_comap_of_surjective _ (cyclotomicLayerCharacter_surjective p (n + 1)),
@@ -353,7 +353,7 @@ theorem lowerRamificationGroup_cyclotomic_index (n r : ℕ) (hr : r ≤ n + 1) :
 layer is the whole original Galois group. -/
 theorem lowerRamificationGroup_cyclotomic_zero (n : ℕ) :
     FontaineWintenberger.lowerRamificationGroup
-      (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0 = ⊤ := by
+      (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0 = ⊤ := by
   apply Subgroup.index_eq_one.mp
   simpa only [pow_zero, Nat.cast_one, sub_self, Nat.totient_one] using
     lowerRamificationGroup_cyclotomic_index p n 0 (by omega)
@@ -362,7 +362,7 @@ theorem lowerRamificationGroup_cyclotomic_zero (n : ℕ) :
 canonical finite-unit reduction kernel. -/
 theorem lowerRamificationGroup_cyclotomic_map_character (n r : ℕ) (hr : r ≤ n + 1) :
     (FontaineWintenberger.lowerRamificationGroup
-      (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).map
+      (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).map
         (cyclotomicLayerCharacter p (n + 1)) =
       (ZMod.unitsMap (pow_dvd_pow p hr)).ker := by
   rw [lowerRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr,
@@ -373,11 +373,11 @@ theorem lowerRamificationGroup_cyclotomic_map_character (n r : ℕ) (hr : r ≤ 
 theorem lowerRamificationGroup_cyclotomic_card (n r : ℕ)
     (hr0 : 0 < r) (hr : r ≤ n + 1) :
     Nat.card (FontaineWintenberger.lowerRamificationGroup
-      (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)) =
+      (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)) =
         p ^ (n + 1 - r) := by
   calc
     _ = Nat.card ((FontaineWintenberger.lowerRamificationGroup
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n))
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n))
           (((p ^ r : ℕ) : ℤ) - 1)).map (cyclotomicLayerCharacter p (n + 1))) :=
       (Subgroup.card_map_of_injective (cyclotomicLayerCharacter_injective p (n + 1))).symm
     _ = _ := by
@@ -387,9 +387,9 @@ theorem lowerRamificationGroup_cyclotomic_card (n r : ℕ)
 /-- Real and integer numbering agree at every cyclotomic lower threshold. -/
 theorem lowerRamificationGroupReal_cyclotomic_threshold (n r : ℕ) :
     FontaineWintenberger.lowerRamificationGroupReal
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℝ) - 1) =
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℝ) - 1) =
       FontaineWintenberger.lowerRamificationGroup
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1) := by
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1) := by
   ext g
   rw [mem_lowerRamificationGroupReal_cyclotomic_iff, mem_lowerRamificationGroup_cyclotomic_iff]
   simp only [sub_add_cancel, Int.toNat_natCast, Nat.cast_le]
@@ -400,9 +400,9 @@ theorem lowerRamificationGroupReal_cyclotomic_constant (n r : ℕ) {t : ℝ}
     (ht0 : ((p ^ r : ℕ) : ℝ) - 1 < t)
     (ht1 : t ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1) :
     FontaineWintenberger.lowerRamificationGroupReal
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) t =
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) t =
       FontaineWintenberger.lowerRamificationGroupReal
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n))
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n))
           (((p ^ (r + 1) : ℕ) : ℝ) - 1) := by
   ext g
   rw [mem_lowerRamificationGroupReal_cyclotomic_iff,
@@ -430,7 +430,7 @@ theorem lowerRamificationGroupReal_cyclotomic_card_on (n r : ℕ) (hr : r ≤ n)
     (ht0 : ((p ^ r : ℕ) : ℝ) - 1 < t)
     (ht1 : t ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1) :
     Nat.card (FontaineWintenberger.lowerRamificationGroupReal
-      (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) t) = p ^ (n - r) := by
+      (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) t) = p ^ (n - r) := by
   rw [lowerRamificationGroupReal_cyclotomic_constant p n r ht0 ht1,
     lowerRamificationGroupReal_cyclotomic_threshold,
     lowerRamificationGroup_cyclotomic_card p n (r + 1) (by omega) (by omega)]
@@ -444,9 +444,9 @@ length one, at every prime and including the first interval. -/
 theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
     (∫ t in (((p ^ r : ℕ) : ℝ) - 1)..(((p ^ (r + 1) : ℕ) : ℝ) - 1),
       (Nat.card (FontaineWintenberger.lowerRamificationGroupReal
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) t) : ℝ) /
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) t) : ℝ) /
         Nat.card (FontaineWintenberger.lowerRamificationGroup
-          (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0)) = 1 := by
+          (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0)) = 1 := by
   have hab : ((p ^ r : ℕ) : ℝ) - 1 ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1 := by
     have hpow : p ^ r ≤ p ^ (r + 1) :=
       (pow_le_pow_iff_right₀ (Fact.out : p.Prime).one_lt).mpr (by omega)
@@ -454,13 +454,13 @@ theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
   have heq :
       (∫ t in (((p ^ r : ℕ) : ℝ) - 1)..(((p ^ (r + 1) : ℕ) : ℝ) - 1),
         (Nat.card (FontaineWintenberger.lowerRamificationGroupReal
-          (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) t) : ℝ) /
+          (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) t) : ℝ) /
             Nat.card (FontaineWintenberger.lowerRamificationGroup
-              (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0)) =
+              (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0)) =
       ∫ _t in (((p ^ r : ℕ) : ℝ) - 1)..(((p ^ (r + 1) : ℕ) : ℝ) - 1),
         (p ^ (n - r) : ℕ) /
           (Nat.card (FontaineWintenberger.lowerRamificationGroup
-            (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0) : ℝ) := by
+            (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0) : ℝ) := by
     apply intervalIntegral.integral_congr_ae
     filter_upwards [] with t
     intro ht
@@ -489,7 +489,7 @@ set_option maxHeartbeats 1000000 in
 /-- The actual integral-defined Herbrand function sends every
 prime-power lower threshold to its integer upper threshold. -/
 theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
-    FontaineWintenberger.herbrandFunction (R := O(n)) (L(n) ≃ₐ[Qp] L(n))
+    FontaineWintenberger.herbrandFunction (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n))
       (((p ^ r : ℕ) : ℝ) - 1) = r := by
   induction r with
   | zero =>
@@ -507,11 +507,11 @@ theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
       exact sub_pos.mpr (by exact_mod_cast hpow)
     let f : ℝ → ℝ := fun t =>
       (Nat.card (FontaineWintenberger.lowerRamificationGroupReal
-        (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) t) : ℝ) /
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) t) : ℝ) /
           Nat.card (FontaineWintenberger.lowerRamificationGroup
-            (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0)
+            (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0)
     have hfa : FontaineWintenberger.herbrandFunction (R := O(n))
-        (L(n) ≃ₐ[Qp] L(n)) (((p ^ r : ℕ) : ℝ) - 1) =
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (((p ^ r : ℕ) : ℝ) - 1) =
           ∫ t in (0 : ℝ)..(((p ^ r : ℕ) : ℝ) - 1), f t := by
       by_cases ha0 : ((p ^ r : ℕ) : ℝ) - 1 ≤ 0
       · have hzero : ((p ^ r : ℕ) : ℝ) - 1 = 0 := le_antisymm ha0 ha
@@ -519,19 +519,19 @@ theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
         simp [FontaineWintenberger.herbrandFunction]
       · rw [FontaineWintenberger.herbrandFunction, ite_eq_right ha0]
     have hfb : FontaineWintenberger.herbrandFunction (R := O(n))
-        (L(n) ≃ₐ[Qp] L(n)) (((p ^ (r + 1) : ℕ) : ℝ) - 1) =
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) (((p ^ (r + 1) : ℕ) : ℝ) - 1) =
           ∫ t in (0 : ℝ)..(((p ^ (r + 1) : ℕ) : ℝ) - 1), f t := by
       rw [FontaineWintenberger.herbrandFunction, ite_eq_right (not_le.mpr hb)]
     have hadd := intervalIntegral.integral_add_adjacent_intervals
       ((FontaineWintenberger.intervalIntegrable_card_lowerRamificationGroupReal
-        (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) 0 (((p ^ r : ℕ) : ℝ) - 1)).div_const
+        (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) 0 (((p ^ r : ℕ) : ℝ) - 1)).div_const
           (Nat.card (FontaineWintenberger.lowerRamificationGroup
-            (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0) : ℝ))
+            (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0) : ℝ))
       ((FontaineWintenberger.intervalIntegrable_card_lowerRamificationGroupReal
-        (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) (((p ^ r : ℕ) : ℝ) - 1)
+        (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) (((p ^ r : ℕ) : ℝ) - 1)
           (((p ^ (r + 1) : ℕ) : ℝ) - 1)).div_const
           (Nat.card (FontaineWintenberger.lowerRamificationGroup
-            (L(n) ≃ₐ[Qp] L(n)) (IsLocalRing.maximalIdeal O(n)) 0) : ℝ))
+            (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0) : ℝ))
     change (∫ t in (0 : ℝ)..(((p ^ r : ℕ) : ℝ) - 1), f t) +
       (∫ t in (((p ^ r : ℕ) : ℝ) - 1)..(((p ^ (r + 1) : ℕ) : ℝ) - 1), f t) =
         (∫ t in (0 : ℝ)..(((p ^ (r + 1) : ℕ) : ℝ) - 1), f t) at hadd
@@ -547,7 +547,7 @@ set_option maxHeartbeats 1000000 in
 of the canonical finite-character principal-unit kernel. -/
 theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) u =
+    FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u =
       (ZMod.unitsMap (pow_dvd_pow p (by omega : r + 1 ≤ n + 1))).ker.comap
         (cyclotomicLayerCharacter p (n + 1)) := by
   have hφ0 := herbrandFunction_cyclotomic_threshold p n r (by omega)
@@ -557,19 +557,19 @@ theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
   have ht1 : -1 ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1 := by
     linarith [Nat.cast_nonneg (α := ℝ) (p ^ (r + 1))]
   have hψ := FontaineWintenberger.inverseHerbrandFunction_mem_Ici (R := O(n))
-    (L(n) ≃ₐ[Qp] L(n)) u
+    (L(n) ≃ₐ[ℚ_[p]] L(n)) u
   have hinv := FontaineWintenberger.herbrandFunction_inverseHerbrandFunction (R := O(n))
-    (L(n) ≃ₐ[Qp] L(n)) (by linarith [Nat.cast_nonneg (α := ℝ) r] : -1 ≤ u)
+    (L(n) ≃ₐ[ℚ_[p]] L(n)) (by linarith [Nat.cast_nonneg (α := ℝ) r] : -1 ≤ u)
   have hψ0 : ((p ^ r : ℕ) : ℝ) - 1 <
-      FontaineWintenberger.inverseHerbrandFunction (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) u := by
+      FontaineWintenberger.inverseHerbrandFunction (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u := by
     apply ((FontaineWintenberger.strictMonoOn_herbrandFunction (R := O(n))
-      (L(n) ≃ₐ[Qp] L(n))).lt_iff_lt ht0 hψ).mp
+      (L(n) ≃ₐ[ℚ_[p]] L(n))).lt_iff_lt ht0 hψ).mp
     rw [hφ0, hinv]
     exact hu0
   have hψ1 : FontaineWintenberger.inverseHerbrandFunction (R := O(n))
-      (L(n) ≃ₐ[Qp] L(n)) u ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1 := by
+      (L(n) ≃ₐ[ℚ_[p]] L(n)) u ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1 := by
     apply ((FontaineWintenberger.strictMonoOn_herbrandFunction (R := O(n))
-      (L(n) ≃ₐ[Qp] L(n))).le_iff_le hψ ht1).mp
+      (L(n) ≃ₐ[ℚ_[p]] L(n))).le_iff_le hψ ht1).mp
     rw [hinv, hφ1]
     simpa only [Nat.cast_add, Nat.cast_one] using hu1
   rw [FontaineWintenberger.upperRamificationGroup,
@@ -581,7 +581,7 @@ theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
 on every closed upper interval. -/
 theorem upperRamificationGroup_cyclotomic_index
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    (FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) u).index =
+    (FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u).index =
       (p ^ (r + 1)).totient := by
   rw [upperRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr hu0 hu1,
     Subgroup.index_comap_of_surjective _ (cyclotomicLayerCharacter_surjective p (n + 1)),
@@ -591,7 +591,7 @@ theorem upperRamificationGroup_cyclotomic_index
 theorem upperRamificationGroup_cyclotomic_card
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     Nat.card (FontaineWintenberger.upperRamificationGroup
-      (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) u) = p ^ (n - r) := by
+      (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u) = p ^ (n - r) := by
   rw [upperRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr hu0 hu1,
     ← lowerRamificationGroup_cyclotomic_eq_comap_unitReduction p n (r + 1) (by omega),
     lowerRamificationGroup_cyclotomic_card p n (r + 1) (by omega) (by omega)]
@@ -601,20 +601,20 @@ theorem upperRamificationGroup_cyclotomic_card
 /-- The actual upper inertia group is full, including the trivial first
 dyadic layer. -/
 theorem upperRamificationGroup_cyclotomic_zero (n : ℕ) :
-    FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) 0 = ⊤ := by
+    FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) 0 = ⊤ := by
   simpa only [FontaineWintenberger.upperRamificationGroup_zero,
     FontaineWintenberger.lowerRamificationGroup_zero] using
       lowerRamificationGroup_cyclotomic_zero p n
 
 /-- The actual finite upper group is trivial after the final upper break. -/
 theorem upperRamificationGroup_cyclotomic_eq_bot (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
-    FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[Qp] L(n)) u = ⊥ := by
+    FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u = ⊥ := by
   by_cases hu1 : u ≤ (n : ℝ) + 1
   · apply Subgroup.card_eq_one.mp
     simpa only [Nat.sub_self, pow_zero] using
       upperRamificationGroup_cyclotomic_card p n n le_rfl hu hu1
   · have ht : FontaineWintenberger.upperRamificationGroup (R := O(n))
-        (L(n) ≃ₐ[Qp] L(n)) ((n : ℝ) + 1) = ⊥ := by
+        (L(n) ≃ₐ[ℚ_[p]] L(n)) ((n : ℝ) + 1) = ⊥ := by
       apply Subgroup.card_eq_one.mp
       simpa only [Nat.sub_self, pow_zero] using
         upperRamificationGroup_cyclotomic_card p n n le_rfl
@@ -622,7 +622,7 @@ theorem upperRamificationGroup_cyclotomic_eq_bot (n : ℕ) {u : ℝ} (hu : (n : 
     apply le_bot_iff.mp
     rw [← ht]
     exact FontaineWintenberger.upperRamificationGroup_antitoneOn (R := O(n))
-      (L(n) ≃ₐ[Qp] L(n))
+      (L(n) ≃ₐ[ℚ_[p]] L(n))
       (by linarith [Nat.cast_nonneg (α := ℝ) n] : -1 ≤ (n : ℝ) + 1)
       (by linarith [Nat.cast_nonneg (α := ℝ) n] : -1 ≤ u) (le_of_not_ge hu1)
 

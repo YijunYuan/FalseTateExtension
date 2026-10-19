@@ -35,30 +35,25 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-local notation "Qp" => Padic p
-local notation "Cyc" => cyclotomicExtension (K := Padic p) p
-
-local instance : IsDiscreteValuationRing
-    (NormedField.valuation (K := Padic p)).valuationSubring :=
-  cyclotomicBase_unitBall_isDiscreteValuationRing p (Padic p)
+local notation "Cyc" => cyclotomicExtension (K := ℚ_[p]) p
 
 /-- The original positive cyclotomic layers test the actual infinite upper
 condition, through their original inclusion isomorphisms. -/
 theorem mem_upperRamificationGroupInfinite_cyclotomic_iff
-    {u : ℝ} (hu : -1 ≤ u) (g : Cyc ≃ₐ[Qp] Cyc) :
-    g ∈ upperRamificationGroupInfinite Qp Cyc u ↔
+    {u : ℝ} (hu : -1 ≤ u) (g : Cyc ≃ₐ[ℚ_[p]] Cyc) :
+    g ∈ upperRamificationGroupInfinite ℚ_[p] Cyc u ↔
       ∀ n, cyclotomicLayerRestriction p (n + 1) g ∈
         upperRamificationGroup
-          (R := spectralIntegerRing Qp (cyclotomicLayer (K := Qp) p (n + 1)))
-          (cyclotomicLayer (K := Qp) p (n + 1) ≃ₐ[Qp]
-            cyclotomicLayer (K := Qp) p (n + 1)) u := by
-  rw [mem_upperRamificationGroupInfinite_iff_cofinal Qp Cyc
-    (cyclotomicFiniteLayer (K := Qp) p)
+          (R := spectralIntegerRing ℚ_[p] (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
+          (cyclotomicLayer (K := ℚ_[p]) p (n + 1) ≃ₐ[ℚ_[p]]
+            cyclotomicLayer (K := ℚ_[p]) p (n + 1)) u := by
+  rw [mem_upperRamificationGroupInfinite_iff_cofinal ℚ_[p] Cyc
+    (cyclotomicFiniteLayer (K := ℚ_[p]) p)
     (fun D ↦ exists_le_cyclotomicFiniteLayer p D.toIntermediateField) hu]
   apply forall_congr'
   intro n
   rw [restrictNormal_cyclotomicFiniteLayer,
-    ← upperRamificationGroup_map_autCongr Qp (cyclotomicFiniteLayerEquiv (K := Qp) p n) hu,
+    ← upperRamificationGroup_map_autCongr ℚ_[p] (cyclotomicFiniteLayerEquiv (K := ℚ_[p]) p n) hu,
     Subgroup.mem_map_equiv]
   simp only [MulEquiv.symm_apply_apply]
   rfl
@@ -67,7 +62,7 @@ theorem mem_upperRamificationGroupInfinite_cyclotomic_iff
 kernel of restriction to the original finite cyclotomic layer. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    upperRamificationGroupInfinite Qp Cyc u = (cyclotomicLayerRestriction p (r + 1)).ker := by
+    upperRamificationGroupInfinite ℚ_[p] Cyc u = (cyclotomicLayerRestriction p (r + 1)).ker := by
   have hu : -1 ≤ u := by linarith [Nat.cast_nonneg (α := ℝ) r]
   ext g
   rw [mem_upperRamificationGroupInfinite_cyclotomic_iff p hu, MonoidHom.mem_ker]
@@ -90,10 +85,10 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
         Subgroup.mem_comap, MonoidHom.mem_ker, cyclotomicLayerCharacter_restrict]
       apply Units.ext
       change ZMod.castHom (pow_dvd_pow p (by omega : r + 1 ≤ n + 1)) (ZMod (p ^ (r + 1)))
-          (PadicInt.toZModPow (n + 1) (cyclotomicExtensionCharacter p g : PadicInt p)) = 1
+          (PadicInt.toZModPow (n + 1) (cyclotomicExtensionCharacter p g : ℤ_[p])) = 1
       have hcomp := congrArg
-        (fun f : PadicInt p →+* ZMod (p ^ (r + 1)) ↦
-          f (cyclotomicExtensionCharacter p g : PadicInt p))
+        (fun f : ℤ_[p] →+* ZMod (p ^ (r + 1)) ↦
+          f (cyclotomicExtensionCharacter p g : ℤ_[p]))
         (PadicInt.zmod_cast_comp_toZModPow (r + 1) (n + 1) (by omega))
       simp only [RingHom.comp_apply] at hcomp
       rw [hcomp]
@@ -104,7 +99,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
 /-- The actual infinite rational cyclotomic extension is totally ramified
 at the level of its full upper inertia subgroup. -/
 theorem upperRamificationGroupInfinite_cyclotomic_zero :
-    upperRamificationGroupInfinite Qp Cyc 0 = ⊤ := by
+    upperRamificationGroupInfinite ℚ_[p] Cyc 0 = ⊤ := by
   apply top_unique
   intro g _
   rw [mem_upperRamificationGroupInfinite_cyclotomic_iff p (by norm_num)]
@@ -115,10 +110,10 @@ theorem upperRamificationGroupInfinite_cyclotomic_zero :
 /-- Nonpositive upper parameters retain the whole actual cyclotomic group. -/
 theorem upperRamificationGroupInfinite_cyclotomic_of_nonpos
     {u : ℝ} (hu : -1 ≤ u) (hu0 : u ≤ 0) :
-    upperRamificationGroupInfinite Qp Cyc u = ⊤ := by
+    upperRamificationGroupInfinite ℚ_[p] Cyc u = ⊤ := by
   apply top_unique
   rw [← upperRamificationGroupInfinite_cyclotomic_zero p]
-  exact upperRamificationGroupInfinite_antitoneOn Qp Cyc hu (by norm_num) hu0
+  exact upperRamificationGroupInfinite_antitoneOn ℚ_[p] Cyc hu (by norm_num) hu0
 
 private theorem exists_cyclotomic_upper_interval {u : ℝ} (hu : 0 < u) :
     ∃ r : ℕ, (r : ℝ) < u ∧ u ≤ (r : ℝ) + 1 := by
@@ -133,9 +128,9 @@ private theorem exists_cyclotomic_upper_interval {u : ℝ} (hu : 0 < u) :
 original infinite cyclotomic character. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_character_ker
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    upperRamificationGroupInfinite Qp Cyc u =
+    upperRamificationGroupInfinite ℚ_[p] Cyc u =
       ((Units.map (PadicInt.toZModPow (r + 1)).toMonoidHom).comp
-        (cyclotomicExtensionCharacter (K := Qp) p)).ker := by
+        (cyclotomicExtensionCharacter (K := ℚ_[p]) p)).ker := by
   rw [upperRamificationGroupInfinite_cyclotomic_eq_ker p r hu0 hu1]
   ext g
   simp only [MonoidHom.mem_ker, MonoidHom.comp_apply]
@@ -151,7 +146,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_character_ker
 kernel of reduction on the original p-adic unit group. -/
 theorem upperRamificationGroupInfinite_cyclotomic_map_character
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    (upperRamificationGroupInfinite Qp Cyc u).map (cyclotomicExtensionCharacter p) =
+    (upperRamificationGroupInfinite ℚ_[p] Cyc u).map (cyclotomicExtensionCharacter p) =
       (Units.map (PadicInt.toZModPow (r + 1)).toMonoidHom).ker := by
   rw [upperRamificationGroupInfinite_cyclotomic_eq_character_ker p r hu0 hu1]
   change ((Units.map (PadicInt.toZModPow (r + 1)).toMonoidHom).ker.comap
@@ -163,17 +158,17 @@ theorem upperRamificationGroupInfinite_cyclotomic_map_character
 prime-power totient of the original finite layer. -/
 theorem upperRamificationGroupInfinite_cyclotomic_index
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    (upperRamificationGroupInfinite Qp Cyc u).index = (p ^ (r + 1)).totient := by
+    (upperRamificationGroupInfinite ℚ_[p] Cyc u).index = (p ^ (r + 1)).totient := by
   rw [upperRamificationGroupInfinite_cyclotomic_eq_ker p r hu0 hu1]
-  change ((⊥ : Subgroup (cyclotomicLayer (K := Qp) p (r + 1) ≃ₐ[Qp]
-    cyclotomicLayer (K := Qp) p (r + 1))).comap (cyclotomicLayerRestriction p (r + 1))).index = _
+  change ((⊥ : Subgroup (cyclotomicLayer (K := ℚ_[p]) p (r + 1) ≃ₐ[ℚ_[p]]
+    cyclotomicLayer (K := ℚ_[p]) p (r + 1))).comap (cyclotomicLayerRestriction p (r + 1))).index = _
   rw [Subgroup.index_comap_of_surjective _ (cyclotomicLayerRestriction_surjective p (r + 1)),
     Subgroup.index_bot, card_cyclotomicLayer_galois]
 
 /-- All actual upper groups of the infinite rational cyclotomic extension
 have finite index. -/
 theorem upperRamificationGroupInfinite_cyclotomic_finiteIndex
-    {u : ℝ} (hu : -1 ≤ u) : (upperRamificationGroupInfinite Qp Cyc u).FiniteIndex := by
+    {u : ℝ} (hu : -1 ≤ u) : (upperRamificationGroupInfinite ℚ_[p] Cyc u).FiniteIndex := by
   by_cases hu0 : u ≤ 0
   · rw [upperRamificationGroupInfinite_cyclotomic_of_nonpos p hu hu0]
     infer_instance
@@ -183,7 +178,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_finiteIndex
 
 /-- APF for the original infinite rational cyclotomic extension, as an
 abstract separable field extension. -/
-theorem isAPF_cyclotomicExtension_padic : IsAPF Qp Cyc := by
+theorem isAPF_cyclotomicExtension_padic : IsAPF ℚ_[p] Cyc := by
   rw [isAPF_iff_upperInfinite_finiteIndex]
   exact fun _ hu ↦ upperRamificationGroupInfinite_cyclotomic_finiteIndex p hu
 
@@ -191,8 +186,8 @@ theorem isAPF_cyclotomicExtension_padic : IsAPF Qp Cyc := by
 profile because the actual rational cyclotomic inertia is full. -/
 theorem apfIndex_cyclotomicExtension_padic
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    apfIndex Qp Cyc u = (p ^ (r + 1)).totient := by
-  rw [apfIndex_eq_upperInfiniteRelIndex Qp Cyc
+    apfIndex ℚ_[p] Cyc u = (p ^ (r + 1)).totient := by
+  rw [apfIndex_eq_upperInfiniteRelIndex ℚ_[p] Cyc
     (by linarith [Nat.cast_nonneg (α := ℝ) r]),
     upperRamificationGroupInfinite_cyclotomic_zero p, Subgroup.relIndex_top_right]
   exact upperRamificationGroupInfinite_cyclotomic_index p r hu0 hu1
@@ -201,8 +196,8 @@ theorem apfIndex_cyclotomicExtension_padic
 rational cyclotomic index by `p`, at every prime. -/
 theorem upperRamificationGroupInfinite_cyclotomic_index_add_one
     {u : ℝ} (hu : 0 < u) :
-    (upperRamificationGroupInfinite Qp Cyc (u + 1)).index =
-      p * (upperRamificationGroupInfinite Qp Cyc u).index := by
+    (upperRamificationGroupInfinite ℚ_[p] Cyc (u + 1)).index =
+      p * (upperRamificationGroupInfinite ℚ_[p] Cyc u).index := by
   obtain ⟨r, hr0, hr1⟩ := exists_cyclotomic_upper_interval hu
   rw [upperRamificationGroupInfinite_cyclotomic_index p r hr0 hr1,
     upperRamificationGroupInfinite_cyclotomic_index p (r + 1)
@@ -213,18 +208,18 @@ theorem upperRamificationGroupInfinite_cyclotomic_index_add_one
 
 /-- The same exact growth holds for the public intrinsic APF index. -/
 theorem apfIndex_cyclotomicExtension_padic_add_one {u : ℝ} (hu : 0 < u) :
-    apfIndex Qp Cyc (u + 1) = p * apfIndex Qp Cyc u := by
-  rw [apfIndex_eq_upperInfiniteRelIndex Qp Cyc (by linarith : 0 ≤ u + 1),
-    apfIndex_eq_upperInfiniteRelIndex Qp Cyc hu.le,
+    apfIndex ℚ_[p] Cyc (u + 1) = p * apfIndex ℚ_[p] Cyc u := by
+  rw [apfIndex_eq_upperInfiniteRelIndex ℚ_[p] Cyc (by linarith : 0 ≤ u + 1),
+    apfIndex_eq_upperInfiniteRelIndex ℚ_[p] Cyc hu.le,
     upperRamificationGroupInfinite_cyclotomic_zero p,
     Subgroup.relIndex_top_right, Subgroup.relIndex_top_right]
   exact upperRamificationGroupInfinite_cyclotomic_index_add_one p hu
 
 /-- Strict APF for the original infinite rational cyclotomic extension
 follows from the proved growth of its actual intrinsic index. -/
-theorem isStrictlyAPF_cyclotomicExtension_padic : IsStrictlyAPF Qp Cyc := by
+theorem isStrictlyAPF_cyclotomicExtension_padic : IsStrictlyAPF ℚ_[p] Cyc := by
   let := isAPF_cyclotomicExtension_padic p
-  apply isStrictlyAPF_of_apfIndex_boundedGrowth Qp Cyc
+  apply isStrictlyAPF_of_apfIndex_boundedGrowth ℚ_[p] Cyc
     (ℓ := 1) (C := (p : ℝ)) (U := 1) (by norm_num)
     (Nat.cast_pos.mpr (Fact.out : p.Prime).pos)
   intro u hu
@@ -234,9 +229,9 @@ theorem isStrictlyAPF_cyclotomicExtension_padic : IsStrictlyAPF Qp Cyc := by
 section Compositum
 
 variable {K : Type*} [Field K] [CharZero K]
-    [Algebra (Padic p) K] [FiniteDimensional (Padic p) K]
+    [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-omit [Algebra (Padic p) K] [FiniteDimensional (Padic p) K] in
+omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
 /-- Every root of the indicated prime-power equation lies in the original
 finite cyclotomic layer, independently of the chosen primitive root. -/
 theorem mem_cyclotomicLayer_of_pow_eq_one (n : ℕ) {ζ : AlgebraicClosure K}
@@ -248,18 +243,18 @@ theorem mem_cyclotomicLayer_of_pow_eq_one (n : ℕ) {ζ : AlgebraicClosure K}
 
 /-- One actual rational closure embedding sends the entire original
 rational cyclotomic field into the original cyclotomic field over `K`. -/
-def rationalCyclotomicEmbedding : Cyc →ₐ[Qp] cyclotomicExtension (K := K) p := by
-  let e := IsAlgClosure.equiv Qp (AlgebraicClosure Qp) (AlgebraicClosure K)
-  let f := e.toAlgHom.comp (cyclotomicExtension (K := Qp) p).val
-  apply f.codRestrict ((cyclotomicExtension (K := K) p).restrictScalars Qp).toSubalgebra
+def rationalCyclotomicEmbedding : Cyc →ₐ[ℚ_[p]] cyclotomicExtension (K := K) p := by
+  let e := IsAlgClosure.equiv ℚ_[p] (AlgebraicClosure ℚ_[p]) (AlgebraicClosure K)
+  let f := e.toAlgHom.comp (cyclotomicExtension (K := ℚ_[p]) p).val
+  apply f.codRestrict ((cyclotomicExtension (K := K) p).restrictScalars ℚ_[p]).toSubalgebra
   intro x
-  obtain ⟨n, hn⟩ := (mem_cyclotomicExtension_iff p (x : AlgebraicClosure Qp)).mp x.property
-  have hroot : e (rootOfUnity (K := Qp) p n) ∈ cyclotomicExtension (K := K) p := by
+  obtain ⟨n, hn⟩ := (mem_cyclotomicExtension_iff p (x : AlgebraicClosure ℚ_[p])).mp x.property
+  have hroot : e (rootOfUnity (K := ℚ_[p]) p n) ∈ cyclotomicExtension (K := K) p := by
     apply cyclotomicLayer_le_cyclotomicExtension p n
     apply mem_cyclotomicLayer_of_pow_eq_one p n
     rw [← map_pow, rootOfUnity_pow, map_one]
-  have hle : cyclotomicLayer (K := Qp) p n ≤
-      ((cyclotomicExtension (K := K) p).restrictScalars Qp).comap e.toAlgHom :=
+  have hle : cyclotomicLayer (K := ℚ_[p]) p n ≤
+      ((cyclotomicExtension (K := K) p).restrictScalars ℚ_[p]).comap e.toAlgHom :=
     IntermediateField.adjoin_simple_le_iff.mpr hroot
   exact hle hn
 
@@ -269,34 +264,34 @@ theorem cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding (n : ℕ) :
     cyclotomicRootOfUnity (K := K) p n ∈
       (rationalCyclotomicEmbedding (K := K) p).fieldRange := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  have hprim := (isPrimitiveRoot_cyclotomicRootOfUnity (K := Qp) p n).map_of_injective
+  have hprim := (isPrimitiveRoot_cyclotomicRootOfUnity (K := ℚ_[p]) p n).map_of_injective
     (rationalCyclotomicEmbedding (K := K) p).injective
   obtain ⟨j, _, hj⟩ := hprim.eq_pow_of_pow_eq_one
     (isPrimitiveRoot_cyclotomicRootOfUnity (K := K) p n).pow_eq_one
   rw [← hj]
   exact (rationalCyclotomicEmbedding (K := K) p).fieldRange.toSubalgebra.pow_mem
-    ⟨cyclotomicRootOfUnity (K := Qp) p n, rfl⟩ j
+    ⟨cyclotomicRootOfUnity (K := ℚ_[p]) p n, rfl⟩ j
 
 local instance (priority := 100) rationalCyclotomicEmbeddingAlgebra :
     Algebra Cyc (cyclotomicExtension (K := K) p) :=
   (rationalCyclotomicEmbedding (K := K) p).toRingHom.toAlgebra
 
 local instance (priority := 100) rationalCyclotomicEmbeddingTower :
-    IsScalarTower Qp Cyc (cyclotomicExtension (K := K) p) :=
+    IsScalarTower ℚ_[p] Cyc (cyclotomicExtension (K := K) p) :=
   IsScalarTower.of_algHom (rationalCyclotomicEmbedding (K := K) p)
 
 local instance rationalCyclotomicBase_isAlgebraic :
-    Algebra.IsAlgebraic Qp (cyclotomicExtension (K := K) p) :=
-  Algebra.IsAlgebraic.trans Qp K (cyclotomicExtension (K := K) p)
+    Algebra.IsAlgebraic ℚ_[p] (cyclotomicExtension (K := K) p) :=
+  Algebra.IsAlgebraic.trans ℚ_[p] K (cyclotomicExtension (K := K) p)
 
 /-- The original cyclotomic field over `K` is the actual compositum of
 the embedded rational cyclotomic field and the original image of `K`. -/
 theorem rationalCyclotomicEmbedding_adjoin_base :
     IntermediateField.adjoin Cyc
-      ((IsScalarTower.toAlgHom Qp K (cyclotomicExtension (K := K) p)).fieldRange :
+      ((IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).fieldRange :
         Set (cyclotomicExtension (K := K) p)) = ⊤ := by
   let A := IntermediateField.adjoin Cyc
-    ((IsScalarTower.toAlgHom Qp K (cyclotomicExtension (K := K) p)).fieldRange :
+    ((IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).fieldRange :
       Set (cyclotomicExtension (K := K) p))
   let D : IntermediateField K (AlgebraicClosure K) :=
     { A.toSubfield.map (cyclotomicExtension (K := K) p).val.toRingHom with
@@ -325,15 +320,15 @@ set_option maxHeartbeats 1000000 in
 cyclotomic extension, because the original base is finite over `Qp`. -/
 theorem rationalCyclotomicEmbedding_finiteDimensional :
     FiniteDimensional Cyc (cyclotomicExtension (K := K) p) := by
-  let L := (IsScalarTower.toAlgHom Qp K (cyclotomicExtension (K := K) p)).fieldRange
-  let : FiniteDimensional Qp L := Module.Finite.equiv
-    (IsScalarTower.toAlgHom Qp K (cyclotomicExtension (K := K) p)).equivFieldRange.toLinearEquiv
+  let L := (IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).fieldRange
+  let : FiniteDimensional ℚ_[p] L := Module.Finite.equiv
+    (IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).equivFieldRange.toLinearEquiv
   let A := IntermediateField.adjoin Cyc (L : Set (cyclotomicExtension (K := K) p))
   let : Module.Free Cyc A := Module.Free.of_divisionRing Cyc A
   have hr := IntermediateField.adjoin_rank_le_of_isAlgebraic_right Cyc L
   have hfinite : FiniteDimensional Cyc A :=
     (Module.rank_lt_aleph0_iff (R := Cyc) (M := A)).mp
-      (hr.trans_lt (Module.rank_lt_aleph0 Qp L))
+      (hr.trans_lt (Module.rank_lt_aleph0 ℚ_[p] L))
   let := hfinite
   apply Module.Finite.of_surjective A.val.toLinearMap
   intro x
@@ -345,9 +340,9 @@ theorem rationalCyclotomicEmbedding_finiteDimensional :
 /-- The original cyclotomic field over a finite base remains strictly APF
 over the rational base, by the proved actual finite compositum. -/
 theorem isStrictlyAPF_cyclotomicExtension_over_padic :
-    IsStrictlyAPF Qp (cyclotomicExtension (K := K) p) := by
+    IsStrictlyAPF ℚ_[p] (cyclotomicExtension (K := K) p) := by
   let := rationalCyclotomicEmbedding_finiteDimensional (K := K) p
-  exact (isStrictlyAPF_finite_extension_iff Qp (cyclotomicExtension (K := K) p) Cyc).mpr
+  exact (isStrictlyAPF_finite_extension_iff ℚ_[p] (cyclotomicExtension (K := K) p) Cyc).mpr
     (isStrictlyAPF_cyclotomicExtension_padic p)
 
 end Compositum
@@ -355,26 +350,22 @@ end Compositum
 section ValuedBase
 
 variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
-    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
+    [IsCompleteDiscreteValuedField K]
+    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 /-- The original cyclotomic extension of every finite compatible normed
 extension of `Qp` is strictly APF, at every prime. -/
 theorem isStrictlyAPF_cyclotomicExtension :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsStrictlyAPF K (cyclotomicExtension (K := K) p) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   let := rationalCyclotomicBase_isAlgebraic (K := K) p
-  exact (isStrictlyAPF_finiteBase_iff_of_normedAlgebra Qp K
+  exact (isStrictlyAPF_finiteBase_iff_of_normedAlgebra ℚ_[p] K
     (cyclotomicExtension (K := K) p)).mp
       (isStrictlyAPF_cyclotomicExtension_over_padic (K := K) p)
 
 /-- Public APF for the original cyclotomic field over its original finite
 normed base, with no normality or finiteness restriction on the top. -/
 theorem isAPF_cyclotomicExtension :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     IsAPF K (cyclotomicExtension (K := K) p) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   exact (isStrictlyAPF_cyclotomicExtension p K).toIsAPF
 
 end ValuedBase
@@ -382,11 +373,9 @@ end ValuedBase
 section CharacterTransport
 
 variable (F : Type*) [NontriviallyNormedField F] [IsCompleteDiscreteValuedField F]
-    [PerfectField (IsLocalRing.ResidueField
-      (NormedField.valuation (K := F)).valuationSubring)]
+    [PerfectField (𝓀[F])]
 
-omit [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := F)).valuationSubring)] in
+omit [PerfectField (𝓀[F])] in
 /-- Actual upper character images are preserved by an algebra isomorphism
 of the top fields. The characters are the canonical characters on those fields. -/
 theorem cyclotomicCharacter_map_upper_autCongr
@@ -433,31 +422,31 @@ character sends the actual positive upper group onto the whole indicated
 principal-unit kernel. The proof uses ordinary restriction to the image of
 the original rational cyclotomic field. -/
 theorem cyclotomicCharacter_map_upperRamificationGroupInfinite
-    (Ω : Type*) [Field Ω] [Algebra Qp Ω] [IsAlgClosure Qp Ω]
+    (Ω : Type*) [Field Ω] [Algebra ℚ_[p] Ω] [IsAlgClosure ℚ_[p] Ω]
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    (upperRamificationGroupInfinite Qp Ω u).map
+    (upperRamificationGroupInfinite ℚ_[p] Ω u).map
       ((_root_.cyclotomicCharacter Ω p).comp
-        (MulSemiringAction.toRingAut (Ω ≃ₐ[Qp] Ω) Ω)) =
+        (MulSemiringAction.toRingAut (Ω ≃ₐ[ℚ_[p]] Ω) Ω)) =
       (Units.map (PadicInt.toZModPow (r + 1)).toMonoidHom).ker := by
-  let : IsAlgClosed Ω := IsAlgClosure.isAlgClosed Qp
-  let : CharZero Ω := charZero_of_injective_algebraMap (algebraMap Qp Ω).injective
+  let : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ_[p]
+  let : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ_[p] Ω).injective
   have hu : -1 ≤ u := by linarith [Nat.cast_nonneg (α := ℝ) r]
-  let i : Cyc →ₐ[Qp] Ω :=
-    (IsAlgClosure.equiv Qp (AlgebraicClosure Qp) Ω).toAlgHom.comp
-      (cyclotomicExtension (K := Qp) p).val
+  let i : Cyc →ₐ[ℚ_[p]] Ω :=
+    (IsAlgClosure.equiv ℚ_[p] (AlgebraicClosure ℚ_[p]) Ω).toAlgHom.comp
+      (cyclotomicExtension (K := ℚ_[p]) p).val
   let e := i.equivFieldRange
-  let : IsGalois Qp i.fieldRange := IsGalois.of_algEquiv e
-  let f : (Ω ≃ₐ[Qp] Ω) →* (Cyc ≃ₐ[Qp] Cyc) :=
+  let : IsGalois ℚ_[p] i.fieldRange := IsGalois.of_algEquiv e
+  let f : (Ω ≃ₐ[ℚ_[p]] Ω) →* (Cyc ≃ₐ[ℚ_[p]] Cyc) :=
     e.symm.autCongr.toMonoidHom.comp (AlgEquiv.restrictNormalHom i.fieldRange)
-  have hf : (upperRamificationGroupInfinite Qp Ω u).map f =
-      upperRamificationGroupInfinite Qp Cyc u := by
+  have hf : (upperRamificationGroupInfinite ℚ_[p] Ω u).map f =
+      upperRamificationGroupInfinite ℚ_[p] Cyc u := by
     rw [show f = e.symm.autCongr.toMonoidHom.comp
         (AlgEquiv.restrictNormalHom i.fieldRange) from rfl,
       ← Subgroup.map_map,
-      restrictNormalHom_map_upperRamificationGroupInfinite Qp Ω i.fieldRange u hu,
-      upperRamificationGroupInfinite_map_autCongr Qp e.symm hu]
+      restrictNormalHom_map_upperRamificationGroupInfinite ℚ_[p] Ω i.fieldRange u hu,
+      upperRamificationGroupInfinite_map_autCongr ℚ_[p] e.symm hu]
   have hχ : ((_root_.cyclotomicCharacter Ω p).comp
-      (MulSemiringAction.toRingAut (Ω ≃ₐ[Qp] Ω) Ω)) =
+      (MulSemiringAction.toRingAut (Ω ≃ₐ[ℚ_[p]] Ω) Ω)) =
       (cyclotomicExtensionCharacter p).comp f := by
     apply MonoidHom.ext
     intro g
@@ -475,59 +464,58 @@ theorem cyclotomicCharacter_map_upperRamificationGroupInfinite
 section CommonClosureCharacter
 
 variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
-    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
-    [Algebra K (SeparableClosure (Padic p))]
-    [IsScalarTower (Padic p) K (SeparableClosure (Padic p))]
+    [IsCompleteDiscreteValuedField K]
+    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
+    [Algebra K (SeparableClosure (ℚ_[p]))]
+    [IsScalarTower (ℚ_[p]) K (SeparableClosure (ℚ_[p]))]
 
 /-- Actual finite base change identifies the upper character image with
 the character image of the old upper group intersected with the actual
 fixing subgroup of the embedded original base. -/
 theorem cyclotomicCharacter_map_upper_finiteBase {u : ℝ} (hu : -1 ≤ u) :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
-    (upperRamificationGroupInfinite K (SeparableClosure K) (apfPsi Qp K u)).map
+    (upperRamificationGroupInfinite K (SeparableClosure K) (apfPsi ℚ_[p] K u)).map
         ((_root_.cyclotomicCharacter (SeparableClosure K) p).comp
           (MulSemiringAction.toRingAut
             (SeparableClosure K ≃ₐ[K] SeparableClosure K) (SeparableClosure K))) =
-      ((IsScalarTower.toAlgHom Qp K (SeparableClosure Qp)).fieldRange.fixingSubgroup ⊓
-        upperRamificationGroupInfinite Qp (SeparableClosure Qp) u).map
-        ((_root_.cyclotomicCharacter (SeparableClosure Qp) p).comp
+      ((IsScalarTower.toAlgHom ℚ_[p] K (SeparableClosure ℚ_[p])).fieldRange.fixingSubgroup ⊓
+        upperRamificationGroupInfinite ℚ_[p] (SeparableClosure ℚ_[p]) u).map
+        ((_root_.cyclotomicCharacter (SeparableClosure ℚ_[p]) p).comp
           (MulSemiringAction.toRingAut
-            (SeparableClosure Qp ≃ₐ[Qp] SeparableClosure Qp) (SeparableClosure Qp))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
-  let := normedAlgebra_residueField_perfectField Qp K
-  let ρ := AbstractFiniteBase.closureHom Qp K
+            (SeparableClosure ℚ_[p] ≃ₐ[ℚ_[p]] SeparableClosure ℚ_[p])
+              (SeparableClosure ℚ_[p]))) := by
+  let := normedAlgebra_residueField_perfectField ℚ_[p] K
+  let ρ := AbstractFiniteBase.closureHom ℚ_[p] K
   have hχ : ((_root_.cyclotomicCharacter (SeparableClosure K) p).comp
       (MulSemiringAction.toRingAut
         (SeparableClosure K ≃ₐ[K] SeparableClosure K) (SeparableClosure K))) =
-      (((_root_.cyclotomicCharacter (SeparableClosure Qp) p).comp
+      (((_root_.cyclotomicCharacter (SeparableClosure ℚ_[p]) p).comp
         (MulSemiringAction.toRingAut
-          (SeparableClosure Qp ≃ₐ[Qp] SeparableClosure Qp) (SeparableClosure Qp))).comp ρ) := by
+          (SeparableClosure ℚ_[p] ≃ₐ[ℚ_[p]] SeparableClosure ℚ_[p])
+              (SeparableClosure ℚ_[p]))).comp ρ) := by
     apply MonoidHom.ext
     intro g
     exact cyclotomicCharacter_eq_of_intertwines p
-      (AbstractFiniteBase.closureEquiv Qp K).toRingHom g.toRingEquiv (ρ g).toRingEquiv
-      (fun x ↦ (AbstractFiniteBase.closureHom_apply Qp K g x).symm)
-  have hupper : (upperRamificationGroupInfinite Qp (SeparableClosure Qp) u).comap ρ =
-      upperRamificationGroupInfinite K (SeparableClosure K) (apfPsi Qp K u) :=
-    AbstractFiniteBase.comap_upper Qp K hu
+      (AbstractFiniteBase.closureEquiv ℚ_[p] K).toRingHom g.toRingEquiv (ρ g).toRingEquiv
+      (fun x ↦ (AbstractFiniteBase.closureHom_apply ℚ_[p] K g x).symm)
+  have hupper : (upperRamificationGroupInfinite ℚ_[p] (SeparableClosure ℚ_[p]) u).comap ρ =
+      upperRamificationGroupInfinite K (SeparableClosure K) (apfPsi ℚ_[p] K u) :=
+    AbstractFiniteBase.comap_upper ℚ_[p] K hu
   rw [hχ, ← Subgroup.map_map, ← hupper,
-    Subgroup.map_comap_eq, AbstractFiniteBase.closureHom_range Qp K]
+    Subgroup.map_comap_eq, AbstractFiniteBase.closureHom_range ℚ_[p] K]
 
 /-- The same finite-base identity computes the character image of the
 original cyclotomic subfield, with its original base and scalar maps. -/
 theorem cyclotomicExtension_map_upper_finiteBase {u : ℝ} (hu : -1 ≤ u) :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
-    (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) (apfPsi Qp K u)).map
+    (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) (apfPsi ℚ_[p] K u)).map
         (cyclotomicExtensionCharacter p) =
-      ((IsScalarTower.toAlgHom Qp K (SeparableClosure Qp)).fieldRange.fixingSubgroup ⊓
-        upperRamificationGroupInfinite Qp (SeparableClosure Qp) u).map
-        ((_root_.cyclotomicCharacter (SeparableClosure Qp) p).comp
+      ((IsScalarTower.toAlgHom ℚ_[p] K (SeparableClosure ℚ_[p])).fieldRange.fixingSubgroup ⊓
+        upperRamificationGroupInfinite ℚ_[p] (SeparableClosure ℚ_[p]) u).map
+        ((_root_.cyclotomicCharacter (SeparableClosure ℚ_[p]) p).comp
           (MulSemiringAction.toRingAut
-            (SeparableClosure Qp ≃ₐ[Qp] SeparableClosure Qp) (SeparableClosure Qp))) := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
-  let := normedAlgebra_residueField_perfectField Qp K
-  have hv := IsAPF.apfPsi_mem_Ici Qp K hu
+            (SeparableClosure ℚ_[p] ≃ₐ[ℚ_[p]] SeparableClosure ℚ_[p])
+              (SeparableClosure ℚ_[p]))) := by
+  let := normedAlgebra_residueField_perfectField ℚ_[p] K
+  have hv := IsAPF.apfPsi_mem_Ici ℚ_[p] K hu
   rw [cyclotomicExtension_map_upper_from_algebraicClosure p K hv,
     ← cyclotomicCharacter_map_upper_autCongr p K
       (IsAlgClosure.equiv K (SeparableClosure K) (AlgebraicClosure K)) hv]
@@ -538,47 +526,43 @@ end CommonClosureCharacter
 section EventualCharacterImage
 
 variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsUltrametricDist K] [CompleteSpace K]
-    [NormedAlgebra (Padic p) K] [FiniteDimensional (Padic p) K]
+    [IsCompleteDiscreteValuedField K]
+    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 /-- After a genuine finite cutoff, the actual upper character image over
 the original finite base is the full rational principal-unit kernel at the
 actual finite-base inverse-Herbrand parameter. -/
 theorem exists_cyclotomicExtension_upper_principal_finiteBase :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     ∃ U : ℝ, 1 ≤ U ∧ ∀ u : ℝ, U ≤ u → ∀ r : ℕ,
       (r : ℝ) < u → u ≤ (r : ℝ) + 1 →
-      (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) (apfPsi Qp K u)).map
+      (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) (apfPsi ℚ_[p] K u)).map
           (cyclotomicExtensionCharacter p) =
         (Units.map (PadicInt.toZModPow (r + 1)).toMonoidHom).ker := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
-  obtain ⟨i⟩ := nonempty_separableClosure_embeddings Qp K
-  let : Algebra K (SeparableClosure Qp) := i.toRingHom.toAlgebra
-  let : IsScalarTower Qp K (SeparableClosure Qp) := IsScalarTower.of_algHom i
+  obtain ⟨i⟩ := nonempty_separableClosure_embeddings ℚ_[p] K
+  let : Algebra K (SeparableClosure ℚ_[p]) := i.toRingHom.toAlgebra
+  let : IsScalarTower ℚ_[p] K (SeparableClosure ℚ_[p]) := IsScalarTower.of_algHom i
   let S := i.fieldRange
-  let : FiniteDimensional Qp S := Module.Finite.equiv i.equivFieldRange.toLinearEquiv
-  obtain ⟨U, _, hfix⟩ := exists_absoluteUpper_le_fixingSubgroup_of_finite Qp S
+  let : FiniteDimensional ℚ_[p] S := Module.Finite.equiv i.equivFieldRange.toLinearEquiv
+  obtain ⟨U, _, hfix⟩ := exists_absoluteUpper_le_fixingSubgroup_of_finite ℚ_[p] S
   refine ⟨max U 1, le_max_right _ _, fun u hu r hr0 hr1 ↦ ?_⟩
   rw [cyclotomicExtension_map_upper_finiteBase p K
     (by linarith [(le_max_right U 1).trans hu] : -1 ≤ u)]
-  have hle : upperRamificationGroupInfinite Qp (SeparableClosure Qp) u ≤ S.fixingSubgroup :=
+  have hle : upperRamificationGroupInfinite ℚ_[p] (SeparableClosure ℚ_[p]) u ≤ S.fixingSubgroup :=
     hfix u ((le_max_left _ _).trans hu)
-  have hi : IsScalarTower.toAlgHom Qp K (SeparableClosure Qp) = i := by
+  have hi : IsScalarTower.toAlgHom ℚ_[p] K (SeparableClosure ℚ_[p]) = i := by
     ext x
     rfl
   rw [hi, inf_eq_right.mpr hle]
-  exact cyclotomicCharacter_map_upperRamificationGroupInfinite p (SeparableClosure Qp)
+  exact cyclotomicCharacter_map_upperRamificationGroupInfinite p (SeparableClosure ℚ_[p])
     r hr0 hr1
 
 /-- The actual full upper index over the original finite base differs from
 the rational index by exactly the fixed actual cyclotomic image index. -/
 theorem exists_cyclotomicExtension_upper_index_finiteBase :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     ∃ U : ℝ, 1 ≤ U ∧ ∀ u : ℝ, U ≤ u →
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p)
-          (apfPsi Qp K u)).index * (cyclotomicExtensionCharacter (K := K) p).range.index =
-        (upperRamificationGroupInfinite Qp Cyc u).index := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
+          (apfPsi ℚ_[p] K u)).index * (cyclotomicExtensionCharacter (K := K) p).range.index =
+        (upperRamificationGroupInfinite ℚ_[p] Cyc u).index := by
   obtain ⟨U, hU, himage⟩ := exists_cyclotomicExtension_upper_principal_finiteBase p K
   refine ⟨U, hU, fun u hu ↦ ?_⟩
   obtain ⟨r, hr0, hr1⟩ := exists_cyclotomic_upper_interval (by linarith : 0 < u)
@@ -594,23 +578,21 @@ theorem exists_cyclotomicExtension_upper_index_finiteBase :
 ramification index eventually multiplies the full cyclotomic upper index by
 exactly `p`. This includes the dyadic case and arbitrary finite residue degree. -/
 theorem exists_upperRamificationGroupInfinite_cyclotomic_index_add_ramificationIdx :
-    letI := cyclotomicBase_isCompleteDiscreteValuedField p K
     ∃ V : ℝ, 0 ≤ V ∧ ∀ v : ℝ, V ≤ v →
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p)
         (v + ((IsLocalRing.maximalIdeal
-          (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
-            (NormedField.valuation (K := Qp)).valuationSubring : ℝ))).index =
+          𝒪[K]).ramificationIdx
+            𝒪[ℚ_[p]] : ℝ))).index =
         p * (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) v).index := by
-  let := cyclotomicBase_isCompleteDiscreteValuedField p K
   obtain ⟨A, hA, hindex⟩ := exists_cyclotomicExtension_upper_index_finiteBase p K
-  obtain ⟨T, _, hshift⟩ := exists_apfPsi_normed_ramificationIdx_shift Qp K
+  obtain ⟨T, _, hshift⟩ := exists_apfPsi_normed_ramificationIdx_shift ℚ_[p] K
   let U := max A T
   have hU : 1 ≤ U := hA.trans (le_max_left _ _)
-  refine ⟨apfPsi Qp K U,
-    (by linarith : 0 ≤ U).trans (IsAPF.le_apfPsi Qp K U), fun v hv ↦ ?_⟩
-  let u := apfPhi Qp K v
-  have hpsi : apfPsi Qp K u = v := apfPsi_apfPhi Qp K v
-  have hu : U ≤ u := (IsAPF.strictMono_apfPsi Qp K).le_iff_le.mp (by
+  refine ⟨apfPsi ℚ_[p] K U,
+    (by linarith : 0 ≤ U).trans (IsAPF.le_apfPsi ℚ_[p] K U), fun v hv ↦ ?_⟩
+  let u := apfPhi ℚ_[p] K v
+  have hpsi : apfPsi ℚ_[p] K u = v := apfPsi_apfPhi ℚ_[p] K v
+  have hu : U ≤ u := (IsAPF.strictMono_apfPsi ℚ_[p] K).le_iff_le.mp (by
     rw [hpsi]
     exact hv)
   have huA : A ≤ u := (le_max_left A T).trans hu

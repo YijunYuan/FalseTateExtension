@@ -31,20 +31,20 @@ variable {p : ℕ} [Fact p.Prime]
 open scoped commutatorElement
 
 /-- The usual affine commutator formula holds in the canonical semidirect product. -/
-theorem padicAffine_commutator_inl (g : PadicAffineGroup p) (m : PadicInt p) :
+theorem padicAffine_commutator_inl (g : PadicAffineGroup p) (m : ℤ_[p]) :
     ⁅g, (SemidirectProduct.inl (Multiplicative.ofAdd m) : PadicAffineGroup p)⁆ =
-      SemidirectProduct.inl (Multiplicative.ofAdd (((g.right : PadicInt p) - 1) * m)) := by
+      SemidirectProduct.inl (Multiplicative.ofAdd (((g.right : ℤ_[p]) - 1) * m)) := by
   apply SemidirectProduct.ext
   · simp only [commutatorElement_def, SemidirectProduct.mul_left,
       SemidirectProduct.mul_right, SemidirectProduct.inv_left, SemidirectProduct.inv_right,
       SemidirectProduct.left_inl, SemidirectProduct.right_inl, mul_one, mul_inv_cancel,
       inv_one, map_one, MulAut.one_apply]
     apply congrArg Multiplicative.ofAdd
-    change g.left.toAdd + (g.right : PadicInt p) * m +
-      (g.right : PadicInt p) * ((g.right⁻¹ : (PadicInt p)ˣ) * -g.left.toAdd) + -m = _
-    have hu := congrArg (fun u : (PadicInt p)ˣ ↦ (u : PadicInt p))
+    change g.left.toAdd + (g.right : ℤ_[p]) * m +
+      (g.right : ℤ_[p]) * ((g.right⁻¹ : (ℤ_[p])ˣ) * -g.left.toAdd) + -m = _
+    have hu := congrArg (fun u : (ℤ_[p])ˣ ↦ (u : ℤ_[p]))
       (mul_inv_cancel g.right)
-    change (g.right : PadicInt p) * (g.right⁻¹ : (PadicInt p)ˣ) = 1 at hu
+    change (g.right : ℤ_[p]) * (g.right⁻¹ : (ℤ_[p])ˣ) = 1 at hu
     rw [← mul_assoc, hu, one_mul]
     ring
   · simp [commutatorElement_def]
@@ -53,7 +53,7 @@ instance padicAffineCompactSpace : CompactSpace (PadicAffineGroup p) :=
   (padicAffineHomeomorphProd p).symm.compactSpace
 
 /-- The actual right-coordinate homomorphism on a closed affine subgroup. -/
-def affineProjection (G : ClosedSubgroup (PadicAffineGroup p)) : G →* (PadicInt p)ˣ :=
+def affineProjection (G : ClosedSubgroup (PadicAffineGroup p)) : G →* (ℤ_[p])ˣ :=
   SemidirectProduct.rightHom.comp G.toSubgroup.subtype
 
 theorem continuous_affineProjection (G : ClosedSubgroup (PadicAffineGroup p)) :
@@ -62,10 +62,10 @@ theorem continuous_affineProjection (G : ClosedSubgroup (PadicAffineGroup p)) :
 
 /-- The actual closed additive translation kernel of a closed affine subgroup. -/
 def affineTranslationKernel (G : ClosedSubgroup (PadicAffineGroup p)) :
-    ClosedAddSubgroup (PadicInt p) where
+    ClosedAddSubgroup (ℤ_[p]) where
   toAddSubgroup := Subgroup.toAddSubgroup' (G.toSubgroup.comap SemidirectProduct.inl)
   isClosed' := by
-    change IsClosed ((fun a : PadicInt p ↦
+    change IsClosed ((fun a : ℤ_[p] ↦
       (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) ⁻¹' (G : Set _))
     apply G.isClosed'.preimage
     apply continuous_induced_rng.mpr
@@ -147,7 +147,7 @@ theorem affineTranslation_commutator (G : ClosedSubgroup (PadicAffineGroup p))
     (g : G) (m : affineTranslationKernel G) :
     ⁅g, affineTranslationHom G (Multiplicative.ofAdd m)⁆ =
       affineTranslationHom G (Multiplicative.ofAdd
-        ⟨((g.val.right : PadicInt p) - 1) * m.val,
+        ⟨((g.val.right : ℤ_[p]) - 1) * m.val,
           PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _ m.property⟩) := by
   apply Subtype.ext
   change (G.toSubgroup.subtype ⁅g, affineTranslationHom G (Multiplicative.ofAdd m)⁆) = _
@@ -159,7 +159,7 @@ commutator in `G`, and belongs to both `I` and the translation kernel. -/
 theorem affineTranslation_scalar_mem (G : ClosedSubgroup (PadicAffineGroup p))
     (I : Subgroup G) [I.Normal] (g : I) (m : affineTranslationKernel G) :
     affineTranslationHom G (Multiplicative.ofAdd
-      ⟨((g.val.val.right : PadicInt p) - 1) * m.val,
+      ⟨((g.val.val.right : ℤ_[p]) - 1) * m.val,
         PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _ m.property⟩) ∈
       (_root_.commutator G ⊓ I ⊓ (affineProjection G).ker) := by
   rw [← affineTranslation_commutator G g.val m]
@@ -177,16 +177,16 @@ subgroup, in `I`, and in the translation kernel. -/
 theorem affineTranslation_scalar_image_le (G : ClosedSubgroup (PadicAffineGroup p))
     (I : Subgroup G) [I.Normal] (g : I) :
     (((affineTranslationKernel G).toAddSubgroup.map
-      (AddMonoidHom.mulLeft ((g.val.val.right : PadicInt p) - 1))).addSubgroupOf
+      (AddMonoidHom.mulLeft ((g.val.val.right : ℤ_[p]) - 1))).addSubgroupOf
         (affineTranslationKernel G).toAddSubgroup).toSubgroup.map (affineTranslationHom G) ≤
       _root_.commutator G ⊓ I ⊓ (affineProjection G).ker := by
   rintro y ⟨x, hx, rfl⟩
   change x.toAdd.val ∈ (affineTranslationKernel G).toAddSubgroup.map
-    (AddMonoidHom.mulLeft ((g.val.val.right : PadicInt p) - 1)) at hx
+    (AddMonoidHom.mulLeft ((g.val.val.right : ℤ_[p]) - 1)) at hx
   obtain ⟨m, hm, hval⟩ := hx
   have hs := affineTranslation_scalar_mem G I g (⟨m, hm⟩ : affineTranslationKernel G)
   have he : Multiplicative.ofAdd
-      (⟨((g.val.val.right : PadicInt p) - 1) * m,
+      (⟨((g.val.val.right : ℤ_[p]) - 1) * m,
         PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _ hm⟩ :
           affineTranslationKernel G) = x := by
     apply Multiplicative.toAdd.injective
@@ -201,7 +201,7 @@ theorem affineProjection_kernel_finiteRelIndex
     (G : ClosedSubgroup (PadicAffineGroup p)) (I : Subgroup G) [I.Normal]
     (g : I) (hg : g.val.val.right ≠ 1) : I.IsFiniteRelIndex (affineProjection G).ker := by
   let M := affineTranslationKernel G
-  let a : PadicInt p := (g.val.val.right : PadicInt p) - 1
+  let a : ℤ_[p] := (g.val.val.right : ℤ_[p]) - 1
   have ha : a ≠ 0 := by
     intro ha
     apply hg

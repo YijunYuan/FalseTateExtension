@@ -34,11 +34,9 @@ open IsDiscreteValuationRing FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
 
-local notation "Qp" => Padic p
-local notation "OK" => Valuation.valuationSubring (NormedField.valuation (K := Qp))
 
 /-- The normalized additive valuation of the rational base prime is one. -/
-theorem addVal_padicUnitBall_p : addVal OK (p : OK) = 1 := by
+theorem addVal_padicUnitBall_p : addVal 𝒪[ℚ_[p]] (p : 𝒪[ℚ_[p]]) = 1 := by
   apply addVal_uniformizer
   have h := (MulEquiv.irreducible_iff (f := (padicUnitBallEquiv p).symm)).mpr
     PadicInt.irreducible_p
@@ -46,8 +44,8 @@ theorem addVal_padicUnitBall_p : addVal OK (p : OK) = 1 := by
 
 /-- The actual radical thresholds over the rational base have absolute scale one. -/
 theorem radicalUpperBreak_padic (r : ℕ) :
-    radicalUpperBreak (K := Qp) p r = (r : ℝ) + 1 / ((p : ℝ) - 1) := by
-  simp [radicalUpperBreak, addVal_padicUnitBall_p]
+    radicalUpperBreak (K := ℚ_[p]) p r = (r : ℝ) + 1 / ((p : ℝ) - 1) := by
+  simp [radicalUpperBreak, absoluteRamificationIdx, addVal_padicUnitBall_p]
 
 /-- The number of original radical thresholds strictly below the upper parameter.
 The strict inequality retains each right endpoint in the preceding group. -/
@@ -77,13 +75,13 @@ theorem radicalTranslationDepth_succ (n : ℕ) (u : ℝ) :
 /-- The complete intrinsic index profile of the original nonnormal radical fields,
 including the zeroth layer, all finite truncations, and every right endpoint. -/
 theorem radicalLayer_apfIndex_eq_pow_translationDepth
-    {π : OK} (hπ : Irreducible π) (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
-    apfIndex Qp (radicalLayer p (π : Qp) n) u = p ^ radicalTranslationDepth p n u := by
+    {π : 𝒪[ℚ_[p]]} (hπ : Irreducible π) (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
+    apfIndex ℚ_[p] (radicalLayer p (π : ℚ_[p]) n) u = p ^ radicalTranslationDepth p n u := by
   induction n with
   | zero =>
     rw [radicalTranslationDepth_zero, pow_zero, radicalLayer_zero,
-      apfIndex_algEquiv Qp _ (IntermediateField.botEquiv Qp _),
-      apfIndex_eq_one_of_bound_eq_top Qp Qp (apfRamificationBound_self Qp) hu]
+      apfIndex_algEquiv ℚ_[p] _ (IntermediateField.botEquiv ℚ_[p] _),
+      apfIndex_eq_one_of_bound_eq_top ℚ_[p] ℚ_[p] (apfRamificationBound_self ℚ_[p]) hu]
   | succ n ih =>
     rw [radicalLayer_apfIndex_succ_threshold p hπ n hu, ih,
       radicalUpperBreak_padic, radicalTranslationDepth_succ]
@@ -411,19 +409,19 @@ theorem finiteAffineSubgroup_self_bot (n : ℕ) : finiteAffineSubgroup p n n ⊥
 
 section ActualUpper
 
-variable {p} {π : Valuation.valuationSubring (NormedField.valuation (K := Padic p))}
+variable {p} {π : 𝒪[ℚ_[p]]}
   (hp₂ : p ≠ 2) (hπ : Irreducible π)
 
-local notation "D(" n ")" => falseTateLayer p (π : Qp) (n + 1) (n + 1)
-local notation "O(" n ")" => spectralIntegerRing Qp D(n)
-local notation "G(" n ")" => D(n) ≃ₐ[Qp] D(n)
+local notation "D(" n ")" => falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
+local notation "O(" n ")" => spectralIntegerRing ℚ_[p] D(n)
+local notation "G(" n ")" => D(n) ≃ₐ[ℚ_[p]] D(n)
 
 local instance vivianiCyclotomicAlgebra (n : ℕ) :
-    Algebra (cyclotomicLayer (K := Qp) p (n + 1)) D(n) :=
-  (finiteCyclotomicInclusion p (π : Qp) (n + 1)).toRingHom.toAlgebra
+    Algebra (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) :=
+  (finiteCyclotomicInclusion p (π : ℚ_[p]) (n + 1)).toRingHom.toAlgebra
 
 local instance vivianiCyclotomicScalarTower (n : ℕ) :
-    IsScalarTower Qp (cyclotomicLayer (K := Qp) p (n + 1)) D(n) :=
+    IsScalarTower ℚ_[p] (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) :=
   IsScalarTower.of_algebraMap_eq (congrFun rfl)
 
 /-- The image of the original upper group under the checked actual finite
@@ -442,7 +440,7 @@ instance finiteUpperAffineGroup_normal (n : ℕ) (u : ℝ) :
 
 /-- The original pure radical fixer becomes precisely the pure-unit factor. -/
 theorem finiteRadicalFixing_map_affine (n : ℕ) :
-    ((finiteRadicalInclusion p (π : Qp) (n + 1)).fieldRange.fixingSubgroup : Subgroup G(n)).map
+    ((finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).fieldRange.fixingSubgroup : Subgroup G(n)).map
       (finiteDiagonalGaloisEquiv_padic p hp₂ hπ (n + 1)).toMonoidHom =
     (SemidirectProduct.inr : (ZMod (p ^ (n + 1)))ˣ →*
       FullFiniteAffineGroup p (n + 1)).range := by
@@ -459,9 +457,9 @@ the translation intersection of the actual upper group. -/
 theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     ((finiteUpperAffineGroup hp₂ hπ n u).comap SemidirectProduct.inl).index =
       p ^ radicalTranslationDepth p (n + 1) u := by
-  have := falseTateLayer_isGalois p (π : Qp) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
-  let M := (finiteRadicalInclusion p (π : Qp) (n + 1)).fieldRange
-  have hi := apfIndex_eq_subgroupRelIndex_of_finiteGalois Qp D(n) M hu
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
+  let M := (finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).fieldRange
+  have hi := apfIndex_eq_subgroupRelIndex_of_finiteGalois ℚ_[p] D(n) M hu
   have hz : upperRamificationGroup (R := O(n)) G(n) 0 = ⊤ := by
     simpa only [upperRamificationGroup_zero, lowerRamificationGroup_zero] using
       lowerRamificationGroup_falseTateLayer_zero p hp₂ hπ n
@@ -476,10 +474,10 @@ theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
       rfl
     _ = (M.fixingSubgroup ⊔ upperRamificationGroup (R := O(n)) G(n) u).index :=
       Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquiv_padic p hp₂ hπ (n + 1))
-    _ = apfIndex Qp M u := hi.symm
-    _ = apfIndex Qp (radicalLayer p (π : Qp) (n + 1)) u :=
-      (apfIndex_algEquiv Qp (radicalLayer p (π : Qp) (n + 1))
-        (finiteRadicalInclusion p (π : Qp) (n + 1)).equivFieldRange u).symm
+    _ = apfIndex ℚ_[p] M u := hi.symm
+    _ = apfIndex ℚ_[p] (radicalLayer p (π : ℚ_[p]) (n + 1)) u :=
+      (apfIndex_algEquiv ℚ_[p] (radicalLayer p (π : ℚ_[p]) (n + 1))
+        (finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).equivFieldRange u).symm
     _ = _ := radicalLayer_apfIndex_eq_pow_translationDepth p hπ (n + 1) hu
 
 /-- Cyclic subgroup uniqueness turns the intrinsic index into the actual
@@ -495,23 +493,23 @@ theorem finiteUpperAffine_translation (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
 cyclotomic field, by ordinary restriction with its own spectral integers. -/
 theorem finiteUpperAffine_unit_projection (n : ℕ) {u : ℝ} (hu : -1 ≤ u) :
     (finiteUpperAffineGroup hp₂ hπ n u).map SemidirectProduct.rightHom =
-      (upperRamificationGroup (R := spectralIntegerRing Qp
-        (cyclotomicLayer (K := Qp) p (n + 1)))
-          (cyclotomicLayer (K := Qp) p (n + 1) ≃ₐ[Qp]
-            cyclotomicLayer (K := Qp) p (n + 1)) u).map
+      (upperRamificationGroup (R := spectralIntegerRing ℚ_[p]
+        (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
+          (cyclotomicLayer (K := ℚ_[p]) p (n + 1) ≃ₐ[ℚ_[p]]
+            cyclotomicLayer (K := ℚ_[p]) p (n + 1)) u).map
         (cyclotomicLayerCharacter p (n + 1)) := by
-  have := falseTateLayer_isGalois p (π : Qp) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
   have hc : SemidirectProduct.rightHom.comp
       (finiteDiagonalGaloisEquiv_padic p hp₂ hπ (n + 1)).toMonoidHom =
       (cyclotomicLayerCharacter p (n + 1)).comp
-        (diagonalCyclotomicRestriction p (π : Qp) (n + 1)) := by
+        (diagonalCyclotomicRestriction p (π : ℚ_[p]) (n + 1)) := by
     apply MonoidHom.ext
     intro g
-    exact (cyclotomicLayerCharacterOver_diagonalRestriction p (π : Qp) (n + 1) g).symm
-  have hr := restrictNormalHom_map_upperRamificationGroup_tower Qp
-    (cyclotomicLayer (K := Qp) p (n + 1)) D(n) u hu
+    exact (cyclotomicLayerCharacterOver_diagonalRestriction p (π : ℚ_[p]) (n + 1) g).symm
+  have hr := restrictNormalHom_map_upperRamificationGroup_tower ℚ_[p]
+    (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) u hu
   change (upperRamificationGroup (R := O(n)) G(n) u).map
-    (diagonalCyclotomicRestriction p (π : Qp) (n + 1)) = _ at hr
+    (diagonalCyclotomicRestriction p (π : ℚ_[p]) (n + 1)) = _ at hr
   rw [finiteUpperAffineGroup, Subgroup.map_map, hc, ← Subgroup.map_map, hr]
 
 /-- Every positive finite cyclotomic interval has its exact principal-unit
@@ -617,22 +615,22 @@ local notation "Ψ(" n ")" => inverseHerbrandFunction (R := O(n)) G(n)
 include hp₂ hπ in
 /-- Full inertia identifies the intrinsic index with the original full upper index. -/
 theorem apfIndex_falseTateLayer_eq_upperIndex (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
-    apfIndex Qp D(n) u = (upperRamificationGroup (R := O(n)) G(n) u).index := by
-  have := falseTateLayer_isGalois p (π : Qp) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
+    apfIndex ℚ_[p] D(n) u = (upperRamificationGroup (R := O(n)) G(n) u).index := by
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
   have hz : upperRamificationGroup (R := O(n)) G(n) 0 = ⊤ := by
     simpa only [upperRamificationGroup_zero, lowerRamificationGroup_zero] using
       lowerRamificationGroup_falseTateLayer_zero p hp₂ hπ n
-  rw [apfIndex_eq_upperRelIndex Qp D(n) hu, hz, Subgroup.relIndex_top_right]
+  rw [apfIndex_eq_upperRelIndex ℚ_[p] D(n) hu, hz, Subgroup.relIndex_top_right]
 
 include hp₂ hπ in
 private theorem viviani_inverse_affine (n : ℕ) {a b : ℝ} (ha : 0 ≤ a) (hab : a ≤ b)
     (c : ℕ) (hc : ∀ u ∈ Set.Ioc a b,
       (upperRamificationGroup (R := O(n)) G(n) u).index = c) :
     Ψ(n) b - Ψ(n) a = (b - a) * c := by
-  have := falseTateLayer_isGalois p (π : Qp) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
-  rw [← apfPsi_eq_inverseHerbrandFunction Qp D(n) (by linarith : -1 ≤ a),
-    ← apfPsi_eq_inverseHerbrandFunction Qp D(n) (by linarith : -1 ≤ b)]
-  exact apfPsi_sub_apfPsi_of_apfIndex_eq Qp D(n) ha hab c fun u hu =>
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
+  rw [← apfPsi_eq_inverseHerbrandFunction ℚ_[p] D(n) (by linarith : -1 ≤ a),
+    ← apfPsi_eq_inverseHerbrandFunction ℚ_[p] D(n) (by linarith : -1 ≤ b)]
+  exact apfPsi_sub_apfPsi_of_apfIndex_eq ℚ_[p] D(n) ha hab c fun u hu =>
     (apfIndex_falseTateLayer_eq_upperIndex hp₂ hπ n (ha.trans hu.1.le)).trans (hc u hu)
 
 include hp₂ hπ in
@@ -1136,18 +1134,18 @@ section IntegerParameter
 /-- The literal integer hypothesis v_p(a)=1 supplies the actual rational
 valuation-ring uniformizer used by every preceding coordinate bridge. -/
 theorem irreducible_integerParameter (a : ℤ) (ha : padicValInt p a = 1) :
-    Irreducible (a : OK) := by
+    Irreducible (a : 𝒪[ℚ_[p]]) := by
   have haZ : a ≠ 0 := by
     rintro rfl
     simp only [padicValInt.zero] at ha
     omega
-  have ha0 : (a : PadicInt p) ≠ 0 := Int.cast_ne_zero.mpr haZ
-  have hv : (a : PadicInt p).valuation = 1 := by
-    have h : ((a : PadicInt p).valuation : ℤ) = 1 := by
+  have ha0 : (a : ℤ_[p]) ≠ 0 := Int.cast_ne_zero.mpr haZ
+  have hv : (a : ℤ_[p]).valuation = 1 := by
+    have h : ((a : ℤ_[p]).valuation : ℤ) = 1 := by
       rw [← PadicInt.valuation_coe, PadicInt.coe_intCast, Padic.valuation_intCast, ha]
       rfl
     exact_mod_cast h
-  have hass : Associated (a : PadicInt p) (p : PadicInt p) := by
+  have hass : Associated (a : ℤ_[p]) (p : ℤ_[p]) := by
     rw [PadicInt.unitCoeff_spec ha0, hv, pow_one]
     exact associated_unit_mul_left _ _ (PadicInt.unitCoeff ha0).isUnit
   have hirr := hass.irreducible_iff.mpr PadicInt.irreducible_p
@@ -1168,8 +1166,8 @@ theorem finiteUpperAffine_integerParameter_interval (hp₂ : p ≠ 2) (a : ℤ)
 a with v_p(a)=1, including the final break of every positive finite layer. -/
 theorem inverseHerbrandFunction_falseTate_integerParameter (hp₂ : p ≠ 2) (a : ℤ)
     (ha : padicValInt p a = 1) (n i : ℕ) (hi : i ≤ n) :
-    let D := falseTateLayer p (a : Qp) (n + 1) (n + 1)
-    let ψ := inverseHerbrandFunction (R := spectralIntegerRing Qp D) (D ≃ₐ[Qp] D)
+    let D := falseTateLayer p (a : ℚ_[p]) (n + 1) (n + 1)
+    let ψ := inverseHerbrandFunction (R := spectralIntegerRing ℚ_[p] D) (D ≃ₐ[ℚ_[p]] D)
     ψ ((i : ℝ) + 1 / ((p : ℝ) - 1)) =
         (2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1) ∧
       ψ ((i : ℝ) + 1) =

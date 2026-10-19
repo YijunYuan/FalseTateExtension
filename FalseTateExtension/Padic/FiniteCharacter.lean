@@ -33,20 +33,20 @@ local instance : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero
 /-- The actual finite rational cyclotomic character, defined by its action on
 the existing chosen primitive root in the actual cyclotomic layer. -/
 def cyclotomicLayerCharacter :
-    (cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) →*
+    (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) →*
       (ZMod (p ^ m))ˣ :=
-  (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow (Padic p)
+  (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow (ℚ_[p])
 
 /-- The defining action of the actual finite character. -/
 theorem cyclotomicLayerCharacter_spec
-    (g : cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) :
+    (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) :
     g (cyclotomicLayerRoot p m) = cyclotomicLayerRoot p m ^
       (cyclotomicLayerCharacter p m g : ZMod (p ^ m)).val :=
-  ((isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_spec (Padic p) g).symm
+  ((isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_spec (ℚ_[p]) g).symm
 
 /-- The action on the actual primitive root uniquely specifies the unit. -/
 theorem cyclotomicLayerCharacter_unique
-    (g : cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m)
+    (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m)
     (u : (ZMod (p ^ m))ˣ)
     (hu : g (cyclotomicLayerRoot p m) = cyclotomicLayerRoot p m ^ (u : ZMod (p ^ m)).val) :
     cyclotomicLayerCharacter p m g = u := by
@@ -58,18 +58,18 @@ theorem cyclotomicLayerCharacter_unique
 /-- Faithfulness follows because the actual primitive root generates the
 actual cyclotomic field. -/
 theorem cyclotomicLayerCharacter_injective : Function.Injective (cyclotomicLayerCharacter p m) :=
-  (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_injective (Padic p)
+  (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_injective (ℚ_[p])
 
 /-- The actual finite cyclotomic Galois group has order equal to its actual
 field degree. -/
 theorem card_cyclotomicLayer_galois_eq_finrank :
-    Nat.card (cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) =
-      Module.finrank (Padic p) (cyclotomicLayer (K := Padic p) p m) :=
-  IsGalois.card_aut_eq_finrank (Padic p) (cyclotomicLayer (K := Padic p) p m)
+    Nat.card (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) =
+      Module.finrank (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m) :=
+  IsGalois.card_aut_eq_finrank (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m)
 
 /-- The cardinality is the prime-power totient, including the zeroth level. -/
 theorem card_cyclotomicLayer_galois :
-    Nat.card (cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) =
+    Nat.card (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) =
       (p ^ m).totient := by
   rw [card_cyclotomicLayer_galois_eq_finrank, finrank_cyclotomicLayer_padic]
 
@@ -81,7 +81,7 @@ theorem card_cyclotomicLayer_character_units : Nat.card (ZMod (p ^ m))ˣ = (p ^ 
 make the actual finite cyclotomic character bijective. -/
 theorem cyclotomicLayerCharacter_bijective : Function.Bijective (cyclotomicLayerCharacter p m) := by
   let := Fintype.ofFinite
-    (cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m)
+    (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m)
   apply (Fintype.bijective_iff_injective_and_card _).mpr
   refine ⟨cyclotomicLayerCharacter_injective p m, ?_⟩
   rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card,
@@ -93,18 +93,18 @@ theorem cyclotomicLayerCharacter_surjective : Function.Surjective (cyclotomicLay
 /-- The isomorphism is the actual character on the actual cyclotomic Galois
 group, rather than an identification through an auxiliary splitting field. -/
 def cyclotomicLayerGaloisEquivUnits :
-    (cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) ≃*
+    (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) ≃*
       (ZMod (p ^ m))ˣ :=
   MulEquiv.ofBijective (cyclotomicLayerCharacter p m) (cyclotomicLayerCharacter_bijective p m)
 
 @[simp]
 theorem cyclotomicLayerGaloisEquivUnits_apply
-    (g : cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) :
+    (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) :
     cyclotomicLayerGaloisEquivUnits p m g = cyclotomicLayerCharacter p m g := rfl
 
 /-- The forward isomorphism evaluates by the action on the original root. -/
 theorem cyclotomicLayerGaloisEquivUnits_spec
-    (g : cyclotomicLayer (K := Padic p) p m ≃ₐ[Padic p] cyclotomicLayer (K := Padic p) p m) :
+    (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) :
     g (cyclotomicLayerRoot p m) = cyclotomicLayerRoot p m ^
       (cyclotomicLayerGaloisEquivUnits p m g : ZMod (p ^ m)).val :=
   cyclotomicLayerCharacter_spec p m g

@@ -45,7 +45,7 @@ instance cyclotomicExtension_hasEnoughRootsOfUnity (n : ℕ) :
 
 /-- The canonical cyclotomic character on the actual infinite cyclotomic field. -/
 def cyclotomicExtensionCharacter :
-    (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →* (PadicInt p)ˣ :=
+    (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →* (ℤ_[p])ˣ :=
   (_root_.cyclotomicCharacter (cyclotomicExtension (K := K) p) p).comp
     (MulSemiringAction.toRingAut
       (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)
@@ -60,7 +60,7 @@ theorem continuous_cyclotomicExtensionCharacter :
 theorem cyclotomicExtensionCharacter_spec (n : ℕ)
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
     g (cyclotomicRootOfUnity p n) = cyclotomicRootOfUnity p n ^
-      (PadicInt.toZModPow n (cyclotomicExtensionCharacter p g : PadicInt p)).val :=
+      (PadicInt.toZModPow n (cyclotomicExtensionCharacter p g : ℤ_[p])).val :=
   _root_.cyclotomicCharacter.spec p g.toRingEquiv (cyclotomicRootOfUnity p n)
     (isPrimitiveRoot_cyclotomicRootOfUnity p n).pow_eq_one
 
@@ -147,10 +147,10 @@ theorem padicCyclotomicCharacter_eq_comp :
   let i := IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π)
   have hi : i (cyclotomicRootOfUnity p n) = extensionRootOfUnity p π n := rfl
   have hpow : extensionRootOfUnity p π n ^
-      (PadicInt.toZModPow n (padicCyclotomicCharacter p π g : PadicInt p)).val =
+      (PadicInt.toZModPow n (padicCyclotomicCharacter p π g : ℤ_[p])).val =
       extensionRootOfUnity p π n ^
         (PadicInt.toZModPow n
-          (cyclotomicExtensionCharacter p (cyclotomicRestriction p π g) : PadicInt p)).val := by
+          (cyclotomicExtensionCharacter p (cyclotomicRestriction p π g) : ℤ_[p])).val := by
     calc
       _ = g (extensionRootOfUnity p π n) :=
         (_root_.cyclotomicCharacter.spec p g.toRingEquiv (extensionRootOfUnity p π n)
@@ -225,13 +225,13 @@ def cyclotomicImageEquiv (hπ : π ≠ 0) :
 /-- The topological identification is given by the actual canonical character. -/
 theorem cyclotomicImageEquiv_apply (hπ : π ≠ 0)
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
-    (cyclotomicImageEquiv p π hπ g : (PadicInt p)ˣ) = cyclotomicExtensionCharacter p g := rfl
+    (cyclotomicImageEquiv p π hπ g : (ℤ_[p])ˣ) = cyclotomicExtensionCharacter p g := rfl
 
 /-- Under this identification, restriction is exactly the false Tate
 cyclotomic character with its codomain restricted to its actual image. -/
 theorem cyclotomicImageEquiv_restrict (hπ : π ≠ 0)
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
-    (cyclotomicImageEquiv p π hπ (cyclotomicRestriction p π g) : (PadicInt p)ˣ) =
+    (cyclotomicImageEquiv p π hπ (cyclotomicRestriction p π g) : (ℤ_[p])ˣ) =
       padicCyclotomicCharacter p π g := by
   rw [cyclotomicImageEquiv_apply, padicCyclotomicCharacter_eq_comp, MonoidHom.comp_apply]
 

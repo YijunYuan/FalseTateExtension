@@ -346,7 +346,7 @@ FalseTateExtension.lean        每层一个聚合文件；docstring 列出六个
 | F1 | 性能速赢，不改接口：两处 `:= rfl` → `restrictNormalHom` 定义；`cyclotomicBase_isCompleteDiscreteValuedField` 改 instance；`NeZero (p^n)` 实例；8 处 `unfold; infer_instance`。预期 1115 s → 约 900 s | 本项目 |
 | F2 | A1：删 NormField*、TameUnits、TameGenerator、`KummerRamification:222–447`；留下的引理归位；根文件更新 | 本项目 |
 | F3 | FW 分支 `false-tate-upstream`（`~/FontaineWintenberger`，提交 `6c9e973`，**尚未推送到 GitHub**；本项目 `lakefile.toml`/`lake-manifest.json` 已指向该提交，`.lake/packages/FontaineWintenberger` 从本地仓库 fetch）：A5.3 九个新叶子模块 + `irreducible_of_valuation_eq_exp_neg_one`；A2.2 (b) 失败退回 (a)。**完成后需要：推送 FW 分支并合并，使 GitHub 上存在该提交** | FW + 本项目 |
-| F4 | A2.1/A2.3/A7：`𝒪[K]`、`𝓀[K]`、`ℚ_[p]`、`ℤ_[p]` 替换；`Padic/Basic.lean`；删旧记号；引入 `falseTateDiagonalLayer`、`FalseTateGaloisGroup`、`absoluteRamificationIdx`、`vivianiOffset` | 本项目 |
+| F4 | A2.1/A2.3/A7：`𝒪[K]`、`𝓀[K]`、`ℚ_[p]`、`ℤ_[p]` 替换；`Padic/Basic.lean`；删 `OK`/`A`/`Zp₀`/`Qp`/`eK`；所有 p 进基域 section 统一为 `[NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]`，`cyclotomicBase_isCompleteDiscreteValuedField` 与 49 处 `let :=` 删除；新定义 `falseTateDiagonalLayer`、`FalseTateGaloisGroup`（abbrev，先定义，使用随 F8 文件拆分进行）、`absoluteRamificationIdx`。**执行时调整**：Viviani 的 `D(n)`/`O(n)`/`G(n)`/`Ψ(n)`/`δ` 与 `vivianiOffset` 推迟到 F8 拆分 Viviani 时处理（这些记号同时出现在约 80 条陈述和证明中，拆文件时逐段改写比全局替换安全）；`cyclotomicBase_residueFinite` 保留为定理（`p` 不在结论中，无法成为 instance）。【已完成 2026-10-19】 | 本项目 |
 | F5 | A3：`[NeZero π]`、`[Fact (Irreducible π)]`、`[Fact (p ≠ 2)]`；`IsGalois`/`IsAPF`/`IsStrictlyAPF` 实例化；去 `hπ`/`hp₂` 穿参 | 本项目 |
 | F6 | A4 + A5.1/A5.2：`Affine/Group.lean` 与半直积拓扑；`Mathlib/` 层；`restrictNormalHomOfLE`；`autEquivPow` 替换 | 本项目 |
 | F7 | E：删除清单、合并重复（含 `SeparableTower`）、`private` 化、`set_option` 归零、陈述拆分 | 本项目 |

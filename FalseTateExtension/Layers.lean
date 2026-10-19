@@ -220,6 +220,14 @@ instance falseTateLayer_finiteDimensional (π : K) (m n : ℕ) :
 def falseTateExtension (π : K) : IntermediateField K (AlgebraicClosure K) :=
   ⨆ m, ⨆ n, falseTateLayer p π m n
 
+/-- The diagonal layer `K(π^{1/p^n}, ζ_{p^n})`. -/
+abbrev falseTateDiagonalLayer (π : K) (n : ℕ) : IntermediateField K (AlgebraicClosure K) :=
+  falseTateLayer p π n n
+
+/-- The Galois group of `K_FT/K`, with its Krull topology. -/
+abbrev FalseTateGaloisGroup (π : K) : Type _ :=
+  falseTateExtension p π ≃ₐ[K] falseTateExtension p π
+
 theorem falseTateLayer_le_falseTateExtension (π : K) (m n : ℕ) :
     falseTateLayer p π m n ≤ falseTateExtension p π :=
   (le_iSup (fun n ↦ falseTateLayer p π m n) n).trans

@@ -33,15 +33,15 @@ variable (p : ℕ) [Fact p.Prime]
 
 /-- The usual action of p-adic units on additive p-adic integers, expressed in
 the canonical multiplicative type tag for the semidirect product. -/
-def padicAffineAction : (PadicInt p)ˣ →* MulAut (Multiplicative (PadicInt p)) :=
-  (MulAutMultiplicative (PadicInt p)).symm.toMonoidHom.comp AddAut.mulLeft
+def padicAffineAction : (ℤ_[p])ˣ →* MulAut (Multiplicative (ℤ_[p])) :=
+  (MulAutMultiplicative (ℤ_[p])).symm.toMonoidHom.comp AddAut.mulLeft
 
 /-- The canonical affine semidirect product over the p-adic integers. -/
 abbrev PadicAffineGroup :=
-  SemidirectProduct (Multiplicative (PadicInt p)) (PadicInt p)ˣ (padicAffineAction p)
+  SemidirectProduct (Multiplicative (ℤ_[p])) (ℤ_[p])ˣ (padicAffineAction p)
 
 /-- The ordinary additive and unit coordinates of the canonical semidirect product. -/
-def padicAffineEquivProd : PadicAffineGroup p ≃ PadicInt p × (PadicInt p)ˣ :=
+def padicAffineEquivProd : PadicAffineGroup p ≃ ℤ_[p] × (ℤ_[p])ˣ :=
   SemidirectProduct.equivProd.trans
     (Equiv.prodCongr Multiplicative.toAdd (Equiv.refl _))
 
@@ -50,7 +50,7 @@ instance padicAffineTopologicalSpace : TopologicalSpace (PadicAffineGroup p) :=
   (padicAffineEquivProd p).topologicalSpace
 
 /-- The product coordinates identify the chosen topology with the product topology. -/
-def padicAffineHomeomorphProd : PadicAffineGroup p ≃ₜ PadicInt p × (PadicInt p)ˣ :=
+def padicAffineHomeomorphProd : PadicAffineGroup p ≃ₜ ℤ_[p] × (ℤ_[p])ˣ :=
   (padicAffineEquivProd p).homeomorph
 
 instance padicAffineT2Space : T2Space (PadicAffineGroup p) :=
@@ -68,7 +68,7 @@ instance padicAffineIsTopologicalGroup : IsTopologicalGroup (PadicAffineGroup p)
   continuous_mul := by
     apply continuous_induced_rng.mpr
     change Continuous (fun x : PadicAffineGroup p × PadicAffineGroup p ↦
-      (x.1.left.toAdd + (x.1.right : PadicInt p) * x.2.left.toAdd, x.1.right * x.2.right))
+      (x.1.left.toAdd + (x.1.right : ℤ_[p]) * x.2.left.toAdd, x.1.right * x.2.right))
     exact ((continuous_padicAffine_left p |>.comp continuous_fst).add
       ((Units.continuous_val.comp ((continuous_padicAffine_right p).comp continuous_fst)).mul
         (continuous_padicAffine_left p |>.comp continuous_snd))).prodMk
@@ -77,14 +77,14 @@ instance padicAffineIsTopologicalGroup : IsTopologicalGroup (PadicAffineGroup p)
   continuous_inv := by
     apply continuous_induced_rng.mpr
     change Continuous (fun x : PadicAffineGroup p ↦
-      ((x.right⁻¹ : (PadicInt p)ˣ) * (-x.left.toAdd), x.right⁻¹))
+      ((x.right⁻¹ : (ℤ_[p])ˣ) * (-x.left.toAdd), x.right⁻¹))
     exact ((Units.continuous_val.comp (continuous_padicAffine_right p).inv).mul
       (continuous_padicAffine_left p).neg).prodMk (continuous_padicAffine_right p).inv
 
 /-- Continuity of every finite residue coordinate suffices for continuity into
 the actual p-adic topology. -/
 theorem _root_.PadicInt.continuous_of_toZModPow {X : Type*} [TopologicalSpace X]
-    (f : X → PadicInt p)
+    (f : X → ℤ_[p])
     (hf : ∀ n, Continuous (fun x ↦ PadicInt.toZModPow n (f x))) : Continuous f := by
   rw [continuous_iff_continuousAt]
   intro x

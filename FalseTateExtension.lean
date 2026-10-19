@@ -23,6 +23,7 @@ public import FalseTateExtension.CyclotomicImage
 
 public import FalseTateExtension.AffineKernel
 
+public import FalseTateExtension.Padic.Basic
 public import FalseTateExtension.Padic.ClosedAddSubgroup
 public import FalseTateExtension.AffineCommutator
 public import FalseTateExtension.AffineIndex

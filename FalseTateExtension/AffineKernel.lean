@@ -28,25 +28,25 @@ noncomputable section
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 /-- The actual affine inclusion of the additive p-adic coordinate is continuous. -/
-theorem continuous_padicAffine_inl : Continuous (fun a : PadicInt p ↦
+theorem continuous_padicAffine_inl : Continuous (fun a : ℤ_[p] ↦
     (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) := by
   apply continuous_induced_rng.mpr
   exact continuous_id.prodMk continuous_const
 
 /-- The closed additive subgroup of coordinates whose affine translation
 belongs to the actual Galois image. -/
-def affineAdditiveKernel (hπ : π ≠ 0) : ClosedAddSubgroup (PadicInt p) where
+def affineAdditiveKernel (hπ : π ≠ 0) : ClosedAddSubgroup (ℤ_[p]) where
   toAddSubgroup := Subgroup.toAddSubgroup'
     ((affineGaloisHom p π hπ).range.comap SemidirectProduct.inl)
   isClosed' := by
-    change IsClosed ((fun a : PadicInt p ↦
+    change IsClosed ((fun a : ℤ_[p] ↦
       (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) ⁻¹'
         Set.range (affineGaloisHom p π hπ))
     exact (isClosedEmbedding_affineGaloisHom p π hπ).isClosed_range.preimage
       (continuous_padicAffine_inl p)
 
 /-- Membership is the defining condition in the actual affine Galois image. -/
-theorem mem_affineAdditiveKernel_iff (hπ : π ≠ 0) (a : PadicInt p) :
+theorem mem_affineAdditiveKernel_iff (hπ : π ≠ 0) (a : ℤ_[p]) :
     a ∈ affineAdditiveKernel p π hπ ↔
       (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p) ∈
         (affineGaloisHom p π hπ).range := Iff.rfl
@@ -82,7 +82,7 @@ def kummerKernelHom (hπ : π ≠ 0) :
 /-- The additive kernel homomorphism is the actual Kummer coordinate. -/
 theorem kummerKernelHom_apply (hπ : π ≠ 0)
     (g : Additive (padicCyclotomicCharacter p π).ker) :
-    (kummerKernelHom p π hπ g : PadicInt p) = padicKummerExponent p π hπ g.toMul := rfl
+    (kummerKernelHom p π hπ g : ℤ_[p]) = padicKummerExponent p π hπ g.toMul := rfl
 
 /-- The actual affine image and coordinate injectivity make the kernel
 coordinate map bijective onto precisely the displayed closed subgroup. -/
@@ -131,7 +131,7 @@ def kummerKernelEquiv (hπ : π ≠ 0) :
 Kummer coordinate. -/
 theorem kummerKernelEquiv_apply (hπ : π ≠ 0)
     (g : Additive (padicCyclotomicCharacter p π).ker) :
-    (kummerKernelEquiv p π hπ g : PadicInt p) = padicKummerExponent p π hπ g.toMul := rfl
+    (kummerKernelEquiv p π hπ g : ℤ_[p]) = padicKummerExponent p π hπ g.toMul := rfl
 
 end
 

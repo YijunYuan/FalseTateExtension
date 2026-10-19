@@ -102,7 +102,7 @@ instance falseTateExtension_hasEnoughRootsOfUnity (n : ℕ) :
 /-- The usual Mathlib cyclotomic character of the actual infinite field,
 restricted to its K-algebra automorphisms. -/
 def padicCyclotomicCharacter :
-    (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* (PadicInt p)ˣ :=
+    (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* (ℤ_[p])ˣ :=
   (_root_.cyclotomicCharacter (falseTateExtension p π) p).comp
     (MulSemiringAction.toRingAut
       (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (falseTateExtension p π))
@@ -150,7 +150,7 @@ theorem kummerRepresentative_step (hπ : π ≠ 0)
 /-- The p-adic Kummer coordinate is the actual limit of the compatible integer
 representatives supplied by the finite coordinates. -/
 def padicKummerExponent (hπ : π ≠ 0)
-    (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) : PadicInt p :=
+    (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) : ℤ_[p] :=
   PadicInt.ofIntSeq (kummerRepresentative p π hπ g)
     (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (kummerRepresentative p π hπ g) p
       (kummerRepresentative_step p π hπ g))
@@ -169,7 +169,7 @@ theorem padicKummerExponent_toZModPow (hπ : π ≠ 0)
 /-- The finite projection formulas uniquely determine the p-adic Kummer
 coordinate, hence make it independent of integer representative choices. -/
 theorem padicKummerExponent_unique (hπ : π ≠ 0)
-    (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (a : PadicInt p)
+    (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (a : ℤ_[p])
     (ha : ∀ n, PadicInt.toZModPow n a =
       finiteKummerExponent p π n hπ (infiniteLayerRestriction p π hπ n g)) :
     padicKummerExponent p π hπ g = a := by
@@ -182,11 +182,11 @@ proved projections. -/
 theorem padicKummerExponent_mul (hπ : π ≠ 0)
     (g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     padicKummerExponent p π hπ (g * h) = padicKummerExponent p π hπ g +
-      (padicCyclotomicCharacter p π g : PadicInt p) * padicKummerExponent p π hπ h := by
+      (padicCyclotomicCharacter p π g : ℤ_[p]) * padicKummerExponent p π hπ h := by
   apply PadicInt.ext_of_toZModPow.mp
   intro n
   have hχ := congrArg Units.val (padicCyclotomicCharacter_toZModPow p π hπ n g)
-  change PadicInt.toZModPow n (padicCyclotomicCharacter p π g : PadicInt p) =
+  change PadicInt.toZModPow n (padicCyclotomicCharacter p π g : ℤ_[p]) =
     (finiteCyclotomicCharacter p π n (infiniteLayerRestriction p π hπ n g) : ZMod (p ^ n)) at hχ
   simp only [map_add, map_mul, padicKummerExponent_toZModPow, hχ]
   exact finiteKummerExponent_mul p π n hπ

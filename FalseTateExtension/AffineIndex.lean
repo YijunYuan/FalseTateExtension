@@ -27,15 +27,15 @@ namespace PadicInt
 variable {p : ℕ} [Fact p.Prime]
 
 /-- The actual image of multiplication by a nonzero scalar has finite index. -/
-theorem mulLeft_range_finiteIndex (a : PadicInt p) (ha : a ≠ 0) :
+theorem mulLeft_range_finiteIndex (a : ℤ_[p]) (ha : a ≠ 0) :
     (AddMonoidHom.mulLeft a).range.FiniteIndex := by
-  let M : ClosedAddSubgroup (PadicInt p) := ⟨⊤, isClosed_univ⟩
-  have h : ((⊤ : AddSubgroup (PadicInt p)).map (AddMonoidHom.mulLeft a)).IsFiniteRelIndex ⊤ :=
+  let M : ClosedAddSubgroup (ℤ_[p]) := ⟨⊤, isClosed_univ⟩
+  have h : ((⊤ : AddSubgroup (ℤ_[p])).map (AddMonoidHom.mulLeft a)).IsFiniteRelIndex ⊤ :=
     closedAddSubgroup_map_mulLeft_finiteRelIndex M a ha
   simpa only [AddSubgroup.map_top] using AddSubgroup.isFiniteRelIndex_top_iff.mp h
 
 /-- The uniform scalar-index constant is positive in the ordinary index convention. -/
-theorem mulLeft_range_index_pos (a : PadicInt p) (ha : a ≠ 0) :
+theorem mulLeft_range_index_pos (a : ℤ_[p]) (ha : a ≠ 0) :
     0 < (AddMonoidHom.mulLeft a).range.index := by
   have := mulLeft_range_finiteIndex a ha
   exact Nat.pos_of_ne_zero AddSubgroup.FiniteIndex.index_ne_zero
@@ -43,39 +43,39 @@ theorem mulLeft_range_index_pos (a : PadicInt p) (ha : a ≠ 0) :
 /-- Multiplication by a scalar has the same relative index on every nonzero
 closed additive subgroup of the p-adic integers. -/
 theorem closedAddSubgroup_map_mulLeft_relIndex_eq
-    (M : ClosedAddSubgroup (PadicInt p)) (hM : M.toAddSubgroup ≠ ⊥) (a : PadicInt p) :
+    (M : ClosedAddSubgroup (ℤ_[p])) (hM : M.toAddSubgroup ≠ ⊥) (a : ℤ_[p]) :
     (M.toAddSubgroup.map (AddMonoidHom.mulLeft a)).relIndex M.toAddSubgroup =
       (AddMonoidHom.mulLeft a).range.index := by
   obtain hzero | ⟨s, hs⟩ := closedAddSubgroup_eq_bot_or_span_pow M
   · exact (hM hzero).elim
-  let f : PadicInt p →+ PadicInt p := AddMonoidHom.mulLeft ((p : PadicInt p) ^ s)
-  have hp : (p : PadicInt p) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
+  let f : ℤ_[p] →+ ℤ_[p] := AddMonoidHom.mulLeft ((p : ℤ_[p]) ^ s)
+  have hp : (p : ℤ_[p]) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
   have hf : Function.Injective f := by
     intro x y h
     exact mul_left_cancel₀ (pow_ne_zero s hp) h
-  have htop : (⊤ : AddSubgroup (PadicInt p)).map f = M.toAddSubgroup := by
+  have htop : (⊤ : AddSubgroup (ℤ_[p])).map f = M.toAddSubgroup := by
     rw [hs]
     ext x
     simp [f, Ideal.mem_span_singleton, dvd_def, eq_comm]
   have hcomm : M.toAddSubgroup.map (AddMonoidHom.mulLeft a) =
-      ((⊤ : AddSubgroup (PadicInt p)).map (AddMonoidHom.mulLeft a)).map f := by
+      ((⊤ : AddSubgroup (ℤ_[p])).map (AddMonoidHom.mulLeft a)).map f := by
     rw [← htop, AddSubgroup.map_map, AddSubgroup.map_map]
     congr 1
     apply AddMonoidHom.ext
     intro x
-    change a * ((p : PadicInt p) ^ s * x) = (p : PadicInt p) ^ s * (a * x)
-    exact mul_left_comm a ((p : PadicInt p) ^ s) x
+    change a * ((p : ℤ_[p]) ^ s * x) = (p : ℤ_[p]) ^ s * (a * x)
+    exact mul_left_comm a ((p : ℤ_[p]) ^ s) x
   calc
-    _ = (((⊤ : AddSubgroup (PadicInt p)).map (AddMonoidHom.mulLeft a)).map f).relIndex
-        ((⊤ : AddSubgroup (PadicInt p)).map f) := by rw [hcomm, htop]
-    _ = ((⊤ : AddSubgroup (PadicInt p)).map (AddMonoidHom.mulLeft a)).relIndex ⊤ :=
+    _ = (((⊤ : AddSubgroup (ℤ_[p])).map (AddMonoidHom.mulLeft a)).map f).relIndex
+        ((⊤ : AddSubgroup (ℤ_[p])).map f) := by rw [hcomm, htop]
+    _ = ((⊤ : AddSubgroup (ℤ_[p])).map (AddMonoidHom.mulLeft a)).relIndex ⊤ :=
       AddSubgroup.relIndex_map_map_of_injective _ _ hf
     _ = _ := by rw [AddSubgroup.relIndex_top_right, AddSubgroup.map_top]
 
 /-- A single actual scalar-index constant bounds every closed additive subgroup,
 including the zero subgroup. -/
 theorem closedAddSubgroup_map_mulLeft_relIndex_le
-    (M : ClosedAddSubgroup (PadicInt p)) (a : PadicInt p) (ha : a ≠ 0) :
+    (M : ClosedAddSubgroup (ℤ_[p])) (a : ℤ_[p]) (ha : a ≠ 0) :
     (M.toAddSubgroup.map (AddMonoidHom.mulLeft a)).relIndex M.toAddSubgroup ≤
       (AddMonoidHom.mulLeft a).range.index := by
   by_cases hM : M.toAddSubgroup = ⊥
@@ -93,7 +93,7 @@ open scoped Pointwise commutatorElement
 
 /-- The actual pure-unit subgroup of a closed affine subgroup. -/
 def affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G :=
-  (SemidirectProduct.inr : (PadicInt p)ˣ →* PadicAffineGroup p).range.comap G.toSubgroup.subtype
+  (SemidirectProduct.inr : (ℤ_[p])ˣ →* PadicAffineGroup p).range.comap G.toSubgroup.subtype
 
 @[simp]
 theorem mem_affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
@@ -111,7 +111,7 @@ theorem isClosed_affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) :
     IsClosed (affinePureUnits G : Set G) := by
   have hc : Continuous (fun g : G ↦ g.val.left.toAdd) :=
     (continuous_padicAffine_left p).comp continuous_subtype_val
-  convert isClosed_eq hc (continuous_const (y := (0 : PadicInt p))) using 1
+  convert isClosed_eq hc (continuous_const (y := (0 : ℤ_[p]))) using 1
   ext g
   change g ∈ affinePureUnits G ↔ g.val.left.toAdd = 0
   rw [mem_affinePureUnits]
@@ -146,12 +146,12 @@ def affineZeroStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G 
   carrier := {g | g.val.left.toAdd ∈ affineTranslationKernel G}
   one_mem' := (affineTranslationKernel G).zero_mem
   mul_mem' {g h} hg hh := by
-    change g.val.left.toAdd + (g.val.right : PadicInt p) * h.val.left.toAdd ∈
+    change g.val.left.toAdd + (g.val.right : ℤ_[p]) * h.val.left.toAdd ∈
       affineTranslationKernel G
     exact (affineTranslationKernel G).add_mem hg
       (PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _ hh)
   inv_mem' {g} hg := by
-    change (g.val.right⁻¹ : (PadicInt p)ˣ) * -g.val.left.toAdd ∈ affineTranslationKernel G
+    change (g.val.right⁻¹ : (ℤ_[p])ˣ) * -g.val.left.toAdd ∈ affineTranslationKernel G
     exact PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _
       ((affineTranslationKernel G).neg_mem hg)
 
@@ -192,25 +192,25 @@ theorem affineZeroStabilizer_inv_mul_mem_iff
     (G : ClosedSubgroup (PadicAffineGroup p)) (g h : G) :
     g⁻¹ * h ∈ affineZeroStabilizer G ↔
       h.val.left.toAdd - g.val.left.toAdd ∈ affineTranslationKernel G := by
-  have hunit : (g.val.right : PadicInt p) * (g.val.right⁻¹ : (PadicInt p)ˣ) = 1 := by
-    exact congrArg (fun u : (PadicInt p)ˣ ↦ (u : PadicInt p)) (mul_inv_cancel g.val.right)
+  have hunit : (g.val.right : ℤ_[p]) * (g.val.right⁻¹ : (ℤ_[p])ˣ) = 1 := by
+    exact congrArg (fun u : (ℤ_[p])ˣ ↦ (u : ℤ_[p])) (mul_inv_cancel g.val.right)
   have hcoord : (g⁻¹ * h).val.left.toAdd =
-      (g.val.right⁻¹ : (PadicInt p)ˣ) * (h.val.left.toAdd - g.val.left.toAdd) := by
-    change (g.val.right⁻¹ : (PadicInt p)ˣ) * -g.val.left.toAdd +
-      (g.val.right⁻¹ : (PadicInt p)ˣ) * h.val.left.toAdd = _
+      (g.val.right⁻¹ : (ℤ_[p])ˣ) * (h.val.left.toAdd - g.val.left.toAdd) := by
+    change (g.val.right⁻¹ : (ℤ_[p])ˣ) * -g.val.left.toAdd +
+      (g.val.right⁻¹ : (ℤ_[p])ˣ) * h.val.left.toAdd = _
     ring
   rw [mem_affineZeroStabilizer, hcoord]
   constructor
   · intro hm
     have h := PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G)
-      (g.val.right : PadicInt p) _ hm
+      (g.val.right : ℤ_[p]) _ hm
     simpa only [← mul_assoc, hunit, one_mul] using h
   · exact PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _
 
 /-- Zero-stabilizer cosets inject into the actual additive quotient by the full kernel. -/
 def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup p)) :
     (G ⧸ affineZeroStabilizer G) ↪
-      (PadicInt p ⧸ (affineTranslationKernel G).toAddSubgroup) where
+      (ℤ_[p] ⧸ (affineTranslationKernel G).toAddSubgroup) where
   toFun := Quotient.map' (fun g : G ↦ g.val.left.toAdd) (by
     intro g h hrel
     rw [QuotientGroup.leftRel_apply] at hrel
@@ -239,7 +239,7 @@ theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p
   have hopen := PadicInt.isOpen_closedAddSubgroup_map_mulLeft
     (affineTranslationKernel G) hM 1 one_ne_zero
   have heq : (affineTranslationKernel G).toAddSubgroup.map
-      (AddMonoidHom.mulLeft (1 : PadicInt p)) = (affineTranslationKernel G).toAddSubgroup := by
+      (AddMonoidHom.mulLeft (1 : ℤ_[p])) = (affineTranslationKernel G).toAddSubgroup := by
     ext x
     simp
   rw [heq] at hopen
@@ -290,13 +290,13 @@ theorem exists_affinePureUnit_ne_one (G : ClosedSubgroup (PadicAffineGroup p))
 
 /-- The actual closed additive translations lying in a closed subgroup of `G`. -/
 def affineTranslationIntersection (G : ClosedSubgroup (PadicAffineGroup p))
-    (P : Subgroup G) (hP : IsClosed (P : Set G)) : ClosedAddSubgroup (PadicInt p) where
+    (P : Subgroup G) (hP : IsClosed (P : Set G)) : ClosedAddSubgroup (ℤ_[p]) where
   toAddSubgroup := Subgroup.toAddSubgroup'
     ((P.map G.toSubgroup.subtype).comap SemidirectProduct.inl)
   isClosed' := by
     have hc : IsClosed (P.map G.toSubgroup.subtype : Set (PadicAffineGroup p)) :=
       (hP.isCompact.image continuous_subtype_val).isClosed
-    change IsClosed ((fun x : PadicInt p ↦
+    change IsClosed ((fun x : ℤ_[p] ↦
       (SemidirectProduct.inl (Multiplicative.ofAdd x) : PadicAffineGroup p)) ⁻¹'
         (P.map G.toSubgroup.subtype : Set (PadicAffineGroup p)))
     apply hc.preimage
@@ -389,7 +389,7 @@ theorem affinePureUnit_scalar_image_le (G : ClosedSubgroup (PadicAffineGroup p))
     (I : Subgroup G) [I.Normal] (hI : IsClosed (I : Set G)) (s₀ : affinePureUnits G) :
     ((affineTranslationIntersection G (affinePureUnits G ⊔ I)
       (isClosed_affinePureUnits_sup G I hI)).toAddSubgroup.map
-        (AddMonoidHom.mulLeft ((s₀.val.val.right : PadicInt p) - 1))) ≤
+        (AddMonoidHom.mulLeft ((s₀.val.val.right : ℤ_[p]) - 1))) ≤
       (affineTranslationIntersection G I hI).toAddSubgroup := by
   rintro y ⟨x, hx, rfl⟩
   obtain ⟨g, hg, hgval⟩ := hx
@@ -398,7 +398,7 @@ theorem affinePureUnit_scalar_image_le (G : ClosedSubgroup (PadicAffineGroup p))
   change G.toSubgroup.subtype ⁅s₀.val, g⁆ = _
   rw [map_commutatorElement]
   change ⁅s₀.val.val, g.val⁆ = SemidirectProduct.inl
-    (Multiplicative.ofAdd (((s₀.val.val.right : PadicInt p) - 1) * x))
+    (Multiplicative.ofAdd (((s₀.val.val.right : ℤ_[p]) - 1) * x))
   rw [hgval]
   exact padicAffine_commutator_inl s₀.val.val x
 
@@ -411,11 +411,11 @@ theorem affinePureUnit_intersection_relIndex_bound
         ((affinePureUnits G ⊔ I).comap (affineTranslationHom G)) ∧
       (I.comap (affineTranslationHom G)).relIndex
         ((affinePureUnits G ⊔ I).comap (affineTranslationHom G)) ≤
-          (AddMonoidHom.mulLeft ((s₀.val.val.right : PadicInt p) - 1)).range.index := by
+          (AddMonoidHom.mulLeft ((s₀.val.val.right : ℤ_[p]) - 1)).range.index := by
   let T := affineTranslationIntersection G (affinePureUnits G ⊔ I)
     (isClosed_affinePureUnits_sup G I hI)
   let Mᵢ := affineTranslationIntersection G I hI
-  let a : PadicInt p := (s₀.val.val.right : PadicInt p) - 1
+  let a : ℤ_[p] := (s₀.val.val.right : ℤ_[p]) - 1
   let J := T.toAddSubgroup.map (AddMonoidHom.mulLeft a)
   have ha : a ≠ 0 := by
     intro ha
@@ -451,7 +451,7 @@ theorem affinePureUnit_kernel_index_bound
     [(affinePureUnits G ⊔ I).FiniteIndex] :
     0 < (I.comap (affineTranslationHom G)).index ∧
       (I.comap (affineTranslationHom G)).index ≤
-        (AddMonoidHom.mulLeft ((s₀.val.val.right : PadicInt p) - 1)).range.index *
+        (AddMonoidHom.mulLeft ((s₀.val.val.right : ℤ_[p]) - 1)).range.index *
           (affinePureUnits G ⊔ I).index := by
   let P := I.comap (affineTranslationHom G)
   let Q := (affinePureUnits G ⊔ I).comap (affineTranslationHom G)
@@ -546,7 +546,7 @@ theorem affineIndex_comparison
         I.index ≤ C * (affinePureUnits G ⊔ I).index *
           (I.map (affineProjection G).rangeRestrict).index := by
   obtain ⟨s₀, hs₀⟩ := exists_affinePureUnit_ne_one G hM
-  let a : PadicInt p := (s₀.val.val.right : PadicInt p) - 1
+  let a : ℤ_[p] := (s₀.val.val.right : ℤ_[p]) - 1
   have ha : a ≠ 0 := by
     intro ha
     apply hs₀

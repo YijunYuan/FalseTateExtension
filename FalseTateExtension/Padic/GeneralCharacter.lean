@@ -47,7 +47,7 @@ theorem cyclotomicCharacter_eq_of_intertwines
   apply ZMod.val_injective
   apply hζ'.pow_inj (ZMod.val_lt _) (ZMod.val_lt _)
   calc
-    _ = i (ζ ^ (PadicInt.toZModPow n (_root_.cyclotomicCharacter E p g : PadicInt p)).val) :=
+    _ = i (ζ ^ (PadicInt.toZModPow n (_root_.cyclotomicCharacter E p g : ℤ_[p])).val) :=
       (map_pow i _ _).symm
     _ = i (g ζ) := congrArg i (_root_.cyclotomicCharacter.spec p g ζ hζ.pow_eq_one).symm
     _ = g' (i ζ) := hi ζ
@@ -56,30 +56,30 @@ theorem cyclotomicCharacter_eq_of_intertwines
 /-- On the actual algebraic closure of the p-adic rationals, the canonical
 character is surjective by restriction to the actual cyclotomic subfield. -/
 theorem cyclotomicCharacter_algebraicClosure_padic_surjective :
-    Function.Surjective ((_root_.cyclotomicCharacter (AlgebraicClosure (Padic p)) p).comp
+    Function.Surjective ((_root_.cyclotomicCharacter (AlgebraicClosure (ℚ_[p])) p).comp
       (MulSemiringAction.toRingAut
-        (AlgebraicClosure (Padic p) ≃ₐ[Padic p] AlgebraicClosure (Padic p))
-        (AlgebraicClosure (Padic p)))) := by
+        (AlgebraicClosure (ℚ_[p]) ≃ₐ[ℚ_[p]] AlgebraicClosure (ℚ_[p]))
+        (AlgebraicClosure (ℚ_[p])))) := by
   intro u
   obtain ⟨g, hg⟩ := cyclotomicExtensionCharacter_surjective_padic p u
-  obtain ⟨h, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (AlgebraicClosure (Padic p)) g
+  obtain ⟨h, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (AlgebraicClosure (ℚ_[p])) g
   refine ⟨h, ?_⟩
-  change _root_.cyclotomicCharacter (AlgebraicClosure (Padic p)) p h.toRingEquiv = u
+  change _root_.cyclotomicCharacter (AlgebraicClosure (ℚ_[p])) p h.toRingEquiv = u
   have hc := cyclotomicCharacter_eq_of_intertwines p
-    (algebraMap (cyclotomicExtension (K := Padic p) p) (AlgebraicClosure (Padic p)))
-    (h.restrictNormal (cyclotomicExtension (K := Padic p) p)).toRingEquiv h.toRingEquiv
-    (AlgEquiv.restrictNormal_commutes h (cyclotomicExtension (K := Padic p) p))
+    (algebraMap (cyclotomicExtension (K := ℚ_[p]) p) (AlgebraicClosure (ℚ_[p])))
+    (h.restrictNormal (cyclotomicExtension (K := ℚ_[p]) p)).toRingEquiv h.toRingEquiv
+    (AlgEquiv.restrictNormal_commutes h (cyclotomicExtension (K := ℚ_[p]) p))
   exact hc.symm.trans hg
 
 /-- Naturality transfers the actual rational surjectivity to any actual
 algebraic closure of the p-adic rationals. -/
 theorem cyclotomicCharacter_surjective_of_isAlgClosure
-    (Ω : Type*) [Field Ω] [Algebra (Padic p) Ω] [IsAlgClosure (Padic p) Ω] :
+    (Ω : Type*) [Field Ω] [Algebra (ℚ_[p]) Ω] [IsAlgClosure (ℚ_[p]) Ω] :
     Function.Surjective ((_root_.cyclotomicCharacter Ω p).comp
-      (MulSemiringAction.toRingAut (Ω ≃ₐ[Padic p] Ω) Ω)) := by
-  let e := IsAlgClosure.equiv (Padic p) (AlgebraicClosure (Padic p)) Ω
-  let : IsAlgClosed Ω := IsAlgClosure.isAlgClosed (Padic p)
-  let : CharZero Ω := charZero_of_injective_algebraMap (algebraMap (Padic p) Ω).injective
+      (MulSemiringAction.toRingAut (Ω ≃ₐ[ℚ_[p]] Ω) Ω)) := by
+  let e := IsAlgClosure.equiv (ℚ_[p]) (AlgebraicClosure (ℚ_[p])) Ω
+  let : IsAlgClosed Ω := IsAlgClosure.isAlgClosed (ℚ_[p])
+  let : CharZero Ω := charZero_of_injective_algebraMap (algebraMap (ℚ_[p]) Ω).injective
   have : NeZero (p : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero⟩
   intro u
   obtain ⟨g, hg⟩ := cyclotomicCharacter_algebraicClosure_padic_surjective p u
@@ -134,35 +134,35 @@ theorem cyclotomicCharacter_restrict_cyclotomicExtension
     (g.restrictNormal (cyclotomicExtension (K := K) p)).toRingEquiv g.toRingEquiv
     (AlgEquiv.restrictNormal_commutes g (cyclotomicExtension (K := K) p))
 
-variable [Algebra (Padic p) K]
+variable [Algebra (ℚ_[p]) K]
 
 /-- The existing actual cyclotomic character image is the image of the
 actual scalar-restriction subgroup in the same algebraic closure. -/
 theorem cyclotomicExtensionCharacter_range_eq_map :
     (cyclotomicExtensionCharacter (K := K) p).range =
-      (AlgEquiv.restrictScalarsHom (Padic p) (S := K) (A := AlgebraicClosure K)).range.map
+      (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range.map
         ((_root_.cyclotomicCharacter (AlgebraicClosure K) p).comp
           (MulSemiringAction.toRingAut
-            (AlgebraicClosure K ≃ₐ[Padic p] AlgebraicClosure K) (AlgebraicClosure K))) := by
+            (AlgebraicClosure K ≃ₐ[ℚ_[p]] AlgebraicClosure K) (AlgebraicClosure K))) := by
   ext u
   constructor
   · rintro ⟨g, rfl⟩
     obtain ⟨h, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (AlgebraicClosure K) g
-    refine ⟨h.restrictScalars (Padic p), ⟨h, rfl⟩, ?_⟩
+    refine ⟨h.restrictScalars (ℚ_[p]), ⟨h, rfl⟩, ?_⟩
     exact (cyclotomicCharacter_restrict_cyclotomicExtension p h).symm
   · rintro ⟨g, ⟨h, rfl⟩, rfl⟩
     exact ⟨h.restrictNormal (cyclotomicExtension (K := K) p),
       cyclotomicCharacter_restrict_cyclotomicExtension p h⟩
 
-variable [FiniteDimensional (Padic p) K]
+variable [FiniteDimensional (ℚ_[p]) K]
 
 /-- The actual character image has genuinely finite index; its index does
 not take the zero value reserved for infinite index. -/
 instance cyclotomicExtensionCharacter_finiteIndex :
     (cyclotomicExtensionCharacter (K := K) p).range.FiniteIndex := by
-  let S := (AlgEquiv.restrictScalarsHom (Padic p) (S := K) (A := AlgebraicClosure K)).range
-  have hS : S.index = Module.finrank (Padic p) K :=
-    index_range_restrictScalarsHom (Padic p) K (AlgebraicClosure K)
+  let S := (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range
+  have hS : S.index = Module.finrank (ℚ_[p]) K :=
+    index_range_restrictScalarsHom (ℚ_[p]) K (AlgebraicClosure K)
   let : S.FiniteIndex := ⟨by rw [hS]; exact Module.finrank_pos.ne'⟩
   rw [cyclotomicExtensionCharacter_range_eq_map]
   exact Subgroup.FiniteIndex.map_of_surjective S
@@ -170,10 +170,10 @@ instance cyclotomicExtensionCharacter_finiteIndex :
 
 /-- The actual cyclotomic image index divides the finite base degree. -/
 theorem cyclotomicExtensionCharacter_index_dvd :
-    (cyclotomicExtensionCharacter (K := K) p).range.index ∣ Module.finrank (Padic p) K := by
+    (cyclotomicExtensionCharacter (K := K) p).range.index ∣ Module.finrank (ℚ_[p]) K := by
   rw [cyclotomicExtensionCharacter_range_eq_map]
   have h :=
-    (AlgEquiv.restrictScalarsHom (Padic p) (S := K) (A := AlgebraicClosure K)).range.index_map_dvd
+    (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range.index_map_dvd
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
   simpa only [index_range_restrictScalarsHom] using h
 
@@ -185,14 +185,14 @@ theorem cyclotomicExtensionCharacter_index_pos :
 /-- The actual character image has index between one and the base degree. -/
 theorem cyclotomicExtensionCharacter_index_bounds :
     1 ≤ (cyclotomicExtensionCharacter (K := K) p).range.index ∧
-      (cyclotomicExtensionCharacter (K := K) p).range.index ≤ Module.finrank (Padic p) K :=
+      (cyclotomicExtensionCharacter (K := K) p).range.index ≤ Module.finrank (ℚ_[p]) K :=
   ⟨cyclotomicExtensionCharacter_index_pos p,
     Nat.le_of_dvd Module.finrank_pos (cyclotomicExtensionCharacter_index_dvd p)⟩
 
 /-- The existing actual cyclotomic character image is open at every prime,
 by its proved finite index and its existing actual closed embedding. -/
 theorem isOpen_cyclotomicExtensionCharacter_range :
-    IsOpen ((cyclotomicExtensionCharacter (K := K) p).range : Set (PadicInt p)ˣ) :=
+    IsOpen ((cyclotomicExtensionCharacter (K := K) p).range : Set (ℤ_[p])ˣ) :=
   Subgroup.isOpen_of_isClosed_of_finiteIndex _
     (isClosedEmbedding_cyclotomicExtensionCharacter (K := K) p).isClosed_range
 
