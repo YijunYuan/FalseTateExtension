@@ -49,7 +49,10 @@ public import FalseTateExtension.Cyclotomic.InertiaImage
 
 public import FalseTateExtension.Cyclotomic.APF
 public import FalseTateExtension.Kummer.Eisenstein
-public import FalseTateExtension.Kummer.Profile
+public import FalseTateExtension.Kummer.StepProfile
+public import FalseTateExtension.Kummer.Breaks
+public import FalseTateExtension.Kummer.FiniteProfile
+public import FalseTateExtension.Kummer.APF
 public import FalseTateExtension.StrictAPF
 public import FalseTateExtension.Padic.Viviani
 public import FalseTateExtension.FalseTate.Viviani.TauRamification

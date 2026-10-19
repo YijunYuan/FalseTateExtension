@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Padic.FiniteGaloisStructure
-public import FalseTateExtension.Kummer.Profile
+public import FalseTateExtension.Kummer.APF
 public import FontaineWintenberger.Ramification.Upper.Transport
 public import FontaineWintenberger.Ramification.Herbrand.Interval
 public import FontaineWintenberger.APF.Finite.ConstantIndex

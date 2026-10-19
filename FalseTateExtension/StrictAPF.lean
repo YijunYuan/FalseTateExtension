@@ -8,7 +8,7 @@ module
 public import FalseTateExtension.AffineIndex
 public import FalseTateExtension.Cyclotomic.APF
 public import FalseTateExtension.Cyclotomic.InertiaImage
-public import FalseTateExtension.Kummer.Profile
+public import FalseTateExtension.Kummer.APF
 public import FontaineWintenberger.APF.Galois
 public import FontaineWintenberger.APF.Galois.Restriction
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
