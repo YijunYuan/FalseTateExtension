@@ -10,11 +10,32 @@ public import FontaineWintenberger.Ramification.Lower.Generator
 public import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!
-# Stable finite ramification of the Kummer generator
+# Lower ramification numbers of the powers of `τ`
 
-The restriction of tau^(p^k) to diagonal level N has stable shifted
-lower break d_k when N≥k+2. Its unshifted integral order is d_k+1.
-The spectral integer rings and every uniformizer are retained.
+Let `p` be an odd prime, `π` a uniformizer of `ℚ_p`, `K_FT = ℚ_p(π^{1/p^∞}, ζ_{p^∞})`,
+`τ` the generator of `Gal(K_FT/K_cyc)` with Kummer exponent `1`, and
+`L_N = ℚ_p(π^{1/p^N}, ζ_{p^N})` the diagonal layers. Put
+`d_k = 1 + 2(p-1) ∑_{j ≤ k} p^{2j} = (2 p^{2k+2} + p - 1)/(p + 1)`. For `N ≥ k + 2` the
+restriction of `τ^{p^k}` to `L_N` lies in the lower ramification group `G_{d_k}` but not in
+`G_{d_k + 1}`: its ramification number `i(τ^{p^k}) = min_x v(τ^{p^k} x - x)` on the valuation
+ring of `L_N` is `d_k + 1`, and `v(τ^{p^k} ϖ - ϖ) = d_k + 1` for every uniformizer `ϖ`.
+
+## Main results
+
+* `kummerRamificationBreak`: the number `d_k`.
+* `kummerRamificationBreak_mul`, `kummerRamificationBreak_real`: the closed formula
+  `(p + 1) d_k = 2 p^{2k+2} + p - 1`.
+* `kummerTauFinite`: the restriction of `τ^{p^k}` to `L_N`.
+* `kummerTauFinite_mem_lower_break`, `kummerTauFinite_notMem_lower_break_add_one`:
+  `τ^{p^k}|_{L_N} ∈ G_{d_k} ∖ G_{d_k + 1}`.
+* `ramificationOrder_kummerTauFinite`: `i(τ^{p^k}|_{L_N}) = d_k + 1` for `N ≥ k + 2`.
+* `addVal_kummerTauFinite_uniformizer`, `normalizedValuation_kummerTauFinite_displacement`:
+  `v(τ^{p^k} ϖ - ϖ) = d_k + 1` for every uniformizer `ϖ` of `L_N`.
+
+## References
+
+* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6.
+* Serre, *Local Fields*, Chapter IV §1.
 -/
 
 @[expose] public section
@@ -23,22 +44,24 @@ noncomputable section
 
 namespace FalseTateExtension
 
-/-- The stable shifted lower break of the `p^k`-th Kummer power. -/
+/-- `d_k = 1 + 2(p-1) ∑_{j ≤ k} p^{2j}`, the lower ramification number of `τ^{p^k}`. -/
 def kummerRamificationBreak (p k : ℕ) : ℕ :=
   1 + 2 * (p - 1) * ∑ j ∈ Finset.range (k + 1), p ^ (2 * j)
 
+/-- `d_0 = 2p - 1`. -/
 lemma kummerRamificationBreak_zero (p : ℕ) (hp : 1 ≤ p) :
     kummerRamificationBreak p 0 = 2 * p - 1 := by
   simp [kummerRamificationBreak]
   omega
 
+/-- `d_{k+1} = d_k + 2(p-1) p^{2(k+1)}`. -/
 lemma kummerRamificationBreak_succ (p k : ℕ) :
     kummerRamificationBreak p (k + 1) =
       kummerRamificationBreak p k + 2 * (p - 1) * p ^ (2 * (k + 1)) := by
   simp only [kummerRamificationBreak, Finset.sum_range_succ]
   ring
 
-/-- The closed formula is stated without truncated subtraction or division. -/
+/-- `(p + 1) d_k = 2 p^{2k+2} + p - 1`. -/
 lemma kummerRamificationBreak_mul (p k : ℕ) (hp : 1 ≤ p) :
     (p + 1) * kummerRamificationBreak p k = 2 * p ^ (2 * k + 2) + (p - 1) := by
   have hp' : p - 1 + 1 = p := Nat.sub_add_cancel hp
@@ -57,10 +80,12 @@ lemma kummerRamificationBreak_mul (p k : ℕ) (hp : 1 ≤ p) :
       have hmul := congrArg (fun n => 2 * p ^ (2 * k + 2) * n) hfactor
       nlinarith [hmul]
 
+/-- `d_k > 0`. -/
 lemma kummerRamificationBreak_pos (p k : ℕ) : 0 < kummerRamificationBreak p k := by
   unfold kummerRamificationBreak
   omega
 
+/-- `d_k = (2 p^{2k+2} + p - 1)/(p + 1)` in `ℝ`. -/
 lemma kummerRamificationBreak_real (p k : ℕ) (hp : 1 ≤ p) :
     (kummerRamificationBreak p k : ℝ) =
       (2 * (p : ℝ) ^ (2 * k + 2) + p - 1) / (p + 1) := by
@@ -69,6 +94,7 @@ lemma kummerRamificationBreak_real (p k : ℕ) (hp : 1 ≤ p) :
   apply (eq_div_iff (by positivity : (p : ℝ) + 1 ≠ 0)).2
   nlinarith [h]
 
+/-- `d_{k+1} + (p - 1)^2 = p^2 d_k`. -/
 lemma kummerRamificationBreak_recurrence (p k : ℕ) (hp : 1 ≤ p) :
     kummerRamificationBreak p (k + 1) + (p - 1) ^ 2 =
       p ^ 2 * kummerRamificationBreak p k := by
@@ -81,18 +107,21 @@ lemma kummerRamificationBreak_recurrence (p k : ℕ) (hp : 1 ≤ p) :
   have hsub := congrArg (fun n => (p + 1) * kummerRamificationBreak p k * n) hp'
   nlinarith [hmul, hsub]
 
+/-- `d_k` increases with `k`. -/
 lemma kummerRamificationBreak_mono (p : ℕ) : Monotone (kummerRamificationBreak p) := by
   apply monotone_nat_of_le_succ
   intro k
   rw [kummerRamificationBreak_succ]
   omega
 
+/-- `p - 1 ≤ d_k`. -/
 lemma kummerRamificationBreak_lower (p k : ℕ) (hp : 1 ≤ p) :
     p - 1 ≤ kummerRamificationBreak p k := by
   have h := kummerRamificationBreak_mono p (Nat.zero_le k)
   rw [kummerRamificationBreak_zero p hp] at h
   omega
 
+/-- `(p + 1) d_k ≤ d_{k+1}` for `p ≥ 2`. -/
 lemma kummerRamificationBreak_growth (p k : ℕ) (hp : 2 ≤ p) :
     (p + 1) * kummerRamificationBreak p k ≤ kummerRamificationBreak p (k + 1) := by
   have hd := kummerRamificationBreak_lower p k (by omega)
@@ -104,6 +133,7 @@ lemma kummerRamificationBreak_growth (p k : ℕ) (hp : 2 ≤ p) :
   have hd' := Nat.mul_le_mul_left (p - 1) hd
   nlinarith [hc', hd']
 
+/-- `d_k` strictly increases with `k` for `p ≥ 2`. -/
 lemma kummerRamificationBreak_strictMono (p : ℕ) (hp : 2 ≤ p) :
     StrictMono (kummerRamificationBreak p) := by
   apply strictMono_nat_of_lt_succ
@@ -112,6 +142,7 @@ lemma kummerRamificationBreak_strictMono (p : ℕ) (hp : 2 ≤ p) :
   have hd := kummerRamificationBreak_pos p k
   nlinarith
 
+/-- `p ∣ d_k + 1`. -/
 lemma kummerRamificationBreak_succ_dvd (p k : ℕ) [Fact p.Prime] :
     p ∣ kummerRamificationBreak p k + 1 := by
   have hp := (Fact.out : p.Prime).one_le
@@ -123,6 +154,7 @@ lemma kummerRamificationBreak_succ_dvd (p k : ℕ) [Fact p.Prime] :
   push_cast
   linear_combination h
 
+/-- `d_k → ∞` as `k → ∞` for `p ≥ 2`. -/
 lemma kummerRamificationBreak_tendsto_real (p : ℕ) (hp : 2 ≤ p) :
     Filter.Tendsto (fun k => (kummerRamificationBreak p k : ℝ)) Filter.atTop Filter.atTop := by
   apply tendsto_atTop_of_geom_le
@@ -131,7 +163,7 @@ lemma kummerRamificationBreak_tendsto_real (p : ℕ) (hp : 2 ≤ p) :
   intro k
   exact_mod_cast kummerRamificationBreak_growth p k hp
 
-/-- The next integer table entry lies at least one lower unit beyond the break. -/
+/-- `d_k + 1 ≤ (p - 1)(p^{2k+3} + 1)/(p + 1)` for `p ≥ 3`. -/
 lemma kummerRamificationBreak_add_one_le_integer (p k : ℕ) (hp : 3 ≤ p) :
     (kummerRamificationBreak p k : ℝ) + 1 ≤
       ((p : ℝ) - 1) * ((p : ℝ) ^ (2 * (k + 1) + 1) + 1) / ((p : ℝ) + 1) := by
@@ -155,14 +187,14 @@ variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[ℚ_[p]])
 variable [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
 
-/-- The finite restriction of the generator power. -/
+/-- The restriction of `τ^{p^k}` to the diagonal layer `L_N = ℚ_p(π^{1/p^N}, ζ_{p^N})`. -/
 def kummerTauFinite (N k : ℕ) :
     (falseTateLayer p (π : ℚ_[p]) N N) ≃ₐ[ℚ_[p]]
       (falseTateLayer p (π : ℚ_[p]) N N) :=
   infiniteLayerRestriction p (π : ℚ_[p]) N
     ((tau p π).val ^ (p ^ k))
 
-/-- Powers in the character kernel have their additive coordinate. -/
+/-- The Kummer exponent of `τ^m` is `m`. -/
 lemma padicKummerExponent_tau_pow (m : ℕ) :
     padicKummerExponent p (π : ℚ_[p])
       ((tau p π).val ^ m) = m := by
@@ -172,8 +204,8 @@ lemma padicKummerExponent_tau_pow (m : ℕ) :
   rw [padicKummerExponent_tau]
   simp
 
-/-- Under the checked finite affine isomorphism the restriction is
-the translation by `p^k`; the unit coordinate is exactly one. -/
+/-- In the affine coordinates `(b_N, χ_N)` of `Gal(L_N/ℚ_p)`, the restriction of `τ^{p^k}`
+is the translation by `p^k`: `b_N = p^k` and `χ_N = 1`. -/
 lemma finiteDiagonalGaloisEquiv_kummerTauFinite (N k : ℕ) :
     finiteDiagonalGaloisEquiv_padic p π N (kummerTauFinite p π N k) =
       SemidirectProduct.inl (Multiplicative.ofAdd (p ^ k : ZMod (p ^ N))) := by
@@ -192,6 +224,7 @@ lemma finiteDiagonalGaloisEquiv_kummerTauFinite (N k : ℕ) :
     simp [hχ]
 
 omit [Fact p.Prime] hp₂ in
+/-- `p^k ∈ p^k (ℤ/p^N)`. -/
 lemma primePower_mem_finiteTranslationSubgroup (N k : ℕ) :
     Multiplicative.ofAdd (p ^ k : ZMod (p ^ N)) ∈ finiteTranslationSubgroup p N k := by
   refine ⟨Multiplicative.ofAdd (1 : ZMod (p ^ N)), ?_⟩
@@ -199,6 +232,7 @@ lemma primePower_mem_finiteTranslationSubgroup (N k : ℕ) :
   simp [nsmul_eq_mul]
 
 omit hp₂ in
+/-- `p^k ∉ p^{k+1} (ℤ/p^N)` for `k < N`. -/
 lemma primePower_notMem_finiteTranslationSubgroup (N k : ℕ) (hk : k < N) :
     Multiplicative.ofAdd (p ^ k : ZMod (p ^ N)) ∉ finiteTranslationSubgroup p N (k + 1) := by
   rintro ⟨a, ha⟩
@@ -215,7 +249,8 @@ lemma primePower_notMem_finiteTranslationSubgroup (N k : ℕ) (hk : k < N) :
   have := (Nat.pow_dvd_pow_iff_le_right (Fact.out : p.Prime).one_lt).mp hd
   omega
 
-/-- The generator power belongs to the lower group at its break. -/
+/-- `τ^{p^k}|_{L_{n+1}}` lies in the lower ramification group `G_{d_k}` of `L_{n+1}/ℚ_p` for
+`k + 1 ≤ n`. -/
 lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
     kummerTauFinite p π (n + 1) k ∈
       lowerRamificationGroupReal
@@ -248,7 +283,8 @@ lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
   have hge : g = kummerTauFinite p π (n + 1) k := e.injective he
   simpa only [lowerRamificationGroupReal, Int.ceil_natCast, hge, SetLike.mem_coe] using hg
 
-/-- Immediately beyond that break the restriction leaves the lower group. -/
+/-- `τ^{p^k}|_{L_{n+1}}` does not lie in the lower ramification group `G_{d_k + 1}` of
+`L_{n+1}/ℚ_p` for `k + 1 ≤ n`. -/
 lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) :
     kummerTauFinite p π (n + 1) k ∉
       lowerRamificationGroupReal
@@ -271,7 +307,8 @@ lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) 
   rw [finiteDiagonalGaloisEquiv_kummerTauFinite] at hm
   exact primePower_notMem_finiteTranslationSubgroup p (n + 1) k (by omega) hm.1
 
-/-- The unshifted order on the spectral integer ring is `d_k + 1`. -/
+/-- `i(τ^{p^k}|_{L_{n+1}}) = min_x v(τ^{p^k} x - x) = d_k + 1` on the valuation ring of
+`L_{n+1}`, for `k + 1 ≤ n`. -/
 theorem ramificationOrder_kummerTauFinite_succ (n k : ℕ) (hk : k + 1 ≤ n) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))
@@ -295,7 +332,7 @@ theorem ramificationOrder_kummerTauFinite_succ (n k : ℕ) (hk : k + 1 ≤ n) :
   · exact (ENat.lt_add_one_iff (by simp)).mp (lt_of_not_ge hhi)
   · exact hlo
 
-/-- The stable order at every diagonal level `N ≥ k + 2`, with the cutoff. -/
+/-- `i(τ^{p^k}|_{L_N}) = d_k + 1` on the valuation ring of `L_N`, for `N ≥ k + 2`. -/
 theorem ramificationOrder_kummerTauFinite (N k : ℕ) (hk : k + 2 ≤ N) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))
@@ -304,7 +341,7 @@ theorem ramificationOrder_kummerTauFinite (N k : ℕ) (hk : k + 2 ≤ N) :
   obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (show N ≠ 0 by omega)
   exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
-/-- Every uniformizer attains that same integral displacement order. -/
+/-- `v(τ^{p^k} ϖ - ϖ) = d_k + 1` for every uniformizer `ϖ` of `L_N`, `N ≥ k + 2`. -/
 theorem addVal_kummerTauFinite_uniformizer (N k : ℕ) (hk : k + 2 ≤ N)
     {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
     (hϖ : Irreducible ϖ) :
@@ -318,7 +355,8 @@ theorem addVal_kummerTauFinite_uniformizer (N k : ℕ) (hk : k + 2 ≤ N)
   rw [← ramificationOrder_eq_generator (D ≃ₐ[ℚ_[p]] D) hgen]
   exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
-/-- Exact normalized displacement on the finite field, for every uniformizer. -/
+/-- The normalized valuation of `τ^{p^k}(ϖ) - ϖ` in `L_N` is that of `ϖ^{d_k + 1}`, for
+every uniformizer `ϖ` of `L_N` and `N ≥ k + 2`. -/
 theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2 ≤ N)
     {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
     (hϖ : Irreducible ϖ) :
