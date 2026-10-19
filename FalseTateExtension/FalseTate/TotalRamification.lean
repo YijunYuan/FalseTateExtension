@@ -19,10 +19,26 @@ public import Mathlib.Data.ZMod.Units
 public import Mathlib.FieldTheory.Finite.Basic
 
 /-!
-# Total ramification of the false Tate extension of ℚ_p
+# Total ramification of the false Tate extension of `ℚ_p`
 
-For `p ≠ 2` and a uniformizer `π` of `ℚ_p`, every finite layer `ℚ_p(π^{1/p^n}, ζ_{p^n})` is totally
-ramified, hence so is every finite subextension of `K_FT/ℚ_p`: the residue field of `K_FT` is `𝔽_p`.
+Let `p ≠ 2` and let `π` be a uniformizer of `ℚ_p`. Every finite subextension `E` of
+`K_FT = ℚ_p(π^{1/p^∞}, ζ_{p^∞})` is totally ramified over `ℚ_p`: its residue degree is `1`
+(`finiteSubextension_falseTate_residueDegree_padic`) and its ramification index is `[E : ℚ_p]`
+(`finiteSubextension_falseTate_ramificationIdx_padic`). Equivalently the residue field of the
+valuation ring of `K_FT` is `𝔽_p` (`falseTateExtension_residueDegree_padic`).
+
+The proof goes through the finite layers `ℚ_p(π^{1/p^{n+1}}, ζ_{p^{n+1}})`, whose Galois group is
+`ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ`: the translations are commutators (with the unit `2`, hence `p ≠ 2`)
+and the units fix the cyclotomic subfield, which is totally ramified; both lie in the inertia
+group, so the inertia group is everything (`lowerRamificationGroup_falseTateLayer_zero`).
+
+## Main results
+
+* `falseTateLayer_spectral_ramificationIdx`:
+  `e(ℚ_p(π^{1/p^{n+1}}, ζ_{p^{n+1}})/ℚ_p) = p^{n+1} φ(p^{n+1})`.
+* `falseTateExtension_residueDegree_padic`: the residue field of `K_FT` is `𝔽_p`.
+* `finiteSubextension_falseTate_ramificationIdx_padic`: every finite subextension of `K_FT/ℚ_p`
+  is totally ramified.
 
 ## References
 
