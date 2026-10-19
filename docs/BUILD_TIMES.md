@@ -192,3 +192,75 @@ Total: 5 min 09 s wall, 805 s CPU, 31 modules.
 | FalseTateExtension.Padic.Cyclotomic | 1.4 |
 | FalseTateExtension | 1.3 |
 | FalseTateExtension.Padic.FiniteCharacter | 1.0 |
+
+## Final (2026-10-20, after F10)
+
+Total: 3 min 16 s wall, 510 s CPU, 64 modules; no `set_option maxHeartbeats`. Every module is
+under 30 s except `Layers/Galois` (36 s, the cofinality lemmas added in F2; to be profiled).
+
+| module | seconds |
+|---|---|
+| FalseTateExtension.Layers.Galois | 36.0 |
+| FalseTateExtension.Kummer.Eisenstein | 20.0 |
+| FalseTateExtension.Kummer.StepProfile | 19.0 |
+| FalseTateExtension.FalseTate.Viviani.Filtration | 19.0 |
+| FalseTateExtension.Cyclotomic.Ramification | 16.0 |
+| FalseTateExtension.Cyclotomic.Inertia | 14.0 |
+| FalseTateExtension.Cyclotomic.InertiaImage | 13.0 |
+| FalseTateExtension.FalseTate.TotalRamification | 11.0 |
+| FalseTateExtension.Cyclotomic.ResidueBound | 11.0 |
+| FalseTateExtension.Kummer.FiniteProfile | 10.0 |
+| FalseTateExtension.FalseTate.Viviani.Preliminaries | 10.0 |
+| FalseTateExtension.Cyclotomic.APF | 9.7 |
+| FalseTateExtension.FalseTate.Viviani.TauRamification | 8.5 |
+| FalseTateExtension.Cyclotomic.Filtration | 7.6 |
+| FalseTateExtension.Coordinates.CyclotomicImage | 6.9 |
+| FalseTateExtension.FalseTate.FiniteGaloisGroup | 4.9 |
+| FalseTateExtension.FalseTate.StrictAPF | 4.5 |
+| FalseTateExtension.FalseTate.LiuLemma | 4.5 |
+| FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence | 4.4 |
+| FalseTateExtension.Cyclotomic.Restriction | 4.3 |
+| FalseTateExtension.FalseTate.TranslationKernel | 4.1 |
+| FalseTateExtension.Cyclotomic.CyclicLayers | 4.1 |
+| FalseTateExtension.Padic.Basic | 3.9 |
+| FalseTateExtension.Mathlib.FieldTheory.RestrictNormal | 3.9 |
+| FalseTateExtension.Mathlib.NumberTheory.Padics.ClosedAddSubgroup | 3.8 |
+| FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector | 3.7 |
+| FalseTateExtension.Mathlib.NumberTheory.Padics.Cyclotomic | 3.7 |
+| FalseTateExtension.Layers.CompatibleRoots | 3.7 |
+| FalseTateExtension.Coordinates.AffineEmbedding | 3.5 |
+| FalseTateExtension.Kummer.APF | 3.4 |
+| FalseTateExtension.FalseTate.RadicalNotCyclotomic | 3.3 |
+| FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniformizer | 3.2 |
+| FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality | 3.2 |
+| FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity | 3.1 |
+| FalseTateExtension.Affine.Index | 3.1 |
+| FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars | 3.0 |
+| FalseTateExtension.FalseTate.Viviani.Corollary | 2.9 |
+| FalseTateExtension.Cyclotomic.InfiniteCharacter | 2.8 |
+| FalseTateExtension.Mathlib.FieldTheory.IntermediateField.Supremum | 2.7 |
+| FalseTateExtension.FalseTate.AffineImage | 2.7 |
+| FalseTateExtension.Cyclotomic.CharacterNaturality | 2.6 |
+| FalseTateExtension.Coordinates.AffineKernel | 2.4 |
+| FalseTateExtension.Layers.Basic | 2.1 |
+| FalseTateExtension.Cyclotomic.FiniteCharacter | 2.1 |
+| FalseTateExtension.Mathlib.Topology.Algebra.SemidirectProduct | 2.0 |
+| FalseTateExtension.Coordinates.Finite | 2.0 |
+| FalseTateExtension.Affine.ClosedSubgroup | 2.0 |
+| FalseTateExtension.Padic.ClosedAddSubgroup | 1.9 |
+| FalseTateExtension.Coordinates.Padic | 1.9 |
+| FalseTateExtension.Mathlib.Data.ZMod.UnitsMap | 1.8 |
+| FalseTateExtension.Coordinates.Transitions | 1.8 |
+| FalseTateExtension.Mathlib | 1.7 |
+| FalseTateExtension.Kummer.Breaks | 1.7 |
+| FalseTateExtension.Cyclotomic.Basic | 1.7 |
+| FalseTateExtension.Coordinates | 1.7 |
+| FalseTateExtension.Affine.Padic | 1.7 |
+| FalseTateExtension.Affine.Group | 1.7 |
+| FalseTateExtension.Layers | 1.6 |
+| FalseTateExtension.Padic | 1.4 |
+| FalseTateExtension.Cyclotomic | 1.4 |
+| FalseTateExtension.Kummer | 1.3 |
+| FalseTateExtension.FalseTate | 1.3 |
+| FalseTateExtension | 1.2 |
+| FalseTateExtension.Affine | 1.1 |
