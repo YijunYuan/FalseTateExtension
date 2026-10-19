@@ -373,76 +373,61 @@ local notation "F₁" => radicalLayer (K := K) p (π : K) (n + 1)
 local notation "O₀" => FontaineWintenberger.spectralIntegerRing K F₀
 local notation "O₁" => FontaineWintenberger.spectralIntegerRing K F₁
 
+/-- The step `F₀ ≤ F₁` as an algebra. -/
+local instance radicalStepAlgebra : Algebra F₀ F₁ :=
+  (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
+
+local instance radicalStepScalarTower : IsScalarTower K F₀ F₁ :=
+  IsScalarTower.of_algebraMap_eq fun _ => rfl
+
+local instance radicalStepHasExtension :
+    (FontaineWintenberger.spectralValuation K F₀).HasExtension
+      (FontaineWintenberger.spectralValuation K F₁) :=
+  FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
+
+local instance radicalStepIntegerScalarTower : IsScalarTower 𝒪[K] O₀ O₁ :=
+  Valuation.HasExtension.valuationSubring_isScalarTower (NormedField.valuation (K := K))
+    (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
+
+set_option synthInstance.maxHeartbeats 100000 in
+-- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
+local instance radicalStepIntegerFinite : Module.Finite O₀ O₁ :=
+  Module.Finite.of_restrictScalars_finite 𝒪[K] O₀ O₁
+
+local instance radicalStepIntegerScalarTower' : IsScalarTower O₀ F₀ F₁ :=
+  Valuation.HasExtension.instIsScalarTower_valuationSubring
+    (L := F₁) (FontaineWintenberger.spectralValuation K F₀)
+
+local instance radicalStepIntegerScalarTower'' : IsScalarTower O₀ O₁ F₁ :=
+  Valuation.HasExtension.instIsScalarTower_valuationSubring'
+    (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
+
 include hπ
+
 
 /-- The canonical integer-ring inclusion in a consecutive radical step
 has ramification index `p`; both rings retain their original spectral
 valuations over `K`. -/
 theorem radicalLayer_step_ramificationIdx :
-    letI : Algebra F₀ F₁ :=
-      (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
-    letI : IsScalarTower K F₀ F₁ := IsScalarTower.of_algebraMap_eq fun _ => rfl
-    letI := FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
     (IsLocalRing.maximalIdeal O₁).ramificationIdx O₀ = p := by
-  let : Algebra F₀ F₁ :=
-    (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
-  have : IsScalarTower K F₀ F₁ := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have := FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
-  have : IsScalarTower 𝒪[K] O₀ O₁ :=
-    Valuation.HasExtension.valuationSubring_isScalarTower (NormedField.valuation (K := K))
-      (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
   have he := FontaineWintenberger.local_ramificationIdx_tower 𝒪[K] O₀ O₁
   rw [radicalLayer_ramificationIdx p π n, radicalLayer_ramificationIdx p π (n + 1),
     pow_succ] at he
   exact Nat.eq_of_mul_eq_mul_left (pow_pos (Fact.out : p.Prime).pos n) he.symm
 
-set_option synthInstance.maxHeartbeats 100000 in
--- The spectral integer-ring tower requires extra dependent instance synthesis.
-set_option maxHeartbeats 1000000 in
 /-- The residue fields of two consecutive actual radical layers have
 degree one, with the original canonical residue inclusion. -/
 theorem radicalLayer_step_residueDegree :
-    letI : Algebra F₀ F₁ :=
-      (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
-    letI : IsScalarTower K F₀ F₁ := IsScalarTower.of_algebraMap_eq fun _ => rfl
-    letI := FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
     Module.finrank (IsLocalRing.ResidueField O₀) (IsLocalRing.ResidueField O₁) = 1 := by
-  let : Algebra F₀ F₁ :=
-    (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
-  have : IsScalarTower K F₀ F₁ := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have := FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
-  have : IsScalarTower 𝒪[K] O₀ O₁ :=
-    Valuation.HasExtension.valuationSubring_isScalarTower (NormedField.valuation (K := K))
-      (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
-  have : Module.Finite O₀ O₁ := Module.Finite.of_restrictScalars_finite 𝒪[K] O₀ O₁
-  have : IsScalarTower O₀ F₀ F₁ := Valuation.HasExtension.instIsScalarTower_valuationSubring
-    (L := F₁) (FontaineWintenberger.spectralValuation K F₀)
-  have : IsScalarTower O₀ O₁ F₁ := Valuation.HasExtension.instIsScalarTower_valuationSubring'
-    (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
   have hd := FontaineWintenberger.local_ramificationIdx_mul_residueDegree_eq_finrank O₀ O₁ F₀ F₁
   rw [radicalLayer_step_ramificationIdx p π n, radicalLayer_step_finrank p π n] at hd
   exact Nat.eq_of_mul_eq_mul_left (Fact.out : p.Prime).pos (by simpa only [mul_one] using hd)
 
-set_option synthInstance.maxHeartbeats 100000 in
--- The spectral integer-ring tower requires extra dependent instance synthesis.
-set_option maxHeartbeats 1000000 in
 /-- The actual relative different exponent follows from canonical
 different transitivity and the two actual absolute exponents. -/
 theorem radicalLayer_step_different_order :
-    letI : Algebra F₀ F₁ :=
-      (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
-    letI : IsScalarTower K F₀ F₁ := IsScalarTower.of_algebraMap_eq fun _ => rfl
-    letI := FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
     (emultiplicity (IsLocalRing.maximalIdeal O₁) (differentIdeal O₀ O₁)).toNat =
       p ^ (n + 1) * (addVal 𝒪[K] (p : 𝒪[K])).toNat + (p - 1) := by
-  let : Algebra F₀ F₁ :=
-    (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
-  have : IsScalarTower K F₀ F₁ := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have := FontaineWintenberger.spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
-  have : IsScalarTower 𝒪[K] O₀ O₁ :=
-    Valuation.HasExtension.valuationSubring_isScalarTower (NormedField.valuation (K := K))
-      (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
-  have : Module.Finite O₀ O₁ := Module.Finite.of_restrictScalars_finite 𝒪[K] O₀ O₁
   have hd := FontaineWintenberger.differentIdeal_order_toNat_tower 𝒪[K] O₀ O₁
   rw [radicalLayer_different_order_toNat p π (n + 1),
     radicalLayer_different_order_toNat p π n, radicalLayer_step_ramificationIdx p π n] at hd

@@ -315,7 +315,7 @@ theorem rationalCyclotomicEmbedding_adjoin_base :
   exact heq ▸ hy
 
 set_option maxHeartbeats 1000000 in
--- The finite compositum proof elaborates several intermediate-field scalar towers.
+-- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
 /-- The actual compositum has finite degree over the embedded rational
 cyclotomic extension, because the original base is finite over `Qp`. -/
 theorem rationalCyclotomicEmbedding_finiteDimensional :

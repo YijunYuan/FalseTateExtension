@@ -232,22 +232,6 @@ theorem cyclotomicInertiaCharacterImage_finiteIndex :
 
 end InertiaImage
 
-/-- The actual cyclotomic inertia character image contains a unit different
-from one; it cannot be the trivial finite-index subgroup of an infinite group. -/
-theorem exists_ne_one_mem_cyclotomicInertiaCharacterImage
-    (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
-    [IsCompleteDiscreteValuedField K]
-    [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] :
-    ∃ h ∈ cyclotomicInertiaCharacterImage p K, h ≠ 1 := by
-  let := padicUnits_infinite p
-  let := cyclotomicInertiaCharacterImage_finiteIndex p K
-  by_contra! h
-  have hbot : cyclotomicInertiaCharacterImage p K = ⊥ :=
-    (Subgroup.eq_bot_iff_forall _).mpr h
-  have hne := (inferInstance : (cyclotomicInertiaCharacterImage p K).FiniteIndex).index_ne_zero
-  rw [hbot, Subgroup.index_bot, Nat.card_eq_zero_of_infinite] at hne
-  exact hne rfl
-
 end FalseTateExtension
 
 end

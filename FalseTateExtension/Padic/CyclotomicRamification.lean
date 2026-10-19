@@ -162,14 +162,6 @@ theorem irreducible_cyclotomicUniformizer (n : ℕ)
     (π : cyclotomicLayer p (n + 1)) = cyclotomicLayerRoot p (n + 1) - 1 at hu
   exact (mul_comm _ _).trans hu
 
-/-- The cyclotomic generator minus one generates the actual maximal ideal. -/
-theorem span_cyclotomicUniformizer (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
-    [(NormedField.valuation (K := ℚ_[p])).HasExtension w] :
-    Ideal.span {cyclotomicUniformizer p n w} = IsLocalRing.maximalIdeal w.valuationSubring :=
-  ((irreducible_iff_uniformizer _).mp (irreducible_cyclotomicUniformizer p n w)).symm
-
 /-- The actual ramification index of a positive cyclotomic layer equals its
 actual field degree. -/
 theorem cyclotomicLayer_ramificationIdx (n : ℕ)

@@ -344,30 +344,6 @@ theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2
   rw [hc] at hv
   exact hv
 
-/-- The normalized relative displacement has the source's shifted order `d_k`. -/
-theorem normalizedValuation_kummerTauFinite_div_sub_one (N k : ℕ) (hk : k + 2 ≤ N)
-    {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
-    (hϖ : Irreducible ϖ) :
-    (maximalIdeal (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))).valuation
-      (falseTateLayer p (π : ℚ_[p]) N N)
-      (kummerTauFinite p π N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) / ϖ - 1) =
-      WithZero.exp (-(kummerRamificationBreak p k : ℤ)) := by
-  let D := falseTateLayer p (π : ℚ_[p]) N N
-  let O := spectralIntegerRing (ℚ_[p]) D
-  have hne : (ϖ : D) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
-  have hu : (maximalIdeal O).valuation D (ϖ : D) = WithZero.exp (-1 : ℤ) := by
-    change (maximalIdeal O).valuation D (algebraMap O D ϖ) = _
-    rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
-    exact (maximalIdeal O).intValuation_singleton hϖ.ne_zero hϖ.maximalIdeal_eq
-  have he : kummerTauFinite p π N k (ϖ : D) / ϖ - 1 =
-      (kummerTauFinite p π N k (ϖ : D) - ϖ) / ϖ := by
-    field_simp
-  rw [he, map_div₀, normalizedValuation_kummerTauFinite_displacement p π N k hk hϖ, hu]
-  rw [← WithZero.exp_sub]
-  congr 1
-  push_cast
-  ring
-
 end ActualGenerator
 
 end FalseTateExtension

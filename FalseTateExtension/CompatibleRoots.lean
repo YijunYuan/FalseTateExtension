@@ -87,18 +87,6 @@ theorem exists_compatible_primitive_roots (p : ℕ) [Fact p.Prime] :
     | zero => simp [ζ]
     | succ n => exact hprim n
 
-/-- Compatible radicals and compatible primitive roots of unity exist
-simultaneously in the same algebraically closed field. -/
-theorem exists_compatible_roots (p : ℕ) [Fact p.Prime] (π : Ω) :
-    ∃ πSeq ζ : ℕ → Ω, πSeq 0 = π ∧ ζ 0 = 1 ∧
-      (∀ n, πSeq (n + 1) ^ p = πSeq n) ∧
-      (∀ n, ζ (n + 1) ^ p = ζ n) ∧
-      (∀ n, πSeq n ^ (p ^ n) = π) ∧
-      ∀ n, IsPrimitiveRoot (ζ n) (p ^ n) := by
-  obtain ⟨πSeq, hπ₀, hπsucc, hπpow⟩ := exists_compatible_radicals p π
-  obtain ⟨ζ, hζ₀, hζsucc, hζprim⟩ := exists_compatible_primitive_roots (Ω := Ω) p
-  exact ⟨πSeq, ζ, hπ₀, hζ₀, hπsucc, hζsucc, hπpow, hζprim⟩
-
 end
 
 end FalseTateExtension
