@@ -33,7 +33,7 @@ variable (p : ℕ) [Fact p.Prime]
 /-- The normalized additive valuation of the rational base prime is one. -/
 theorem addVal_padicUnitBall_p : addVal 𝒪[ℚ_[p]] (p : 𝒪[ℚ_[p]]) = 1 := by
   apply addVal_uniformizer
-  have h := (MulEquiv.irreducible_iff (f := (padicUnitBallEquiv p).symm)).mpr
+  have h := (MulEquiv.irreducible_iff (f := (padicValuationSubringEquiv p).symm)).mpr
     PadicInt.irreducible_p
   simpa only [map_natCast] using h
 
@@ -257,7 +257,7 @@ variable {p} (n : ℕ)
 
 /-- Conjugation by the unit two extracts the translation coordinate. -/
 theorem finiteAffine_commutator_two [hp₂ : Fact (p ≠ 2)] (g : FullFiniteAffineGroup p n) :
-    ⁅(SemidirectProduct.inr (finiteAffineTwo p n) : FullFiniteAffineGroup p n), g⁆ =
+    ⁅(SemidirectProduct.inr (unitTwo p n) : FullFiniteAffineGroup p n), g⁆ =
       SemidirectProduct.inl g.left := by
   apply SemidirectProduct.ext
   · simp only [commutatorElement_def, SemidirectProduct.mul_left,
@@ -265,21 +265,21 @@ theorem finiteAffine_commutator_two [hp₂ : Fact (p ≠ 2)] (g : FullFiniteAffi
       SemidirectProduct.left_inr, SemidirectProduct.right_inr, inv_one, map_one,
       one_mul, mul_one]
     apply congrArg Multiplicative.ofAdd
-    change (finiteAffineTwo p n : ZMod (p ^ n)) * g.left.toAdd +
-      ((finiteAffineTwo p n : ZMod (p ^ n)) * (g.right : ZMod (p ^ n)) *
-        ((finiteAffineTwo p n)⁻¹ : (ZMod (p ^ n))ˣ)) *
+    change (unitTwo p n : ZMod (p ^ n)) * g.left.toAdd +
+      ((unitTwo p n : ZMod (p ^ n)) * (g.right : ZMod (p ^ n)) *
+        ((unitTwo p n)⁻¹ : (ZMod (p ^ n))ˣ)) *
         ((g.right⁻¹ : (ZMod (p ^ n))ˣ) * -g.left.toAdd) = g.left.toAdd
-    rw [coe_finiteAffineTwo]
+    rw [coe_unitTwo]
     have htwo : (2 : ZMod (p ^ n)) *
-        ((finiteAffineTwo p n)⁻¹ : (ZMod (p ^ n))ˣ) = 1 := by
-      simpa only [Units.val_mul, coe_finiteAffineTwo, Units.val_one] using
+        ((unitTwo p n)⁻¹ : (ZMod (p ^ n))ˣ) = 1 := by
+      simpa only [Units.val_mul, coe_unitTwo, Units.val_one] using
         congrArg (fun u : (ZMod (p ^ n))ˣ => (u : ZMod (p ^ n)))
-          (mul_inv_cancel (finiteAffineTwo p n))
+          (mul_inv_cancel (unitTwo p n))
     have hu : (g.right : ZMod (p ^ n)) *
         (g.right⁻¹ : (ZMod (p ^ n))ˣ) = 1 := Units.mul_inv g.right
     calc
       _ = 2 * g.left.toAdd +
-          (2 * ((finiteAffineTwo p n)⁻¹ : (ZMod (p ^ n))ˣ)) *
+          (2 * ((unitTwo p n)⁻¹ : (ZMod (p ^ n))ˣ)) *
           ((g.right : ZMod (p ^ n)) * (g.right⁻¹ : (ZMod (p ^ n))ˣ)) *
           -g.left.toAdd := by ring
       _ = g.left.toAdd := by rw [htwo, hu]; ring

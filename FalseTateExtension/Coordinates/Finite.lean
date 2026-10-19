@@ -42,93 +42,93 @@ noncomputable section
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K) (n : ℕ)
 
 /-- `π^{1/p^n}` as an element of `K(π^{1/p^n}, ζ_{p^n})`. -/
-def layerRadical : falseTateLayer p π n n :=
-  ⟨radical p π n, radical_mem_falseTateLayer p π n n⟩
+def pPowRootLayer : falseTateLayer p π n n :=
+  ⟨pPowRoot p π n, pPowRoot_mem_falseTateLayer p π n n⟩
 
 /-- `ζ_{p^n}` as an element of `K(π^{1/p^n}, ζ_{p^n})`. -/
-def layerRootOfUnity : falseTateLayer p π n n :=
-  ⟨rootOfUnity p n, rootOfUnity_mem_falseTateLayer p π n n⟩
+def zetaLayer : falseTateLayer p π n n :=
+  ⟨zeta p n, zeta_mem_falseTateLayer p π n n⟩
 
-/-- `layerRadical p π n` is `π^{1/p^n}` in the algebraic closure. -/
+/-- `pPowRootLayer p π n` is `π^{1/p^n}` in the algebraic closure. -/
 @[simp]
-theorem coe_layerRadical : (layerRadical p π n : AlgebraicClosure K) = radical p π n := rfl
+theorem coe_pPowRootLayer : (pPowRootLayer p π n : AlgebraicClosure K) = pPowRoot p π n := rfl
 
-/-- `layerRootOfUnity p π n` is `ζ_{p^n}` in the algebraic closure. -/
+/-- `zetaLayer p π n` is `ζ_{p^n}` in the algebraic closure. -/
 @[simp]
-theorem coe_layerRootOfUnity :
-    (layerRootOfUnity p π n : AlgebraicClosure K) = rootOfUnity p n := rfl
+theorem coe_zetaLayer :
+    (zetaLayer p π n : AlgebraicClosure K) = zeta p n := rfl
 
 /-- `ζ_{p^n}` is a primitive `p^n`-th root of unity in `K(π^{1/p^n}, ζ_{p^n})`. -/
-theorem isPrimitiveRoot_layerRootOfUnity :
-    IsPrimitiveRoot (layerRootOfUnity p π n) (p ^ n) := by
-  exact (isPrimitiveRoot_rootOfUnity (K := K) p n).of_map_of_injective
+theorem isPrimitiveRoot_zetaLayer :
+    IsPrimitiveRoot (zetaLayer p π n) (p ^ n) := by
+  exact (isPrimitiveRoot_zeta (K := K) p n).of_map_of_injective
     (f := (falseTateLayer p π n n).val) (falseTateLayer p π n n).val.injective
 
 /-- `(π^{1/p^n})^{p^n} = π` in `K(π^{1/p^n}, ζ_{p^n})`. -/
-theorem layerRadical_pow :
-    layerRadical p π n ^ (p ^ n) = algebraMap K (falseTateLayer p π n n) π := by
+theorem pPowRootLayer_pow :
+    pPowRootLayer p π n ^ (p ^ n) = algebraMap K (falseTateLayer p π n n) π := by
   apply Subtype.ext
-  exact radical_pow p π n
+  exact pPowRoot_pow p π n
 
 /-- `π^{1/p^n} ≠ 0` in `K(π^{1/p^n}, ζ_{p^n})` when `π ≠ 0`. -/
-theorem layerRadical_ne_zero [hπ : NeZero π] : layerRadical p π n ≠ 0 := by
+theorem pPowRootLayer_ne_zero [hπ : NeZero π] : pPowRootLayer p π n ≠ 0 := by
   intro h
-  exact radical_ne_zero p π n (congrArg Subtype.val h)
+  exact pPowRoot_ne_zero p π n (congrArg Subtype.val h)
 
 /-- The cyclotomic character `χ_n : Gal(K(π^{1/p^n}, ζ_{p^n})/K) → (ℤ/p^n)ˣ`, given by
 `g(ζ_{p^n}) = ζ_{p^n}^{χ_n(g)}`. -/
 def finiteCyclotomicCharacter :
     (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) →* (ZMod (p ^ n))ˣ := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  exact (isPrimitiveRoot_layerRootOfUnity p π n).autToPow K
+  exact (isPrimitiveRoot_zetaLayer p π n).autToPow K
 
 /-- `g(ζ_{p^n}) = ζ_{p^n}^{χ_n(g)}`. -/
 theorem finiteCyclotomicCharacter_spec
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
-    g (layerRootOfUnity p π n) = layerRootOfUnity p π n ^
+    g (zetaLayer p π n) = zetaLayer p π n ^
       (finiteCyclotomicCharacter p π n g : ZMod (p ^ n)).val := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  exact ((isPrimitiveRoot_layerRootOfUnity p π n).autToPow_spec K g).symm
+  exact ((isPrimitiveRoot_zetaLayer p π n).autToPow_spec K g).symm
 
 /-- `ζ_{p^n}` as a unit of `K(π^{1/p^n}, ζ_{p^n})`. -/
 def layerRootUnit : (falseTateLayer p π n n)ˣ :=
-  Units.mk0 (layerRootOfUnity p π n)
-    ((isPrimitiveRoot_layerRootOfUnity p π n).ne_zero
+  Units.mk0 (zetaLayer p π n)
+    ((isPrimitiveRoot_zetaLayer p π n).ne_zero
       (pow_ne_zero n (Fact.out : p.Prime).ne_zero))
 
 /-- The unit `layerRootUnit p π n` is `ζ_{p^n}`. -/
 @[simp]
 theorem coe_layerRootUnit :
-    (layerRootUnit p π n : falseTateLayer p π n n) = layerRootOfUnity p π n := rfl
+    (layerRootUnit p π n : falseTateLayer p π n n) = zetaLayer p π n := rfl
 
 /-- `ζ_{p^n}` is a primitive `p^n`-th root of unity in the unit group of the diagonal layer. -/
 theorem isPrimitiveRoot_layerRootUnit : IsPrimitiveRoot (layerRootUnit p π n) (p ^ n) :=
-  IsPrimitiveRoot.coe_units_iff.mp (isPrimitiveRoot_layerRootOfUnity p π n)
+  IsPrimitiveRoot.coe_units_iff.mp (isPrimitiveRoot_zetaLayer p π n)
 
 /-- The unit `g(π^{1/p^n}) / π^{1/p^n}` of `K(π^{1/p^n}, ζ_{p^n})`, a `p^n`-th root of unity. -/
 def kummerRatio [hπ : NeZero π]
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
     (falseTateLayer p π n n)ˣ :=
-  Units.map g.toMonoidHom (Units.mk0 (layerRadical p π n) (layerRadical_ne_zero p π n)) /
-    Units.mk0 (layerRadical p π n) (layerRadical_ne_zero p π n)
+  Units.map g.toMonoidHom (Units.mk0 (pPowRootLayer p π n) (pPowRootLayer_ne_zero p π n)) /
+    Units.mk0 (pPowRootLayer p π n) (pPowRootLayer_ne_zero p π n)
 
 /-- `kummerRatio p π n g` is `g(π^{1/p^n}) / π^{1/p^n}`. -/
 @[simp]
 theorem coe_kummerRatio [hπ : NeZero π]
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
     (kummerRatio p π n g : falseTateLayer p π n n) =
-      g (layerRadical p π n) / layerRadical p π n := rfl
+      g (pPowRootLayer p π n) / pPowRootLayer p π n := rfl
 
 /-- `(g(π^{1/p^n}) / π^{1/p^n})^{p^n} = 1`. -/
 theorem kummerRatio_pow [hπ : NeZero π]
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
     kummerRatio p π n g ^ (p ^ n) = 1 := by
   apply Units.ext
-  change (g (layerRadical p π n) / layerRadical p π n) ^ (p ^ n) = 1
-  rw [div_pow, ← map_pow, layerRadical_pow, g.commutes]
+  change (g (pPowRootLayer p π n) / pPowRootLayer p π n) ^ (p ^ n) = 1
+  rw [div_pow, ← map_pow, pPowRootLayer_pow, g.commutes]
   apply div_self
-  rw [← layerRadical_pow p π n]
-  exact pow_ne_zero _ (layerRadical_ne_zero p π n)
+  rw [← pPowRootLayer_pow p π n]
+  exact pow_ne_zero _ (pPowRootLayer_ne_zero p π n)
 
 /-- `g(π^{1/p^n}) / π^{1/p^n}` is a power of `ζ_{p^n}`. -/
 theorem kummerRatio_mem_zpowers [hπ : NeZero π]
@@ -158,8 +158,8 @@ theorem zmodEquivZPowers_val (a : ZMod (p ^ n)) :
 /-- `g(π^{1/p^n}) = ζ_{p^n}^{b_n(g)} π^{1/p^n}`. -/
 theorem finiteKummerExponent_spec [hπ : NeZero π]
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
-    g (layerRadical p π n) = layerRootOfUnity p π n ^
-      (finiteKummerExponent p π n g).val * layerRadical p π n := by
+    g (pPowRootLayer p π n) = zetaLayer p π n ^
+      (finiteKummerExponent p π n g).val * pPowRootLayer p π n := by
   have h := congrArg
     (fun z : Additive (Subgroup.zpowers (layerRootUnit p π n)) ↦
       (z.toMul : (falseTateLayer p π n n)ˣ))
@@ -168,18 +168,18 @@ theorem finiteKummerExponent_spec [hπ : NeZero π]
   rw [zmodEquivZPowers_val] at h
   have hf := congrArg Units.val h
   simp only [Units.val_pow_eq_pow_val] at hf
-  change layerRootOfUnity p π n ^ (finiteKummerExponent p π n g).val =
-    g (layerRadical p π n) / layerRadical p π n at hf
-  have hm := congrArg (· * layerRadical p π n) hf
-  rw [div_mul_cancel₀ _ (layerRadical_ne_zero p π n)] at hm
+  change zetaLayer p π n ^ (finiteKummerExponent p π n g).val =
+    g (pPowRootLayer p π n) / pPowRootLayer p π n at hf
+  have hm := congrArg (· * pPowRootLayer p π n) hf
+  rw [div_mul_cancel₀ _ (pPowRootLayer_ne_zero p π n)] at hm
   exact hm.symm
 
 /-- `a ↦ ζ_{p^n}^a` is injective on `ℤ/p^n`. -/
-theorem layerRootOfUnity_pow_injective :
-    Function.Injective (fun a : ZMod (p ^ n) ↦ layerRootOfUnity p π n ^ a.val) := by
+theorem zetaLayer_pow_injective :
+    Function.Injective (fun a : ZMod (p ^ n) ↦ zetaLayer p π n ^ a.val) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   intro a b hab
-  have hv := (isPrimitiveRoot_layerRootOfUnity p π n).pow_inj
+  have hv := (isPrimitiveRoot_zetaLayer p π n).pow_inj
     (ZMod.val_lt a) (ZMod.val_lt b) hab
   simpa only [ZMod.natCast_zmod_val] using congrArg (fun i : ℕ ↦ (i : ZMod (p ^ n))) hv
 
@@ -187,21 +187,21 @@ theorem layerRootOfUnity_pow_injective :
 theorem finiteKummerExponent_unique [hπ : NeZero π]
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n)
     (a : ZMod (p ^ n))
-    (ha : g (layerRadical p π n) = layerRootOfUnity p π n ^ a.val * layerRadical p π n) :
+    (ha : g (pPowRootLayer p π n) = zetaLayer p π n ^ a.val * pPowRootLayer p π n) :
     finiteKummerExponent p π n g = a := by
-  apply layerRootOfUnity_pow_injective p π n
+  apply zetaLayer_pow_injective p π n
   have h := (finiteKummerExponent_spec p π n g).symm.trans ha
-  have hd := congrArg (· / layerRadical p π n) h
-  simpa only [mul_div_cancel_right₀ _ (layerRadical_ne_zero p π n)] using hd
+  have hd := congrArg (· / pPowRootLayer p π n) h
+  simpa only [mul_div_cancel_right₀ _ (pPowRootLayer_ne_zero p π n)] using hd
 
 /-- If `g(ζ_{p^n}) = ζ_{p^n}^a` then `χ_n(g) = a`. -/
 theorem finiteCyclotomicCharacter_unique
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n)
     (a : (ZMod (p ^ n))ˣ)
-    (ha : g (layerRootOfUnity p π n) = layerRootOfUnity p π n ^ (a : ZMod (p ^ n)).val) :
+    (ha : g (zetaLayer p π n) = zetaLayer p π n ^ (a : ZMod (p ^ n)).val) :
     finiteCyclotomicCharacter p π n g = a := by
   apply Units.ext
-  exact layerRootOfUnity_pow_injective p π n
+  exact zetaLayer_pow_injective p π n
     ((finiteCyclotomicCharacter_spec p π n g).symm.trans ha)
 
 /-- The cocycle rule `b_n(gh) = b_n(g) + χ_n(g) b_n(h)`. -/
@@ -211,18 +211,18 @@ theorem finiteKummerExponent_mul [hπ : NeZero π]
       (finiteCyclotomicCharacter p π n g : ZMod (p ^ n)) *
         finiteKummerExponent p π n h := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  have heval : (g * h) (layerRadical p π n) =
-      layerRootOfUnity p π n ^
+  have heval : (g * h) (pPowRootLayer p π n) =
+      zetaLayer p π n ^
         ((finiteCyclotomicCharacter p π n g : ZMod (p ^ n)).val *
           (finiteKummerExponent p π n h).val + (finiteKummerExponent p π n g).val) *
-        layerRadical p π n := by
-    change g (h (layerRadical p π n)) = _
+        pPowRootLayer p π n := by
+    change g (h (pPowRootLayer p π n)) = _
     rw [finiteKummerExponent_spec p π n h, map_mul, map_pow,
       finiteCyclotomicCharacter_spec p π n g, finiteKummerExponent_spec p π n g,
       ← pow_mul, ← mul_assoc, ← pow_add]
-  have hpow := congrArg (· / layerRadical p π n)
+  have hpow := congrArg (· / pPowRootLayer p π n)
     ((finiteKummerExponent_spec p π n (g * h)).symm.trans heval)
-  simp only [mul_div_cancel_right₀ _ (layerRadical_ne_zero p π n)] at hpow
+  simp only [mul_div_cancel_right₀ _ (pPowRootLayer_ne_zero p π n)] at hpow
   have hu : layerRootUnit p π n ^ (finiteKummerExponent p π n (g * h)).val =
       layerRootUnit p π n ^
         ((finiteCyclotomicCharacter p π n g : ZMod (p ^ n)).val *
@@ -241,10 +241,10 @@ theorem finiteKummerExponent_mul [hπ : NeZero π]
 equal. -/
 theorem finiteLayer_aut_ext
     {g h : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n}
-    (hα : g (layerRadical p π n) = h (layerRadical p π n))
-    (hζ : g (layerRootOfUnity p π n) = h (layerRootOfUnity p π n)) : g = h := by
+    (hα : g (pPowRootLayer p π n) = h (pPowRootLayer p π n))
+    (hζ : g (zetaLayer p π n) = h (zetaLayer p π n)) : g = h := by
   have hE : falseTateLayer p π n n =
-      IntermediateField.adjoin K {radical p π n, rootOfUnity p n} := by
+      IntermediateField.adjoin K {pPowRoot p π n, zeta p n} := by
     unfold falseTateLayer radicalLayer cyclotomicLayer
     rw [← IntermediateField.adjoin_union, Set.singleton_union]
   apply AlgEquiv.coe_toAlgHom_injective

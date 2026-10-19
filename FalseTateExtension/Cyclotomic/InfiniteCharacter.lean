@@ -50,8 +50,8 @@ theorem cyclotomicLayerCharacter_restrict (m : ℕ)
   let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := ℚ_[p]) p m)
   apply i.injective
   rw [map_pow]
-  change i (cyclotomicRestrictionToLayer p m g (cyclotomicLayerRoot p m)) =
-    cyclotomicRootOfUnity p m ^
+  change i (cyclotomicRestrictionToLayer p m g (zetaCyc p m)) =
+    zetaCycExt p m ^
       (PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p])).val
   rw [cyclotomicRestrictionToLayer_commutes]
   exact cyclotomicExtensionCharacter_spec p m g

@@ -80,36 +80,36 @@ translation factor, normalized by the roots. -/
 def cyclotomicRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K)) ≃ₜ* Multiplicative (ℤ_[p]) :=
-  (cyclotomicKernelRelativeEquiv p π).symm.trans (fullKummerKernelMulEquiv p π)
+  (cyclotomicKernelRelativeEquiv p π).symm.trans (kummerKernelMulEquivPadicInt p π)
 
 /-- The generator as an automorphism over the
 cyclotomic field, rather than only as an element of its fixing subgroup. -/
-def relativeTau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+def kummerGeneratorRel [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K) :=
-  cyclotomicKernelRelativeEquiv p π (tau p π)
+  cyclotomicKernelRelativeEquiv p π (kummerGenerator p π)
 
 /-- The relative generator has precisely the radical actions. -/
 theorem relativeTau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
-    relativeTau p π (extensionRadical p (π : K) (n + 1)) =
-      extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1) :=
+    kummerGeneratorRel p π (pPowRootExt p (π : K) (n + 1)) =
+      zetaExt p (π : K) (n + 1) * pPowRootExt p (π : K) (n + 1) :=
   tau_extensionRadical p π n
 
 /-- Integral powers are dense in the relative cyclotomic Galois group. -/
 theorem denseRange_relativeTau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
-    DenseRange (fun n : ℤ => relativeTau p π ^ n) := by
+    DenseRange (fun n : ℤ => kummerGeneratorRel p π ^ n) := by
   have hd := (cyclotomicKernelRelativeEquiv p π).surjective.denseRange.comp
     (denseRange_tau_zpow p π) (cyclotomicKernelRelativeEquiv p π).continuous
-  simpa only [Function.comp_def, map_zpow, relativeTau] using hd
+  simpa only [Function.comp_def, map_zpow, kummerGeneratorRel] using hd
 
 /-- The relative generator corresponds to exactly one under the
 isomorphism normalized by the compatible roots. -/
 theorem cyclotomicRelativeGaloisEquiv_relativeTau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
-    cyclotomicRelativeGaloisEquiv p π (relativeTau p π) =
+    cyclotomicRelativeGaloisEquiv p π (kummerGeneratorRel p π) =
       Multiplicative.ofAdd (1 : ℤ_[p]) := by
-  change fullKummerKernelMulEquiv p π
+  change kummerKernelMulEquivPadicInt p π
     ((cyclotomicKernelRelativeEquiv p π).symm
-      (cyclotomicKernelRelativeEquiv p π (tau p π))) = _
+      (cyclotomicKernelRelativeEquiv p π (kummerGenerator p π))) = _
   rw [(cyclotomicKernelRelativeEquiv p π).symm_apply_apply]
   exact congrArg Multiplicative.ofAdd (padicKummerExponent_tau p π)
 
@@ -118,13 +118,13 @@ relative cyclotomic Galois group. -/
 theorem relativeTau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K))
-    (hg : ∀ n : ℕ, g (extensionRadical p (π : K) (n + 1)) =
-      extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1)) :
-    g = relativeTau p π := by
+    (hg : ∀ n : ℕ, g (pPowRootExt p (π : K) (n + 1)) =
+      zetaExt p (π : K) (n + 1) * pPowRootExt p (π : K) (n + 1)) :
+    g = kummerGeneratorRel p π := by
   apply (cyclotomicKernelRelativeEquiv p π).symm.injective
   change (cyclotomicKernelRelativeEquiv p π).symm g =
     (cyclotomicKernelRelativeEquiv p π).symm
-      (cyclotomicKernelRelativeEquiv p π (tau p π))
+      (cyclotomicKernelRelativeEquiv p π (kummerGenerator p π))
   rw [(cyclotomicKernelRelativeEquiv p π).symm_apply_apply]
   apply tau_unique p π
   exact hg

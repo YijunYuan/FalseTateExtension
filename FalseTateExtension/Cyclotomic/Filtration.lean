@@ -88,10 +88,10 @@ theorem normalizedValuation_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
     v(n) (ζ - 1) = WithZero.exp (-1 : ℤ) := by
   have hn := FontaineWintenberger.extensionValuationSubring_normalizedValuation_norm
     ℚ_[p] L(n) (FontaineWintenberger.spectralValuation ℚ_[p] L(n)) (ζ - 1)
-  rw [norm_primitive_cyclotomic_sub_one p n hζ, cyclotomicLayer_spectral_residueDegree,
+  rw [norm_primitive_cyclotomic_sub_one p n hζ, cyclotomicLayer_spectral_residueDegree_eq_one,
     pow_one] at hn
   simpa only [map_mul, map_pow, Valuation.map_neg, map_one, one_pow, one_mul,
-    padicUnitBall_normalizedValuation_p] using hn.symm
+    padicValuationSubring_valuation_p] using hn.symm
 
 /-- For a primitive `p^{n+1}`-th root of unity `ζ ∈ ℚ_[p](ζ_{p^{n+1}})` and `s ≤ n`, the
 normalized valuation of `ζ^{p^s} - 1` is `exp (-p^s)`. -/
@@ -109,8 +109,8 @@ theorem normalizedValuation_primitive_cyclotomic_pow_sub_one
       ℚ_[p] L(n) (FontaineWintenberger.spectralValuation ℚ_[p] L(n)) (ζ ^ (p ^ s) - 1)
     rw [hζ.norm_pow_sub_one_eq_prime_pow_of_ne_zero
       (Padic.irreducible_cyclotomic_prime_pow p (n + 1)) hs hn,
-      cyclotomicLayer_spectral_residueDegree, pow_one, map_pow,
-      padicUnitBall_normalizedValuation_p] at hv
+      cyclotomicLayer_spectral_residueDegree_eq_one, pow_one, map_pow,
+      padicValuationSubring_valuation_p] at hv
     simpa using hv.symm
 
 /-- Every unit `a ≠ 1` of `ℤ/p^{n+1}` has representative `1 + p^s b` with `s = v_p(a - 1) ≤ n`
@@ -160,10 +160,10 @@ theorem normalizedValuation_cyclotomic_displacement_of_exponent
     (g : L(n) ≃ₐ[ℚ_[p]] L(n))
     (ha : (cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val =
       1 + p ^ s * b) :
-    v(n) (g (cyclotomicLayerRoot p (n + 1)) - cyclotomicLayerRoot p (n + 1)) =
+    v(n) (g (zetaCyc p (n + 1)) - zetaCyc p (n + 1)) =
       WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
-  let ζ := cyclotomicLayerRoot p (n + 1)
-  have hζ := isPrimitiveRoot_cyclotomicLayerRoot p (n + 1)
+  let ζ := zetaCyc p (n + 1)
+  have hζ := isPrimitiveRoot_zetaCyc p (n + 1)
   have hpower : IsPrimitiveRoot (ζ ^ b) (p ^ (n + 1)) :=
     hζ.pow_of_coprime b ((Fact.out : p.Prime).coprime_pow_of_not_dvd hb)
   have hv := normalizedValuation_primitive_cyclotomic_pow_sub_one p n s hs hpower
@@ -180,7 +180,7 @@ some `s ≤ n`. -/
 theorem normalizedValuation_cyclotomic_displacement
     (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (hg : g ≠ 1) :
     ∃ s : ℕ, s ≤ n ∧
-      v(n) (g (cyclotomicLayerRoot p (n + 1)) - cyclotomicLayerRoot p (n + 1)) =
+      v(n) (g (zetaCyc p (n + 1)) - zetaCyc p (n + 1)) =
         WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
   have ha : cyclotomicLayerCharacter p (n + 1) g ≠ 1 := by
     intro h
@@ -212,11 +212,11 @@ theorem ramificationOrder_cyclotomic_of_exponent
     (cyclotomicUniformizer_adjoin_spectral p n)]
   have hv : v(n) ((g • π - π : O(n)) : L(n)) = WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
     have hcoe : ((g • π - π : O(n)) : L(n)) =
-        g (cyclotomicLayerRoot p (n + 1)) - cyclotomicLayerRoot p (n + 1) := by
+        g (zetaCyc p (n + 1)) - zetaCyc p (n + 1) := by
       change ((g • π : O(n)) : L(n)) - (π : L(n)) = _
       rw [FontaineWintenberger.coe_spectralIntegerRing_galois_smul]
-      change g (cyclotomicLayerRoot p (n + 1) - 1) -
-        (cyclotomicLayerRoot p (n + 1) - 1) = _
+      change g (zetaCyc p (n + 1) - 1) -
+        (zetaCyc p (n + 1) - 1) = _
       rw [map_sub, map_one]
       ring
     rw [hcoe]

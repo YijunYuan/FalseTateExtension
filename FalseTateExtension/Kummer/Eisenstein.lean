@@ -64,14 +64,14 @@ section Layers
 variable {K : Type*} [Field K] (p : ℕ) [Fact p.Prime]
 
 /-- `π^{1/p^n}` as an element of `K(π^{1/p^n})`. -/
-def radicalLayerRoot (π : K) (n : ℕ) : radicalLayer p π n :=
-  ⟨radical p π n, radical_mem_radicalLayer p π n⟩
+def pPowRootLayer' (π : K) (n : ℕ) : radicalLayer p π n :=
+  ⟨pPowRoot p π n, pPowRoot_mem_radicalLayer p π n⟩
 
 /-- `(π^{1/p^n})^{p^n} = π` in `K(π^{1/p^n})`. -/
 theorem radicalLayerRoot_pow (π : K) (n : ℕ) :
-    radicalLayerRoot p π n ^ (p ^ n) = algebraMap K (radicalLayer p π n) π := by
+    pPowRootLayer' p π n ^ (p ^ n) = algebraMap K (radicalLayer p π n) π := by
   apply Subtype.ext
-  exact radical_pow p π n
+  exact pPowRoot_pow p π n
 
 end Layers
 
@@ -85,23 +85,23 @@ variable (p : ℕ) [Fact p.Prime]
 theorem finrank_radicalLayer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
     Module.finrank K (radicalLayer p (π : K) n) = p ^ n := by
   have hp : 0 < p ^ n := pow_pos (Fact.out : p.Prime).pos n
-  change Module.finrank K (IntermediateField.adjoin K {radical p (π : K) n}) = _
+  change Module.finrank K (IntermediateField.adjoin K {pPowRoot p (π : K) n}) = _
   rw [IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral _),
-    minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out hp K _ (radical_pow p (π : K) n),
+    minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out hp K _ (pPowRoot_pow p (π : K) n),
     natDegree_X_pow_sub_C]
 
 /-- The minimal polynomial of `π^{1/p^n}` over `K` is `X^{p^n} - π`. -/
 theorem minpoly_radicalLayerRoot (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
-    minpoly K (radicalLayerRoot p (π : K) n) = X ^ (p ^ n) - C (π : K) :=
+    minpoly K (pPowRootLayer' p (π : K) n) = X ^ (p ^ n) - C (π : K) :=
   minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out (pow_pos (Fact.out : p.Prime).pos n) K _
     (radicalLayerRoot_pow p (π : K) n)
 
 /-- `N_{K(π^{1/p^n})/K}(π^{1/p^n}) = (-1)^{p^n + 1} π`. -/
 theorem norm_radicalLayerRoot (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
-    Algebra.norm K (radicalLayerRoot p (π : K) n) = (-1 : K) ^ (p ^ n + 1) * π := by
+    Algebra.norm K (pPowRootLayer' p (π : K) n) = (-1 : K) ^ (p ^ n + 1) * π := by
   let pb : PowerBasis K (radicalLayer p (π : K) n) := IntermediateField.adjoin.powerBasis
-    (show IsIntegral K (radical p (π : K) n) from Algebra.IsIntegral.isIntegral _)
-  have hgen : pb.gen = radicalLayerRoot p (π : K) n := rfl
+    (show IsIntegral K (pPowRoot p (π : K) n) from Algebra.IsIntegral.isIntegral _)
+  have hgen : pb.gen = pPowRootLayer' p (π : K) n := rfl
   have hdim : pb.dim = p ^ n := by rw [← pb.finrank, finrank_radicalLayer p π]
   have hn := Algebra.PowerBasis.norm_gen_eq_coeff_zero_minpoly pb
   have hc : (X ^ (p ^ n) - C (π : K) : K[X]).coeff 0 = -(π : K) := by
@@ -143,13 +143,13 @@ theorem radicalLayer_normalizedValuation_pow (π : 𝒪[K]) [hπ : Fact (Irreduc
     letI := FontaineWintenberger.extensionValuationSubring_isDiscreteValuationRing
       K (radicalLayer p (π : K) n) w
     ((maximalIdeal w.valuationSubring).valuation (radicalLayer p (π : K) n)
-      (radicalLayerRoot p (π : K) n)) ^
+      (pPowRootLayer' p (π : K) n)) ^
         Module.finrank (𝓀[K]) (IsLocalRing.ResidueField w.valuationSubring) =
       WithZero.exp (-1 : ℤ) := by
   have := FontaineWintenberger.extensionValuationSubring_isDiscreteValuationRing
     K (radicalLayer p (π : K) n) w
   have hn := FontaineWintenberger.extensionValuationSubring_normalizedValuation_norm
-    K (radicalLayer p (π : K) n) w (radicalLayerRoot p (π : K) n)
+    K (radicalLayer p (π : K) n) w (pPowRootLayer' p (π : K) n)
   rw [norm_radicalLayerRoot p π] at hn
   have hπv : (maximalIdeal 𝒪[K]).valuation K (π : K) = WithZero.exp (-1 : ℤ) := by
     change (maximalIdeal 𝒪[K]).valuation K (algebraMap 𝒪[K] K π) = _
@@ -180,7 +180,7 @@ theorem radicalLayer_normalizedValuation_root (π : 𝒪[K]) [hπ : Fact (Irredu
     letI := FontaineWintenberger.extensionValuationSubring_isDiscreteValuationRing
       K (radicalLayer p (π : K) n) w
     (maximalIdeal w.valuationSubring).valuation (radicalLayer p (π : K) n)
-      (radicalLayerRoot p (π : K) n) = WithZero.exp (-1 : ℤ) := by
+      (pPowRootLayer' p (π : K) n) = WithZero.exp (-1 : ℤ) := by
   have := FontaineWintenberger.extensionValuationSubring_isDiscreteValuationRing
     K (radicalLayer p (π : K) n) w
   simpa only [radicalLayer_residueDegree p π n w, pow_one] using
@@ -191,7 +191,7 @@ theorem radicalLayerRoot_mem (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : �
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
     [(NormedField.valuation (K := K)).HasExtension w] :
-    radicalLayerRoot p (π : K) n ∈ w.valuationSubring := by
+    pPowRootLayer' p (π : K) n ∈ w.valuationSubring := by
   have := FontaineWintenberger.extensionValuationSubring_isDiscreteValuationRing
     K (radicalLayer p (π : K) n) w
   rw [← w.valuationSubring.normalizedValuation_valuationSubring]
@@ -204,7 +204,7 @@ def radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
     [(NormedField.valuation (K := K)).HasExtension w] : w.valuationSubring :=
-  ⟨radicalLayerRoot p (π : K) n, radicalLayerRoot_mem p π n w⟩
+  ⟨pPowRootLayer' p (π : K) n, radicalLayerRoot_mem p π n w⟩
 
 /-- `π^{1/p^n}` is a uniformizer of `K(π^{1/p^n})`. -/
 theorem irreducible_radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
@@ -222,15 +222,15 @@ theorem irreducible_radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible �
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
     exact (maximalIdeal w.valuationSubring).intValuation_singleton hϖ.ne_zero hϖ.maximalIdeal_eq
   obtain ⟨u, hu⟩ := associated_of_valuation_eq (A := w.valuationSubring)
-    (ϖ : radicalLayer p (π : K) n) (radicalLayerRoot p (π : K) n)
+    (ϖ : radicalLayer p (π : K) n) (pPowRootLayer' p (π : K) n)
     (hvϖ.trans (radicalLayer_normalizedValuation_root p π n w).symm)
   apply Associated.irreducible _ hϖ
   refine ⟨u, ?_⟩
   apply Subtype.ext
   change (ϖ : radicalLayer p (π : K) n) *
-    ((u : w.valuationSubring) : radicalLayer p (π : K) n) = radicalLayerRoot p (π : K) n
+    ((u : w.valuationSubring) : radicalLayer p (π : K) n) = pPowRootLayer' p (π : K) n
   change ((u : w.valuationSubring) : radicalLayer p (π : K) n) *
-    (ϖ : radicalLayer p (π : K) n) = radicalLayerRoot p (π : K) n at hu
+    (ϖ : radicalLayer p (π : K) n) = pPowRootLayer' p (π : K) n at hu
   exact (mul_comm _ _).trans hu
 
 /-- `K(π^{1/p^n})/K` has ramification index `p^n`. -/
@@ -416,7 +416,7 @@ variable [Algebra (ℚ_[p]) K]
 theorem addVal_p_eq_padic_ramificationIdx :
     addVal 𝒪[K] (p : 𝒪[K]) = ((IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx 𝒪[ℚ_[p]] : ℕ∞) := by
   have hpπ : Irreducible (p : 𝒪[ℚ_[p]]) := by
-    have h := (MulEquiv.irreducible_iff (f := (padicUnitBallEquiv p).symm)).mpr
+    have h := (MulEquiv.irreducible_iff (f := (padicValuationSubringEquiv p).symm)).mpr
       PadicInt.irreducible_p
     simpa only [map_natCast] using h
   have h := FontaineWintenberger.addVal_algebraMap 𝒪[ℚ_[p]] 𝒪[K] (p : 𝒪[ℚ_[p]])

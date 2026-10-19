@@ -38,7 +38,7 @@ theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
     IsAbelianGalois K (cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
-    (isPrimitiveRoot_rootOfUnity (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
+    (isPrimitiveRoot_zeta (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
   exact IsCyclotomicExtension.isAbelianGalois {p ^ n} K _
 
 /-- At an odd prime, the finite cyclotomic Galois group over any
@@ -47,11 +47,11 @@ theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
     IsCyclic (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
-    (isPrimitiveRoot_rootOfUnity (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
+    (isPrimitiveRoot_zeta (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
   let ζ : cyclotomicLayer (K := K) p n :=
-    ⟨rootOfUnity p n, rootOfUnity_mem_cyclotomicLayer p n⟩
+    ⟨zeta p n, zeta_mem_cyclotomicLayer p n⟩
   have hζ : IsPrimitiveRoot ζ (p ^ n) :=
-    (isPrimitiveRoot_rootOfUnity (K := K) p n).of_map_of_injective
+    (isPrimitiveRoot_zeta (K := K) p n).of_map_of_injective
       (f := (cyclotomicLayer (K := K) p n).val) (cyclotomicLayer p n).val.injective
   let := ZMod.isCyclic_units_of_prime_pow p (Fact.out : p.Prime) hp₂.out n
   exact isCyclic_of_injective (hζ.autToPow K) (hζ.autToPow_injective K)
@@ -63,16 +63,16 @@ theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
     (h₁ : cyclotomicLayer (K := K) p 1 = ⊥)
     (hprev : cyclotomicLayer (K := K) p n = ⊥)
     (hnext : cyclotomicLayer (K := K) p (n + 1) ≠ ⊥) :
-    ∃ a : K, algebraMap K (AlgebraicClosure K) a = rootOfUnity p n ∧
-      minpoly K (rootOfUnity (K := K) p (n + 1)) = Polynomial.X ^ p - Polynomial.C a := by
-  have hprevMem : rootOfUnity (K := K) p n ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
+    ∃ a : K, algebraMap K (AlgebraicClosure K) a = zeta p n ∧
+      minpoly K (zeta (K := K) p (n + 1)) = Polynomial.X ^ p - Polynomial.C a := by
+  have hprevMem : zeta (K := K) p n ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
     rw [← hprev]
-    exact rootOfUnity_mem_cyclotomicLayer p n
+    exact zeta_mem_cyclotomicLayer p n
   obtain ⟨a, ha⟩ := hprevMem
-  change algebraMap K (AlgebraicClosure K) a = rootOfUnity p n at ha
+  change algebraMap K (AlgebraicClosure K) a = zeta p n at ha
   have ha₀ : a ≠ 0 := by
     intro h
-    have hz := rootOfUnity_pow (K := K) p n
+    have hz := zeta_pow_eq_one (K := K) p n
     rw [← ha, h, map_zero, zero_pow (pow_ne_zero n (Fact.out : p.Prime).ne_zero)] at hz
     exact zero_ne_one hz
   have hnot (b : K) : b ^ p ≠ a := by
@@ -81,21 +81,21 @@ theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
       intro h
       apply ha₀
       rw [← hb, h, zero_pow (Fact.out : p.Prime).ne_zero]
-    have hquot : (rootOfUnity (K := K) p (n + 1) /
+    have hquot : (zeta (K := K) p (n + 1) /
         algebraMap K (AlgebraicClosure K) b) ^ p = 1 := by
-      rw [div_pow, rootOfUnity_succ_pow, ← ha, ← map_pow, hb,
+      rw [div_pow, zeta_succ_pow, ← ha, ← map_pow, hb,
         div_self ((map_ne_zero (algebraMap K (AlgebraicClosure K))).mpr ha₀)]
-    have hprimitive : IsPrimitiveRoot (rootOfUnity (K := K) p 1) p := by
-      simpa only [pow_one] using isPrimitiveRoot_rootOfUnity (K := K) p 1
+    have hprimitive : IsPrimitiveRoot (zeta (K := K) p 1) p := by
+      simpa only [pow_one] using isPrimitiveRoot_zeta (K := K) p 1
     obtain ⟨i, _, hi⟩ := hprimitive.eq_pow_of_pow_eq_one hquot
-    have hζ₁ : rootOfUnity (K := K) p 1 ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
+    have hζ₁ : zeta (K := K) p 1 ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
       rw [← h₁]
-      exact rootOfUnity_mem_cyclotomicLayer p 1
+      exact zeta_mem_cyclotomicLayer p 1
     apply hnext
     apply le_antisymm _ bot_le
     apply IntermediateField.adjoin_simple_le_iff.mpr
-    have hroot : rootOfUnity (K := K) p (n + 1) =
-        rootOfUnity p 1 ^ i * algebraMap K (AlgebraicClosure K) b := by
+    have hroot : zeta (K := K) p (n + 1) =
+        zeta p 1 ^ i * algebraMap K (AlgebraicClosure K) b := by
       rw [hi, div_mul_cancel₀ _ ((map_ne_zero (algebraMap K (AlgebraicClosure K))).mpr hb₀)]
     rw [hroot]
     exact (⊥ : IntermediateField K (AlgebraicClosure K)).mul_mem
@@ -107,7 +107,7 @@ theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
   symm
   apply minpoly.eq_of_irreducible_of_monic hirr
   · simp only [map_sub, map_pow, Polynomial.aeval_X, Polynomial.aeval_C,
-      rootOfUnity_succ_pow, ha, sub_self]
+      zeta_succ_pow, ha, sub_self]
   · exact Polynomial.monic_X_pow_sub_C a (Fact.out : p.Prime).ne_zero
 
 /-- A new cyclotomic layer immediately above the base has
@@ -119,7 +119,7 @@ theorem cyclotomicLayer_step_finrank_of_eq_bot (n : ℕ)
     Module.finrank K (cyclotomicLayer (K := K) p (n + 1)) = p := by
   obtain ⟨a, _, hmin⟩ := cyclotomicLayer_step_minpoly_of_eq_bot p n h₁ hprev hnext
   calc
-    _ = (minpoly K (rootOfUnity (K := K) p (n + 1))).natDegree :=
+    _ = (minpoly K (zeta (K := K) p (n + 1))).natDegree :=
       IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral _)
     _ = p := by rw [hmin, natDegree_X_pow_sub_C]
 

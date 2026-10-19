@@ -79,7 +79,7 @@ theorem affinePureUnits_commute (G : ClosedSubgroup (PadicAffineGroup p))
   · exact mul_comm _ _
 
 /-- The zero stabilizer modulo the full translation ideal. -/
-def affineZeroStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G where
+def affineTranslationStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G where
   carrier := {g | g.val.left.toAdd ∈ affineTranslationKernel G}
   one_mem' := (affineTranslationKernel G).zero_mem
   mul_mem' {g h} hg hh := by
@@ -94,11 +94,11 @@ def affineZeroStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G 
 
 @[simp]
 theorem mem_affineZeroStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
-    g ∈ affineZeroStabilizer G ↔ g.val.left.toAdd ∈ affineTranslationKernel G := Iff.rfl
+    g ∈ affineTranslationStabilizer G ↔ g.val.left.toAdd ∈ affineTranslationKernel G := Iff.rfl
 
 /-- The zero stabilizer is the product of the full kernel and pure units. -/
 theorem affineZeroStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
-    affineZeroStabilizer G = (affineProjection G).ker ⊔ affinePureUnits G := by
+    affineTranslationStabilizer G = (affineProjection G).ker ⊔ affinePureUnits G := by
   apply le_antisymm
   · intro g hg
     have ht : (SemidirectProduct.inl g.val.left : PadicAffineGroup p) ∈ G := hg
@@ -127,7 +127,7 @@ theorem affineZeroStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
 /-- Congruence of translation coordinates is exactly the zero-stabilizer coset relation. -/
 theorem affineZeroStabilizer_inv_mul_mem_iff
     (G : ClosedSubgroup (PadicAffineGroup p)) (g h : G) :
-    g⁻¹ * h ∈ affineZeroStabilizer G ↔
+    g⁻¹ * h ∈ affineTranslationStabilizer G ↔
       h.val.left.toAdd - g.val.left.toAdd ∈ affineTranslationKernel G := by
   have hunit : (g.val.right : ℤ_[p]) * (g.val.right⁻¹ : (ℤ_[p])ˣ) = 1 := by
     exact congrArg (fun u : (ℤ_[p])ˣ ↦ (u : ℤ_[p])) (mul_inv_cancel g.val.right)
@@ -146,7 +146,7 @@ theorem affineZeroStabilizer_inv_mul_mem_iff
 
 /-- Zero-stabilizer cosets inject into the additive quotient by the full kernel. -/
 def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup p)) :
-    (G ⧸ affineZeroStabilizer G) ↪
+    (G ⧸ affineTranslationStabilizer G) ↪
       (ℤ_[p] ⧸ (affineTranslationKernel G).toAddSubgroup) where
   toFun := Quotient.map' (fun g : G ↦ g.val.left.toAdd) (by
     intro g h hrel
@@ -159,8 +159,8 @@ def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup 
     intro x y
     refine Quotient.inductionOn₂ x y ?_
     intro g h heq
-    apply @Quotient.sound G (QuotientGroup.leftRel (affineZeroStabilizer G)) g h
-    change (QuotientGroup.leftRel (affineZeroStabilizer G)) g h
+    apply @Quotient.sound G (QuotientGroup.leftRel (affineTranslationStabilizer G)) g h
+    change (QuotientGroup.leftRel (affineTranslationStabilizer G)) g h
     rw [QuotientGroup.leftRel_apply]
     apply (affineZeroStabilizer_inv_mul_mem_iff G g h).mpr
     have hrel : (QuotientAddGroup.leftRel (affineTranslationKernel G).toAddSubgroup)
@@ -172,7 +172,7 @@ def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup 
 /-- A nonzero translation kernel makes the zero stabilizer have finite index. -/
 theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
-    (affineZeroStabilizer G).FiniteIndex := by
+    (affineTranslationStabilizer G).FiniteIndex := by
   have hopen := PadicInt.isOpen_closedAddSubgroup_map_mulLeft
     (affineTranslationKernel G) hM 1 one_ne_zero
   have heq : (affineTranslationKernel G).toAddSubgroup.map
@@ -181,7 +181,7 @@ theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p
     simp
   rw [heq] at hopen
   have := AddSubgroup.quotient_finite_of_isOpen (affineTranslationKernel G).toAddSubgroup hopen
-  have : Finite (G ⧸ affineZeroStabilizer G) :=
+  have : Finite (G ⧸ affineTranslationStabilizer G) :=
     Finite.of_injective (affineZeroStabilizerQuotientEmbedding G)
       (affineZeroStabilizerQuotientEmbedding G).injective
   exact Subgroup.finiteIndex_of_finite_quotient
@@ -189,7 +189,7 @@ theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p
 /-- The zero-stabilizer index is exactly the unit-image index of pure units. -/
 theorem affinePureUnits_image_index (G : ClosedSubgroup (PadicAffineGroup p)) :
     ((affinePureUnits G).map (affineProjection G).rangeRestrict).index =
-      (affineZeroStabilizer G).index := by
+      (affineTranslationStabilizer G).index := by
   let ρ := (affineProjection G).rangeRestrict
   have hr : ρ.range = ⊤ :=
     ρ.range_eq_top_of_surjective (affineProjection G).rangeRestrict_surjective
@@ -489,7 +489,7 @@ theorem affineIndex_comparison
     apply Units.ext
     exact sub_eq_zero.mp ha
   let C := (AddMonoidHom.mulLeft a).range.index
-  let D := (affineZeroStabilizer G).index
+  let D := (affineTranslationStabilizer G).index
   have hDfinite := affineZeroStabilizer_finiteIndex G hM
   have hD : 0 < D := Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero
   refine ⟨C, D, PadicInt.mulLeft_range_index_pos a ha, hD, ?_⟩

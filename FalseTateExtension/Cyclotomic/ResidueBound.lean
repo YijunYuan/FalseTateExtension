@@ -92,14 +92,14 @@ variable {K : Type*} [Field K] [CharZero K] [Algebra (ℚ_[p]) K]
 /-- For `K/ℚ_[p]`, `[K(ζ_{p^m}) : K] ≤ φ(p^m)`. -/
 theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
     Module.finrank K (cyclotomicLayer (K := K) p m) ≤ (p ^ m).totient := by
-  have hi := (isPrimitiveRoot_rootOfUnity (K := K) p m).isIntegral
+  have hi := (isPrimitiveRoot_zeta (K := K) p m).isIntegral
     (pow_pos (Fact.out : p.Prime).pos m)
   have hdim : Module.finrank K (cyclotomicLayer (K := K) p m) =
-      (minpoly K (rootOfUnity (K := K) p m)).natDegree :=
-    IntermediateField.adjoin.finrank (hi.tower_top : IsIntegral K (rootOfUnity p m))
+      (minpoly K (zeta (K := K) p m)).natDegree :=
+    IntermediateField.adjoin.finrank (hi.tower_top : IsIntegral K (zeta p m))
   rw [hdim]
-  have hd := minpoly.dvd_map_of_isScalarTower (ℚ_[p]) K (rootOfUnity (K := K) p m)
-  rw [← (isPrimitiveRoot_rootOfUnity (K := K) p m).minpoly_eq_cyclotomic_of_irreducible
+  have hd := minpoly.dvd_map_of_isScalarTower (ℚ_[p]) K (zeta (K := K) p m)
+  rw [← (isPrimitiveRoot_zeta (K := K) p m).minpoly_eq_cyclotomic_of_irreducible
     (Padic.irreducible_cyclotomic_prime_pow p m)] at hd
   exact (Polynomial.natDegree_le_of_dvd hd ((cyclotomic.monic _ _).map _).ne_zero).trans_eq
     (by rw [Polynomial.natDegree_map, natDegree_cyclotomic])
@@ -108,15 +108,15 @@ theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
 def rationalCyclotomicSubfield (m : ℕ) :
     IntermediateField (ℚ_[p]) (cyclotomicLayer (K := K) p m) :=
   IntermediateField.adjoin (ℚ_[p])
-    {(⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)}
+    {(⟨zeta p m, zeta_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)}
 
 omit [Algebra (ℚ_[p]) K] in
 /-- `ζ_{p^m}` is a primitive `p^m`-th root of unity in `K(ζ_{p^m})`. -/
 theorem isPrimitiveRoot_cyclotomicLayer_generator (m : ℕ) :
     IsPrimitiveRoot
-      (⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)
+      (⟨zeta p m, zeta_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)
       (p ^ m) :=
-  (isPrimitiveRoot_rootOfUnity (K := K) p m).of_map_of_injective
+  (isPrimitiveRoot_zeta (K := K) p m).of_map_of_injective
     (f := (cyclotomicLayer (K := K) p m).val) (cyclotomicLayer p m).val.injective
 
 variable [FiniteDimensional (ℚ_[p]) K]

@@ -48,7 +48,7 @@ def falseTateAffineImage [hπ : NeZero π] : ClosedSubgroup (PadicAffineGroup p)
 
 /-- The Krull Galois group is the closed affine image,
 with its group structure and topology. -/
-def falseTateAffineEquiv [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p π := by
+def falseTateGaloisEquivAffineImage [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p π := by
   have := falseTateExtension_isGalois p π
   let f : Γ →* falseTateAffineImage p π := (affineGaloisHom p π).rangeRestrict
   have hf : Function.Bijective f :=
@@ -63,13 +63,13 @@ def falseTateAffineEquiv [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p �
 
 @[simp]
 theorem falseTateAffineEquiv_apply [hπ : NeZero π] (g : Γ) :
-    (falseTateAffineEquiv p π g : PadicAffineGroup p) = affineGaloisHom p π g := rfl
+    (falseTateGaloisEquivAffineImage p π g : PadicAffineGroup p) = affineGaloisHom p π g := rfl
 
 /-- Unit projection of the affine isomorphism is exactly the
 cyclotomic character. -/
 theorem falseTateAffineEquiv_projection [hπ : NeZero π] :
     (affineProjection (falseTateAffineImage p π)).comp
-      (falseTateAffineEquiv p π).toMonoidHom = padicCyclotomicCharacter p π := rfl
+      (falseTateGaloisEquivAffineImage p π).toMonoidHom = padicCyclotomicCharacter p π := rfl
 
 /-- The affine unit image is the cyclotomic character
 image on the cyclotomic subfield. -/
@@ -80,10 +80,10 @@ theorem falseTateAffineImage_projection_range [hπ : NeZero π] :
   ext u
   constructor
   · rintro ⟨g, rfl⟩
-    obtain ⟨σ, rfl⟩ := (falseTateAffineEquiv p π).surjective g
+    obtain ⟨σ, rfl⟩ := (falseTateGaloisEquivAffineImage p π).surjective g
     exact ⟨σ, rfl⟩
   · rintro ⟨σ, rfl⟩
-    exact ⟨falseTateAffineEquiv p π σ, rfl⟩
+    exact ⟨falseTateGaloisEquivAffineImage p π σ, rfl⟩
 
 /-- The infinite radical tower lies in the false Tate field. -/
 theorem kummerExtension_le_falseTateExtension :
@@ -113,12 +113,12 @@ theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
     simp only [ZMod.val_zero, pow_zero, one_mul]
     apply (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).injective
     change (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n))
-        (infiniteLayerRestriction p π n σ (layerRadical p π n)) =
+        (infiniteLayerRestriction p π n σ (pPowRootLayer p π n)) =
       (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n))
-        (layerRadical p π n)
+        (pPowRootLayer p π n)
     rw [infiniteLayerRestriction_commutes]
-    let y : kummerExtension p π := ⟨radical p π n,
-      radicalLayer_le_kummerExtension p π n (radical_mem_radicalLayer p π n)⟩
+    let y : kummerExtension p π := ⟨pPowRoot p π n,
+      radicalLayer_le_kummerExtension p π n (pPowRoot_mem_radicalLayer p π n)⟩
     exact hfix _ ⟨y, rfl⟩
   · intro hσ
     change σ ∈ (falseTateKummerInclusion p π).fieldRange.fixingSubgroup
@@ -145,7 +145,7 @@ theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
 
 /-- Pure units in the affine image pull back to the radical fixer. -/
 theorem falseTateAffineEquiv_mem_pureUnits [hπ : NeZero π] (σ : Γ) :
-    falseTateAffineEquiv p π σ ∈ affinePureUnits (falseTateAffineImage p π) ↔
+    falseTateGaloisEquivAffineImage p π σ ∈ affinePureUnits (falseTateAffineImage p π) ↔
       σ ∈ falseTateKummerFixing p π := by
   rw [mem_affinePureUnits, mem_falseTateKummerFixing_iff p π]
   rfl
@@ -153,13 +153,13 @@ theorem falseTateAffineEquiv_mem_pureUnits [hπ : NeZero π] (σ : Γ) :
 /-- The radical fixer becomes exactly the pure-unit subgroup in
 the closed affine image. -/
 theorem falseTateKummerFixing_map_affine [hπ : NeZero π] :
-    (falseTateKummerFixing p π).map (falseTateAffineEquiv p π).toMonoidHom =
+    (falseTateKummerFixing p π).map (falseTateGaloisEquivAffineImage p π).toMonoidHom =
       affinePureUnits (falseTateAffineImage p π) := by
   ext g
-  obtain ⟨σ, rfl⟩ := (falseTateAffineEquiv p π).surjective g
+  obtain ⟨σ, rfl⟩ := (falseTateGaloisEquivAffineImage p π).surjective g
   constructor
   · rintro ⟨τ, hτ, heq⟩
-    have hτσ := (falseTateAffineEquiv p π).injective heq
+    have hτσ := (falseTateGaloisEquivAffineImage p π).injective heq
     subst τ
     exact (falseTateAffineEquiv_mem_pureUnits p π σ).mpr hτ
   · intro hσ
@@ -190,9 +190,9 @@ theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
     Function.Injective (padicCyclotomicCharacter p π) := by
   have hi : Function.Injective ((affineProjection (falseTateAffineImage p π)).comp
-      (falseTateAffineEquiv p π).toMonoidHom) :=
+      (falseTateGaloisEquivAffineImage p π).toMonoidHom) :=
     (affineProjection_injective_of_translationKernel_eq_bot _ hM).comp
-      (falseTateAffineEquiv p π).injective
+      (falseTateGaloisEquivAffineImage p π).injective
   rw [falseTateAffineEquiv_projection] at hi
   exact hi
 

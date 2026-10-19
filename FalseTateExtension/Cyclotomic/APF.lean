@@ -255,9 +255,9 @@ omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
 theorem mem_cyclotomicLayer_of_pow_eq_one (n : ℕ) {ζ : AlgebraicClosure K}
     (hζ : ζ ^ (p ^ n) = 1) : ζ ∈ cyclotomicLayer (K := K) p n := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  obtain ⟨j, _, rfl⟩ := (isPrimitiveRoot_rootOfUnity (K := K) p n).eq_pow_of_pow_eq_one hζ
+  obtain ⟨j, _, rfl⟩ := (isPrimitiveRoot_zeta (K := K) p n).eq_pow_of_pow_eq_one hζ
   exact (cyclotomicLayer (K := K) p n).toSubalgebra.pow_mem
-    (rootOfUnity_mem_cyclotomicLayer p n) j
+    (zeta_mem_cyclotomicLayer p n) j
 
 /-- A `ℚ_[p]`-algebra embedding `ℚ_[p](ζ_{p^∞}) →ₐ[ℚ_[p]] K(ζ_{p^∞})`, induced by an
 isomorphism of algebraic closures `ℚ̄_p ≃ K̄`. -/
@@ -267,10 +267,10 @@ def rationalCyclotomicEmbedding : Cyc →ₐ[ℚ_[p]] cyclotomicExtension (K := 
   apply f.codRestrict ((cyclotomicExtension (K := K) p).restrictScalars ℚ_[p]).toSubalgebra
   intro x
   obtain ⟨n, hn⟩ := (mem_cyclotomicExtension_iff p (x : AlgebraicClosure ℚ_[p])).mp x.property
-  have hroot : e (rootOfUnity (K := ℚ_[p]) p n) ∈ cyclotomicExtension (K := K) p := by
+  have hroot : e (zeta (K := ℚ_[p]) p n) ∈ cyclotomicExtension (K := K) p := by
     apply cyclotomicLayer_le_cyclotomicExtension p n
     apply mem_cyclotomicLayer_of_pow_eq_one p n
-    rw [← map_pow, rootOfUnity_pow, map_one]
+    rw [← map_pow, zeta_pow_eq_one, map_one]
   have hle : cyclotomicLayer (K := ℚ_[p]) p n ≤
       ((cyclotomicExtension (K := K) p).restrictScalars ℚ_[p]).comap e.toAlgHom :=
     IntermediateField.adjoin_simple_le_iff.mpr hroot
@@ -278,16 +278,16 @@ def rationalCyclotomicEmbedding : Cyc →ₐ[ℚ_[p]] cyclotomicExtension (K := 
 
 /-- The root of unity `ζ_{p^n} ∈ K(ζ_{p^∞})` lies in the image of `ℚ_[p](ζ_{p^∞})`. -/
 theorem cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding (n : ℕ) :
-    cyclotomicRootOfUnity (K := K) p n ∈
+    zetaCycExt (K := K) p n ∈
       (rationalCyclotomicEmbedding (K := K) p).fieldRange := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  have hprim := (isPrimitiveRoot_cyclotomicRootOfUnity (K := ℚ_[p]) p n).map_of_injective
+  have hprim := (isPrimitiveRoot_zetaCycExt (K := ℚ_[p]) p n).map_of_injective
     (rationalCyclotomicEmbedding (K := K) p).injective
   obtain ⟨j, _, hj⟩ := hprim.eq_pow_of_pow_eq_one
-    (isPrimitiveRoot_cyclotomicRootOfUnity (K := K) p n).pow_eq_one
+    (isPrimitiveRoot_zetaCycExt (K := K) p n).pow_eq_one
   rw [← hj]
   exact (rationalCyclotomicEmbedding (K := K) p).fieldRange.toSubalgebra.pow_mem
-    ⟨cyclotomicRootOfUnity (K := ℚ_[p]) p n, rfl⟩ j
+    ⟨zetaCycExt (K := ℚ_[p]) p n, rfl⟩ j
 
 /-- `K(ζ_{p^∞})` as an algebra over `ℚ_[p](ζ_{p^∞})` via `rationalCyclotomicEmbedding`. -/
 local instance (priority := 100) rationalCyclotomicEmbeddingAlgebra :
@@ -316,7 +316,7 @@ theorem rationalCyclotomicEmbedding_adjoin_base :
     { A.toSubfield.map (cyclotomicExtension (K := K) p).val.toRingHom with
       algebraMap_mem' := fun k ↦ ⟨algebraMap K (cyclotomicExtension (K := K) p) k,
         IntermediateField.subset_adjoin Cyc _ ⟨k, rfl⟩, rfl⟩ }
-  have hroots (n : ℕ) : cyclotomicRootOfUnity (K := K) p n ∈ A := by
+  have hroots (n : ℕ) : zetaCycExt (K := K) p n ∈ A := by
     obtain ⟨z, hz⟩ := cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding (K := K) p n
     have hzA := A.algebraMap_mem z
     change rationalCyclotomicEmbedding p z ∈ A at hzA
@@ -326,7 +326,7 @@ theorem rationalCyclotomicEmbedding_adjoin_base :
     apply iSup_le
     intro n
     apply IntermediateField.adjoin_simple_le_iff.mpr
-    exact ⟨cyclotomicRootOfUnity (K := K) p n, hroots n, rfl⟩
+    exact ⟨zetaCycExt (K := K) p n, hroots n, rfl⟩
   apply top_unique
   intro x _
   obtain ⟨y, hy, hxy⟩ := hD x.property

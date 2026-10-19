@@ -47,7 +47,7 @@ variable (π : 𝒪[ℚ_[p]])
 
 /-- Oddness makes the affine multiplier two invertible at every
 finite level, including the zeroth level. -/
-def finiteAffineTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) : (ZMod (p ^ n))ˣ :=
+def unitTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) : (ZMod (p ^ n))ˣ :=
   ZMod.unitOfCoprime 2 (by
     have hp : p.Coprime 2 := (Fact.out : p.Prime).coprime_iff_not_dvd.mpr (by
       intro h
@@ -56,8 +56,8 @@ def finiteAffineTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) : (ZMod (p ^ n))ˣ :=
     exact hp.symm.pow_right n)
 
 @[simp]
-theorem coe_finiteAffineTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
-    (finiteAffineTwo p n : ZMod (p ^ n)) = 2 := ZMod.coe_unitOfCoprime _ _
+theorem coe_unitTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
+    (unitTwo p n : ZMod (p ^ n)) = 2 := ZMod.coe_unitOfCoprime _ _
 
 /-- Every translation in the rational finite Galois group
 belongs to its inertia subgroup. -/
@@ -71,18 +71,18 @@ theorem finiteDiagonal_translation_mem_inertia
           (falseTateLayer p (π : ℚ_[p]) n n))) 0 := by
   have := falseTateLayer_isGalois p (π : ℚ_[p]) n
   let e := finiteDiagonalGaloisEquiv_padic p π n
-  let δ := e.symm (SemidirectProduct.inr (finiteAffineTwo p n))
+  let δ := e.symm (SemidirectProduct.inr (unitTwo p n))
   let τ := e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b))
   have h := commutatorElement_mem_lowerRamificationGroup_zero (ℚ_[p])
     (falseTateLayer p (π : ℚ_[p]) n n) δ τ
   have heq : ⁅δ, τ⁆ = τ := by
     apply e.injective
     rw [map_commutatorElement]
-    change ⁅e (e.symm (SemidirectProduct.inr (finiteAffineTwo p n))),
+    change ⁅e (e.symm (SemidirectProduct.inr (unitTwo p n))),
       e (e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b)))⁆ =
         e (e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b)))
     rw [e.apply_symm_apply, e.apply_symm_apply, finiteAffine_commutator_inl]
-    simp only [SemidirectProduct.right_inr, coe_finiteAffineTwo]
+    simp only [SemidirectProduct.right_inr, coe_unitTwo]
     rw [show (2 : ZMod (p ^ n)) - 1 = 1 by ring, one_mul]
   rwa [heq] at h
 
@@ -121,7 +121,7 @@ theorem lowerRamificationGroup_falseTateLayer_zero
   rw [sup_eq_right.mpr (finiteCyclotomicFixing_le_inertia p π (n + 1)),
     spectral_residueDegree_algEquiv (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1))
       i.equivFieldRange,
-    cyclotomicLayer_spectral_residueDegree] at hidx
+    cyclotomicLayer_spectral_residueDegree_eq_one] at hidx
   exact Subgroup.index_eq_one.mp hidx
 
 /-- The spectral residue degree of each positive rational diagonal

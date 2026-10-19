@@ -21,13 +21,14 @@ normalized valuation of `p` is `exp (-1)`, the residue characteristic is `p`, an
 
 ## Main results
 
-* `padicUnitBallEquiv : 𝒪[ℚ_[p]] ≃+* ℤ_[p]` and `padicUnitBallResidueEquiv : 𝓀[ℚ_[p]] ≃+* ZMod p`
+* `padicValuationSubringEquiv : 𝒪[ℚ_[p]] ≃+* ℤ_[p]` and
+  `padicResidueFieldEquiv : 𝓀[ℚ_[p]] ≃+* ZMod p`
 * `padic_isCompleteDiscreteValuedField`, `padic_isPerfectResidueLocalField`: the
   `FontaineWintenberger` instances for `ℚ_[p]`
-* `padicUnitBall_residueFinite`, `padicUnitBall_residueCharP`: `𝓀[ℚ_[p]]` is finite of
+* `padicResidueField_finite`, `padicResidueField_charP`: `𝓀[ℚ_[p]]` is finite of
   characteristic `p`
 * `residueChar_padic : residueChar ℚ_[p] = p`
-* `padicUnitBall_normalizedValuation_p`: the normalized valuation of `p` is `exp (-1)`
+* `padicValuationSubring_valuation_p`: the normalized valuation of `p` is `exp (-1)`
 * `padicUnits_infinite`: `ℤ_[p]ˣ` is infinite
 -/
 
@@ -47,28 +48,29 @@ theorem padic_valuationSubring_toSubring : 𝒪[ℚ_[p]].toSubring = PadicInt.su
   rfl
 
 /-- The ring isomorphism `𝒪[ℚ_[p]] ≃+* ℤ_[p]`, the identity on elements of `ℚ_[p]`. -/
-def padicUnitBallEquiv : 𝒪[ℚ_[p]] ≃+* ℤ_[p] :=
+def padicValuationSubringEquiv : 𝒪[ℚ_[p]] ≃+* ℤ_[p] :=
   RingEquiv.subringCongr (padic_valuationSubring_toSubring p)
 
 /-- The residue field `𝓀[ℚ_[p]]` is the prime field `ZMod p`. -/
-def padicUnitBallResidueEquiv : 𝓀[ℚ_[p]] ≃+* ZMod p :=
-  (IsLocalRing.ResidueField.mapEquiv (padicUnitBallEquiv p)).trans (PadicInt.residueField (p := p))
+def padicResidueFieldEquiv : 𝓀[ℚ_[p]] ≃+* ZMod p :=
+  (IsLocalRing.ResidueField.mapEquiv (padicValuationSubringEquiv p)).trans
+    (PadicInt.residueField (p := p))
 
 /-- `𝒪[ℚ_[p]]` is a discrete valuation ring. -/
-instance padicUnitBall_isDiscreteValuationRing : IsDiscreteValuationRing 𝒪[ℚ_[p]] :=
-  RingEquivClass.isDiscreteValuationRing (padicUnitBallEquiv p).symm
+instance padicValuationSubring_isDiscreteValuationRing : IsDiscreteValuationRing 𝒪[ℚ_[p]] :=
+  RingEquivClass.isDiscreteValuationRing (padicValuationSubringEquiv p).symm
 
 /-- `ℚ_[p]` is a complete discretely valued field. -/
 instance padic_isCompleteDiscreteValuedField : IsCompleteDiscreteValuedField ℚ_[p] where
 
 /-- The residue field `𝓀[ℚ_[p]]` is finite. -/
-instance padicUnitBall_residueFinite : Finite 𝓀[ℚ_[p]] :=
-  Finite.of_injective (padicUnitBallResidueEquiv p) (padicUnitBallResidueEquiv p).injective
+instance padicResidueField_finite : Finite 𝓀[ℚ_[p]] :=
+  Finite.of_injective (padicResidueFieldEquiv p) (padicResidueFieldEquiv p).injective
 
 /-- The residue field `𝓀[ℚ_[p]]` has characteristic `p`. -/
-instance padicUnitBall_residueCharP : CharP 𝓀[ℚ_[p]] p where
+instance padicResidueField_charP : CharP 𝓀[ℚ_[p]] p where
   cast_eq_zero_iff n := by
-    rw [← (padicUnitBallResidueEquiv p).injective.eq_iff, map_natCast, map_zero]
+    rw [← (padicResidueFieldEquiv p).injective.eq_iff, map_natCast, map_zero]
     exact CharP.cast_eq_zero_iff (ZMod p) p n
 
 /-- `ℚ_[p]` is a complete discretely valued field with perfect residue field. -/
@@ -80,11 +82,11 @@ instance padic_isPerfectResidueLocalField : IsPerfectResidueLocalField ℚ_[p] :
   residueChar_eq ℚ_[p] p
 
 /-- The normalized valuation of `ℚ_[p]` takes the value `exp (-1)` at `p`. -/
-theorem padicUnitBall_normalizedValuation_p :
+theorem padicValuationSubring_valuation_p :
     (maximalIdeal 𝒪[ℚ_[p]]).valuation ℚ_[p] (p : ℚ_[p]) = WithZero.exp (-1 : ℤ) := by
-  let π : 𝒪[ℚ_[p]] := (padicUnitBallEquiv p).symm (p : ℤ_[p])
+  let π : 𝒪[ℚ_[p]] := (padicValuationSubringEquiv p).symm (p : ℤ_[p])
   have hπ : Irreducible π :=
-    (MulEquiv.irreducible_iff (f := (padicUnitBallEquiv p).symm)).mpr PadicInt.irreducible_p
+    (MulEquiv.irreducible_iff (f := (padicValuationSubringEquiv p).symm)).mpr PadicInt.irreducible_p
   change (maximalIdeal 𝒪[ℚ_[p]]).valuation ℚ_[p] (algebraMap 𝒪[ℚ_[p]] ℚ_[p] π) = _
   rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
   exact (maximalIdeal 𝒪[ℚ_[p]]).intValuation_singleton hπ.ne_zero hπ.maximalIdeal_eq

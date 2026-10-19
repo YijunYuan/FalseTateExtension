@@ -11,9 +11,9 @@ public import FalseTateExtension.Mathlib.FieldTheory.IntermediateField.Supremum
 /-!
 # Finite layers of the false Tate extension
 
-Let `K` be a field and `p` a prime. For `π ∈ K`, `radical p π n = π^{1/p^n}` is a compatible
+Let `K` be a field and `p` a prime. For `π ∈ K`, `pPowRoot p π n = π^{1/p^n}` is a compatible
 system of `p`-power roots of `π` in the algebraic closure of `K`, and, when `K` has
-characteristic zero, `rootOfUnity p n = ζ_{p^n}` is a compatible system of primitive `p`-power
+characteristic zero, `zeta p n = ζ_{p^n}` is a compatible system of primitive `p`-power
 roots of unity. The finite layers are `radicalLayer p π n = K(π^{1/p^n})`,
 `cyclotomicLayer p n = K(ζ_{p^n})` and `falseTateLayer p π m n = K(π^{1/p^m}, ζ_{p^n})`; the
 infinite extensions `kummerExtension p π = K(π^{1/p^∞})`, `cyclotomicExtension p = K(ζ_{p^∞})`
@@ -23,7 +23,7 @@ and cyclotomic extensions and is the union of the diagonal layers
 
 ## Main results
 
-* `radical_pow`, `isPrimitiveRoot_rootOfUnity`: the defining properties of the two systems.
+* `pPowRoot_pow`, `isPrimitiveRoot_zeta`: the defining properties of the two systems.
 * `radicalLayer_mono`, `cyclotomicLayer_mono`, `falseTateLayer_mono`: the layers increase.
 * `mem_kummerExtension_iff`, `mem_cyclotomicExtension_iff`, `mem_falseTateExtension_iff`:
   the infinite extensions are the unions of their finite layers.
@@ -45,49 +45,49 @@ noncomputable section
 variable {K : Type*} [Field K] (p : ℕ) [Fact p.Prime]
 
 /-- A compatible system `π^{1/p^n}` of `p`-power roots of `π` in the algebraic closure of
-`K`: `radical p π 0 = π` and `radical p π (n + 1) ^ p = radical p π n`. -/
-def radical (π : K) : ℕ → AlgebraicClosure K :=
+`K`: `pPowRoot p π 0 = π` and `pPowRoot p π (n + 1) ^ p = pPowRoot p π n`. -/
+def pPowRoot (π : K) : ℕ → AlgebraicClosure K :=
   Classical.choose (exists_compatible_radicals p (algebraMap K (AlgebraicClosure K) π))
 
 /-- The zeroth radical is `π` itself. -/
 @[simp]
-theorem radical_zero (π : K) : radical p π 0 = algebraMap K (AlgebraicClosure K) π :=
+theorem pPowRoot_zero (π : K) : pPowRoot p π 0 = algebraMap K (AlgebraicClosure K) π :=
   (Classical.choose_spec
     (exists_compatible_radicals p (algebraMap K (AlgebraicClosure K) π))).1
 
 /-- `(π^{1/p^{n+1}})^p = π^{1/p^n}`. -/
-theorem radical_succ_pow (π : K) (n : ℕ) : radical p π (n + 1) ^ p = radical p π n :=
+theorem pPowRoot_succ_pow (π : K) (n : ℕ) : pPowRoot p π (n + 1) ^ p = pPowRoot p π n :=
   (Classical.choose_spec
     (exists_compatible_radicals p (algebraMap K (AlgebraicClosure K) π))).2.1 n
 
 /-- `(π^{1/p^n})^{p^n} = π`. -/
-theorem radical_pow (π : K) (n : ℕ) :
-    radical p π n ^ (p ^ n) = algebraMap K (AlgebraicClosure K) π :=
+theorem pPowRoot_pow (π : K) (n : ℕ) :
+    pPowRoot p π n ^ (p ^ n) = algebraMap K (AlgebraicClosure K) π :=
   (Classical.choose_spec
     (exists_compatible_radicals p (algebraMap K (AlgebraicClosure K) π))).2.2 n
 
 /-- The Kummer layer `K(π^{1/p^n})`. -/
 def radicalLayer (π : K) (n : ℕ) : IntermediateField K (AlgebraicClosure K) :=
-  IntermediateField.adjoin K {radical p π n}
+  IntermediateField.adjoin K {pPowRoot p π n}
 
 /-- `π^{1/p^n} ∈ K(π^{1/p^n})`. -/
-theorem radical_mem_radicalLayer (π : K) (n : ℕ) : radical p π n ∈ radicalLayer p π n :=
+theorem pPowRoot_mem_radicalLayer (π : K) (n : ℕ) : pPowRoot p π n ∈ radicalLayer p π n :=
   IntermediateField.subset_adjoin K _ (Set.mem_singleton _)
 
 /-- The zeroth Kummer layer is `K`. -/
 @[simp]
 theorem radicalLayer_zero (π : K) : radicalLayer p π 0 = ⊥ := by
   apply IntermediateField.adjoin_simple_eq_bot_iff.mpr
-  rw [radical_zero]
+  rw [pPowRoot_zero]
   exact IntermediateField.algebraMap_mem _ π
 
 /-- `K(π^{1/p^n}) ⊆ K(π^{1/p^{n+1}})`. -/
 theorem radicalLayer_le_succ (π : K) (n : ℕ) :
     radicalLayer p π n ≤ radicalLayer p π (n + 1) := by
   apply IntermediateField.adjoin_simple_le_iff.mpr
-  rw [← radical_succ_pow p π n]
+  rw [← pPowRoot_succ_pow p π n]
   exact (radicalLayer p π (n + 1)).toSubalgebra.pow_mem
-    (radical_mem_radicalLayer p π (n + 1)) p
+    (pPowRoot_mem_radicalLayer p π (n + 1)) p
 
 /-- The Kummer layers `K(π^{1/p^n})` increase with `n`. -/
 theorem radicalLayer_mono (π : K) : Monotone (radicalLayer p π) :=
@@ -96,7 +96,7 @@ theorem radicalLayer_mono (π : K) : Monotone (radicalLayer p π) :=
 /-- `K(π^{1/p^n})/K` is finite. -/
 instance radicalLayer_finiteDimensional (π : K) (n : ℕ) :
     FiniteDimensional K (radicalLayer p π n) :=
-  inferInstanceAs (FiniteDimensional K (IntermediateField.adjoin K {radical p π n}))
+  inferInstanceAs (FiniteDimensional K (IntermediateField.adjoin K {pPowRoot p π n}))
 
 /-- The Kummer extension `K(π^{1/p^∞}) = ⋃_n K(π^{1/p^n})`. -/
 def kummerExtension (π : K) : IntermediateField K (AlgebraicClosure K) :=
@@ -114,39 +114,39 @@ theorem mem_kummerExtension_iff (π : K) (x : AlgebraicClosure K) :
 variable [CharZero K]
 
 /-- A compatible system `ζ_{p^n}` of primitive `p^n`-th roots of unity in the algebraic
-closure of `K`: `rootOfUnity p 0 = 1` and `rootOfUnity p (n + 1) ^ p = rootOfUnity p n`. -/
-def rootOfUnity : ℕ → AlgebraicClosure K :=
+closure of `K`: `zeta p 0 = 1` and `zeta p (n + 1) ^ p = zeta p n`. -/
+def zeta : ℕ → AlgebraicClosure K :=
   Classical.choose (exists_compatible_primitive_roots (Ω := AlgebraicClosure K) p)
 
 /-- `ζ_{p^0} = 1`. -/
 @[simp]
-theorem rootOfUnity_zero : rootOfUnity (K := K) p 0 = 1 :=
+theorem zeta_zero : zeta (K := K) p 0 = 1 :=
   (Classical.choose_spec
     (exists_compatible_primitive_roots (Ω := AlgebraicClosure K) p)).1
 
 /-- `ζ_{p^{n+1}}^p = ζ_{p^n}`. -/
-theorem rootOfUnity_succ_pow (n : ℕ) :
-    rootOfUnity (K := K) p (n + 1) ^ p = rootOfUnity p n :=
+theorem zeta_succ_pow (n : ℕ) :
+    zeta (K := K) p (n + 1) ^ p = zeta p n :=
   (Classical.choose_spec
     (exists_compatible_primitive_roots (Ω := AlgebraicClosure K) p)).2.1 n
 
 /-- `ζ_{p^n}` is a primitive `p^n`-th root of unity. -/
-theorem isPrimitiveRoot_rootOfUnity (n : ℕ) :
-    IsPrimitiveRoot (rootOfUnity (K := K) p n) (p ^ n) :=
+theorem isPrimitiveRoot_zeta (n : ℕ) :
+    IsPrimitiveRoot (zeta (K := K) p n) (p ^ n) :=
   (Classical.choose_spec
     (exists_compatible_primitive_roots (Ω := AlgebraicClosure K) p)).2.2 n
 
 /-- `ζ_{p^n}^{p^n} = 1`. -/
-theorem rootOfUnity_pow (n : ℕ) : rootOfUnity (K := K) p n ^ (p ^ n) = 1 :=
-  (isPrimitiveRoot_rootOfUnity (K := K) p n).pow_eq_one
+theorem zeta_pow_eq_one (n : ℕ) : zeta (K := K) p n ^ (p ^ n) = 1 :=
+  (isPrimitiveRoot_zeta (K := K) p n).pow_eq_one
 
 /-- The cyclotomic layer `K(ζ_{p^n})`. -/
 def cyclotomicLayer (n : ℕ) : IntermediateField K (AlgebraicClosure K) :=
-  IntermediateField.adjoin K {rootOfUnity (K := K) p n}
+  IntermediateField.adjoin K {zeta (K := K) p n}
 
 /-- `ζ_{p^n} ∈ K(ζ_{p^n})`. -/
-theorem rootOfUnity_mem_cyclotomicLayer (n : ℕ) :
-    rootOfUnity (K := K) p n ∈ cyclotomicLayer p n :=
+theorem zeta_mem_cyclotomicLayer (n : ℕ) :
+    zeta (K := K) p n ∈ cyclotomicLayer p n :=
   IntermediateField.subset_adjoin K _ (Set.mem_singleton _)
 
 /-- The zeroth cyclotomic layer is `K`. -/
@@ -158,9 +158,9 @@ theorem cyclotomicLayer_zero : cyclotomicLayer (K := K) p 0 = ⊥ := by
 theorem cyclotomicLayer_le_succ (n : ℕ) :
     cyclotomicLayer (K := K) p n ≤ cyclotomicLayer p (n + 1) := by
   apply IntermediateField.adjoin_simple_le_iff.mpr
-  rw [← rootOfUnity_succ_pow (K := K) p n]
+  rw [← zeta_succ_pow (K := K) p n]
   exact (cyclotomicLayer (K := K) p (n + 1)).toSubalgebra.pow_mem
-    (rootOfUnity_mem_cyclotomicLayer p (n + 1)) p
+    (zeta_mem_cyclotomicLayer p (n + 1)) p
 
 /-- The cyclotomic layers `K(ζ_{p^n})` increase with `n`. -/
 theorem cyclotomicLayer_mono : Monotone (cyclotomicLayer (K := K) p) :=
@@ -169,7 +169,7 @@ theorem cyclotomicLayer_mono : Monotone (cyclotomicLayer (K := K) p) :=
 /-- `K(ζ_{p^n})/K` is finite. -/
 instance cyclotomicLayer_finiteDimensional (n : ℕ) :
     FiniteDimensional K (cyclotomicLayer (K := K) p n) :=
-  inferInstanceAs (FiniteDimensional K (IntermediateField.adjoin K {rootOfUnity (K := K) p n}))
+  inferInstanceAs (FiniteDimensional K (IntermediateField.adjoin K {zeta (K := K) p n}))
 
 /-- The cyclotomic extension `K(ζ_{p^∞}) = ⋃_n K(ζ_{p^n})`. -/
 def cyclotomicExtension : IntermediateField K (AlgebraicClosure K) :=
@@ -194,16 +194,16 @@ theorem falseTateLayer_zero_zero (π : K) : falseTateLayer p π 0 0 = ⊥ := by
   simp [falseTateLayer]
 
 /-- `π^{1/p^m} ∈ K(π^{1/p^m}, ζ_{p^n})`. -/
-theorem radical_mem_falseTateLayer (π : K) (m n : ℕ) :
-    radical p π m ∈ falseTateLayer p π m n :=
+theorem pPowRoot_mem_falseTateLayer (π : K) (m n : ℕ) :
+    pPowRoot p π m ∈ falseTateLayer p π m n :=
   (le_sup_left : radicalLayer p π m ≤ falseTateLayer p π m n)
-    (radical_mem_radicalLayer p π m)
+    (pPowRoot_mem_radicalLayer p π m)
 
 /-- `ζ_{p^n} ∈ K(π^{1/p^m}, ζ_{p^n})`. -/
-theorem rootOfUnity_mem_falseTateLayer (π : K) (m n : ℕ) :
-    rootOfUnity p n ∈ falseTateLayer p π m n :=
+theorem zeta_mem_falseTateLayer (π : K) (m n : ℕ) :
+    zeta p n ∈ falseTateLayer p π m n :=
   (le_sup_right : cyclotomicLayer p n ≤ falseTateLayer p π m n)
-    (rootOfUnity_mem_cyclotomicLayer p n)
+    (zeta_mem_cyclotomicLayer p n)
 
 /-- `K(π^{1/p^m}, ζ_{p^n}) ⊆ K(π^{1/p^{m'}}, ζ_{p^{n'}})` when `m ≤ m'` and `n ≤ n'`. -/
 theorem falseTateLayer_mono (π : K) {m m' n n' : ℕ} (hm : m ≤ m') (hn : n ≤ n') :

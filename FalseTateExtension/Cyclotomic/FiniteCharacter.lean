@@ -44,38 +44,38 @@ local instance : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero
 def cyclotomicLayerCharacter :
     (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) →*
       (ZMod (p ^ m))ˣ :=
-  (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow (ℚ_[p])
+  (isPrimitiveRoot_zetaCyc p m).autToPow (ℚ_[p])
 
 /-- `g(ζ_{p^m}) = ζ_{p^m}^{χ_m(g)}`. -/
 theorem cyclotomicLayerCharacter_spec
     (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) :
-    g (cyclotomicLayerRoot p m) = cyclotomicLayerRoot p m ^
+    g (zetaCyc p m) = zetaCyc p m ^
       (cyclotomicLayerCharacter p m g : ZMod (p ^ m)).val :=
-  ((isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_spec (ℚ_[p]) g).symm
+  ((isPrimitiveRoot_zetaCyc p m).autToPow_spec (ℚ_[p]) g).symm
 
 /-- If `g(ζ_{p^m}) = ζ_{p^m}^u` for a unit `u` of `ℤ/p^m`, then `χ_m(g) = u`. -/
 theorem cyclotomicLayerCharacter_unique
     (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m)
     (u : (ZMod (p ^ m))ˣ)
-    (hu : g (cyclotomicLayerRoot p m) = cyclotomicLayerRoot p m ^ (u : ZMod (p ^ m)).val) :
+    (hu : g (zetaCyc p m) = zetaCyc p m ^ (u : ZMod (p ^ m)).val) :
     cyclotomicLayerCharacter p m g = u := by
   apply Units.ext
   apply ZMod.val_injective
-  exact (isPrimitiveRoot_cyclotomicLayerRoot p m).pow_inj (ZMod.val_lt _) (ZMod.val_lt _)
+  exact (isPrimitiveRoot_zetaCyc p m).pow_inj (ZMod.val_lt _) (ZMod.val_lt _)
     ((cyclotomicLayerCharacter_spec p m g).symm.trans hu)
 
 /-- The cyclotomic character `χ_m` is injective. -/
 theorem cyclotomicLayerCharacter_injective : Function.Injective (cyclotomicLayerCharacter p m) :=
-  (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_injective (ℚ_[p])
+  (isPrimitiveRoot_zetaCyc p m).autToPow_injective (ℚ_[p])
 
 /-- The cyclotomic character `χ_m` agrees with Mathlib's `IsCyclotomicExtension.autEquivPow`. -/
 theorem cyclotomicLayerCharacter_eq_autEquivPow
     (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) :
     cyclotomicLayerCharacter p m g = IsCyclotomicExtension.autEquivPow
       (cyclotomicLayer (K := ℚ_[p]) p m) (Padic.irreducible_cyclotomic_prime_pow p m) g := by
-  change (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow ℚ_[p] g =
+  change (isPrimitiveRoot_zetaCyc p m).autToPow ℚ_[p] g =
     (IsCyclotomicExtension.zeta_spec (p ^ m) ℚ_[p] _).autToPow ℚ_[p] g
-  rw [(isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_eq_modularCyclotomicCharacter (p ^ m)
+  rw [(isPrimitiveRoot_zetaCyc p m).autToPow_eq_modularCyclotomicCharacter (p ^ m)
     ℚ_[p], (IsCyclotomicExtension.zeta_spec (p ^ m) ℚ_[p] _).autToPow_eq_modularCyclotomicCharacter
     (p ^ m) ℚ_[p]]
 

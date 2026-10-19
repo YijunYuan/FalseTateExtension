@@ -86,7 +86,7 @@ theorem cyclotomicLayer_le_radicalLayer_of_isGalois [hπ : Fact (Irreducible π)
   let F := radicalLayer p (π : K) n
   let f : K[X] := X ^ (p ^ n) - C (π : K)
   have hsplit : (f.map (algebraMap K F)).Splits := by
-    have h := Normal.splits (inferInstance : Normal K F) (radicalLayerRoot p (π : K) n)
+    have h := Normal.splits (inferInstance : Normal K F) (pPowRootLayer' p (π : K) n)
     simpa only [minpoly_radicalLayerRoot p π n] using h
   have hle : falseTateLayer p (π : K) n n ≤ F := by
     rw [← adjoin_rootSet_eq_falseTateLayer p (π : K) n]
@@ -124,7 +124,7 @@ cyclotomic extension at an odd prime. The proof uses finite cyclicity and
 the reverse eigenbasis comparison over the base. -/
 theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
-    radical p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
+    pPowRoot p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
   intro hmem
   obtain ⟨m, hm⟩ := (mem_cyclotomicExtension_iff p _).mp hmem
   have hFm : radicalLayer p (π : K) 1 ≤ cyclotomicLayer p m :=
@@ -139,40 +139,40 @@ theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
   obtain ⟨u, hu, _⟩ := cyclotomicLayer_step_minpoly_of_eq_bot p r h₁ hprev hnext
   let C := cyclotomicLayer (K := K) p (r + 1)
   let B : PowerBasis K C := IntermediateField.adjoin.powerBasis
-    (show IsIntegral K (rootOfUnity (K := K) p (r + 1)) from Algebra.IsIntegral.isIntegral _)
+    (show IsIntegral K (zeta (K := K) p (r + 1)) from Algebra.IsIntegral.isIntegral _)
   have hdim : B.dim = p := B.finrank.symm.trans
     (cyclotomicLayer_step_finrank_of_eq_bot p r h₁ hprev hnext)
   have hβpow : B.gen ^ p = algebraMap K C u := by
     apply C.val.injective
-    exact rootOfUnity_succ_pow (K := K) p r |>.trans hu.symm
+    exact zeta_succ_pow (K := K) p r |>.trans hu.symm
   have hβunity : B.gen ^ (p ^ (r + 1)) = 1 :=
-    Subtype.ext (rootOfUnity_pow (K := K) p (r + 1))
+    Subtype.ext (zeta_pow_eq_one (K := K) p (r + 1))
   have hβ₀ : B.gen ≠ 0 := by
     intro hz
     rw [hz, zero_pow (pow_ne_zero (r + 1) (Fact.out : p.Prime).ne_zero)] at hβunity
     exact zero_ne_one hβunity
-  have hαmem : radical p (π : K) 1 ∈ C := by
-    change radical p (π : K) 1 ∈ cyclotomicLayer p (r + 1)
+  have hαmem : pPowRoot p (π : K) 1 ∈ C := by
+    change pPowRoot p (π : K) 1 ∈ cyclotomicLayer p (r + 1)
     rw [← hF]
-    exact radical_mem_radicalLayer p (π : K) 1
-  let α : C := ⟨radical p (π : K) 1, hαmem⟩
+    exact pPowRoot_mem_radicalLayer p (π : K) 1
+  let α : C := ⟨pPowRoot p (π : K) 1, hαmem⟩
   have hαpow : α ^ p = algebraMap K C (π : K) := by
     apply C.val.injective
-    change radical p (π : K) 1 ^ p = algebraMap K (AlgebraicClosure K) (π : K)
-    simpa only [pow_one] using radical_pow p (π : K) 1
+    change pPowRoot p (π : K) 1 ^ p = algebraMap K (AlgebraicClosure K) (π : K)
+    simpa only [pow_one] using pPowRoot_pow p (π : K) 1
   have hα₀ : α ≠ 0 := by
     intro hz
-    exact radical_ne_zero p (π : K) 1
+    exact pPowRoot_ne_zero p (π : K) 1
       (congrArg Subtype.val hz)
-  have hζmem : rootOfUnity (K := K) p 1 ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
+  have hζmem : zeta (K := K) p 1 ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
     rw [← h₁]
-    exact rootOfUnity_mem_cyclotomicLayer p 1
+    exact zeta_mem_cyclotomicLayer p 1
   obtain ⟨z, hz⟩ := hζmem
-  change algebraMap K (AlgebraicClosure K) z = rootOfUnity p 1 at hz
+  change algebraMap K (AlgebraicClosure K) z = zeta p 1 at hz
   have hzprim : IsPrimitiveRoot z p := by
     have hh : IsPrimitiveRoot (algebraMap K (AlgebraicClosure K) z) p := by
       rw [hz]
-      simpa only [pow_one] using isPrimitiveRoot_rootOfUnity (K := K) p 1
+      simpa only [pow_one] using isPrimitiveRoot_zeta (K := K) p 1
     exact hh.of_map_of_injective (f := algebraMap K (AlgebraicClosure K))
       (algebraMap K (AlgebraicClosure K)).injective
   have hzC : IsPrimitiveRoot (algebraMap K C z) p :=
@@ -228,7 +228,7 @@ theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
   have hunity : (u ^ (i : ℕ)) ^ (p ^ r) = 1 := by
     apply (algebraMap K (AlgebraicClosure K)).injective
     rw [map_pow, map_pow, hu, ← pow_mul, Nat.mul_comm (i : ℕ) (p ^ r), pow_mul,
-      rootOfUnity_pow, one_pow, map_one]
+      zeta_pow_eq_one, one_pow, map_one]
   exact uniformizer_ne_pow_mul_torsion p π a (u ^ (i : ℕ))
     (pow_ne_zero r (Fact.out : p.Prime).ne_zero) hunity heq
 

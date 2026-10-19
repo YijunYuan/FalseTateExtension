@@ -25,7 +25,7 @@ ring of `L_N` is `d_k + 1`, and `v(τ^{p^k} ϖ - ϖ) = d_k + 1` for every unifor
 * `kummerRamificationBreak`: the number `d_k`.
 * `kummerRamificationBreak_mul`, `kummerRamificationBreak_real`: the closed formula
   `(p + 1) d_k = 2 p^{2k+2} + p - 1`.
-* `kummerTauFinite`: the restriction of `τ^{p^k}` to `L_N`.
+* `tauPowRestrict`: the restriction of `τ^{p^k}` to `L_N`.
 * `kummerTauFinite_mem_lower_break`, `kummerTauFinite_notMem_lower_break_add_one`:
   `τ^{p^k}|_{L_N} ∈ G_{d_k} ∖ G_{d_k + 1}`.
 * `ramificationOrder_kummerTauFinite`: `i(τ^{p^k}|_{L_N}) = d_k + 1` for `N ≥ k + 2`.
@@ -115,7 +115,7 @@ lemma kummerRamificationBreak_mono (p : ℕ) : Monotone (kummerRamificationBreak
   omega
 
 /-- `p - 1 ≤ d_k`. -/
-lemma kummerRamificationBreak_lower (p k : ℕ) (hp : 1 ≤ p) :
+lemma kummerRamificationBreak_sub_one_le (p k : ℕ) (hp : 1 ≤ p) :
     p - 1 ≤ kummerRamificationBreak p k := by
   have h := kummerRamificationBreak_mono p (Nat.zero_le k)
   rw [kummerRamificationBreak_zero p hp] at h
@@ -124,7 +124,7 @@ lemma kummerRamificationBreak_lower (p k : ℕ) (hp : 1 ≤ p) :
 /-- `(p + 1) d_k ≤ d_{k+1}` for `p ≥ 2`. -/
 lemma kummerRamificationBreak_growth (p k : ℕ) (hp : 2 ≤ p) :
     (p + 1) * kummerRamificationBreak p k ≤ kummerRamificationBreak p (k + 1) := by
-  have hd := kummerRamificationBreak_lower p k (by omega)
+  have hd := kummerRamificationBreak_sub_one_le p k (by omega)
   have he := kummerRamificationBreak_recurrence p k (by omega)
   have hc : (p + 1) + (p - 1) ≤ p ^ 2 := by
     have hs : p - 1 + 1 = p := Nat.sub_add_cancel (by omega)
@@ -188,39 +188,39 @@ variable (π : 𝒪[ℚ_[p]])
 variable [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
 
 /-- The restriction of `τ^{p^k}` to the diagonal layer `L_N = ℚ_p(π^{1/p^N}, ζ_{p^N})`. -/
-def kummerTauFinite (N k : ℕ) :
+def tauPowRestrict (N k : ℕ) :
     (falseTateLayer p (π : ℚ_[p]) N N) ≃ₐ[ℚ_[p]]
       (falseTateLayer p (π : ℚ_[p]) N N) :=
   infiniteLayerRestriction p (π : ℚ_[p]) N
-    ((tau p π).val ^ (p ^ k))
+    ((kummerGenerator p π).val ^ (p ^ k))
 
 /-- The Kummer exponent of `τ^m` is `m`. -/
 lemma padicKummerExponent_tau_pow (m : ℕ) :
     padicKummerExponent p (π : ℚ_[p])
-      ((tau p π).val ^ m) = m := by
-  change (fullKummerKernelMulEquiv p π ((tau p π) ^ m)).toAdd = _
+      ((kummerGenerator p π).val ^ m) = m := by
+  change (kummerKernelMulEquivPadicInt p π ((kummerGenerator p π) ^ m)).toAdd = _
   rw [map_pow]
-  change m • padicKummerExponent p (π : ℚ_[p]) (tau p π).val = _
+  change m • padicKummerExponent p (π : ℚ_[p]) (kummerGenerator p π).val = _
   rw [padicKummerExponent_tau]
   simp
 
 /-- In the affine coordinates `(b_N, χ_N)` of `Gal(L_N/ℚ_p)`, the restriction of `τ^{p^k}`
 is the translation by `p^k`: `b_N = p^k` and `χ_N = 1`. -/
 lemma finiteDiagonalGaloisEquiv_kummerTauFinite (N k : ℕ) :
-    finiteDiagonalGaloisEquiv_padic p π N (kummerTauFinite p π N k) =
+    finiteDiagonalGaloisEquiv_padic p π N (tauPowRestrict p π N k) =
       SemidirectProduct.inl (Multiplicative.ofAdd (p ^ k : ZMod (p ^ N))) := by
   apply SemidirectProduct.ext
   · apply congrArg Multiplicative.ofAdd
     change finiteKummerExponent p (π : ℚ_[p]) N
-      (infiniteLayerRestriction p (π : ℚ_[p]) N ((tau p π).val ^ (p ^ k))) = _
+      (infiniteLayerRestriction p (π : ℚ_[p]) N ((kummerGenerator p π).val ^ (p ^ k))) = _
     rw [← padicKummerExponent_toZModPow, padicKummerExponent_tau_pow]
     simp
   · rw [finiteDiagonalGaloisEquiv_padic_right]
     change finiteCyclotomicCharacter p (π : ℚ_[p]) N
-      (infiniteLayerRestriction p (π : ℚ_[p]) N ((tau p π).val ^ (p ^ k))) = 1
+      (infiniteLayerRestriction p (π : ℚ_[p]) N ((kummerGenerator p π).val ^ (p ^ k))) = 1
     rw [← padicCyclotomicCharacter_toZModPow, map_pow]
-    have hχ : padicCyclotomicCharacter p (π : ℚ_[p]) (tau p π).val = 1 :=
-      (tau p π).property
+    have hχ : padicCyclotomicCharacter p (π : ℚ_[p]) (kummerGenerator p π).val = 1 :=
+      (kummerGenerator p π).property
     simp [hχ]
 
 omit [Fact p.Prime] hp₂ in
@@ -252,7 +252,7 @@ lemma primePower_notMem_finiteTranslationSubgroup (N k : ℕ) (hk : k < N) :
 /-- `τ^{p^k}|_{L_{n+1}}` lies in the lower ramification group `G_{d_k}` of `L_{n+1}/ℚ_p` for
 `k + 1 ≤ n`. -/
 lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
-    kummerTauFinite p π (n + 1) k ∈
+    tauPowRestrict p π (n + 1) k ∈
       lowerRamificationGroupReal
         ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
         (IsLocalRing.maximalIdeal
@@ -267,7 +267,7 @@ lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
       kummerRamificationBreak_real p k (Fact.out : p.Prime).one_le
   rw [← hd] at htable
   simp only [Nat.add_sub_cancel] at htable
-  have hm : e (kummerTauFinite p π (n + 1) k) ∈
+  have hm : e (tauPowRestrict p π (n + 1) k) ∈
       (lowerRamificationGroupReal
         ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
         (IsLocalRing.maximalIdeal
@@ -280,13 +280,13 @@ lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
       (finiteUnitSubgroup p (n + 1) (k + 1 + 1)) from
       ⟨primePower_mem_finiteTranslationSubgroup p (n + 1) k, Subgroup.one_mem _⟩)
   obtain ⟨g, hg, he⟩ := hm
-  have hge : g = kummerTauFinite p π (n + 1) k := e.injective he
+  have hge : g = tauPowRestrict p π (n + 1) k := e.injective he
   simpa only [lowerRamificationGroupReal, Int.ceil_natCast, hge, SetLike.mem_coe] using hg
 
 /-- `τ^{p^k}|_{L_{n+1}}` does not lie in the lower ramification group `G_{d_k + 1}` of
 `L_{n+1}/ℚ_p` for `k + 1 ≤ n`. -/
 lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) :
-    kummerTauFinite p π (n + 1) k ∉
+    tauPowRestrict p π (n + 1) k ∉
       lowerRamificationGroupReal
         ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
         (IsLocalRing.maximalIdeal
@@ -303,7 +303,7 @@ lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) 
     (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom hg
   rw [htable] at hm
   change finiteDiagonalGaloisEquiv_padic p π (n + 1)
-    (kummerTauFinite p π (n + 1) k) ∈ _ at hm
+    (tauPowRestrict p π (n + 1) k) ∈ _ at hm
   rw [finiteDiagonalGaloisEquiv_kummerTauFinite] at hm
   exact primePower_notMem_finiteTranslationSubgroup p (n + 1) k (by omega) hm.1
 
@@ -313,17 +313,17 @@ theorem ramificationOrder_kummerTauFinite_succ (n k : ℕ) (hk : k + 1 ≤ n) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))
       ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
-      (kummerTauFinite p π (n + 1) k) = (kummerRamificationBreak p k + 1 : ℕ) := by
+      (tauPowRestrict p π (n + 1) k) = (kummerRamificationBreak p k + 1 : ℕ) := by
   let D := falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
   let G := D ≃ₐ[ℚ_[p]] D
   let O := spectralIntegerRing (ℚ_[p]) D
   have hm := kummerTauFinite_mem_lower_break p π n k hk
   have hn := kummerTauFinite_notMem_lower_break_add_one p π n k hk
   have hlo : (kummerRamificationBreak p k + 1 : ℕ∞) ≤
-      ramificationOrder (R := O) G (kummerTauFinite p π (n + 1) k) := by
+      ramificationOrder (R := O) G (tauPowRestrict p π (n + 1) k) := by
     simpa [lowerRamificationGroupReal, mem_lowerRamificationGroup_iff_le_order] using hm
   have hhi : ¬ (kummerRamificationBreak p k + 1 : ℕ∞) + 1 ≤
-      ramificationOrder (R := O) G (kummerTauFinite p π (n + 1) k) := by
+      ramificationOrder (R := O) G (tauPowRestrict p π (n + 1) k) := by
     have hto : ((kummerRamificationBreak p k : ℤ) + 2).toNat =
         kummerRamificationBreak p k + 2 := by omega
     simpa [lowerRamificationGroupReal, mem_lowerRamificationGroup_iff_le_order,
@@ -337,7 +337,7 @@ theorem ramificationOrder_kummerTauFinite (N k : ℕ) (hk : k + 2 ≤ N) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))
       ((falseTateLayer p (π : ℚ_[p]) N N) ≃ₐ[ℚ_[p]] _)
-      (kummerTauFinite p π N k) = (kummerRamificationBreak p k + 1 : ℕ) := by
+      (tauPowRestrict p π N k) = (kummerRamificationBreak p k + 1 : ℕ) := by
   obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (show N ≠ 0 by omega)
   exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
@@ -346,7 +346,7 @@ theorem addVal_kummerTauFinite_uniformizer (N k : ℕ) (hk : k + 2 ≤ N)
     {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
     (hϖ : Irreducible ϖ) :
     addVal (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))
-      (kummerTauFinite p π N k • ϖ - ϖ) = (kummerRamificationBreak p k + 1 : ℕ) := by
+      (tauPowRestrict p π N k • ϖ - ϖ) = (kummerRamificationBreak p k + 1 : ℕ) := by
   obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (show N ≠ 0 by omega)
   let D := falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
   have hgen := extensionValuationSubring_adjoin_uniformizer_eq_top (ℚ_[p]) D
@@ -362,22 +362,22 @@ theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2
     (hϖ : Irreducible ϖ) :
     (maximalIdeal (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))).valuation
       (falseTateLayer p (π : ℚ_[p]) N N)
-      (kummerTauFinite p π N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) - ϖ) =
+      (tauPowRestrict p π N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) - ϖ) =
       WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
   let D := falseTateLayer p (π : ℚ_[p]) N N
   let O := spectralIntegerRing (ℚ_[p]) D
   have hv : (maximalIdeal O).valuation D
-      ((kummerTauFinite p π N k • ϖ - ϖ : O) : D) =
+      ((tauPowRestrict p π N k • ϖ - ϖ : O) : D) =
       WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
     change (maximalIdeal O).valuation D
-      (algebraMap O D (kummerTauFinite p π N k • ϖ - ϖ)) = _
+      (algebraMap O D (tauPowRestrict p π N k • ϖ - ϖ)) = _
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
       intValuation_maximalIdeal, addVal_kummerTauFinite_uniformizer p π N k hk hϖ]
     rw [ENat.recTopCoe_natCast]
     simp [← WithZero.exp_eq_coe_ofAdd]
-  have hc : ((kummerTauFinite p π N k • ϖ - ϖ : O) : D) =
-      kummerTauFinite p π N k (ϖ : D) - ϖ := by
-    change ((kummerTauFinite p π N k • ϖ : O) : D) - (ϖ : D) = _
+  have hc : ((tauPowRestrict p π N k • ϖ - ϖ : O) : D) =
+      tauPowRestrict p π N k (ϖ : D) - ϖ := by
+    change ((tauPowRestrict p π N k • ϖ : O) : D) - (ϖ : D) = _
     rw [coe_spectralIntegerRing_galois_smul]
   rw [hc] at hv
   exact hv

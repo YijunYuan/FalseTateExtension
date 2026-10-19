@@ -43,20 +43,20 @@ noncomputable section
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
 /-- `ζ_{p^n}` as an element of `K_cyc = K(ζ_{p^∞})`. -/
-def cyclotomicRootOfUnity (n : ℕ) : cyclotomicExtension (K := K) p :=
-  ⟨rootOfUnity p n, cyclotomicLayer_le_cyclotomicExtension p n
-    (rootOfUnity_mem_cyclotomicLayer p n)⟩
+def zetaCycExt (n : ℕ) : cyclotomicExtension (K := K) p :=
+  ⟨zeta p n, cyclotomicLayer_le_cyclotomicExtension p n
+    (zeta_mem_cyclotomicLayer p n)⟩
 
 /-- `ζ_{p^n}` is a primitive `p^n`-th root of unity in `K_cyc`. -/
-theorem isPrimitiveRoot_cyclotomicRootOfUnity (n : ℕ) :
-    IsPrimitiveRoot (cyclotomicRootOfUnity (K := K) p n) (p ^ n) :=
-  (isPrimitiveRoot_rootOfUnity (K := K) p n).of_map_of_injective
+theorem isPrimitiveRoot_zetaCycExt (n : ℕ) :
+    IsPrimitiveRoot (zetaCycExt (K := K) p n) (p ^ n) :=
+  (isPrimitiveRoot_zeta (K := K) p n).of_map_of_injective
     (f := (cyclotomicExtension (K := K) p).val) (cyclotomicExtension p).val.injective
 
 /-- `K_cyc` contains a primitive `p^n`-th root of unity for every `n`. -/
 instance cyclotomicExtension_hasEnoughRootsOfUnity (n : ℕ) :
     HasEnoughRootsOfUnity (cyclotomicExtension (K := K) p) (p ^ n) :=
-  ⟨⟨cyclotomicRootOfUnity p n, isPrimitiveRoot_cyclotomicRootOfUnity p n⟩,
+  ⟨⟨zetaCycExt p n, isPrimitiveRoot_zetaCycExt p n⟩,
     rootsOfUnity.isCyclic _ _⟩
 
 /-- The cyclotomic character `Gal(K_cyc/K) → ℤ_p^×`, given by `g(ζ) = ζ^{χ(g)}` for every
@@ -76,16 +76,16 @@ theorem continuous_cyclotomicExtensionCharacter :
 /-- `g(ζ_{p^n}) = ζ_{p^n}^{χ(g)}` for `g ∈ Gal(K_cyc/K)`. -/
 theorem cyclotomicExtensionCharacter_spec (n : ℕ)
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
-    g (cyclotomicRootOfUnity p n) = cyclotomicRootOfUnity p n ^
+    g (zetaCycExt p n) = zetaCycExt p n ^
       (PadicInt.toZModPow n (cyclotomicExtensionCharacter p g : ℤ_[p])).val :=
-  _root_.cyclotomicCharacter.spec p g.toRingEquiv (cyclotomicRootOfUnity p n)
-    (isPrimitiveRoot_cyclotomicRootOfUnity p n).pow_eq_one
+  _root_.cyclotomicCharacter.spec p g.toRingEquiv (zetaCycExt p n)
+    (isPrimitiveRoot_zetaCycExt p n).pow_eq_one
 
 /-- The cyclotomic character of `Gal(K_cyc/K)` is injective. -/
 theorem cyclotomicExtensionCharacter_injective :
     Function.Injective (cyclotomicExtensionCharacter (K := K) p) := by
   intro g h heq
-  have hroot (n : ℕ) : g (cyclotomicRootOfUnity p n) = h (cyclotomicRootOfUnity p n) := by
+  have hroot (n : ℕ) : g (zetaCycExt p n) = h (zetaCycExt p n) := by
     rw [cyclotomicExtensionCharacter_spec, cyclotomicExtensionCharacter_spec, heq]
   apply AlgEquiv.ext
   intro x
@@ -94,7 +94,7 @@ theorem cyclotomicExtensionCharacter_injective :
   have hres : g.toAlgHom.comp i = h.toAlgHom.comp i := by
     apply IntermediateField.algHom_ext_of_eq_adjoin (F := K)
       (rfl : cyclotomicLayer (K := K) p n =
-      IntermediateField.adjoin K {rootOfUnity p n})
+      IntermediateField.adjoin K {zeta p n})
     intro y hy
     obtain rfl := Set.mem_singleton_iff.mp hy
     exact hroot n
@@ -146,20 +146,20 @@ theorem padicCyclotomicCharacter_eq_comp :
   intro n
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   let i := IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π)
-  have hi : i (cyclotomicRootOfUnity p n) = extensionRootOfUnity p π n := rfl
-  have hpow : extensionRootOfUnity p π n ^
+  have hi : i (zetaCycExt p n) = zetaExt p π n := rfl
+  have hpow : zetaExt p π n ^
       (PadicInt.toZModPow n (padicCyclotomicCharacter p π g : ℤ_[p])).val =
-      extensionRootOfUnity p π n ^
+      zetaExt p π n ^
         (PadicInt.toZModPow n
           (cyclotomicExtensionCharacter p (cyclotomicRestriction p π g) : ℤ_[p])).val := by
     calc
-      _ = g (extensionRootOfUnity p π n) :=
-        (_root_.cyclotomicCharacter.spec p g.toRingEquiv (extensionRootOfUnity p π n)
-          (isPrimitiveRoot_extensionRootOfUnity p π n).pow_eq_one).symm
-      _ = i (cyclotomicRestriction p π g (cyclotomicRootOfUnity p n)) := by
+      _ = g (zetaExt p π n) :=
+        (_root_.cyclotomicCharacter.spec p g.toRingEquiv (zetaExt p π n)
+          (isPrimitiveRoot_zetaExt p π n).pow_eq_one).symm
+      _ = i (cyclotomicRestriction p π g (zetaCycExt p n)) := by
         rw [cyclotomicRestriction_commutes, hi]
       _ = _ := by rw [cyclotomicExtensionCharacter_spec, map_pow, hi]
-  have hv := (isPrimitiveRoot_extensionRootOfUnity p π n).pow_inj
+  have hv := (isPrimitiveRoot_zetaExt p π n).pow_inj
     (ZMod.val_lt _) (ZMod.val_lt _) hpow
   simpa only [ZMod.natCast_zmod_val, MonoidHom.comp_apply] using
     congrArg (fun k : ℕ ↦ (k : ZMod (p ^ n))) hv

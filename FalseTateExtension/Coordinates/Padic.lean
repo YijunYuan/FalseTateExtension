@@ -92,26 +92,26 @@ theorem infiniteLayerRestriction_jointly_injective [hπ : NeZero π]
     ← infiniteLayerRestriction_commutes p π n h, heq n]
 
 /-- `ζ_{p^n}` as an element of `K_FT`. -/
-def extensionRootOfUnity (n : ℕ) : falseTateExtension p π :=
+def zetaExt (n : ℕ) : falseTateExtension p π :=
   IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
-    (layerRootOfUnity p π n)
+    (zetaLayer p π n)
 
-/-- `extensionRootOfUnity p π n` is `ζ_{p^n}` in the algebraic closure. -/
+/-- `zetaExt p π n` is `ζ_{p^n}` in the algebraic closure. -/
 @[simp]
-theorem coe_extensionRootOfUnity (n : ℕ) :
-    (extensionRootOfUnity p π n : AlgebraicClosure K) = rootOfUnity p n := rfl
+theorem coe_zetaExt (n : ℕ) :
+    (zetaExt p π n : AlgebraicClosure K) = zeta p n := rfl
 
 /-- `ζ_{p^n}` is a primitive `p^n`-th root of unity in `K_FT`. -/
-theorem isPrimitiveRoot_extensionRootOfUnity (n : ℕ) :
-    IsPrimitiveRoot (extensionRootOfUnity p π n) (p ^ n) :=
-  (isPrimitiveRoot_layerRootOfUnity p π n).map_of_injective
+theorem isPrimitiveRoot_zetaExt (n : ℕ) :
+    IsPrimitiveRoot (zetaExt p π n) (p ^ n) :=
+  (isPrimitiveRoot_zetaLayer p π n).map_of_injective
     (f := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n))
     (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).injective
 
 /-- `K_FT` contains a primitive `p^n`-th root of unity for every `n`. -/
 instance falseTateExtension_hasEnoughRootsOfUnity (n : ℕ) :
     HasEnoughRootsOfUnity (falseTateExtension p π) (p ^ n) :=
-  ⟨⟨extensionRootOfUnity p π n, isPrimitiveRoot_extensionRootOfUnity p π n⟩,
+  ⟨⟨zetaExt p π n, isPrimitiveRoot_zetaExt p π n⟩,
     rootsOfUnity.isCyclic _ _⟩
 
 /-- The cyclotomic character `χ : Gal(K_FT/K) → ℤ_p^×`, given by `g(ζ) = ζ^{χ(g)}` for every
@@ -133,8 +133,8 @@ theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
     (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)) from
     (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).injective)
   rw [infiniteLayerRestriction_commutes, map_pow]
-  exact _root_.cyclotomicCharacter.spec p g.toRingEquiv (extensionRootOfUnity p π n)
-    (isPrimitiveRoot_extensionRootOfUnity p π n).pow_eq_one
+  exact _root_.cyclotomicCharacter.spec p g.toRingEquiv (zetaExt p π n)
+    (isPrimitiveRoot_zetaExt p π n).pow_eq_one
 
 /-- The integer in `[0, p^n)` representing `b_n(g|_{L_n}) ∈ ℤ/p^n`. -/
 def kummerRepresentative [hπ : NeZero π]

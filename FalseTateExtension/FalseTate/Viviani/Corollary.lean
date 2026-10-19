@@ -55,7 +55,7 @@ theorem irreducible_integerParameter (a : ℤ) (ha : padicValInt p a = 1) :
     rw [PadicInt.unitCoeff_spec ha0, hv, pow_one]
     exact associated_unit_mul_left _ _ (PadicInt.unitCoeff ha0).isUnit
   have hirr := hass.irreducible_iff.mpr PadicInt.irreducible_p
-  apply (MulEquiv.irreducible_iff (padicUnitBallEquiv p)).mp
+  apply (MulEquiv.irreducible_iff (padicValuationSubringEquiv p)).mp
   simpa only [map_intCast] using hirr
 
 /-- An integer `a` with `v_p(a) = 1` is a uniformizer of `ℚ_[p]`. -/

@@ -17,8 +17,8 @@ The library builds on [FontaineWintenberger](https://github.com/YijunYuan/Fontai
 |---|---|
 | 1. `K_{m,n}`, `K_FT`, `K_Kum`, `K_cyc` | `falseTateLayer`, `falseTateExtension`, `kummerExtension`, `cyclotomicExtension` (`Layers`) |
 | 2. `K_FT`, `K_Kum`, `K_cyc` are strictly APF | `isStrictlyAPF_falseTateExtension_of_finiteDimensional` (`StrictAPF`), `isStrictlyAPF_kummerExtension` (`KummerProfile`), `isStrictlyAPF_cyclotomicExtension` (`Padic.CyclotomicAPF`) |
-| 3. Liu, Lemma 5.1.2 (`p ≥ 3`): `K_Kum ∩ K_cyc = K`, `Gal(K_FT/K_cyc) ≅ ℤ_p`, `Gal(K_FT/K) ≅ ℤ_p ⋊ Gal(K_cyc/K)` | `kummerExtension_inf_cyclotomicExtension`, `cyclotomicRelativeGaloisEquiv`, `falseTateGaloisEquiv` (`GaloisStructure`) |
-| 4. The topological generator `τ` of `Gal(K_FT/K_cyc)` with `τ(π^{1/p^m}) = ζ_{p^m} π^{1/p^m}` | `tau`, `tau_extensionRadical`, `denseRange_tau_zpow` (`GaloisStructure`) |
+| 3. Liu, Lemma 5.1.2 (`p ≥ 3`): `K_Kum ∩ K_cyc = K`, `Gal(K_FT/K_cyc) ≅ ℤ_p`, `Gal(K_FT/K) ≅ ℤ_p ⋊ Gal(K_cyc/K)` | `kummerExtension_inf_cyclotomicExtension`, `cyclotomicRelativeGaloisEquiv`, `falseTateGaloisEquivSemidirectProduct` (`GaloisStructure`) |
+| 4. The topological generator `τ` of `Gal(K_FT/K_cyc)` with `τ(π^{1/p^m}) = ζ_{p^m} π^{1/p^m}` | `kummerGenerator`, `tau_extensionRadical`, `denseRange_tau_zpow` (`GaloisStructure`) |
 | 5. `K = ℚ_p`: `K_FT/ℚ_p` is totally ramified | `falseTateExtension_residueDegree_padic`, `finiteSubextension_falseTate_ramificationIdx_padic` (`Padic.FiniteGaloisStructure`) |
 | 6. Viviani, Corollary 6.10 (ramification filtration of `ℚ_p(π^{1/p^n}, ζ_{p^n})`, with the correction of FalseTateLift, Remark 5.2) | `Padic.Viviani` (upper groups `finiteUpperAffine_*`, Herbrand table `inverseHerbrandFunction_falseTate_*`, lower groups `lowerRamificationGroupReal_falseTate_*`) |
 

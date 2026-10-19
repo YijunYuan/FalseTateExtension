@@ -51,14 +51,14 @@ instance cyclotomicLayer_isGalois (n : ℕ) :
     IsGalois K (cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
-    (isPrimitiveRoot_rootOfUnity (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
+    (isPrimitiveRoot_zeta (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
   exact IsCyclotomicExtension.isGalois {p ^ n} K _
 
 omit [CharZero K] in
 /-- `π^{1/p^n} ≠ 0` when `π ≠ 0`. -/
-theorem radical_ne_zero (π : K) [hπ : NeZero π] (n : ℕ) : radical p π n ≠ 0 := by
+theorem pPowRoot_ne_zero (π : K) [hπ : NeZero π] (n : ℕ) : pPowRoot p π n ≠ 0 := by
   intro hzero
-  have h := radical_pow p π n
+  have h := pPowRoot_pow p π n
   rw [hzero, zero_pow (pow_ne_zero n (Fact.out : p.Prime).ne_zero)] at h
   exact hπ.out ((algebraMap K (AlgebraicClosure K)).injective (by simpa using h.symm))
 
@@ -76,36 +76,36 @@ theorem adjoin_rootSet_eq_falseTateLayer (π : K) [hπ : NeZero π] (n : ℕ) :
         x ^ (p ^ n) = algebraMap K (AlgebraicClosure K) π := by
     rw [Polynomial.mem_rootSet_of_ne hpoly]
     simp only [map_sub, map_pow, aeval_X, aeval_C, sub_eq_zero]
-  have hα : radical p π n ≠ 0 := radical_ne_zero p π n
+  have hα : pPowRoot p π n ≠ 0 := pPowRoot_ne_zero p π n
   apply le_antisymm
   · apply IntermediateField.adjoin_le_iff.mpr
     intro x hx
-    have hquot : (x / radical p π n) ^ (p ^ n) = 1 := by
-      rw [div_pow, (hroot x).mp hx, radical_pow p π n]
+    have hquot : (x / pPowRoot p π n) ^ (p ^ n) = 1 := by
+      rw [div_pow, (hroot x).mp hx, pPowRoot_pow p π n]
       apply div_self
-      rw [← radical_pow p π n]
+      rw [← pPowRoot_pow p π n]
       exact pow_ne_zero _ hα
     obtain ⟨i, _, hi⟩ :=
-      (isPrimitiveRoot_rootOfUnity (K := K) p n).eq_pow_of_pow_eq_one hquot
-    have hxmul : x = rootOfUnity p n ^ i * radical p π n := by
+      (isPrimitiveRoot_zeta (K := K) p n).eq_pow_of_pow_eq_one hquot
+    have hxmul : x = zeta p n ^ i * pPowRoot p π n := by
       rw [hi, div_mul_cancel₀ _ hα]
     rw [hxmul]
     exact (falseTateLayer p π n n).mul_mem
       ((falseTateLayer p π n n).toSubalgebra.pow_mem
-        (rootOfUnity_mem_falseTateLayer p π n n) i)
-      (radical_mem_falseTateLayer p π n n)
+        (zeta_mem_falseTateLayer p π n n) i)
+      (pPowRoot_mem_falseTateLayer p π n n)
   · apply sup_le
     · apply IntermediateField.adjoin_simple_le_iff.mpr
-      exact IntermediateField.subset_adjoin K _ ((hroot _).mpr (radical_pow p π n))
+      exact IntermediateField.subset_adjoin K _ ((hroot _).mpr (pPowRoot_pow p π n))
     · apply IntermediateField.adjoin_simple_le_iff.mpr
-      have hαmem : radical p π n ∈ IntermediateField.adjoin K
+      have hαmem : pPowRoot p π n ∈ IntermediateField.adjoin K
           ((X ^ (p ^ n) - C π : K[X]).rootSet (AlgebraicClosure K)) :=
-        IntermediateField.subset_adjoin K _ ((hroot _).mpr (radical_pow p π n))
-      have hζαmem : rootOfUnity p n * radical p π n ∈ IntermediateField.adjoin K
+        IntermediateField.subset_adjoin K _ ((hroot _).mpr (pPowRoot_pow p π n))
+      have hζαmem : zeta p n * pPowRoot p π n ∈ IntermediateField.adjoin K
           ((X ^ (p ^ n) - C π : K[X]).rootSet (AlgebraicClosure K)) := by
         apply IntermediateField.subset_adjoin K _
         apply (hroot _).mpr
-        rw [mul_pow, rootOfUnity_pow, one_mul, radical_pow]
+        rw [mul_pow, zeta_pow_eq_one, one_mul, pPowRoot_pow]
       have hd := (IntermediateField.adjoin K
         ((X ^ (p ^ n) - C π : K[X]).rootSet (AlgebraicClosure K))).div_mem hζαmem hαmem
       simpa only [mul_div_cancel_right₀ _ hα] using hd

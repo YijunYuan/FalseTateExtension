@@ -104,12 +104,12 @@ variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 the full upper index of the cyclotomic extension. -/
 theorem falseTateAffine_upper_projection_index [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (((upperRamificationGroupInfinite K (falseTateExtension p π) u).map
-        (falseTateAffineEquiv p π).toMonoidHom).map
+        (falseTateGaloisEquivAffineImage p π).toMonoidHom).map
           (affineProjection (falseTateAffineImage p π)).rangeRestrict).index =
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) u).index := by
   let U := upperRamificationGroupInfinite K (falseTateExtension p π) u
   let V := upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) u
-  let e := falseTateAffineEquiv p π
+  let e := falseTateGaloisEquivAffineImage p π
   let q := affineProjection (falseTateAffineImage p π)
   let J := (U.map e.toMonoidHom).map q.rangeRestrict
   have hJ : J.map q.range.subtype = U.map (padicCyclotomicCharacter p π) := by
@@ -155,12 +155,12 @@ theorem falseTateAffine_upper_radical_index [hπ : Fact (Irreducible π)]
     {u : ℝ} (hu : 0 ≤ u) :
     (affinePureUnits (falseTateAffineImage p (π : K)) ⊔
       (upperRamificationGroupInfinite K (falseTateExtension p (π : K)) u).map
-        (falseTateAffineEquiv p (π : K)).toMonoidHom).index =
+        (falseTateGaloisEquivAffineImage p (π : K)).toMonoidHom).index =
       apfIndex K (kummerExtension p (π : K)) u := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   let i := falseTateKummerInclusion p (π : K)
   let M := i.fieldRange
-  let e := falseTateAffineEquiv p (π : K)
+  let e := falseTateGaloisEquivAffineImage p (π : K)
   let j : falseTateExtension p (π : K) →ₐ[K] SeparableClosure K := IsSepClosed.lift
   have hr : (j.comp M.val).fieldRange = (j.comp i).fieldRange := by
     ext z
@@ -223,7 +223,7 @@ theorem exists_falseTate_upper_index_comparison [hπ : Fact (Irreducible π)]
           (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) u).index := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   let G := falseTateAffineImage p (π : K)
-  let e := falseTateAffineEquiv p (π : K)
+  let e := falseTateGaloisEquivAffineImage p (π : K)
   have := falseTateExtension_isGalois p (π : K)
   let : Infinite (affineProjection G).range :=
     falseTateAffineImage_projection_infinite p (π : K)
@@ -266,7 +266,7 @@ theorem falseTate_upper_index_of_translationKernel_eq_bot [hπ : Fact (Irreducib
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) u).index := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   let G := falseTateAffineImage p (π : K)
-  let e := falseTateAffineEquiv p (π : K)
+  let e := falseTateGaloisEquivAffineImage p (π : K)
   let U := upperRamificationGroupInfinite K (falseTateExtension p (π : K)) u
   calc
     U.index = (U.map e.toMonoidHom).index := (Subgroup.index_map_equiv U e.toMulEquiv).symm

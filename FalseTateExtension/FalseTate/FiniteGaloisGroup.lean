@@ -38,12 +38,12 @@ variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (n : ℕ)
 
 /-- The primitive root in its finite cyclotomic field over
 an arbitrary characteristic-zero base. -/
-def cyclotomicLayerRootOver : cyclotomicLayer (K := K) p n :=
-  ⟨rootOfUnity p n, rootOfUnity_mem_cyclotomicLayer p n⟩
+def zetaCycOver : cyclotomicLayer (K := K) p n :=
+  ⟨zeta p n, zeta_mem_cyclotomicLayer p n⟩
 
-theorem isPrimitiveRoot_cyclotomicLayerRootOver :
-    IsPrimitiveRoot (cyclotomicLayerRootOver (K := K) p n) (p ^ n) :=
-  (isPrimitiveRoot_rootOfUnity (K := K) p n).of_map_of_injective
+theorem isPrimitiveRoot_zetaCycOver :
+    IsPrimitiveRoot (zetaCycOver (K := K) p n) (p ^ n) :=
+  (isPrimitiveRoot_zeta (K := K) p n).of_map_of_injective
     (f := (cyclotomicLayer (K := K) p n).val) (cyclotomicLayer p n).val.injective
 
 /-- The finite cyclotomic character on the cyclotomic field over
@@ -52,32 +52,32 @@ def cyclotomicLayerCharacterOver :
     (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) →*
       (ZMod (p ^ n))ˣ := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  exact (isPrimitiveRoot_cyclotomicLayerRootOver (K := K) p n).autToPow K
+  exact (isPrimitiveRoot_zetaCycOver (K := K) p n).autToPow K
 
 theorem cyclotomicLayerCharacterOver_spec
     (g : cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) :
-    g (cyclotomicLayerRootOver p n) = cyclotomicLayerRootOver p n ^
+    g (zetaCycOver p n) = zetaCycOver p n ^
       (cyclotomicLayerCharacterOver p n g : ZMod (p ^ n)).val := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  exact ((isPrimitiveRoot_cyclotomicLayerRootOver (K := K) p n).autToPow_spec K g).symm
+  exact ((isPrimitiveRoot_zetaCycOver (K := K) p n).autToPow_spec K g).symm
 
 theorem cyclotomicLayerCharacterOver_unique
     (g : cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n)
     (u : (ZMod (p ^ n))ˣ)
-    (hu : g (cyclotomicLayerRootOver p n) = cyclotomicLayerRootOver p n ^ (u : ZMod (p ^ n)).val) :
+    (hu : g (zetaCycOver p n) = zetaCycOver p n ^ (u : ZMod (p ^ n)).val) :
     cyclotomicLayerCharacterOver p n g = u := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   apply Units.ext
   apply ZMod.val_injective
-  exact (isPrimitiveRoot_cyclotomicLayerRootOver (K := K) p n).pow_inj
+  exact (isPrimitiveRoot_zetaCycOver (K := K) p n).pow_inj
     (ZMod.val_lt _) (ZMod.val_lt _) ((cyclotomicLayerCharacterOver_spec p n g).symm.trans hu)
 
 theorem cyclotomicLayerCharacterOver_injective :
     Function.Injective (cyclotomicLayerCharacterOver (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
-    (isPrimitiveRoot_rootOfUnity (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
-  exact (isPrimitiveRoot_cyclotomicLayerRootOver (K := K) p n).autToPow_injective K
+    (isPrimitiveRoot_zeta (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
+  exact (isPrimitiveRoot_zetaCycOver (K := K) p n).autToPow_injective K
 
 /-- Restriction from the cyclotomic union to the
 finite cyclotomic field, over the same base. -/
@@ -258,14 +258,14 @@ theorem mem_finiteRadicalInclusion_fixingSubgroup_iff [hπ : NeZero π]
     apply finiteKummerExponent_unique p π n g 0
     simp only [ZMod.val_zero, pow_zero, one_mul]
     exact (IntermediateField.mem_fixingSubgroup_iff i.fieldRange g).mp hg _
-      ⟨⟨radical p π n, radical_mem_radicalLayer p π n⟩, rfl⟩
+      ⟨⟨pPowRoot p π n, pPowRoot_mem_radicalLayer p π n⟩, rfl⟩
   · intro hb
     rw [IntermediateField.mem_fixingSubgroup_iff]
     have heq : g.toAlgHom.comp i = i := by
       apply IntermediateField.adjoin_algHom_ext
       intro z hz
       obtain rfl := Set.mem_singleton_iff.mp hz
-      change g (layerRadical p π n) = layerRadical p π n
+      change g (pPowRootLayer p π n) = pPowRootLayer p π n
       have h := finiteKummerExponent_spec p π n g
       simpa only [hb, ZMod.val_zero, pow_zero, one_mul] using h
     rintro x ⟨y, rfl⟩

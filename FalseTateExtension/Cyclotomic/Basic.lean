@@ -42,7 +42,7 @@ variable (p : ℕ) [Fact p.Prime]
 instance cyclotomicLayer_padic_isCyclotomicExtension (m : ℕ) :
     IsCyclotomicExtension {p ^ m} (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m) := by
   have : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
-  exact (isPrimitiveRoot_rootOfUnity (K := ℚ_[p]) p
+  exact (isPrimitiveRoot_zeta (K := ℚ_[p]) p
     m).intermediateField_adjoin_isCyclotomicExtension (ℚ_[p])
 
 /-- `[ℚ_[p](ζ_{p^m}) : ℚ_[p]] = φ(p^m)`. -/
