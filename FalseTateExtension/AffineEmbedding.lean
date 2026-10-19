@@ -6,6 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.PadicCoordinates
+public import Mathlib.FieldTheory.Galois.Profinite
 public import Mathlib.Algebra.Ring.AddAut
 public import Mathlib.GroupTheory.SemidirectProduct
 public import Mathlib.Topology.Homeomorph.TransferInstance

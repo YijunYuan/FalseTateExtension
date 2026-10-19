@@ -74,9 +74,8 @@ theorem radicalLayer_mono (π : K) : Monotone (radicalLayer p π) :=
   monotone_nat_of_le_succ (radicalLayer_le_succ p π)
 
 instance radicalLayer_finiteDimensional (π : K) (n : ℕ) :
-    FiniteDimensional K (radicalLayer p π n) := by
-  unfold radicalLayer
-  infer_instance
+    FiniteDimensional K (radicalLayer p π n) :=
+  inferInstanceAs (FiniteDimensional K (IntermediateField.adjoin K {radical p π n}))
 
 /-- The infinite Kummer extension as an intermediate field of the fixed closure. -/
 def kummerExtension (π : K) : IntermediateField K (AlgebraicClosure K) :=
@@ -150,9 +149,8 @@ theorem cyclotomicLayer_mono : Monotone (cyclotomicLayer (K := K) p) :=
   monotone_nat_of_le_succ (cyclotomicLayer_le_succ p)
 
 instance cyclotomicLayer_finiteDimensional (n : ℕ) :
-    FiniteDimensional K (cyclotomicLayer (K := K) p n) := by
-  unfold cyclotomicLayer
-  infer_instance
+    FiniteDimensional K (cyclotomicLayer (K := K) p n) :=
+  inferInstanceAs (FiniteDimensional K (IntermediateField.adjoin K {rootOfUnity (K := K) p n}))
 
 /-- The infinite cyclotomic extension inside the canonical algebraic closure. -/
 def cyclotomicExtension : IntermediateField K (AlgebraicClosure K) :=
@@ -214,9 +212,9 @@ theorem falseTateLayer_le_diagonal (π : K) (m n : ℕ) :
   falseTateLayer_mono p π (le_max_left _ _) (le_max_right _ _)
 
 instance falseTateLayer_finiteDimensional (π : K) (m n : ℕ) :
-    FiniteDimensional K (falseTateLayer p π m n) := by
-  unfold falseTateLayer
-  infer_instance
+    FiniteDimensional K (falseTateLayer p π m n) :=
+  inferInstanceAs (FiniteDimensional K (radicalLayer p π m ⊔ cyclotomicLayer p n :
+    IntermediateField K (AlgebraicClosure K)))
 
 /-- The infinite false Tate extension as the supremum of its finite layers. -/
 def falseTateExtension (π : K) : IntermediateField K (AlgebraicClosure K) :=

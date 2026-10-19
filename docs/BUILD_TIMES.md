@@ -45,3 +45,48 @@ Total: 6 min 44 s wall, 1115 s CPU, 35 modules. `set_option maxHeartbeats`: 16, 
 | FalseTateExtension.GaloisLayers | 2.0 |
 | FalseTateExtension.CompatibleRoots | 1.8 |
 | FalseTateExtension.Padic.Cyclotomic | 1.7 |
+
+## After F1 (performance quick wins)
+
+Total: 6 min 14 s wall, 941 s CPU, 36 modules (new `Mathlib/FieldTheory/RestrictNormal`).
+`CoordinateTransitions` 46 s → 2.6 s and `PadicCoordinates` 46 s → 2.3 s by defining the restriction maps
+through `IntermediateField.restrictNormalHomOfLE` instead of the categorical `finGaloisGroupMap`.
+
+| module | seconds |
+|---|---|
+| FalseTateExtension.KummerProfile | 107.0 |
+| FalseTateExtension.Padic.Viviani | 78.0 |
+| FalseTateExtension.Padic.CyclotomicUpper | 64.0 |
+| FalseTateExtension.Padic.NormFieldRamification | 43.0 |
+| FalseTateExtension.RadicalRamification | 39.0 |
+| FalseTateExtension.Padic.FiniteGaloisStructure | 20.0 |
+| FalseTateExtension.Padic.CyclotomicRamification | 18.0 |
+| FalseTateExtension.Padic.CyclotomicInertia | 18.0 |
+| FalseTateExtension.Padic.CyclotomicAPF | 17.0 |
+| FalseTateExtension.Padic.CyclotomicResidueBound | 16.0 |
+| FalseTateExtension.Padic.NormFieldCoordinates | 12.0 |
+| FalseTateExtension.Padic.CyclotomicInertiaCompletion | 12.0 |
+| FalseTateExtension.Padic.KummerRamification | 9.2 |
+| FalseTateExtension.GaloisStructure | 8.7 |
+| FalseTateExtension.CyclotomicImage | 8.6 |
+| FalseTateExtension.Padic.InfiniteCharacter | 6.6 |
+| FalseTateExtension.StrictAPF | 6.5 |
+| FalseTateExtension.Padic.NormFieldAction | 5.5 |
+| FalseTateExtension.AffineCommutator | 3.8 |
+| FalseTateExtension.AffineIndex | 3.7 |
+| FalseTateExtension.AffineKernel | 3.3 |
+| FalseTateExtension.Padic.TameGenerator | 3.0 |
+| FalseTateExtension.Padic.GeneralCharacter | 3.0 |
+| FalseTateExtension.AffineEmbedding | 3.0 |
+| FalseTateExtension.PadicCoordinates | 2.7 |
+| FalseTateExtension.FiniteCoordinates | 2.5 |
+| FalseTateExtension.Mathlib.FieldTheory.RestrictNormal | 2.3 |
+| FalseTateExtension.Padic.TameUnits | 2.2 |
+| FalseTateExtension.Padic.FiniteCharacter | 2.2 |
+| FalseTateExtension.Layers | 1.9 |
+| FalseTateExtension.GaloisLayers | 1.9 |
+| FalseTateExtension.CoordinateTransitions | 1.9 |
+| FalseTateExtension.CompatibleRoots | 1.9 |
+| FalseTateExtension.Padic.Cyclotomic | 1.6 |
+| FalseTateExtension | 1.3 |
+| FalseTateExtension.Padic.ClosedAddSubgroup | 1.0 |

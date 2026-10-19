@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.FiniteCoordinates
-public import Mathlib.FieldTheory.Galois.Profinite
+public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 public import Mathlib.Data.ZMod.Units
 
 /-!
@@ -27,89 +27,46 @@ namespace FalseTateExtension
 
 noncomputable section
 
-open CategoryTheory Opposite
-
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- The actual diagonal field bundled with its proved finite Galois properties.
-Its carrier is definitionally the existing false Tate layer. -/
-def finiteGaloisLayer (hπ : π ≠ 0) (n : ℕ) :
-    FiniteGaloisIntermediateField K (AlgebraicClosure K) where
-  toIntermediateField := falseTateLayer p π n n
-  finiteDimensional := inferInstance
-  isGalois := falseTateLayer_isGalois p π hπ n
-
-/-- Ordinary finite Galois restriction between the actual diagonal layers,
-using Mathlib's canonical finite-Galois functor. -/
+/-- Galois restriction between diagonal layers `n ≤ m`. -/
 def finiteLayerRestriction (hπ : π ≠ 0) {n m : ℕ} (h : n ≤ m) :
     (falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) →*
       (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :=
-  (finGaloisGroupMap
-    ((homOfLE (show finiteGaloisLayer p π hπ n ≤ finiteGaloisLayer p π hπ m from
-      falseTateLayer_mono p π h h)).op)).hom.hom
+  haveI := falseTateLayer_isGalois p π hπ n
+  IntermediateField.restrictNormalHomOfLE (falseTateLayer_mono p π h h)
 
-/-- Restriction preserves the original inclusion of the smaller field into
-the larger actual diagonal field. -/
+/-- Restriction commutes with the inclusion of the smaller layer into the larger one. -/
 theorem finiteLayerRestriction_commutes (hπ : π ≠ 0) {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m)
     (x : falseTateLayer p π n n) :
     IntermediateField.inclusion (falseTateLayer_mono p π h h)
         (finiteLayerRestriction p π hπ h g x) =
-      g (IntermediateField.inclusion (falseTateLayer_mono p π h h) x) := by
-  have := falseTateLayer_isGalois p π hπ n
-  let : Algebra (falseTateLayer p π n n) (falseTateLayer p π m m) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (falseTateLayer_mono p π h h))
-  let : IsScalarTower K (falseTateLayer p π n n) (falseTateLayer p π m m) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (falseTateLayer p π n n) x
+      g (IntermediateField.inclusion (falseTateLayer_mono p π h h) x) :=
+  haveI := falseTateLayer_isGalois p π hπ n
+  IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
-/-- Every automorphism of a smaller diagonal layer extends to the larger
-finite Galois layer. -/
+/-- Every automorphism of a smaller diagonal layer extends to a larger one. -/
 theorem finiteLayerRestriction_surjective (hπ : π ≠ 0) {n m : ℕ} (h : n ≤ m) :
-    Function.Surjective (finiteLayerRestriction p π hπ h) := by
-  have := falseTateLayer_isGalois p π hπ n
-  have := falseTateLayer_isGalois p π hπ m
-  let : Algebra (falseTateLayer p π n n) (falseTateLayer p π m m) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (falseTateLayer_mono p π h h))
-  let : IsScalarTower K (falseTateLayer p π n n) (falseTateLayer p π m m) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  change Function.Surjective (AlgEquiv.restrictNormalHom (falseTateLayer p π n n) :
-    (falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) →*
-      (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n))
-  exact AlgEquiv.restrictNormalHom_surjective (falseTateLayer p π m m)
+    Function.Surjective (finiteLayerRestriction p π hπ h) :=
+  haveI := falseTateLayer_isGalois p π hπ n
+  haveI := falseTateLayer_isGalois p π hπ m
+  IntermediateField.restrictNormalHomOfLE_surjective _
 
 @[simp]
 theorem finiteLayerRestriction_refl (hπ : π ≠ 0) (n : ℕ) :
-    finiteLayerRestriction p π hπ (le_refl n) = MonoidHom.id _ := by
-  apply MonoidHom.ext
-  intro g
-  apply AlgEquiv.ext
-  intro x
-  exact finiteLayerRestriction_commutes p π hπ (le_refl n) g x
+    finiteLayerRestriction p π hπ (le_refl n) = MonoidHom.id _ :=
+  haveI := falseTateLayer_isGalois p π hπ n
+  IntermediateField.restrictNormalHomOfLE_refl
 
-/-- Finite Galois restriction composes through every intermediate level. -/
+/-- Restriction is transitive in the layers. -/
 theorem finiteLayerRestriction_comp (hπ : π ≠ 0) {n m l : ℕ}
     (hnm : n ≤ m) (hml : m ≤ l) :
     (finiteLayerRestriction p π hπ hnm).comp (finiteLayerRestriction p π hπ hml) =
-      finiteLayerRestriction p π hπ (hnm.trans hml) := by
-  apply MonoidHom.ext
-  intro g
-  apply AlgEquiv.ext
-  intro x
-  apply (IntermediateField.inclusion (falseTateLayer_mono p π (hnm.trans hml)
-    (hnm.trans hml))).injective
-  calc
-    _ = IntermediateField.inclusion (falseTateLayer_mono p π hml hml)
-        (IntermediateField.inclusion (falseTateLayer_mono p π hnm hnm)
-          (finiteLayerRestriction p π hπ hnm (finiteLayerRestriction p π hπ hml g) x)) := rfl
-    _ = IntermediateField.inclusion (falseTateLayer_mono p π hml hml)
-        (finiteLayerRestriction p π hπ hml g
-          (IntermediateField.inclusion (falseTateLayer_mono p π hnm hnm) x)) := by
-      rw [finiteLayerRestriction_commutes]
-    _ = g (IntermediateField.inclusion (falseTateLayer_mono p π hml hml)
-        (IntermediateField.inclusion (falseTateLayer_mono p π hnm hnm) x)) :=
-      finiteLayerRestriction_commutes p π hπ hml g _
-    _ = _ := (finiteLayerRestriction_commutes p π hπ (hnm.trans hml) g x).symm
+      finiteLayerRestriction p π hπ (hnm.trans hml) :=
+  haveI := falseTateLayer_isGalois p π hπ n
+  haveI := falseTateLayer_isGalois p π hπ m
+  IntermediateField.restrictNormalHomOfLE_comp _ _
 
 omit [CharZero K] in
 /-- Iterating compatibility expresses a smaller radical as a power of a

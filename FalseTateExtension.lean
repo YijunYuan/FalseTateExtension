@@ -18,6 +18,7 @@ public import FalseTateExtension.CoordinateTransitions
 public import FalseTateExtension.PadicCoordinates
 
 public import FalseTateExtension.AffineEmbedding
+public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 
 public import FalseTateExtension.CyclotomicImage
 
