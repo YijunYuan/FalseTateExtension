@@ -17,15 +17,41 @@ public import FontaineWintenberger.APF.Galois.Restriction
 /-!
 # The false Tate extension is strictly APF
 
-For a finite extension `K/ℚ_p` with uniformizer `π`, `K_FT = K(π^{1/p^∞}, ζ_{p^∞})` is strictly
-arithmetically profinite over `K`. The indices of the upper ramification groups of `K_FT/K` are
-compared with those of `K_cyc/K` and `K_Kum/K` through the affine image, and the bounded growth of
-the latter gives the APF condition and the strict bound.
+Let `K/ℚ_p` be finite with uniformizer `π`, `e_K = v_K(p)`, and
+`K_FT = K(π^{1/p^∞}, ζ_{p^∞})` with Galois group `Γ`. For `u ≥ -1` let `Γ^u` be the upper
+ramification groups and `(Γ : Γ^u)` their indices; the APF index of a subextension `L/K` is
+`apfIndex K L u = (G_K^0 : G_L G_K^u)`. Under the isomorphism of `Γ` with its affine image
+`G ⊆ ℤ_[p] ⋊ ℤ_[p]ˣ`, the index of `Γ^u` in `Γ` is compared with the two indices
+`[G : P(G) Γ^u] = apfIndex K K_Kum u` and `[ρ(G) : ρ(Γ^u)] = (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`,
+where `P(G)` are the pure units and `ρ` the unit projection: if the translation kernel of `G` is
+nonzero, `Affine/Index` gives constants `C, D > 0` with
+
+`apfIndex K K_Kum u · (Gal(K_cyc/K) : Gal(K_cyc/K)^u) ≤ D · (Γ : Γ^u)` and
+`(Γ : Γ^u) ≤ C · apfIndex K K_Kum u · (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`
+
+for all `u ≥ 0`, and if it is zero then `(Γ : Γ^u) = (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`. Since
+`K_Kum/K` and `K_cyc/K` are APF and their indices grow at most by a factor `p` under
+`u ↦ u + e_K`, every `(Γ : Γ^u)` is finite, so `K_FT/K` is APF, and
+`apfIndex K K_FT (u + e_K) ≤ Q · apfIndex K K_FT u` for large `u`, so `K_FT/K` is strictly APF.
+
+## Main results
+
+* `falseTateAffine_upper_projection_index`:
+  `[ρ(G) : ρ(Γ^u)] = (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`.
+* `falseTateAffine_upper_radical_index`: `[G : P(G) Γ^u] = apfIndex K K_Kum u`.
+* `exists_falseTate_upper_index_comparison`: the two-sided comparison of `(Γ : Γ^u)` with
+  `apfIndex K K_Kum u · (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`.
+* `isAPF_falseTateExtension`, `isAPF_falseTateExtension_of_finiteDimensional`: `K_FT/K` is APF.
+* `exists_falseTate_apfIndex_boundedGrowth`:
+  `apfIndex K K_FT (u + e_K) ≤ Q · apfIndex K K_FT u` for `u ≥ V`.
+* `isStrictlyAPF_falseTateExtension`, `isStrictlyAPF_falseTateExtension_of_finiteDimensional`:
+  `K_FT/K` is strictly APF.
 
 ## References
 
 * Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2.
+  applications*, §1.2, Proposition 1.2.3.
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
 -/
 
 @[expose] public section
@@ -43,9 +69,8 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 
 variable (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- Infinite upper restriction identifies the full APF product
-index of any subfield of the false Tate field. The subfield may
-be nonnormal and infinite, and its residue factor is retained. -/
+/-- For a subextension `M` of `K_FT/K`, embedded in `K^sep` through `j : K_FT → K^sep`, and
+`u ≥ -1`: `(G_K : G_M G_K^u) = (Γ : Gal(K_FT/M) Γ^u)`. -/
 theorem apfSubgroup_fieldRange_index_eq_falseTateFixing_sup_upper
     [hπ : NeZero π] (M : IntermediateField K (falseTateExtension p π))
     (j : falseTateExtension p π →ₐ[K] SeparableClosure K) {u : ℝ} (hu : -1 ≤ u) :
@@ -65,8 +90,7 @@ theorem apfSubgroup_fieldRange_index_eq_falseTateFixing_sup_upper
     ← upperRamificationGroupInfinite_map_autCongr K e hu, ← Subgroup.map_sup]
   exact Subgroup.index_map_equiv _ e.autCongr
 
-/-- Naturality of the cyclotomic character identifies the upper
-character images of the false Tate and cyclotomic fields. -/
+/-- For `u ≥ -1`, `χ(Γ^u) = χ(Gal(K_cyc/K)^u)` in `ℤ_[p]ˣ`. -/
 theorem falseTateCharacter_map_upperRamificationGroupInfinite
     [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite K (falseTateExtension p π) u).map
@@ -85,8 +109,7 @@ theorem falseTateCharacter_map_upperRamificationGroupInfinite
     (τ.restrictNormal (falseTateExtension p π)).toRingEquiv τ.toRingEquiv
     (AlgEquiv.restrictNormal_commutes τ (falseTateExtension p π))
 
-/-- Restriction from the false Tate extension sends its
-upper group onto the upper group of its cyclotomic field. -/
+/-- For `u ≥ -1`, restriction `Γ → Gal(K_cyc/K)` maps `Γ^u` onto `Gal(K_cyc/K)^u`. -/
 theorem cyclotomicRestriction_map_upperRamificationGroupInfinite
     [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite K (falseTateExtension p π) u).map
@@ -100,8 +123,8 @@ theorem cyclotomicRestriction_map_upperRamificationGroupInfinite
 
 variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The unit projection index of the affine upper group equals
-the full upper index of the cyclotomic extension. -/
+/-- For `u ≥ -1`, `[ρ(G) : ρ(Γ^u)] = (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`, where `ρ` is the
+unit projection of the affine image `G` of `Γ`. -/
 theorem falseTateAffine_upper_projection_index [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (((upperRamificationGroupInfinite K (falseTateExtension p π) u).map
         (falseTateGaloisEquivAffineImage p π).toMonoidHom).map
@@ -145,9 +168,8 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[K])
 
-/-- The pure-unit product index is exactly the radical
-index. Total ramification of the radical tower removes its residue factor;
-no total ramification of the false Tate field is used. -/
+/-- For `e_K > 0` and `u ≥ 0`, `[G : P(G) Γ^u] = apfIndex K K_Kum u`, where `P(G)` are the pure
+units of the affine image `G` of `Γ`. -/
 theorem falseTateAffine_upper_radical_index [hπ : Fact (Irreducible π)]
     (he : 0 < (IsDiscreteValuationRing.addVal
       𝒪[K]
@@ -199,6 +221,7 @@ variable (π : 𝒪[K])
 
 omit [PerfectField (𝓀[K])] [CharZero K]
   [FiniteDimensional (ℚ_[p]) K] in
+/-- `e_K = v_K(p) > 0` for a `p`-adic field `K`. -/
 theorem falseTateBase_addVal_p_pos :
     0 < (IsDiscreteValuationRing.addVal
       𝒪[K]
@@ -208,9 +231,10 @@ theorem falseTateBase_addVal_p_pos :
     𝒪[ℚ_[p]]
     𝒪[K]
 
-/-- If the translation kernel is nonzero, the full false Tate upper
-index is finite and uniformly comparable with the radical and
-cyclotomic indices. The constants depend only on the affine image. -/
+/-- If the translation kernel of the affine image of `Γ` is nonzero, there are `C, D > 0` such
+that for every `u ≥ 0` the index `(Γ : Γ^u)` is finite and
+`apfIndex K K_Kum u · (Gal(K_cyc/K) : Gal(K_cyc/K)^u) ≤ D · (Γ : Γ^u)` and
+`(Γ : Γ^u) ≤ C · apfIndex K K_Kum u · (Gal(K_cyc/K) : Gal(K_cyc/K)^u)`. -/
 theorem exists_falseTate_upper_index_comparison [hπ : Fact (Irreducible π)]
     (hM : (affineTranslationKernel (falseTateAffineImage p (π : K))).toAddSubgroup ≠ ⊥) :
     ∃ C D : ℕ, 0 < C ∧ 0 < D ∧ ∀ u : ℝ, 0 ≤ u →
@@ -257,8 +281,8 @@ theorem exists_falseTate_upper_index_comparison [hπ : Fact (Irreducible π)]
   · simpa only [hA, hB, hindex] using hlo
   · simpa only [hA, hB, hindex] using hhi
 
-/-- If the translation kernel vanishes, the full upper index is
-exactly the cyclotomic upper index. -/
+/-- If the translation kernel of the affine image of `Γ` is zero, then
+`(Γ : Γ^u) = (Gal(K_cyc/K) : Gal(K_cyc/K)^u)` for `u ≥ -1`. -/
 theorem falseTate_upper_index_of_translationKernel_eq_bot [hπ : Fact (Irreducible π)]
     (hM : (affineTranslationKernel (falseTateAffineImage p (π : K))).toAddSubgroup = ⊥)
     {u : ℝ} (hu : -1 ≤ u) :
@@ -274,8 +298,7 @@ theorem falseTate_upper_index_of_translationKernel_eq_bot [hπ : Fact (Irreducib
       (affineProjection_index_of_translationKernel_eq_bot G hM _).symm
     _ = _ := falseTateAffine_upper_projection_index p (π : K) hu
 
-/-- The false Tate extension is APF over every finite
-norm-compatible `p`-adic base, including the prime two. -/
+/-- `K_FT/K` is arithmetically profinite. -/
 instance isAPF_falseTateExtension [hπ : Fact (Irreducible π)] :
     IsAPF K (falseTateExtension p (π : K)) := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -299,8 +322,7 @@ instance isAPF_falseTateExtension [hπ : Fact (Irreducible π)] :
       (upperRamificationGroupInfinite_antitoneOn K (falseTateExtension p (π : K))
         hu (by norm_num : -1 ≤ (0 : ℝ)) (le_of_not_ge h))
 
-/-- The full false Tate upper index has bounded growth across
-the positive ramification-index shift of the base. -/
+/-- There are `Q > 0` and `V ≥ 0` with `(Γ : Γ^{u + e_K}) ≤ Q · (Γ : Γ^u)` for all `u ≥ V`. -/
 theorem exists_falseTate_upper_index_boundedGrowth [hπ : Fact (Irreducible π)] :
     ∃ Q : ℕ, 0 < Q ∧ ∃ V : ℝ, 0 ≤ V ∧ ∀ u : ℝ, V ≤ u →
       (upperRamificationGroupInfinite K (falseTateExtension p (π : K))
@@ -347,8 +369,7 @@ theorem exists_falseTate_upper_index_boundedGrowth [hπ : Fact (Irreducible π)]
       _ = _ := by ring
 
 omit [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- The full upper index retains the fixed inertia index as a
-factor. This identity allows a finite initial residue extension. -/
+/-- For `u ≥ 0`, `(Γ : Γ^u) = apfIndex K K_FT u · (Γ : Γ^0)`. -/
 theorem falseTate_upper_index_eq_apfIndex_mul_inertia_index [hπ : Fact (Irreducible π)]
     {u : ℝ} (hu : 0 ≤ u) :
     (upperRamificationGroupInfinite K (falseTateExtension p (π : K)) u).index =
@@ -360,8 +381,8 @@ theorem falseTate_upper_index_eq_apfIndex_mul_inertia_index [hπ : Fact (Irreduc
     (upperRamificationGroupInfinite_antitoneOn K _
       (by norm_num : -1 ≤ (0 : ℝ)) (by linarith : -1 ≤ u) hu)).symm
 
-/-- Cancelling the positive finite inertia factor gives bounded growth of
-the false Tate index over its base. -/
+/-- There are `Q > 0` and `V ≥ 0` with `apfIndex K K_FT (u + e_K) ≤ Q · apfIndex K K_FT u` for
+all `u ≥ V`. -/
 theorem exists_falseTate_apfIndex_boundedGrowth [hπ : Fact (Irreducible π)] :
     ∃ Q : ℕ, 0 < Q ∧ ∃ V : ℝ, 0 ≤ V ∧ ∀ u : ℝ, V ≤ u →
       apfIndex K (falseTateExtension p (π : K))
@@ -383,9 +404,7 @@ theorem exists_falseTate_apfIndex_boundedGrowth [hπ : Fact (Irreducible π)] :
     ← Nat.mul_assoc] at hg
   exact (mul_le_mul_iff_left₀ hzero).mp hg
 
-/-- Every false Tate extension over a finite norm-compatible
-`p`-adic base is strictly APF, including the prime two and a finite initial
-residue extension. -/
+/-- `K_FT/K` is strictly arithmetically profinite. -/
 instance isStrictlyAPF_falseTateExtension [hπ : Fact (Irreducible π)] :
     IsStrictlyAPF K (falseTateExtension p (π : K)) := by
   obtain ⟨Q, hQ, V, _, hgrowth⟩ := exists_falseTate_apfIndex_boundedGrowth p π
@@ -404,16 +423,13 @@ variable (K : Type*) [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
     [CharZero K] [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
-/-- Over an arbitrary finite norm-compatible `p`-adic base, the
-unit-ball DVR structure and its perfect residue field supply every
-valued-field hypothesis of false Tate strictness. -/
+/-- `K_FT/K` is strictly arithmetically profinite, for every finite extension `K/ℚ_p`. -/
 instance isStrictlyAPF_falseTateExtension_of_finiteDimensional [hπ : Fact (Irreducible π)] :
     IsStrictlyAPF K (falseTateExtension p (π : K)) := by
   let := normedAlgebra_residueField_perfectField (ℚ_[p]) K
   exact isStrictlyAPF_falseTateExtension p π
 
-/-- Public APF over every finite norm-compatible `p`-adic base,
-without a separate DVR or perfect-residue hypothesis. -/
+/-- `K_FT/K` is arithmetically profinite, for every finite extension `K/ℚ_p`. -/
 instance isAPF_falseTateExtension_of_finiteDimensional [hπ : Fact (Irreducible π)] :
     IsAPF K (falseTateExtension p (π : K)) := by
   exact (isStrictlyAPF_falseTateExtension_of_finiteDimensional p K π).toIsAPF
