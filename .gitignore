@@ -1,2 +1,7 @@
 # cache and other artifacts produced by Lean's Lake build tool
 .lake/
+*.olean
+*.ilean
+__pycache__/
+# reference papers are not distributed with the repository
+*.pdf
