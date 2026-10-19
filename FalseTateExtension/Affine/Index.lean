@@ -11,11 +11,40 @@ public import Mathlib.Topology.Algebra.Group.Pointwise
 public import Mathlib.Algebra.Group.Pointwise.Set.Card
 
 /-!
-# Uniform indices in closed p-adic affine groups
+# Uniform index bounds in closed subgroups of the `p`-adic affine group
 
-This file proves uniform scalar-index bounds for closed additive subgroups
-and compares the two projection indices of a closed affine group.
-The pure statements and proofs are in blueprint `affine-index.tex`.
+Let `G` be a closed subgroup of `ℤ_[p] ⋊ ℤ_[p]ˣ` with unit projection `ρ : G → ℤ_[p]ˣ`,
+`(a, u) ↦ u`, translation kernel `T(G) = {a | (a, 1) ∈ G}` and pure units
+`P(G) = {(0, u) ∈ G}`; for a subgroup `I` of `G` write `T(I) = {a | (a, 1) ∈ I}`. If `ρ(G)` is
+infinite and `T(G) ≠ 0`, there are constants `C, D > 0` such that every closed normal subgroup
+`I` of `G` with `[G : P(G) I] < ∞` and `[ρ(G) : ρ(I)] < ∞` is open and satisfies
+
+`[G : P(G) I] · [ρ(G) : ρ(I)] ≤ D · [G : I]`  and  `[G : I] ≤ C · [G : P(G) I] · [ρ(G) : ρ(I)]`.
+
+The upper bound comes from the commutator formula `⁅(0, u), (a, 1)⁆ = ((u - 1) a, 1)`: for a pure
+unit `(0, u) ∈ G` with `u ≠ 1`, `(u - 1) T(P(G) I) ⊆ T(I)`, so `[T(G) : T(I)]` is at most
+`[ℤ_[p] : (u - 1) ℤ_[p]] · [G : P(G) I]`. Applied to the image of `Gal(K_FT/K)`, these bounds
+compare the ramification indices of `K_FT/K` with those of `K_Kum/K` and `K_cyc/K`
+(`FalseTate/StrictAPF`).
+
+## Main results
+
+* `affinePureUnits`: the pure units `P(G) = {(0, u) ∈ G}`.
+* `affineTranslationStabilizer`, `affineZeroStabilizer_eq_sup`: the subgroup
+  `{(a, u) ∈ G | a ∈ T(G)}`, equal to `ker ρ · P(G)`.
+* `exists_affinePureUnit_ne_one`: if `ρ(G)` is infinite and `T(G) ≠ 0`, `G` contains a pure
+  unit `(0, u)` with `u ≠ 1`.
+* `affinePureUnit_kernel_index_bound`:
+  `[T(G) : T(I)] ≤ [ℤ_[p] : (u - 1) ℤ_[p]] · [G : P(G) I]` for such a `u`.
+* `index_sup_le_index_sup_mul_relIndex`: `[Γ : S I] ≤ [Γ : S M] · [M : I ∩ M]` in any group.
+* `affineIndex_comparison`: the two-sided comparison of `[G : I]` with
+  `[G : P(G) I] · [ρ(G) : ρ(I)]`.
+* `affineProjection_index_of_translationKernel_eq_bot`: if `T(G) = 0` then
+  `[ρ(G) : ρ(I)] = [G : I]`.
+
+## References
+
+* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
 -/
 
 @[expose] public section
@@ -28,10 +57,11 @@ variable {p : ℕ} [Fact p.Prime]
 
 open scoped Pointwise commutatorElement
 
-/-- The pure-unit subgroup of a closed affine subgroup. -/
+/-- The pure units `P(G) = {(0, u) ∈ G}` of a closed subgroup `G` of `ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
 def affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G :=
   (SemidirectProduct.inr : (ℤ_[p])ˣ →* PadicAffineGroup p).range.comap G.toSubgroup.subtype
 
+/-- `g ∈ P(G)` if and only if the translation coordinate of `g` is `0`. -/
 @[simp]
 theorem mem_affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
     g ∈ affinePureUnits G ↔ g.val.left = 1 := by
@@ -43,7 +73,7 @@ theorem mem_affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
   · intro hg
     exact ⟨g.val.right, SemidirectProduct.ext hg.symm rfl⟩
 
-/-- Pure units form a closed subgroup in the affine topology. -/
+/-- `P(G)` is a closed subgroup of `G`. -/
 theorem isClosed_affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) :
     IsClosed (affinePureUnits G : Set G) := by
   have hc : Continuous (fun g : G ↦ g.val.left.toAdd) :=
@@ -54,7 +84,7 @@ theorem isClosed_affinePureUnits (G : ClosedSubgroup (PadicAffineGroup p)) :
   rw [mem_affinePureUnits]
   exact Multiplicative.toAdd.injective.eq_iff.symm
 
-/-- The unit projection is injective on the pure-unit subgroup. -/
+/-- The unit projection `(0, u) ↦ u` is injective on `P(G)`. -/
 theorem affineProjection_injective_on_pureUnits
     (G : ClosedSubgroup (PadicAffineGroup p)) :
     Function.Injective ((affineProjection G).comp (affinePureUnits G).subtype) := by
@@ -66,7 +96,7 @@ theorem affineProjection_injective_on_pureUnits
       ((mem_affinePureUnits G h.val).mp h.property).symm
   · exact heq
 
-/-- Pure units commute, as seen in the unit coordinate. -/
+/-- Any two pure units of `G` commute. -/
 theorem affinePureUnits_commute (G : ClosedSubgroup (PadicAffineGroup p))
     (g h : affinePureUnits G) : Commute (g : G) (h : G) := by
   change (g : G) * h = h * g
@@ -78,7 +108,8 @@ theorem affinePureUnits_commute (G : ClosedSubgroup (PadicAffineGroup p))
       (mem_affinePureUnits G h.val).mp h.property, map_one, mul_one]
   · exact mul_comm _ _
 
-/-- The zero stabilizer modulo the full translation ideal. -/
+/-- The subgroup `S(G) = {(a, u) ∈ G | a ∈ T(G)}` of `G`, the stabilizer of `0` for the action
+of `G` on `ℤ_[p] / T(G)`; it equals `ker ρ · P(G)` (`affineZeroStabilizer_eq_sup`). -/
 def affineTranslationStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subgroup G where
   carrier := {g | g.val.left.toAdd ∈ affineTranslationKernel G}
   one_mem' := (affineTranslationKernel G).zero_mem
@@ -92,11 +123,12 @@ def affineTranslationStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) : Subg
     exact PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _
       ((affineTranslationKernel G).neg_mem hg)
 
+/-- `g ∈ S(G)` if and only if the translation coordinate of `g` lies in `T(G)`. -/
 @[simp]
 theorem mem_affineZeroStabilizer (G : ClosedSubgroup (PadicAffineGroup p)) (g : G) :
     g ∈ affineTranslationStabilizer G ↔ g.val.left.toAdd ∈ affineTranslationKernel G := Iff.rfl
 
-/-- The zero stabilizer is the product of the full kernel and pure units. -/
+/-- `S(G) = ker ρ ⊔ P(G)`, where `ρ` is the unit projection of `G`. -/
 theorem affineZeroStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
     affineTranslationStabilizer G = (affineProjection G).ker ⊔ affinePureUnits G := by
   apply le_antisymm
@@ -124,7 +156,8 @@ theorem affineZeroStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup p)) :
       rw [(mem_affinePureUnits G g).mp hg]
       exact (affineTranslationKernel G).zero_mem
 
-/-- Congruence of translation coordinates is exactly the zero-stabilizer coset relation. -/
+/-- `g⁻¹ h ∈ S(G)` if and only if the translation coordinates of `g` and `h` are congruent
+modulo `T(G)`. -/
 theorem affineZeroStabilizer_inv_mul_mem_iff
     (G : ClosedSubgroup (PadicAffineGroup p)) (g h : G) :
     g⁻¹ * h ∈ affineTranslationStabilizer G ↔
@@ -144,7 +177,7 @@ theorem affineZeroStabilizer_inv_mul_mem_iff
     simpa only [← mul_assoc, hunit, one_mul] using h
   · exact PadicInt.mul_mem_closedAddSubgroup (affineTranslationKernel G) _ _
 
-/-- Zero-stabilizer cosets inject into the additive quotient by the full kernel. -/
+/-- The translation coordinate induces an injection `G / S(G) ↪ ℤ_[p] / T(G)`. -/
 def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup p)) :
     (G ⧸ affineTranslationStabilizer G) ↪
       (ℤ_[p] ⧸ (affineTranslationKernel G).toAddSubgroup) where
@@ -169,7 +202,7 @@ def affineZeroStabilizerQuotientEmbedding (G : ClosedSubgroup (PadicAffineGroup 
     change -g.val.left.toAdd + h.val.left.toAdd ∈ affineTranslationKernel G at hrel
     simpa only [sub_eq_add_neg, add_comm] using hrel
 
-/-- A nonzero translation kernel makes the zero stabilizer have finite index. -/
+/-- If `T(G) ≠ 0`, then `S(G)` has finite index in `G`. -/
 theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
     (affineTranslationStabilizer G).FiniteIndex := by
@@ -186,7 +219,7 @@ theorem affineZeroStabilizer_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p
       (affineZeroStabilizerQuotientEmbedding G).injective
   exact Subgroup.finiteIndex_of_finite_quotient
 
-/-- The zero-stabilizer index is exactly the unit-image index of pure units. -/
+/-- `[ρ(G) : ρ(P(G))] = [G : S(G)]`. -/
 theorem affinePureUnits_image_index (G : ClosedSubgroup (PadicAffineGroup p)) :
     ((affinePureUnits G).map (affineProjection G).rangeRestrict).index =
       (affineTranslationStabilizer G).index := by
@@ -198,7 +231,7 @@ theorem affinePureUnits_image_index (G : ClosedSubgroup (PadicAffineGroup p)) :
     sup_comm, ← affineZeroStabilizer_eq_sup] at h
   exact h
 
-/-- The pure-unit image has finite index when the translation kernel is nonzero. -/
+/-- If `T(G) ≠ 0`, then `ρ(P(G))` has finite index in `ρ(G)`. -/
 theorem affinePureUnits_image_finiteIndex (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
     ((affinePureUnits G).map (affineProjection G).rangeRestrict).FiniteIndex := by
@@ -207,7 +240,8 @@ theorem affinePureUnits_image_finiteIndex (G : ClosedSubgroup (PadicAffineGroup 
   rw [affinePureUnits_image_index]
   exact Subgroup.FiniteIndex.index_ne_zero
 
-/-- Nonzero kernel and infinite unit image supply a fixed nonidentity pure unit. -/
+/-- If `ρ(G)` is infinite and `T(G) ≠ 0`, then `G` contains a pure unit `(0, u)` with
+`u ≠ 1`. -/
 theorem exists_affinePureUnit_ne_one (G : ClosedSubgroup (PadicAffineGroup p))
     [Infinite (affineProjection G).range]
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
@@ -225,7 +259,8 @@ theorem exists_affinePureUnit_ne_one (G : ClosedSubgroup (PadicAffineGroup p))
   rw [himage, Subgroup.index_bot, Nat.card_eq_zero_of_infinite] at hne
   exact hne rfl
 
-/-- The closed additive translations lying in a closed subgroup of `G`. -/
+/-- The translations `T(P) = {a ∈ ℤ_[p] | (a, 1) ∈ P}` of a closed subgroup `P` of `G`, a
+closed additive subgroup of `ℤ_[p]`. -/
 def affineTranslationIntersection (G : ClosedSubgroup (PadicAffineGroup p))
     (P : Subgroup G) (hP : IsClosed (P : Set G)) : ClosedAddSubgroup (ℤ_[p]) where
   toAddSubgroup := Subgroup.toAddSubgroup'
@@ -239,8 +274,7 @@ def affineTranslationIntersection (G : ClosedSubgroup (PadicAffineGroup p))
     apply hc.preimage
     exact AffineGroup.continuous_inl _
 
-/-- The intersection embeds the same translation preimage,
-without replacing its elements by a certificate or a second kernel. -/
+/-- `T(P)` is the image in `ℤ_[p]` of the subgroup `{a ∈ T(G) | (a, 1) ∈ P}` of `T(G)`. -/
 theorem affineTranslationIntersection_toAddSubgroup
     (G : ClosedSubgroup (PadicAffineGroup p)) (P : Subgroup G) (hP : IsClosed (P : Set G)) :
     (affineTranslationIntersection G P hP).toAddSubgroup =
@@ -267,8 +301,8 @@ theorem affineTranslationIntersection_toAddSubgroup
       SemidirectProduct.inl (Multiplicative.ofAdd x)
     rw [hmx]
 
-/-- Relative indices of the additive intersections are the
-relative indices of translation preimages. -/
+/-- The relative index of `T(P)` in `T(Q)` equals that of `{a ∈ T(G) | (a, 1) ∈ P}` in
+`{a ∈ T(G) | (a, 1) ∈ Q}`. -/
 theorem affineTranslationIntersection_relIndex
     (G : ClosedSubgroup (PadicAffineGroup p)) (P Q : Subgroup G)
     (hP : IsClosed (P : Set G)) (hQ : IsClosed (Q : Set G)) :
@@ -280,7 +314,7 @@ theorem affineTranslationIntersection_relIndex
     AddSubgroup.relIndex_map_map_of_injective _ _ Subtype.val_injective]
   rfl
 
-/-- Multiplication of compact pure units by a closed normal subgroup is closed. -/
+/-- For a closed normal subgroup `I` of `G`, the subgroup `P(G) I` is closed. -/
 theorem isClosed_affinePureUnits_sup (G : ClosedSubgroup (PadicAffineGroup p))
     (I : Subgroup G) [I.Normal] (hI : IsClosed (I : Set G)) :
     IsClosed ((affinePureUnits G ⊔ I : Subgroup G) : Set G) := by
@@ -293,8 +327,7 @@ theorem isClosed_affinePureUnits_sup (G : ClosedSubgroup (PadicAffineGroup p))
   rw [heq]
   exact hI.mul_left_of_isCompact (isClosed_affinePureUnits G).isCompact
 
-/-- A fixed pure unit commutes modulo a normal subgroup with every element
-of its pure-unit product. -/
+/-- For a pure unit `s₀` of `G`, a normal subgroup `I` and `g ∈ P(G) I`, `⁅s₀, g⁆ ∈ I`. -/
 theorem affinePureUnit_commutator_mem (G : ClosedSubgroup (PadicAffineGroup p))
     (I : Subgroup G) [I.Normal] (s₀ : affinePureUnits G) (g : G)
     (hg : g ∈ affinePureUnits G ⊔ I) : ⁅(s₀ : G), g⁆ ∈ I := by
@@ -310,7 +343,7 @@ theorem affinePureUnit_commutator_mem (G : ClosedSubgroup (PadicAffineGroup p))
   rw [map_commutatorElement, map_mul, hiq, mul_one, commutatorElement_def, hcomm.eq]
   simp only [mul_assoc, mul_inv_cancel, one_mul]
 
-/-- Closed translation intersections respect subgroup inclusion. -/
+/-- If `P ≤ Q` then `T(P) ≤ T(Q)`. -/
 theorem affineTranslationIntersection_mono
     (G : ClosedSubgroup (PadicAffineGroup p)) (P Q : Subgroup G)
     (hP : IsClosed (P : Set G)) (hQ : IsClosed (Q : Set G)) (hPQ : P ≤ Q) :
@@ -319,8 +352,8 @@ theorem affineTranslationIntersection_mono
   rintro x ⟨g, hg, hgval⟩
   exact ⟨g, hPQ hg, hgval⟩
 
-/-- The fixed pure unit supplies a scalar image inside `I` on the
-entire translation intersection with the pure-unit product. -/
+/-- For a pure unit `(0, u) ∈ G` and a closed normal subgroup `I` of `G`,
+`(u - 1) · T(P(G) I) ⊆ T(I)`. -/
 theorem affinePureUnit_scalar_image_le (G : ClosedSubgroup (PadicAffineGroup p))
     (I : Subgroup G) [I.Normal] (hI : IsClosed (I : Set G)) (s₀ : affinePureUnits G) :
     ((affineTranslationIntersection G (affinePureUnits G ⊔ I)
@@ -338,8 +371,8 @@ theorem affinePureUnit_scalar_image_le (G : ClosedSubgroup (PadicAffineGroup p))
   rw [hgval]
   exact padicAffine_commutator_inl s₀.val.val x
 
-/-- The intersection index is positive and bounded by a constant depending
-only on the nonidentity pure unit, for every closed normal `I`. -/
+/-- For a pure unit `(0, u) ∈ G` with `u ≠ 1` and a closed normal subgroup `I` of `G`,
+`0 < [T(P(G) I) : T(I)] ≤ [ℤ_[p] : (u - 1) ℤ_[p]]`. -/
 theorem affinePureUnit_intersection_relIndex_bound
     (G : ClosedSubgroup (PadicAffineGroup p)) (I : Subgroup G) [I.Normal]
     (hI : IsClosed (I : Set G)) (s₀ : affinePureUnits G) (hs₀ : s₀.val.val.right ≠ 1) :
@@ -379,8 +412,8 @@ theorem affinePureUnit_intersection_relIndex_bound
   rw [heq] at hindexpos hbound
   exact ⟨hindexpos, hbound⟩
 
-/-- A finite pure-unit projection index and a fixed pure unit bound the
-full translation-kernel index, with no openness premise on `I`. -/
+/-- For a pure unit `(0, u) ∈ G` with `u ≠ 1` and a closed normal subgroup `I` of `G` with
+`[G : P(G) I] < ∞`, `0 < [T(G) : T(I)] ≤ [ℤ_[p] : (u - 1) ℤ_[p]] · [G : P(G) I]`. -/
 theorem affinePureUnit_kernel_index_bound
     (G : ClosedSubgroup (PadicAffineGroup p)) (I : Subgroup G) [I.Normal]
     (hI : IsClosed (I : Set G)) (s₀ : affinePureUnits G) (hs₀ : s₀.val.val.right ≠ 1)
@@ -411,8 +444,8 @@ theorem affinePureUnit_kernel_index_bound
     rw [← hmul]
     exact Nat.mul_le_mul hbound.2 hQle
 
-/-- Finite indices of both projections imply finite index of `I`,
-using the uniform scalar bound rather than assuming `I` open. -/
+/-- If `ρ(G)` is infinite and `T(G) ≠ 0`, every closed normal subgroup `I` of `G` with
+`[G : P(G) I] < ∞` and `[ρ(G) : ρ(I)] < ∞` has finite index in `G`. -/
 theorem affineIndex_finiteIndex_of_projectionIndices
     (G : ClosedSubgroup (PadicAffineGroup p)) [Infinite (affineProjection G).range]
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥)
@@ -425,6 +458,8 @@ theorem affineIndex_finiteIndex_of_projectionIndices
   rw [affineTranslation_index_product]
   exact mul_ne_zero Subgroup.FiniteIndex.index_ne_zero hbound.1.ne'
 
+/-- In a group `Γ`, for subgroups `S`, `M`, `I` with `M` and `I` normal, `[Γ : I] < ∞` and
+`[Γ : S M] < ∞`: `[Γ : S I] ≤ [Γ : S M] · [M : I ∩ M]`. -/
 theorem index_sup_le_index_sup_mul_relIndex
     {Γ : Type*} [Group Γ] (S M I : Subgroup Γ) [M.Normal] [I.Normal]
     [I.FiniteIndex] [(S ⊔ M).FiniteIndex] :
@@ -468,8 +503,10 @@ theorem index_sup_le_index_sup_mul_relIndex
   have hlt : (S ⊔ M).index * I.relIndex M < (S ⊔ I).index := Nat.lt_of_not_ge hnot
   exact (not_lt_of_ge hQ) (mul_lt_mul_of_pos_right hlt (show 0 < Nat.card V from Nat.card_pos))
 
-/-- Uniform index comparison for every closed normal subgroup with
-finite indices in both projections. Openness is a conclusion. -/
+/-- If `ρ(G)` is infinite and `T(G) ≠ 0`, there are `C, D > 0` such that every closed normal
+subgroup `I` of `G` with `[G : P(G) I] < ∞` and `[ρ(G) : ρ(I)] < ∞` is open of finite index and
+satisfies `[G : P(G) I] · [ρ(G) : ρ(I)] ≤ D · [G : I]` and
+`[G : I] ≤ C · [G : P(G) I] · [ρ(G) : ρ(I)]`. -/
 theorem affineIndex_comparison
     (G : ClosedSubgroup (PadicAffineGroup p)) [Infinite (affineProjection G).range]
     (hM : (affineTranslationKernel G).toAddSubgroup ≠ ⊥) :
@@ -518,7 +555,7 @@ theorem affineIndex_comparison
           (C * (affinePureUnits G ⊔ I).index) := Nat.mul_le_mul_left _ hupper
       _ = _ := by ring
 
-/-- A zero translation kernel makes the unit projection faithful. -/
+/-- If `T(G) = 0`, the unit projection of `G` has trivial kernel. -/
 theorem affineProjection_ker_eq_bot_of_translationKernel_eq_bot
     (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup = ⊥) :
@@ -538,7 +575,7 @@ theorem affineProjection_ker_eq_bot_of_translationKernel_eq_bot
   apply Subtype.ext
   exact SemidirectProduct.ext (Multiplicative.toAdd.injective hz) hr
 
-/-- The unit coordinate is injective when its full translation kernel vanishes. -/
+/-- If `T(G) = 0`, the unit projection of `G` is injective. -/
 theorem affineProjection_injective_of_translationKernel_eq_bot
     (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup = ⊥) :
@@ -550,7 +587,7 @@ theorem affineProjection_injective_of_translationKernel_eq_bot
   rw [affineProjection_ker_eq_bot_of_translationKernel_eq_bot G hM] at hker
   exact inv_mul_eq_one.mp hker
 
-/-- The zero-kernel topological isomorphism preserves every subgroup index. -/
+/-- If `T(G) = 0`, then `[ρ(G) : ρ(I)] = [G : I]` for every subgroup `I` of `G`. -/
 theorem affineProjection_index_of_translationKernel_eq_bot
     (G : ClosedSubgroup (PadicAffineGroup p))
     (hM : (affineTranslationKernel G).toAddSubgroup = ⊥) (I : Subgroup G) :
