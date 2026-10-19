@@ -16,10 +16,10 @@ public import Mathlib.Topology.Algebra.Group.Units
 public import Mathlib.Topology.Instances.ZMod
 
 /-!
-# The closed affine embedding of the actual false Tate Galois group
+# The closed affine embedding of the false Tate Galois group
 
-The canonical semidirect product of additive p-adic integers by their units is
-given its product topology. The actual Kummer cocycle and cyclotomic character
+The semidirect product of additive p-adic integers by their units is
+given its product topology. The Kummer cocycle and cyclotomic character
 define a continuous closed embedding of the Krull Galois group into it.
 This proves blueprint `ft:affine-closed-embedding`, the topological part of the
 compatible-coordinate realization in Liu, Section 5.1.
@@ -54,9 +54,9 @@ theorem continuous_padicAffine_right :
 
 variable {K : Type*} [Field K] [CharZero K] (π : K)
 
-/-- Ordinary restriction to each actual diagonal layer is continuous for the
+/-- Restriction to each diagonal layer is continuous for the
 Krull topologies. The intermediate field inside the infinite field is the
-actual image of the original inclusion. -/
+image of the inclusion. -/
 theorem continuous_infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
     Continuous (infiniteLayerRestriction p π n) := by
   let i := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
@@ -80,7 +80,7 @@ theorem continuous_infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
   rw [he]
   exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
 
-/-- The canonical Kummer coordinate is continuous for the actual Krull topology. -/
+/-- The Kummer coordinate is continuous for the Krull topology. -/
 theorem continuous_padicKummerExponent [hπ : NeZero π] :
     Continuous (padicKummerExponent p π) := by
   apply PadicInt.continuous_of_toZModPow
@@ -89,11 +89,11 @@ theorem continuous_padicKummerExponent [hπ : NeZero π] :
   exact (continuous_of_discreteTopology : Continuous (finiteKummerExponent p π n)).comp
     (continuous_infiniteLayerRestriction p π n)
 
-/-- The canonical cyclotomic character is continuous for the actual Krull topology. -/
+/-- The cyclotomic character is continuous for the Krull topology. -/
 theorem continuous_padicCyclotomicCharacter : Continuous (padicCyclotomicCharacter p π) :=
   _root_.cyclotomicCharacter.continuous p K (falseTateExtension p π)
 
-/-- The actual Galois homomorphism into the canonical affine semidirect product. -/
+/-- The Galois homomorphism into the affine semidirect product. -/
 def affineGaloisHom [hπ : NeZero π] :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* PadicAffineGroup p where
   toFun g := ⟨Multiplicative.ofAdd (padicKummerExponent p π g),
@@ -112,7 +112,7 @@ def affineGaloisHom [hπ : NeZero π] :
     · exact congrArg Multiplicative.ofAdd (padicKummerExponent_mul p π g h)
     · exact map_mul (padicCyclotomicCharacter p π) g h
 
-/-- The affine homomorphism has the previously constructed actual coordinates. -/
+/-- The affine homomorphism has the previously constructed coordinates. -/
 theorem affineGaloisHom_coordinates [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     padicAffineHomeomorphProd p (affineGaloisHom p π g) =
@@ -130,7 +130,7 @@ theorem continuous_affineGaloisHom [hπ : NeZero π] :
   exact (continuous_padicKummerExponent p π).prodMk
     (continuous_padicCyclotomicCharacter p π)
 
-/-- The actual false Tate Galois group embeds as a closed subgroup of the
+/-- The false Tate Galois group embeds as a closed subgroup of the
 Hausdorff topological affine group. -/
 theorem isClosedEmbedding_affineGaloisHom [hπ : NeZero π] :
     Topology.IsClosedEmbedding (affineGaloisHom p π) := by

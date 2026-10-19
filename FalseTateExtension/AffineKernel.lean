@@ -9,10 +9,10 @@ public import FalseTateExtension.AffineEmbedding
 public import Mathlib.Topology.Algebra.Group.ClosedSubgroup
 
 /-!
-# The closed additive kernel of the actual affine embedding
+# The closed additive kernel of the affine embedding
 
 The additive coordinates in the affine image with unit coordinate one form
-a canonical closed additive subgroup of the p-adic integers. The actual
+a closed additive subgroup of the p-adic integers. The
 Kummer coordinate identifies the cyclotomic-character kernel with this
 subgroup as a topological additive group.
 This proves blueprint `ft:affine-additive-kernel`, the kernel part of the
@@ -27,13 +27,13 @@ noncomputable section
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- The actual affine inclusion of the additive p-adic coordinate is continuous. -/
+/-- The affine inclusion of the additive p-adic coordinate is continuous. -/
 theorem continuous_padicAffine_inl : Continuous (fun a : ℤ_[p] ↦
     (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) :=
   AffineGroup.continuous_inl _
 
 /-- The closed additive subgroup of coordinates whose affine translation
-belongs to the actual Galois image. -/
+belongs to the Galois image. -/
 def affineAdditiveKernel [hπ : NeZero π] : ClosedAddSubgroup (ℤ_[p]) where
   toAddSubgroup := Subgroup.toAddSubgroup'
     ((affineGaloisHom p π).range.comap SemidirectProduct.inl)
@@ -44,13 +44,13 @@ def affineAdditiveKernel [hπ : NeZero π] : ClosedAddSubgroup (ℤ_[p]) where
     exact (isClosedEmbedding_affineGaloisHom p π).isClosed_range.preimage
       (continuous_padicAffine_inl p)
 
-/-- Membership is the defining condition in the actual affine Galois image. -/
+/-- Membership is the defining condition in the affine Galois image. -/
 theorem mem_affineAdditiveKernel_iff [hπ : NeZero π] (a : ℤ_[p]) :
     a ∈ affineAdditiveKernel p π ↔
       (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p) ∈
         (affineGaloisHom p π).range := Iff.rfl
 
-/-- The actual Kummer coordinate of a character-kernel element belongs to the
+/-- The Kummer coordinate of a character-kernel element belongs to the
 closed additive affine kernel. -/
 theorem padicKummerExponent_mem_affineAdditiveKernel [hπ : NeZero π]
     (g : (padicCyclotomicCharacter p π).ker) :
@@ -61,7 +61,7 @@ theorem padicKummerExponent_mem_affineAdditiveKernel [hπ : NeZero π]
   · rfl
   · exact g.property
 
-/-- On the actual cyclotomic-character kernel the Kummer cocycle is additive. -/
+/-- On the cyclotomic-character kernel the Kummer cocycle is additive. -/
 def kummerKernelHom [hπ : NeZero π] :
     Additive (padicCyclotomicCharacter p π).ker →+ affineAdditiveKernel p π where
   toFun g := ⟨padicKummerExponent p π g.toMul,
@@ -78,13 +78,13 @@ def kummerKernelHom [hπ : NeZero π] :
       show padicCyclotomicCharacter p π g.toMul.val = 1 from g.toMul.property]
     simp
 
-/-- The additive kernel homomorphism is the actual Kummer coordinate. -/
+/-- The additive kernel homomorphism is the Kummer coordinate. -/
 theorem kummerKernelHom_apply [hπ : NeZero π]
     (g : Additive (padicCyclotomicCharacter p π).ker) :
     (kummerKernelHom p π g : ℤ_[p]) = padicKummerExponent p π g.toMul := rfl
 
-/-- The actual affine image and coordinate injectivity make the kernel
-coordinate map bijective onto precisely the displayed closed subgroup. -/
+/-- The affine image and coordinate injectivity make the kernel
+coordinate map bijective onto precisely the closed subgroup. -/
 theorem kummerKernelHom_bijective [hπ : NeZero π] :
     Function.Bijective (kummerKernelHom p π) := by
   constructor
@@ -101,15 +101,15 @@ theorem kummerKernelHom_bijective [hπ : NeZero π] :
       congrArg (fun x : PadicAffineGroup p ↦ x.left.toAdd) hg
     exact ⟨Additive.ofMul ⟨g, hχ⟩, Subtype.ext hb⟩
 
-/-- Restricting the actual continuous Kummer coordinate gives a continuous
-map on the actual character kernel and into the actual additive kernel. -/
+/-- Restricting the continuous Kummer coordinate gives a continuous
+map on the character kernel and into the additive kernel. -/
 theorem continuous_kummerKernelHom [hπ : NeZero π] :
     Continuous (kummerKernelHom p π) := by
   apply Continuous.subtype_mk
   exact (continuous_padicKummerExponent p π).comp
     (continuous_subtype_val.comp continuous_toMul)
 
-/-- The Kummer coordinate identifies the actual character kernel with its
+/-- The Kummer coordinate identifies the character kernel with its
 closed additive affine kernel as a topological additive group. -/
 def kummerKernelEquiv [hπ : NeZero π] :
     Additive (padicCyclotomicCharacter p π).ker ≃ₜ+ affineAdditiveKernel p π := by
@@ -126,7 +126,7 @@ def kummerKernelEquiv [hπ : NeZero π] :
       continuous_toFun := hc
       continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
-/-- The topological additive identification evaluates to the original actual
+/-- The topological additive identification evaluates to the
 Kummer coordinate. -/
 theorem kummerKernelEquiv_apply [hπ : NeZero π]
     (g : Additive (padicCyclotomicCharacter p π).ker) :

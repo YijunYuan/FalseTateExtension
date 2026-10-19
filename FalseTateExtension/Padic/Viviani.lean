@@ -13,15 +13,15 @@ public import FontaineWintenberger.APF.Finite.ConstantIndex
 public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
-# The corrected finite False Tate ramification filtration
+# The finite False Tate ramification filtration
 
-The intrinsic pure-radical indices determine the translation component of
-the actual upper groups, through the original finite affine isomorphism.
-Ordinary finite cyclotomic restriction gives the unit component. Their true
-indices integrate to the corrected inverse Herbrand table, which determines
-the original lower groups and every open-left, closed-right interval. The
-first layer is included separately, and literal integer parameters enter
-through the proved implication from `padicValInt p a = 1` to a uniformizer.
+The pure-radical indices determine the translation component of
+the upper groups, through the finite affine isomorphism.
+Finite cyclotomic restriction gives the unit component. Their
+indices integrate to the inverse Herbrand table, which determines
+the lower groups and every open-left, closed-right interval. The
+first layer is included separately, and integer parameters enter
+through the implication from `padicValInt p a = 1` to a uniformizer.
 -/
 
 @[expose] public section
@@ -42,12 +42,12 @@ theorem addVal_padicUnitBall_p : addVal 𝒪[ℚ_[p]] (p : 𝒪[ℚ_[p]]) = 1 :=
     PadicInt.irreducible_p
   simpa only [map_natCast] using h
 
-/-- The actual radical thresholds over the rational base have absolute scale one. -/
+/-- The radical thresholds over the rational base have absolute scale one. -/
 theorem radicalUpperBreak_padic (r : ℕ) :
     radicalUpperBreak (K := ℚ_[p]) p r = (r : ℝ) + 1 / ((p : ℝ) - 1) := by
   simp [radicalUpperBreak, absoluteRamificationIdx, addVal_padicUnitBall_p]
 
-/-- The number of original radical thresholds strictly below the upper parameter.
+/-- The number of radical thresholds strictly below the upper parameter.
 The strict inequality retains each right endpoint in the preceding group. -/
 def radicalTranslationDepth (n : ℕ) (u : ℝ) : ℕ :=
   ((Finset.range n).filter (fun r : ℕ => (r : ℝ) + 1 + 1 / ((p : ℝ) - 1) < u)).card
@@ -72,7 +72,7 @@ theorem radicalTranslationDepth_succ (n : ℕ) (u : ℝ) :
   · rw [ite_eq_left (lt_of_not_ge h), ite_eq_right h, Finset.card_insert_of_notMem]
     exact fun hn => Nat.lt_irrefl n (Finset.mem_range.mp (Finset.mem_filter.mp hn).1)
 
-/-- The complete intrinsic index profile of the original nonnormal radical fields,
+/-- The complete index profile of the nonnormal radical fields,
 including the zeroth layer, all finite truncations, and every right endpoint. -/
 theorem radicalLayer_apfIndex_eq_pow_translationDepth
     (π : 𝒪[ℚ_[p]]) [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
@@ -158,7 +158,7 @@ open scoped commutatorElement
 
 variable {p} (n : ℕ)
 
-/-- Conjugation by the actual unit two extracts the translation coordinate. -/
+/-- Conjugation by the unit two extracts the translation coordinate. -/
 theorem finiteAffine_commutator_two [hp₂ : Fact (p ≠ 2)] (g : FullFiniteAffineGroup p n) :
     ⁅(SemidirectProduct.inr (finiteAffineTwo p n) : FullFiniteAffineGroup p n), g⁆ =
       SemidirectProduct.inl g.left := by
@@ -189,7 +189,7 @@ theorem finiteAffine_commutator_two [hp₂ : Fact (p ≠ 2)] (g : FullFiniteAffi
   · simp [commutatorElement_def, mul_comm]
 
 /-- Every odd-prime normal affine subgroup contains the translation coordinate
-of each of its elements, by the actual commutator with two. -/
+of each of its elements, by the commutator with two. -/
 theorem finiteAffine_normal_inl_left [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     {g : FullFiniteAffineGroup p n} (hg : g ∈ N) :
@@ -197,7 +197,7 @@ theorem finiteAffine_normal_inl_left [hp₂ : Fact (p ≠ 2)]
   rw [← finiteAffine_commutator_two n g, commutatorElement_def]
   exact N.mul_mem ((inferInstance : N.Normal).conj_mem g hg _) (N.inv_mem hg)
 
-/-- Its unit coordinate also belongs to the same actual normal subgroup. -/
+/-- Its unit coordinate also belongs to the same normal subgroup. -/
 theorem finiteAffine_normal_inr_right [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     {g : FullFiniteAffineGroup p n} (hg : g ∈ N) :
@@ -208,8 +208,8 @@ theorem finiteAffine_normal_inr_right [hp₂ : Fact (p ≠ 2)]
   rw [← he]
   exact N.mul_mem (N.inv_mem (finiteAffine_normal_inl_left n N hg)) hg
 
-/-- The normal subgroup splits into its actual translation intersection and
-its actual unit projection; no assumed semidirect filtration is used. -/
+/-- The normal subgroup splits into its translation intersection and
+its unit projection; no assumed semidirect filtration is used. -/
 theorem mem_finiteAffine_normal_iff [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     (g : FullFiniteAffineGroup p n) :
@@ -226,7 +226,7 @@ theorem mem_finiteAffine_normal_iff [hp₂ : Fact (p ≠ 2)]
     simpa only [SemidirectProduct.inl_left_mul_inr_right] using hprod
 
 /-- Multiplying a normal affine subgroup by all pure units keeps precisely
-its original translation intersection. -/
+its translation intersection. -/
 theorem mem_finiteAffine_units_sup_iff [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     (g : FullFiniteAffineGroup p n) :
@@ -251,7 +251,7 @@ theorem mem_finiteAffine_units_sup_iff [hp₂ : Fact (p ≠ 2)]
     simpa only [SemidirectProduct.inl_left_mul_inr_right] using
       Subgroup.mul_mem _ hleft hright
 
-/-- The actual pure-unit product index equals the translation-intersection index. -/
+/-- The pure-unit product index equals the translation-intersection index. -/
 theorem finiteAffine_units_sup_index [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal] :
     ((SemidirectProduct.inr : (ZMod (p ^ n))ˣ →* FullFiniteAffineGroup p n).range ⊔ N).index =
@@ -280,7 +280,7 @@ theorem finiteAffine_units_sup_index [hp₂ : Fact (p ≠ 2)]
   exact h'.trans T.card_mul_index.symm
 
 omit [Fact p.Prime] in
-/-- The ordinary index product for an actual normal affine subgroup. -/
+/-- The index product for a normal affine subgroup. -/
 theorem finiteAffine_normal_index (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal] :
     N.index = (N.map SemidirectProduct.rightHom).index *
       (N.comap SemidirectProduct.inl).index := by
@@ -297,8 +297,8 @@ theorem finiteAffine_normal_index (N : Subgroup (FullFiniteAffineGroup p n)) [N.
 
 end NormalAffine
 
-/-- The canonical subgroup of translations divisible by p^k, represented as
-the range of the ordinary power homomorphism on the multiplicative type tag. -/
+/-- The subgroup of translations divisible by p^k, represented as
+the range of the power homomorphism on the multiplicative type tag. -/
 def finiteTranslationSubgroup (n k : ℕ) : Subgroup (Multiplicative (ZMod (p ^ n))) :=
   (powMonoidHom (p ^ k) : Multiplicative (ZMod (p ^ n)) →* _).range
 
@@ -328,7 +328,7 @@ theorem finiteTranslationSubgroup_self (n : ℕ) : finiteTranslationSubgroup p n
     rw [hb']
     exact Subgroup.one_mem _
 
-/-- The principal-unit subgroup, truncated at the actual finite level.
+/-- The principal-unit subgroup, truncated at the finite level.
 At depth zero it is the full unit group; at depth n it is trivial. -/
 def finiteUnitSubgroup (n r : ℕ) : Subgroup (ZMod (p ^ n))ˣ :=
   (ZMod.unitsMap (pow_dvd_pow p (Nat.min_le_right r n))).ker
@@ -352,16 +352,8 @@ theorem finiteUnitSubgroup_eq_bot (n r : ℕ) (hr : n ≤ r) :
   rw [he, ZMod.unitsMap_self]
   exact MonoidHom.ker_id
 
-theorem finiteTranslationSubgroup_card (n k : ℕ) (hk : k ≤ n) :
-    Nat.card (finiteTranslationSubgroup p n k) = p ^ (n - k) := by
-  have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  apply Nat.mul_right_cancel (pow_pos (Fact.out : p.Prime).pos k)
-  rw [← finiteTranslationSubgroup_index p n k hk, Subgroup.card_mul_index]
-  simp only [Nat.card_eq_fintype_card, Fintype.card_multiplicative, ZMod.card]
-  rw [finiteTranslationSubgroup_index p n k hk, ← pow_add, Nat.sub_add_cancel hk]
-
 omit [Fact p.Prime] in
-/-- Each canonical p-power translation subgroup is stable under every unit. -/
+/-- Each p-power translation subgroup is stable under every unit. -/
 theorem finiteTranslationSubgroup_action (n k : ℕ) (u : (ZMod (p ^ n))ˣ)
     {b : Multiplicative (ZMod (p ^ n))} (hb : b ∈ finiteTranslationSubgroup p n k) :
     finiteAffineAction p n u b ∈ finiteTranslationSubgroup p n k := by
@@ -371,7 +363,7 @@ theorem finiteTranslationSubgroup_action (n k : ℕ) (u : (ZMod (p ^ n))ˣ)
   change (finiteAffineAction p n u a) ^ (p ^ k) = finiteAffineAction p n u b
   rw [← map_pow, ha]
 
-/-- The indicated subgroup of the existing canonical finite affine group. -/
+/-- The indicated subgroup of the finite affine group. -/
 def finiteAffineSubgroup (n k : ℕ) (V : Subgroup (ZMod (p ^ n))ˣ) :
     Subgroup (FullFiniteAffineGroup p n) where
   carrier := {g | g.left ∈ finiteTranslationSubgroup p n k ∧ g.right ∈ V}
@@ -407,7 +399,7 @@ theorem finiteAffineSubgroup_self_bot (n : ℕ) : finiteAffineSubgroup p n n ⊥
   · rintro rfl
     exact ⟨rfl, rfl⟩
 
-section ActualUpper
+section Upper
 
 variable {p} (π : 𝒪[ℚ_[p]])
   [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
@@ -424,8 +416,8 @@ local instance vivianiCyclotomicScalarTower (n : ℕ) :
     IsScalarTower ℚ_[p] (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) :=
   IsScalarTower.of_algebraMap_eq (congrFun rfl)
 
-/-- The image of the original upper group under the checked actual finite
-affine isomorphism. This retains its original spectral integer ring. -/
+/-- The image of the upper group under the checked finite
+affine isomorphism. This retains its spectral integer ring. -/
 def finiteUpperAffineGroup (n : ℕ) (u : ℝ) :
     Subgroup (FullFiniteAffineGroup p (n + 1)) := by
   let e : G(n) ≃* FullFiniteAffineGroup p (n + 1) :=
@@ -438,7 +430,7 @@ instance finiteUpperAffineGroup_normal (n : ℕ) (u : ℝ) :
   Subgroup.Normal.map inferInstance _
     (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective
 
-/-- The original pure radical fixer becomes precisely the pure-unit factor. -/
+/-- The pure radical fixer becomes precisely the pure-unit factor. -/
 theorem finiteRadicalFixing_map_affine (n : ℕ) :
     ((finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).fieldRange.fixingSubgroup : Subgroup G(n)).map
       (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
@@ -452,8 +444,8 @@ theorem finiteRadicalFixing_map_affine (n : ℕ) :
     obtain ⟨g, rfl⟩ := (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective x
     exact ⟨g, (finiteDiagonalGaloisEquiv_padic_mem_units p π (n + 1) g).mp hx, rfl⟩
 
-/-- The intrinsic index of the original nonnormal radical subfield measures
-the translation intersection of the actual upper group. -/
+/-- The index of the nonnormal radical subfield measures
+the translation intersection of the upper group. -/
 theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     ((finiteUpperAffineGroup π n u).comap SemidirectProduct.inl).index =
       p ^ radicalTranslationDepth p (n + 1) u := by
@@ -480,7 +472,7 @@ theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
         (finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).equivFieldRange u).symm
     _ = _ := radicalLayer_apfIndex_eq_pow_translationDepth p π (n + 1) hu
 
-/-- Cyclic subgroup uniqueness turns the intrinsic index into the actual
+/-- Cyclic subgroup uniqueness turns the index into the
 translation subgroup, without a separate assumed depth certificate. -/
 theorem finiteUpperAffine_translation (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     (finiteUpperAffineGroup π n u).comap SemidirectProduct.inl =
@@ -489,8 +481,8 @@ theorem finiteUpperAffine_translation (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
   rw [finiteUpperAffine_translation_index π n hu,
     finiteTranslationSubgroup_index p _ _ (radicalTranslationDepth_le p _ _)]
 
-/-- The unit projection is exactly the upper group of the original finite
-cyclotomic field, by ordinary restriction with its own spectral integers. -/
+/-- The unit projection is exactly the upper group of the finite
+cyclotomic field, by restriction with its own spectral integers. -/
 theorem finiteUpperAffine_unit_projection (n : ℕ) {u : ℝ} (hu : -1 ≤ u) :
     (finiteUpperAffineGroup π n u).map SemidirectProduct.rightHom =
       (upperRamificationGroup (R := spectralIntegerRing ℚ_[p]
@@ -531,8 +523,8 @@ theorem finiteUpperAffine_unit_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     linarith [Nat.cast_nonneg (α := ℝ) n]),
     upperRamificationGroup_cyclotomic_eq_bot p n hu, Subgroup.map_bot]
 
-/-- The actual finite upper group in affine coordinates on every positive
-cyclotomic interval, with its intrinsic strict-threshold translation depth. -/
+/-- The finite upper group in affine coordinates on every positive
+cyclotomic interval, with its strict-threshold translation depth. -/
 theorem finiteUpperAffine_eq_interval (n r : ℕ) (hr : r ≤ n)
     {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     finiteUpperAffineGroup π n u =
@@ -545,8 +537,8 @@ theorem finiteUpperAffine_eq_interval (n r : ℕ) (hr : r ≤ n)
     finiteUpperAffine_unit_interval π n r hr hu0 hu1]
   rfl
 
-/-- The actual finite upper group after the final cyclotomic break is its
-canonical translation subgroup with the same original-base depth. -/
+/-- The finite upper group after the final cyclotomic break is its
+translation subgroup with the same base depth. -/
 theorem finiteUpperAffine_eq_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     finiteUpperAffineGroup π n u =
       finiteAffineSubgroup p (n + 1) (radicalTranslationDepth p (n + 1) u) ⊥ := by
@@ -558,7 +550,7 @@ theorem finiteUpperAffine_eq_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
   rfl
 
 include hp₂ hπ in
-/-- The original upper index on each closed cyclotomic interval. -/
+/-- The upper index on each closed cyclotomic interval. -/
 theorem upperRamificationGroup_falseTate_index (n r : ℕ) (hr : r ≤ n)
     {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     (upperRamificationGroup (R := O(n)) G(n) u).index =
@@ -573,7 +565,7 @@ theorem upperRamificationGroup_falseTate_index (n r : ℕ) (hr : r ≤ n)
     ZMod.index_ker_unitsMap_prime_pow p n (r + 1) (by omega)]
 
 include hp₂ hπ in
-/-- The original upper index after the final cyclotomic break. -/
+/-- The upper index after the final cyclotomic break. -/
 theorem upperRamificationGroup_falseTate_index_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     (upperRamificationGroup (R := O(n)) G(n) u).index =
       (p ^ (n + 1)).totient * p ^ radicalTranslationDepth p (n + 1) u := by
@@ -587,7 +579,7 @@ theorem upperRamificationGroup_falseTate_index_tail (n : ℕ) {u : ℝ} (hu : (n
   simp only [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient]
 
 /-- The upper group at every fractional Kummer break, including both final
-breaks and the single first-layer break, with the actual finite truncation. -/
+breaks and the single first-layer break, with the finite truncation. -/
 theorem finiteUpperAffine_fractional (n i : ℕ) (hi : 1 ≤ i) (hin : i ≤ n + 1) :
     finiteUpperAffineGroup π n ((i : ℝ) + 1 / ((p : ℝ) - 1)) =
       finiteAffineSubgroup p (n + 1) (i - 1) (finiteUnitSubgroup p (n + 1) (i + 1)) := by
@@ -613,7 +605,7 @@ local notation "δ" => 1 / ((p : ℝ) - 1)
 local notation "Ψ(" n ")" => inverseHerbrandFunction (R := O(n)) G(n)
 
 include hp₂ hπ in
-/-- Full inertia identifies the intrinsic index with the original full upper index. -/
+/-- Full inertia identifies the index with the full upper index. -/
 theorem apfIndex_falseTateLayer_eq_upperIndex (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     apfIndex ℚ_[p] D(n) u = (upperRamificationGroup (R := O(n)) G(n) u).index := by
   have := falseTateLayer_isGalois p (π : ℚ_[p]) (n + 1)
@@ -673,7 +665,7 @@ theorem upperRamificationGroup_falseTate_index_integer_fractional
 
 include hp₂ hπ in
 /-- On the final fractional interval both cyclotomic and radical truncation
-are retained; this also includes n=0, the first actual layer. -/
+are retained; this also includes n=0, the first layer. -/
 theorem upperRamificationGroup_falseTate_index_final (n : ℕ) {u : ℝ}
     (hu0 : (n : ℝ) + δ < u) (hu1 : u ≤ (n : ℝ) + 1 + δ) :
     (upperRamificationGroup (R := O(n)) G(n) u).index = (p - 1) * p ^ (2 * n) := by
@@ -685,7 +677,7 @@ theorem upperRamificationGroup_falseTate_index_final (n : ℕ) {u : ℝ}
   ring
 
 include hp₂ hπ in
-/-- The first integer upper parameter has original lower parameter p-1. -/
+/-- The first integer upper parameter has lower parameter p-1. -/
 theorem inverseHerbrandFunction_falseTate_one (n : ℕ) : Ψ(n) 1 = (p : ℝ) - 1 := by
   have h := viviani_inverse_affine π n (a := 0) (b := 1) le_rfl zero_le_one
     (p - 1) (fun u hu => upperRamificationGroup_falseTate_index_initial π n hu.1 hu.2)
@@ -740,7 +732,7 @@ theorem inverseHerbrandFunction_falseTate_fractional (n i : ℕ) (hi : i ≤ n) 
         ring
 
 include hp₂ hπ in
-/-- The corrected integer-break formula has exponent 2i+1. -/
+/-- The integer-break formula has exponent 2i+1. -/
 theorem inverseHerbrandFunction_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     Ψ(n) ((i : ℝ) + 1) =
       ((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1) := by
@@ -764,7 +756,7 @@ theorem inverseHerbrandFunction_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
       ring
 
 include hp₂ hπ in
-/-- The final original lower break, valid also in the first layer n=0. -/
+/-- The final lower break, valid also in the first layer n=0. -/
 theorem inverseHerbrandFunction_falseTate_final (n : ℕ) :
     Ψ(n) ((n : ℝ) + 1 + δ) =
       ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) / ((p : ℝ) + 1) := by
@@ -786,7 +778,7 @@ theorem inverseHerbrandFunction_falseTate_final (n : ℕ) :
       ring
 
 include hp₂ hπ in
-/-- The original real lower groups at the fractional table entries. -/
+/-- The real lower groups at the fractional table entries. -/
 theorem lowerRamificationGroupReal_falseTate_fractional (n i : ℕ)
     (hi : 1 ≤ i) (hin : i ≤ n) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
@@ -797,7 +789,7 @@ theorem lowerRamificationGroupReal_falseTate_fractional (n i : ℕ)
   exact finiteUpperAffine_fractional π n i hi (by omega)
 
 include hp₂ hπ in
-/-- The original real lower groups at the corrected integer table entries. -/
+/-- The real lower groups at the integer table entries. -/
 theorem lowerRamificationGroupReal_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       (((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1))).map
@@ -807,7 +799,7 @@ theorem lowerRamificationGroupReal_falseTate_integer (n i : ℕ) (hi : i ≤ n) 
   exact finiteUpperAffine_integer π n i hi
 
 include hp₂ hπ in
-/-- The final original lower group is the order-p translation subgroup. -/
+/-- The final lower group is the order-p translation subgroup. -/
 theorem lowerRamificationGroupReal_falseTate_final (n : ℕ) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       (((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
@@ -882,7 +874,7 @@ theorem finiteUpperAffine_final_interval (n : ℕ) {u : ℝ}
   rw [finiteUpperAffine_eq_tail π n (by linarith),
     radicalTranslationDepth_interval p (n + 1) n hu0 hu1, Nat.min_eq_right (Nat.le_succ n)]
 
-/-- The finite upper groups vanish strictly after the final actual break. -/
+/-- The finite upper groups vanish strictly after the final break. -/
 theorem finiteUpperAffine_eq_bot (n : ℕ) {u : ℝ} (hu : (n : ℝ) + 1 + δ < u) :
     finiteUpperAffineGroup π n u = ⊥ := by
   have hδ := viviani_fraction_pos_lt_one p
@@ -919,7 +911,7 @@ theorem viviani_lower_map (n : ℕ) {t : ℝ} (ht : -1 ≤ t) :
       finiteUpperAffineGroup π n (herbrandFunction (R := O(n)) G(n) t) := by
   rw [finiteUpperAffineGroup, upperRamificationGroup_herbrandFunction G(n) ht]
 
-/-- The initial original lower interval is exactly 0<t≤p-1. -/
+/-- The initial lower interval is exactly 0<t≤p-1. -/
 theorem lowerRamificationGroupReal_falseTate_initial (n : ℕ) {t : ℝ}
     (ht0 : 0 < t) (ht1 : t ≤ (p : ℝ) - 1) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
@@ -975,7 +967,7 @@ theorem lowerRamificationGroupReal_falseTate_integer_fractional (n i : ℕ) (hi 
     ((inverseHerbrandFunction_mem_Ici (R := O(n)) G(n) _).trans h0.le)]
   exact finiteUpperAffine_integer_fractional π n i hi h.1 h.2
 
-/-- The final original lower interval, before the last group vanishes. -/
+/-- The final lower interval, before the last group vanishes. -/
 theorem lowerRamificationGroupReal_falseTate_final_interval (n : ℕ) {t : ℝ}
     (ht0 : (2 * (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) / ((p : ℝ) + 1) < t)
     (ht1 : t ≤ ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
@@ -996,7 +988,7 @@ theorem lowerRamificationGroupReal_falseTate_final_interval (n : ℕ) {t : ℝ}
   exact finiteUpperAffine_final_interval π n h.1 h.2
 
 include hp₂ hπ in
-/-- The original upper group is trivial strictly after the final upper break. -/
+/-- The upper group is trivial strictly after the final upper break. -/
 theorem upperRamificationGroup_falseTate_eq_bot (n : ℕ) {u : ℝ}
     (hu : (n : ℝ) + 1 + δ < u) : upperRamificationGroup (R := O(n)) G(n) u = ⊥ := by
   apply Subgroup.map_injective
@@ -1006,7 +998,7 @@ theorem upperRamificationGroup_falseTate_eq_bot (n : ℕ) {u : ℝ}
   exact finiteUpperAffine_eq_bot π n hu
 
 include hp₂ hπ in
-/-- The original lower group is trivial strictly after the final lower break. -/
+/-- The lower group is trivial strictly after the final lower break. -/
 theorem lowerRamificationGroupReal_falseTate_eq_bot (n : ℕ) {t : ℝ}
     (ht : ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
       ((p : ℝ) + 1) < t) :
@@ -1023,7 +1015,7 @@ theorem lowerRamificationGroupReal_falseTate_eq_bot (n : ℕ) {t : ℝ}
   rw [← upperRamificationGroup_herbrandFunction G(n) htm]
   exact upperRamificationGroup_falseTate_eq_bot π n hu
 
-/-- Negative upper parameters through zero give the full actual affine group. -/
+/-- Negative upper parameters through zero give the full affine group. -/
 theorem finiteUpperAffine_nonpos (n : ℕ) {u : ℝ} (hu : -1 ≤ u) (hu0 : u ≤ 0) :
     finiteUpperAffineGroup π n u = ⊤ := by
   rw [finiteUpperAffineGroup, upperRamificationGroup_falseTate_nonpos π n hu hu0,
@@ -1031,13 +1023,13 @@ theorem finiteUpperAffine_nonpos (n : ℕ) {u : ℝ} (hu : -1 ≤ u) (hu0 : u �
       (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective]
 
 omit hp₂ in
-/-- The usual first-layer upper break equals the first strict radical threshold. -/
+/-- The first-layer upper break equals the first strict radical threshold. -/
 theorem viviani_first_break : 1 + δ = (p : ℝ) / ((p : ℝ) - 1) := by
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   field_simp
   ring
 
-/-- The positive first-layer upper group is precisely the original translation
+/-- The positive first-layer upper group is precisely the translation
 factor, through and including p/(p-1). -/
 theorem finiteUpperAffine_first_layer {u : ℝ}
     (hu : 0 < u) (hu1 : u ≤ (p : ℝ) / ((p : ℝ) - 1)) :
@@ -1048,7 +1040,7 @@ theorem finiteUpperAffine_first_layer {u : ℝ}
   rw [finiteUpperAffine_eq_tail π 0 (by simpa using hu),
     radicalTranslationDepth_initial p 1 hb, finiteAffineSubgroup_zero_bot]
 
-/-- The full first-layer upper filtration, with the actual right endpoint. -/
+/-- The full first-layer upper filtration, with the right endpoint. -/
 theorem finiteUpperAffine_first_layer_filtration {u : ℝ} (hu : -1 ≤ u) :
     finiteUpperAffineGroup π 0 u =
       if u ≤ 0 then ⊤ else if u ≤ (p : ℝ) / ((p : ℝ) - 1) then
@@ -1080,14 +1072,14 @@ theorem inverseHerbrandFunction_falseTate_first_layer {u : ℝ}
   simpa only [Nat.cast_sub (Fact.out : p.Prime).one_le, Nat.cast_one, mul_comm] using h
 
 include hp₂ hπ in
-/-- The actual positive first-layer lower break is p. -/
+/-- The positive first-layer lower break is p. -/
 theorem inverseHerbrandFunction_falseTate_first_break :
     Ψ(0) ((p : ℝ) / ((p : ℝ) - 1)) = p := by
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   rw [inverseHerbrandFunction_falseTate_first_layer π (by positivity) le_rfl]
   field_simp
 
-/-- The positive original first-layer lower group, including its final endpoint. -/
+/-- The positive first-layer lower group, including its final endpoint. -/
 theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
     (ht : 0 < t) (ht1 : t ≤ p) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
@@ -1105,7 +1097,7 @@ theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
   rw [viviani_lower_map π 0 (by linarith)]
   exact finiteUpperAffine_first_layer π h.1 h.2
 
-/-- The full original first-layer lower filtration. -/
+/-- The full first-layer lower filtration. -/
 theorem lowerRamificationGroupReal_falseTate_first_layer_filtration (t : ℝ) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
       (finiteDiagonalGaloisEquiv_padic p π 1).toMonoidHom =
@@ -1126,11 +1118,11 @@ theorem lowerRamificationGroupReal_falseTate_first_layer_filtration (t : ℝ) :
       rw [lowerRamificationGroupReal_falseTate_eq_bot π 0 (by
         rw [hfinal]; exact lt_of_not_ge ht1), Subgroup.map_bot]
 
-end ActualUpper
+end Upper
 
 section IntegerParameter
 
-/-- The literal integer hypothesis v_p(a)=1 supplies the actual rational
+/-- The integer hypothesis v_p(a)=1 supplies the rational
 valuation-ring uniformizer used by every preceding coordinate bridge. -/
 theorem irreducible_integerParameter (a : ℤ) (ha : padicValInt p a = 1) :
     Irreducible (a : 𝒪[ℚ_[p]]) := by
@@ -1166,7 +1158,7 @@ theorem finiteUpperAffine_integerParameter_interval [Fact (p ≠ 2)] (a : ℤ)
         (finiteUnitSubgroup p (n + 1) (r + 1)) :=
   finiteUpperAffine_eq_interval (a : 𝒪[ℚ_[p]]) n r hr hu0 hu1
 
-/-- The corrected Herbrand table (Viviani, Corollary 6.10, with the correction of
+/-- The Herbrand table (Viviani, Corollary 6.10, with the correction of
 FalseTateLift, Remark 5.2) for an integer parameter `a` with `v_p(a) = 1`. -/
 theorem inverseHerbrandFunction_falseTate_integerParameter [Fact (p ≠ 2)] (a : ℤ)
     [Fact (padicValInt p a = 1)] (n i : ℕ) (hi : i ≤ n) :

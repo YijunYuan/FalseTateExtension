@@ -16,12 +16,12 @@ public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
 /-!
 # Odd-prime false Tate Galois structure
 
-At an odd prime the actual finite cyclotomic groups are cyclic and the first
+At an odd prime the finite cyclotomic groups are cyclic and the first
 Eisenstein radical is not cyclotomic. These facts force the full translation
-kernel. The original fields then give the intersection theorem, the actual
-topological semidirect product with the original cyclotomic character image,
-and the prescribed topological generator of the relative cyclotomic Galois group.
-All relative scalar actions are the original inclusions.
+kernel. The fields then give the intersection theorem, the
+topological semidirect product with the cyclotomic character image,
+and the topological generator of the relative cyclotomic Galois group.
+All relative scalar actions are the inclusions.
 -/
 
 @[expose] public section
@@ -37,7 +37,7 @@ section FiniteCyclotomic
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
-/-- The actual cyclotomic layer over the original base is abelian Galois. -/
+/-- The cyclotomic layer over the base is abelian Galois. -/
 theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
     IsAbelianGalois K (cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
@@ -45,7 +45,7 @@ theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
     (isPrimitiveRoot_rootOfUnity (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
   exact IsCyclotomicExtension.isAbelianGalois {p ^ n} K _
 
-/-- At an odd prime, the actual finite cyclotomic Galois group over any
+/-- At an odd prime, the finite cyclotomic Galois group over any
 characteristic-zero base is cyclic, including level zero. -/
 theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
     IsCyclic (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
@@ -61,8 +61,8 @@ theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
   exact isCyclic_of_injective (hζ.autToPow K) (hζ.autToPow_injective K)
 
 /-- If the preceding cyclotomic layer and the first roots of unity are
-already in the base, a genuinely new next root has its literal degree-`p`
-binomial minimal polynomial over the original base. -/
+already in the base, a new next root has its degree-`p`
+binomial minimal polynomial over the base. -/
 theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
     (h₁ : cyclotomicLayer (K := K) p 1 = ⊥)
     (hprev : cyclotomicLayer (K := K) p n = ⊥)
@@ -114,7 +114,7 @@ theorem cyclotomicLayer_step_minpoly_of_eq_bot (n : ℕ)
       rootOfUnity_succ_pow, ha, sub_self]
   · exact Polynomial.monic_X_pow_sub_C a (Fact.out : p.Prime).ne_zero
 
-/-- A genuinely new cyclotomic layer immediately above the base has
+/-- A new cyclotomic layer immediately above the base has
 degree exactly `p` when the first roots of unity already lie in the base. -/
 theorem cyclotomicLayer_step_finrank_of_eq_bot (n : ℕ)
     (h₁ : cyclotomicLayer (K := K) p 1 = ⊥)
@@ -127,8 +127,8 @@ theorem cyclotomicLayer_step_finrank_of_eq_bot (n : ℕ)
       IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral _)
     _ = p := by rw [hmin, natDegree_X_pow_sub_C]
 
-/-- Every nontrivial finite cyclotomic layer contains an actual first
-nontrivial layer immediately above a layer equal to the original base. -/
+/-- Every nontrivial finite cyclotomic layer contains a first
+nontrivial layer immediately above a layer equal to the base. -/
 theorem exists_first_nontrivial_cyclotomicLayer {n : ℕ}
     (hn : cyclotomicLayer (K := K) p n ≠ ⊥) :
     ∃ r : ℕ, r + 1 ≤ n ∧ cyclotomicLayer (K := K) p r = ⊥ ∧
@@ -147,9 +147,9 @@ theorem exists_first_nontrivial_cyclotomicLayer {n : ℕ}
   · exact not_not.mp (Nat.find_min h (by omega : r < Nat.find h))
   · simpa only [hr] using Nat.find_spec h
 
-/-- A degree-`p` subfield of an actual finite odd-prime cyclotomic layer
+/-- A degree-`p` subfield of a finite odd-prime cyclotomic layer
 is exactly the first nontrivial cyclotomic layer, if the first roots of
-unity lie in the original base. -/
+unity lie in the base. -/
 theorem exists_eq_first_cyclotomicLayer_of_finrank_prime [hp₂ : Fact (p ≠ 2)]
     (F : IntermediateField K (AlgebraicClosure K)) [FiniteDimensional K F]
     {m : ℕ} (hFm : F ≤ cyclotomicLayer (K := K) p m)
@@ -225,8 +225,8 @@ theorem uniformizer_ne_pow_mul_torsion [hπ : Fact (Irreducible π)]
   simp only [nsmul_eq_mul, ENat.toNat_mul, ENat.toNat_natCast, ENat.toNat_one] at hnat
   exact (Fact.out : p.Prime).not_dvd_one ⟨_, hnat.symm⟩
 
-/-- If an actual radical layer is already Galois, its normality contains
-all the corresponding roots of unity in that same original field. -/
+/-- If a radical layer is already Galois, its normality contains
+all the corresponding roots of unity in that same field. -/
 theorem cyclotomicLayer_le_radicalLayer_of_isGalois [hπ : Fact (Irreducible π)] (n : ℕ)
     [IsGalois K (radicalLayer p (π : K) n)] :
     cyclotomicLayer (K := K) p n ≤ radicalLayer p (π : K) n := by
@@ -245,7 +245,7 @@ theorem cyclotomicLayer_le_radicalLayer_of_isGalois [hπ : Fact (Irreducible π)
     le_sup_right).trans hle
 
 /-- Normality of the first Eisenstein radical layer forces the first
-cyclotomic layer to be the original base. -/
+cyclotomic layer to be the base. -/
 theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p]) K]
     [hπ : Fact (Irreducible π)]
     [IsGalois K (radicalLayer p (π : K) 1)] :
@@ -266,9 +266,9 @@ theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p
   exact IntermediateField.adjoin_simple_le_iff.mpr
     (IntermediateField.finrank_adjoin_simple_eq_one_iff.mp hd₁)
 
-/-- The actual first radical cannot belong to the original infinite
+/-- The first radical cannot belong to the infinite
 cyclotomic extension at an odd prime. The proof uses finite cyclicity and
-the literal reverse eigenbasis comparison over the original base. -/
+the reverse eigenbasis comparison over the base. -/
 theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     radical p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
@@ -385,7 +385,7 @@ section InfiniteCoordinates
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- The prescribed radical, viewed in the original infinite false Tate field. -/
+/-- The radical, viewed in the infinite false Tate field. -/
 def extensionRadical (n : ℕ) : falseTateExtension p π :=
   IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
     (layerRadical p π n)
@@ -394,7 +394,7 @@ def extensionRadical (n : ℕ) : falseTateExtension p π :=
 theorem coe_extensionRadical (n : ℕ) :
     (extensionRadical p π n : AlgebraicClosure K) = radical p π n := rfl
 
-/-- The infinite Kummer coordinate evaluates on each original chosen radical. -/
+/-- The infinite Kummer coordinate evaluates on each radical. -/
 theorem padicKummerExponent_spec [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     g (extensionRadical p π n) = extensionRootOfUnity p π n ^
@@ -405,8 +405,8 @@ theorem padicKummerExponent_spec [hπ : NeZero π]
   rw [finiteKummerExponent_spec p π n, map_mul, map_pow]
   rfl
 
-/-- The original cyclotomic subfield has precisely the actual character kernel
-as its fixing subgroup in the original false Tate field. -/
+/-- The cyclotomic subfield has precisely the character kernel
+as its fixing subgroup in the false Tate field. -/
 theorem cyclotomicInclusion_fixingSubgroup :
     (IntermediateField.inclusion
       (cyclotomicExtension_le_falseTateExtension p π)).fieldRange.fixingSubgroup =
@@ -438,8 +438,8 @@ theorem extensionRadical_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
   rw [padicKummerExponent_spec p π, hb]
   simp
 
-/-- Fixing by the actual character kernel places an original radical in the
-actual cyclotomic subfield, by infinite Galois correspondence. -/
+/-- Fixing by the character kernel places a radical in the
+cyclotomic subfield, by infinite Galois correspondence. -/
 theorem radical_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
     (hf : ∀ g : (padicCyclotomicCharacter p π).ker,
       g.val (extensionRadical p π n) = extensionRadical p π n) :
@@ -468,7 +468,7 @@ section RestrictedCoordinates
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- The original affine coordinates, with unit coordinate in the actual
+/-- The affine coordinates, with unit coordinate in the
 cyclotomic character image rather than in the whole p-adic unit group. -/
 def restrictedAffineGaloisHom [hπ : NeZero π] :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →*
@@ -488,7 +488,7 @@ def restrictedAffineGaloisHom [hπ : NeZero π] :
     · apply Subtype.ext
       exact map_mul (padicCyclotomicCharacter p π) g h
 
-/-- Restricting the unit coordinate retains continuity in the ordinary product topology. -/
+/-- Restricting the unit coordinate retains continuity in the product topology. -/
 theorem continuous_restrictedAffineGaloisHom [hπ : NeZero π] :
     Continuous (restrictedAffineGaloisHom p π) := by
   apply continuous_induced_rng.mpr
@@ -516,8 +516,8 @@ theorem closedAddSubgroup_toZModPow_one_eq_zero
     exact IsLocalRing.le_maximalIdeal hJ
   exact hle ha
 
-/-- At an odd prime the actual closed translation kernel is the whole p-adic
-additive group, with the coordinate normalization fixed by the chosen roots. -/
+/-- At an odd prime the closed translation kernel is the whole p-adic
+additive group, with the coordinate normalization fixed by the roots. -/
 theorem affineAdditiveKernel_eq_top [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (affineAdditiveKernel p (π : K)).toAddSubgroup = ⊤ := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -530,7 +530,7 @@ theorem affineAdditiveKernel_eq_top [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irredu
     (affineAdditiveKernel p (π : K)) hM
     (padicKummerExponent_mem_affineAdditiveKernel p (π : K) g)
 
-/-- The actual Kummer coordinate is a topological additive isomorphism onto
+/-- The Kummer coordinate is a topological additive isomorphism onto
 all p-adic integers at an odd prime. -/
 def fullKummerKernelEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     Additive (padicCyclotomicCharacter p (π : K)).ker ≃ₜ+ ℤ_[p] := by
@@ -569,7 +569,7 @@ theorem fullKummerKernelEquiv_apply [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irredu
     fullKummerKernelEquiv p π g =
       padicKummerExponent p (π : K) g.toMul := rfl
 
-/-- The actual character-kernel automorphism whose chosen Kummer coordinate
+/-- The character-kernel automorphism whose Kummer coordinate
 is exactly one. -/
 def tau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker :=
@@ -581,8 +581,8 @@ theorem padicKummerExponent_tau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducibl
       (tau p π).val = 1 :=
   (fullKummerKernelEquiv p π).apply_symm_apply 1
 
-/-- The prescribed generator acts on every chosen positive-level radical
-by multiplication by the corresponding chosen root of unity. -/
+/-- The generator acts on every positive-level radical
+by multiplication by the corresponding root of unity. -/
 theorem tau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (tau p π).val (extensionRadical p (π : K) (n + 1)) =
       extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1) := by
@@ -591,7 +591,7 @@ theorem tau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible �
   have hpow : 1 < p ^ (n + 1) := one_lt_pow₀ (Fact.out : p.Prime).one_lt (Nat.succ_ne_zero n)
   simp only [ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
-/-- Integral powers of the prescribed automorphism are dense in the original
+/-- Integral powers of the automorphism are dense in the
 cyclotomic-character kernel. -/
 theorem denseRange_tau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     DenseRange (fun n : ℤ => tau p π ^ n) := by
@@ -614,8 +614,8 @@ theorem denseRange_tau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π
   rw [e.symm_apply_apply] at hg
   exact hg
 
-/-- Every translation coordinate and every actual cyclotomic unit coordinate
-occur together in the original Galois group. -/
+/-- Every translation coordinate and every cyclotomic unit coordinate
+occur together in the Galois group. -/
 theorem exists_padicCoordinates_eq [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (b : ℤ_[p]) (u : (ℤ_[p])ˣ)
     (hu : u ∈ (cyclotomicExtensionCharacter (K := K) p).range) :
@@ -641,8 +641,8 @@ theorem exists_padicCoordinates_eq [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreduc
     exact sub_add_cancel b _
   · rw [map_mul, htχ, one_mul]
 
-/-- The actual cyclotomic fixer and actual radical fixer generate the whole
-original false Tate Galois group. -/
+/-- The cyclotomic fixer and radical fixer generate the whole
+false Tate Galois group. -/
 theorem cyclotomicKernel_sup_kummerFixing [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ⊔ falseTateKummerFixing p (π : K) = ⊤ := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -660,8 +660,8 @@ theorem cyclotomicKernel_sup_kummerFixing [hp₂ : Fact (p ≠ 2)] [hπ : Fact (
   have h := Subgroup.mul_mem_sup ht hs
   simpa only [inv_mul_cancel_right] using h
 
-/-- The original infinite radical and cyclotomic subfields meet exactly in
-the original base field, for every odd prime and every actual uniformizer. -/
+/-- The infinite radical and cyclotomic subfields meet exactly in
+the base field, for every odd prime and every uniformizer. -/
 theorem kummerExtension_inf_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     kummerExtension p (π : K) ⊓ cyclotomicExtension (K := K) p = ⊥ := by
   have := falseTateExtension_isGalois p (π : K)
@@ -671,8 +671,8 @@ theorem kummerExtension_inf_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : 
   rw [cyclotomicInclusion_fixingSubgroup, sup_comm]
   exact cyclotomicKernel_sup_kummerFixing p π
 
-/-- The original Krull Galois group is the canonical affine semidirect product
-of all translations by the actual cyclotomic character image. -/
+/-- The Krull Galois group is the affine semidirect product
+of all translations by the cyclotomic character image. -/
 def falseTateGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) ≃ₜ*
       RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range := by
@@ -698,19 +698,19 @@ def falseTateGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] 
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
-/-- The semidirect isomorphism retains the original actual Kummer coordinate. -/
+/-- The semidirect isomorphism retains the Kummer coordinate. -/
 theorem falseTateGaloisEquiv_left [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     (falseTateGaloisEquiv p π g).left.toAdd =
       padicKummerExponent p (π : K) g := rfl
 
-/-- The semidirect isomorphism retains the original actual cyclotomic character. -/
+/-- The semidirect isomorphism retains the cyclotomic character. -/
 theorem falseTateGaloisEquiv_right [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     (falseTateGaloisEquiv p π g).right.val = padicCyclotomicCharacter p (π : K) g := rfl
 
-/-- The original cyclotomic fixer is exactly the translation factor under
-the actual topological semidirect isomorphism. -/
+/-- The cyclotomic fixer is exactly the translation factor under
+the topological semidirect isomorphism. -/
 theorem falseTateGaloisEquiv_mem_translations [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     falseTateGaloisEquiv p π g ∈
@@ -722,7 +722,7 @@ theorem falseTateGaloisEquiv_mem_translations [hp₂ : Fact (p ≠ 2)] [hπ : Fa
   · exact fun h => congrArg Subtype.val h
   · exact fun h => Subtype.ext h
 
-/-- The original radical fixer is exactly the pure cyclotomic-unit factor. -/
+/-- The radical fixer is exactly the pure cyclotomic-unit factor. -/
 theorem falseTateGaloisEquiv_mem_units [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
     falseTateGaloisEquiv p π g ∈
@@ -739,8 +739,8 @@ theorem falseTateGaloisEquiv_mem_units [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irr
     · exact congrArg Multiplicative.ofAdd hb.symm
     · rfl
 
-/-- Restriction of the actual cyclotomic character identifies the original
-radical fixer with the actual cyclotomic character image. -/
+/-- Restriction of the cyclotomic character identifies the
+radical fixer with the cyclotomic character image. -/
 def kummerFixingEquivCyclotomicImage [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateKummerFixing p (π : K) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -779,14 +779,14 @@ def kummerFixingEquivCyclotomicImage [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irred
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
-/-- On the original radical fixer the factor isomorphism is the usual
-cyclotomic character, with its actual image as codomain. -/
+/-- On the radical fixer the factor isomorphism is the
+cyclotomic character, with its image as codomain. -/
 theorem kummerFixingEquivCyclotomicImage_apply [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateKummerFixing p (π : K)) :
     (kummerFixingEquivCyclotomicImage p π g).val =
       padicCyclotomicCharacter p (π : K) g.val := rfl
 
-/-- The prescribed generator fixes the original embedded cyclotomic field. -/
+/-- The generator fixes the embedded cyclotomic field. -/
 theorem tau_fixes_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (x : cyclotomicExtension (K := K) p) :
     (tau p π).val
@@ -799,8 +799,8 @@ theorem tau_fixes_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irre
     exact (tau p π).property
   exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hg _ ⟨x, rfl⟩
 
-/-- Fixing the cyclotomic field and the displayed actions on all compatible
-positive-level radicals uniquely specify the original automorphism. -/
+/-- Fixing the cyclotomic field and the actions on all compatible
+positive-level radicals uniquely specify the automorphism. -/
 theorem tau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : (padicCyclotomicCharacter p (π : K)).ker)
     (hg : ∀ n : ℕ, g.val (extensionRadical p (π : K) (n + 1)) =
@@ -836,7 +836,7 @@ theorem tau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
       _ = _ := by rw [map_mul, map_pow, ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
 /-- Multiplicative notation for the topological Kummer-coordinate isomorphism
-on the original character kernel. -/
+on the character kernel. -/
 def fullKummerKernelMulEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ≃ₜ* Multiplicative (ℤ_[p]) := by
   let e := fullKummerKernelEquiv p π
@@ -853,7 +853,7 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
-/-- The original inclusion defines the relative cyclotomic scalar action. -/
+/-- The inclusion defines the relative cyclotomic scalar action. -/
 local instance cyclotomicRelativeAlgebra :
     Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) :=
   IntermediateField.algebraOfLE (cyclotomicExtension_le_falseTateExtension p (π : K))
@@ -863,7 +863,7 @@ local instance cyclotomicRelativeScalarTower :
   IntermediateField.isScalarTower_of_le (cyclotomicExtension_le_falseTateExtension p (π : K))
 
 omit [Algebra (ℚ_[p]) K] in
-/-- The relative scalar homomorphism is exactly the original cyclotomic inclusion. -/
+/-- The relative scalar homomorphism is exactly the cyclotomic inclusion. -/
 theorem cyclotomicRelative_scalarHom_eq :
     IsScalarTower.toAlgHom K (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) =
       IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) := by
@@ -871,8 +871,8 @@ theorem cyclotomicRelative_scalarHom_eq :
   intro x
   rfl
 
-/-- The original character kernel is the original relative cyclotomic Galois
-group, with its own Krull topology and original inclusion of scalars. -/
+/-- The character kernel is the relative cyclotomic Galois
+group, with its own Krull topology and inclusion of scalars. -/
 def cyclotomicKernelRelativeEquiv [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ≃ₜ*
       (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
@@ -886,35 +886,35 @@ def cyclotomicKernelRelativeEquiv [hπ : Fact (Irreducible π)] :
   exact e.trans (AlgEquiv.fixingSubgroupContinuousMulEquiv K (cyclotomicExtension (K := K) p)
     (falseTateExtension p (π : K)) i (AlgHom.congr_fun (cyclotomicRelative_scalarHom_eq p π)))
 
-/-- The original relative cyclotomic Galois group is the full p-adic
-translation factor, normalized by the prescribed roots. -/
+/-- The relative cyclotomic Galois group is the full p-adic
+translation factor, normalized by the roots. -/
 def cyclotomicRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K)) ≃ₜ* Multiplicative (ℤ_[p]) :=
   (cyclotomicKernelRelativeEquiv p π).symm.trans (fullKummerKernelMulEquiv p π)
 
-/-- The prescribed generator as an actual automorphism over the original
+/-- The generator as an automorphism over the
 cyclotomic field, rather than only as an element of its fixing subgroup. -/
 def relativeTau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K) :=
   cyclotomicKernelRelativeEquiv p π (tau p π)
 
-/-- The original relative generator has precisely the prescribed radical actions. -/
+/-- The relative generator has precisely the radical actions. -/
 theorem relativeTau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     relativeTau p π (extensionRadical p (π : K) (n + 1)) =
       extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1) :=
   tau_extensionRadical p π n
 
-/-- Integral powers are dense in the original relative cyclotomic Galois group. -/
+/-- Integral powers are dense in the relative cyclotomic Galois group. -/
 theorem denseRange_relativeTau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     DenseRange (fun n : ℤ => relativeTau p π ^ n) := by
   have hd := (cyclotomicKernelRelativeEquiv p π).surjective.denseRange.comp
     (denseRange_tau_zpow p π) (cyclotomicKernelRelativeEquiv p π).continuous
   simpa only [Function.comp_def, map_zpow, relativeTau] using hd
 
-/-- The original relative generator corresponds to exactly one under the
-isomorphism normalized by the prescribed compatible roots. -/
+/-- The relative generator corresponds to exactly one under the
+isomorphism normalized by the compatible roots. -/
 theorem cyclotomicRelativeGaloisEquiv_relativeTau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     cyclotomicRelativeGaloisEquiv p π (relativeTau p π) =
       Multiplicative.ofAdd (1 : ℤ_[p]) := by
@@ -924,7 +924,7 @@ theorem cyclotomicRelativeGaloisEquiv_relativeTau [hp₂ : Fact (p ≠ 2)] [hπ 
   rw [(cyclotomicKernelRelativeEquiv p π).symm_apply_apply]
   exact congrArg Multiplicative.ofAdd (padicKummerExponent_tau p π)
 
-/-- The displayed actions uniquely determine the generator in the original
+/-- The actions uniquely determine the generator in the
 relative cyclotomic Galois group. -/
 theorem relativeTau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
@@ -948,7 +948,7 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
-/-- The original inclusion defines the relative radical scalar action. -/
+/-- The inclusion defines the relative radical scalar action. -/
 local instance kummerRelativeAlgebra :
     Algebra (kummerExtension p (π : K)) (falseTateExtension p (π : K)) :=
   IntermediateField.algebraOfLE (kummerExtension_le_falseTateExtension p (π : K))
@@ -958,7 +958,7 @@ local instance kummerRelativeScalarTower :
   IntermediateField.isScalarTower_of_le (kummerExtension_le_falseTateExtension p (π : K))
 
 omit [Algebra (ℚ_[p]) K] in
-/-- The relative scalar homomorphism is exactly the original radical inclusion. -/
+/-- The relative scalar homomorphism is exactly the radical inclusion. -/
 theorem kummerRelative_scalarHom_eq :
     IsScalarTower.toAlgHom K (kummerExtension p (π : K)) (falseTateExtension p (π : K)) =
       falseTateKummerInclusion p (π : K) := by
@@ -966,8 +966,8 @@ theorem kummerRelative_scalarHom_eq :
   intro x
   rfl
 
-/-- The actual Galois group over the original radical field is the actual
-cyclotomic character image, with both of their original topologies. -/
+/-- The Galois group over the radical field is the
+cyclotomic character image, with both of their topologies. -/
 def kummerRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[kummerExtension p (π : K)]
       falseTateExtension p (π : K)) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by

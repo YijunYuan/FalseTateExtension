@@ -14,11 +14,11 @@ public import FontaineWintenberger.APF.Galois.Restriction
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
 
 /-!
-# Strict APF of the actual false Tate extension
+# Strict APF of the false Tate extension
 
-The actual affine Galois image identifies its radical-fixer and cyclotomic
-projection indices with the ramification indices of the original fields.
-Their bounded growth proves APF and strict APF of the original false Tate
+The affine Galois image identifies its radical-fixer and cyclotomic
+projection indices with the ramification indices of the fields.
+Their bounded growth proves APF and strict APF of the false Tate
 extension, retaining its finite residue factor and including the prime two.
 -/
 
@@ -36,14 +36,14 @@ variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 local notation "Γ" => falseTateExtension p π ≃ₐ[K] falseTateExtension p π
 
-/-- The closed image of the original false Tate Galois group under its
-actual Kummer and cyclotomic coordinates. -/
+/-- The closed image of the false Tate Galois group under its
+Kummer and cyclotomic coordinates. -/
 def falseTateAffineImage [hπ : NeZero π] : ClosedSubgroup (PadicAffineGroup p) where
   toSubgroup := (affineGaloisHom p π).range
   isClosed' := (isClosedEmbedding_affineGaloisHom p π).isClosed_range
 
-/-- The original Krull Galois group is the actual closed affine image,
-with its original group structure and topology. -/
+/-- The Krull Galois group is the closed affine image,
+with its group structure and topology. -/
 def falseTateAffineEquiv [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p π := by
   have := falseTateExtension_isGalois p π
   let f : Γ →* falseTateAffineImage p π := (affineGaloisHom p π).rangeRestrict
@@ -61,14 +61,14 @@ def falseTateAffineEquiv [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p �
 theorem falseTateAffineEquiv_apply [hπ : NeZero π] (g : Γ) :
     (falseTateAffineEquiv p π g : PadicAffineGroup p) = affineGaloisHom p π g := rfl
 
-/-- Unit projection of the actual affine isomorphism is exactly the
-original cyclotomic character. -/
+/-- Unit projection of the affine isomorphism is exactly the
+cyclotomic character. -/
 theorem falseTateAffineEquiv_projection [hπ : NeZero π] :
     (affineProjection (falseTateAffineImage p π)).comp
       (falseTateAffineEquiv p π).toMonoidHom = padicCyclotomicCharacter p π := rfl
 
-/-- The actual affine unit image is the canonical cyclotomic character
-image on the original cyclotomic subfield. -/
+/-- The affine unit image is the cyclotomic character
+image on the cyclotomic subfield. -/
 theorem falseTateAffineImage_projection_range [hπ : NeZero π] :
     (affineProjection (falseTateAffineImage p π)).range =
       (cyclotomicExtensionCharacter (K := K) p).range := by
@@ -81,21 +81,21 @@ theorem falseTateAffineImage_projection_range [hπ : NeZero π] :
   · rintro ⟨σ, rfl⟩
     exact ⟨falseTateAffineEquiv p π σ, rfl⟩
 
-/-- The actual infinite radical tower lies in the original false Tate field. -/
+/-- The infinite radical tower lies in the false Tate field. -/
 theorem kummerExtension_le_falseTateExtension :
     kummerExtension p π ≤ falseTateExtension p π := by
   rw [falseTateExtension_eq_sup]
   exact le_sup_left
 
-/-- The original inclusion of the actual radical tower into the false Tate field. -/
+/-- The inclusion of the radical tower into the false Tate field. -/
 def falseTateKummerInclusion : kummerExtension p π →ₐ[K] falseTateExtension p π :=
   IntermediateField.inclusion (kummerExtension_le_falseTateExtension p π)
 
-/-- The actual subgroup fixing the original infinite radical tower. -/
+/-- The subgroup fixing the infinite radical tower. -/
 def falseTateKummerFixing : Subgroup Γ := (falseTateKummerInclusion p π).fieldRange.fixingSubgroup
 
-/-- Fixing every actual radical is equivalent to vanishing of the
-canonical p-adic translation coordinate. -/
+/-- Fixing every radical is equivalent to vanishing of the
+p-adic translation coordinate. -/
 theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
     σ ∈ falseTateKummerFixing p π ↔ padicKummerExponent p π σ = 0 := by
   constructor
@@ -139,15 +139,15 @@ theorem mem_falseTateKummerFixing_iff [hπ : NeZero π] (σ : Γ) :
       exact hh
     exact AlgHom.congr_fun heq ⟨y.val, hn⟩
 
-/-- Pure units in the actual affine image pull back to the actual radical fixer. -/
+/-- Pure units in the affine image pull back to the radical fixer. -/
 theorem falseTateAffineEquiv_mem_pureUnits [hπ : NeZero π] (σ : Γ) :
     falseTateAffineEquiv p π σ ∈ affinePureUnits (falseTateAffineImage p π) ↔
       σ ∈ falseTateKummerFixing p π := by
   rw [mem_affinePureUnits, mem_falseTateKummerFixing_iff p π]
   rfl
 
-/-- The actual radical fixer becomes exactly the pure-unit subgroup in
-the original closed affine image. -/
+/-- The radical fixer becomes exactly the pure-unit subgroup in
+the closed affine image. -/
 theorem falseTateKummerFixing_map_affine [hπ : NeZero π] :
     (falseTateKummerFixing p π).map (falseTateAffineEquiv p π).toMonoidHom =
       affinePureUnits (falseTateAffineImage p π) := by
@@ -163,7 +163,7 @@ theorem falseTateKummerFixing_map_affine [hπ : NeZero π] :
 
 variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The actual affine unit projection has infinite image for every finite
+/-- The affine unit projection has infinite image for every finite
 p-adic base, including the dyadic case. -/
 theorem falseTateAffineImage_projection_infinite [hπ : NeZero π] :
     Infinite (affineProjection (falseTateAffineImage p π)).range := by
@@ -180,7 +180,7 @@ theorem falseTateAffineImage_projection_infinite [hπ : NeZero π] :
   · exact hinf
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- The actual character is faithful when the actual translation kernel vanishes. -/
+/-- The character is faithful when the translation kernel vanishes. -/
 theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
     [hπ : NeZero π]
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
@@ -193,8 +193,8 @@ theorem padicCyclotomicCharacter_injective_of_translationKernel_eq_bot
   exact hi
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- The original cyclotomic inclusion has trivial fixing subgroup when the
-actual translation kernel vanishes. -/
+/-- The cyclotomic inclusion has trivial fixing subgroup when the
+translation kernel vanishes. -/
 theorem falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot
     [hπ : NeZero π]
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
@@ -218,8 +218,8 @@ theorem falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot
     _ = _ := (map_one _).symm
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- A vanishing actual translation kernel makes the original false Tate
-field equal to its actual cyclotomic subfield, by infinite Galois correspondence. -/
+/-- A vanishing translation kernel makes the false Tate
+field equal to its cyclotomic subfield, by infinite Galois correspondence. -/
 theorem falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot
     [hπ : NeZero π]
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
@@ -238,8 +238,8 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 
 variable (p : ℕ) [Fact p.Prime] (π : K)
 
-/-- Actual infinite upper restriction identifies the full APF product
-index of any subfield of the original false Tate field. The subfield may
+/-- Infinite upper restriction identifies the full APF product
+index of any subfield of the false Tate field. The subfield may
 be nonnormal and infinite, and its residue factor is retained. -/
 theorem apfSubgroup_fieldRange_index_eq_falseTateFixing_sup_upper
     [hπ : NeZero π] (M : IntermediateField K (falseTateExtension p π))
@@ -260,8 +260,8 @@ theorem apfSubgroup_fieldRange_index_eq_falseTateFixing_sup_upper
     ← upperRamificationGroupInfinite_map_autCongr K e hu, ← Subgroup.map_sup]
   exact Subgroup.index_map_equiv _ e.autCongr
 
-/-- Naturality of the actual cyclotomic character identifies the upper
-character images of the original false Tate and cyclotomic fields. -/
+/-- Naturality of the cyclotomic character identifies the upper
+character images of the false Tate and cyclotomic fields. -/
 theorem falseTateCharacter_map_upperRamificationGroupInfinite
     [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite K (falseTateExtension p π) u).map
@@ -280,8 +280,8 @@ theorem falseTateCharacter_map_upperRamificationGroupInfinite
     (τ.restrictNormal (falseTateExtension p π)).toRingEquiv τ.toRingEquiv
     (AlgEquiv.restrictNormal_commutes τ (falseTateExtension p π))
 
-/-- Ordinary restriction from the actual false Tate extension sends its
-actual upper group onto the upper group of its original cyclotomic field. -/
+/-- Restriction from the false Tate extension sends its
+upper group onto the upper group of its cyclotomic field. -/
 theorem cyclotomicRestriction_map_upperRamificationGroupInfinite
     [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite K (falseTateExtension p π) u).map
@@ -295,8 +295,8 @@ theorem cyclotomicRestriction_map_upperRamificationGroupInfinite
 
 variable [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The unit projection index of the actual affine upper group equals
-the full upper index of the original cyclotomic extension. -/
+/-- The unit projection index of the affine upper group equals
+the full upper index of the cyclotomic extension. -/
 theorem falseTateAffine_upper_projection_index [hπ : NeZero π] {u : ℝ} (hu : -1 ≤ u) :
     (((upperRamificationGroupInfinite K (falseTateExtension p π) u).map
         (falseTateAffineEquiv p π).toMonoidHom).map
@@ -340,7 +340,7 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[K])
 
-/-- The actual pure-unit product index is exactly the intrinsic radical
+/-- The pure-unit product index is exactly the radical
 index. Total ramification of the radical tower removes its residue factor;
 no total ramification of the false Tate field is used. -/
 theorem falseTateAffine_upper_radical_index [hπ : Fact (Irreducible π)]
@@ -403,9 +403,9 @@ theorem falseTateBase_addVal_p_pos :
     𝒪[ℚ_[p]]
     𝒪[K]
 
-/-- If the actual translation kernel is nonzero, the full false Tate upper
-index is finite and uniformly comparable with the original radical and
-cyclotomic indices. The constants depend only on the actual affine image. -/
+/-- If the translation kernel is nonzero, the full false Tate upper
+index is finite and uniformly comparable with the radical and
+cyclotomic indices. The constants depend only on the affine image. -/
 theorem exists_falseTate_upper_index_comparison [hπ : Fact (Irreducible π)]
     (hM : (affineTranslationKernel (falseTateAffineImage p (π : K))).toAddSubgroup ≠ ⊥) :
     ∃ C D : ℕ, 0 < C ∧ 0 < D ∧ ∀ u : ℝ, 0 ≤ u →
@@ -452,8 +452,8 @@ theorem exists_falseTate_upper_index_comparison [hπ : Fact (Irreducible π)]
   · simpa only [hA, hB, hindex] using hlo
   · simpa only [hA, hB, hindex] using hhi
 
-/-- If the actual translation kernel vanishes, the full upper index is
-exactly the original cyclotomic upper index. -/
+/-- If the translation kernel vanishes, the full upper index is
+exactly the cyclotomic upper index. -/
 theorem falseTate_upper_index_of_translationKernel_eq_bot [hπ : Fact (Irreducible π)]
     (hM : (affineTranslationKernel (falseTateAffineImage p (π : K))).toAddSubgroup = ⊥)
     {u : ℝ} (hu : -1 ≤ u) :
@@ -469,7 +469,7 @@ theorem falseTate_upper_index_of_translationKernel_eq_bot [hπ : Fact (Irreducib
       (affineProjection_index_of_translationKernel_eq_bot G hM _).symm
     _ = _ := falseTateAffine_upper_projection_index p (π : K) hu
 
-/-- The original false Tate extension is APF over every finite
+/-- The false Tate extension is APF over every finite
 norm-compatible `p`-adic base, including the prime two. -/
 instance isAPF_falseTateExtension [hπ : Fact (Irreducible π)] :
     IsAPF K (falseTateExtension p (π : K)) := by
@@ -494,8 +494,8 @@ instance isAPF_falseTateExtension [hπ : Fact (Irreducible π)] :
       (upperRamificationGroupInfinite_antitoneOn K (falseTateExtension p (π : K))
         hu (by norm_num : -1 ≤ (0 : ℝ)) (le_of_not_ge h))
 
-/-- The full original false Tate upper index has bounded growth across
-the actual positive ramification-index shift of the base. -/
+/-- The full false Tate upper index has bounded growth across
+the positive ramification-index shift of the base. -/
 theorem exists_falseTate_upper_index_boundedGrowth [hπ : Fact (Irreducible π)] :
     ∃ Q : ℕ, 0 < Q ∧ ∃ V : ℝ, 0 ≤ V ∧ ∀ u : ℝ, V ≤ u →
       (upperRamificationGroupInfinite K (falseTateExtension p (π : K))
@@ -542,7 +542,7 @@ theorem exists_falseTate_upper_index_boundedGrowth [hπ : Fact (Irreducible π)]
       _ = _ := by ring
 
 omit [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- The actual full upper index retains the fixed inertia index as a
+/-- The full upper index retains the fixed inertia index as a
 factor. This identity allows a finite initial residue extension. -/
 theorem falseTate_upper_index_eq_apfIndex_mul_inertia_index [hπ : Fact (Irreducible π)]
     {u : ℝ} (hu : 0 ≤ u) :
@@ -556,7 +556,7 @@ theorem falseTate_upper_index_eq_apfIndex_mul_inertia_index [hπ : Fact (Irreduc
       (by norm_num : -1 ≤ (0 : ℝ)) (by linarith : -1 ≤ u) hu)).symm
 
 /-- Cancelling the positive finite inertia factor gives bounded growth of
-the intrinsic false Tate index over its original base. -/
+the false Tate index over its base. -/
 theorem exists_falseTate_apfIndex_boundedGrowth [hπ : Fact (Irreducible π)] :
     ∃ Q : ℕ, 0 < Q ∧ ∃ V : ℝ, 0 ≤ V ∧ ∀ u : ℝ, V ≤ u →
       apfIndex K (falseTateExtension p (π : K))
@@ -578,7 +578,7 @@ theorem exists_falseTate_apfIndex_boundedGrowth [hπ : Fact (Irreducible π)] :
     ← Nat.mul_assoc] at hg
   exact (mul_le_mul_iff_left₀ hzero).mp hg
 
-/-- Every actual false Tate extension over a finite norm-compatible
+/-- Every false Tate extension over a finite norm-compatible
 `p`-adic base is strictly APF, including the prime two and a finite initial
 residue extension. -/
 instance isStrictlyAPF_falseTateExtension [hπ : Fact (Irreducible π)] :
@@ -599,16 +599,16 @@ variable (K : Type*) [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
     [CharZero K] [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 variable (π : 𝒪[K])
 
-/-- Over an arbitrary finite norm-compatible `p`-adic base, the canonical
-unit-ball DVR structure and its actual perfect residue field supply every
+/-- Over an arbitrary finite norm-compatible `p`-adic base, the
+unit-ball DVR structure and its perfect residue field supply every
 valued-field hypothesis of false Tate strictness. -/
 instance isStrictlyAPF_falseTateExtension_of_finiteDimensional [hπ : Fact (Irreducible π)] :
     IsStrictlyAPF K (falseTateExtension p (π : K)) := by
   let := normedAlgebra_residueField_perfectField (ℚ_[p]) K
   exact isStrictlyAPF_falseTateExtension p π
 
-/-- Canonical public APF over every finite norm-compatible `p`-adic base,
-without a separate chosen DVR or perfect-residue hypothesis. -/
+/-- Public APF over every finite norm-compatible `p`-adic base,
+without a separate DVR or perfect-residue hypothesis. -/
 instance isAPF_falseTateExtension_of_finiteDimensional [hπ : Fact (Irreducible π)] :
     IsAPF K (falseTateExtension p (π : K)) := by
   exact (isStrictlyAPF_falseTateExtension_of_finiteDimensional p K π).toIsAPF
