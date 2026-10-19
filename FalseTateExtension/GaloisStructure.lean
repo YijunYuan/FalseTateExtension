@@ -459,54 +459,8 @@ section RestrictedAffineGroup
 
 variable (p : ℕ) [Fact p.Prime] (H : Subgroup (ℤ_[p])ˣ)
 
-/-- The canonical affine semidirect product with its unit factor restricted
-to a specified actual subgroup. -/
-abbrev RestrictedPadicAffineGroup :=
-  SemidirectProduct (Multiplicative (ℤ_[p])) H ((padicAffineAction p).comp H.subtype)
-
-/-- Ordinary product coordinates for the restricted canonical semidirect product. -/
-def restrictedPadicAffineEquivProd : RestrictedPadicAffineGroup p H ≃ ℤ_[p] × H :=
-  SemidirectProduct.equivProd.trans
-    (Equiv.prodCongr Multiplicative.toAdd (Equiv.refl _))
-
-/-- The usual product topology on the restricted semidirect product. -/
-instance restrictedPadicAffineTopologicalSpace :
-    TopologicalSpace (RestrictedPadicAffineGroup p H) :=
-  (restrictedPadicAffineEquivProd p H).topologicalSpace
-
-/-- The chosen topology is precisely the product topology in affine coordinates. -/
-def restrictedPadicAffineHomeomorphProd :
-    RestrictedPadicAffineGroup p H ≃ₜ ℤ_[p] × H :=
-  (restrictedPadicAffineEquivProd p H).homeomorph
-
-instance restrictedPadicAffineT2Space : T2Space (RestrictedPadicAffineGroup p H) :=
-  (restrictedPadicAffineHomeomorphProd p H).symm.t2Space
-
-instance restrictedPadicAffineIsTopologicalGroup :
-    IsTopologicalGroup (RestrictedPadicAffineGroup p H) where
-  continuous_mul := by
-    have hl : Continuous (fun x : RestrictedPadicAffineGroup p H => x.left.toAdd) :=
-      continuous_fst.comp (restrictedPadicAffineHomeomorphProd p H).continuous
-    have hr : Continuous (fun x : RestrictedPadicAffineGroup p H => x.right) :=
-      continuous_snd.comp (restrictedPadicAffineHomeomorphProd p H).continuous
-    have hu : Continuous (fun x : RestrictedPadicAffineGroup p H => (x.right.val : ℤ_[p])) :=
-      Units.continuous_val.comp (continuous_subtype_val.comp hr)
-    apply continuous_induced_rng.mpr
-    change Continuous (fun x : RestrictedPadicAffineGroup p H × RestrictedPadicAffineGroup p H =>
-      (x.1.left.toAdd + (x.1.right.val : ℤ_[p]) * x.2.left.toAdd, x.1.right * x.2.right))
-    exact ((hl.comp continuous_fst).add
-      ((hu.comp continuous_fst).mul (hl.comp continuous_snd))).prodMk
-      ((hr.comp continuous_fst).mul (hr.comp continuous_snd))
-  continuous_inv := by
-    have hl : Continuous (fun x : RestrictedPadicAffineGroup p H => x.left.toAdd) :=
-      continuous_fst.comp (restrictedPadicAffineHomeomorphProd p H).continuous
-    have hr : Continuous (fun x : RestrictedPadicAffineGroup p H => x.right) :=
-      continuous_snd.comp (restrictedPadicAffineHomeomorphProd p H).continuous
-    apply continuous_induced_rng.mpr
-    change Continuous (fun x : RestrictedPadicAffineGroup p H =>
-      (((x.right⁻¹).val : ℤ_[p]) * (-x.left.toAdd), x.right⁻¹))
-    exact ((Units.continuous_val.comp
-      (continuous_subtype_val.comp hr.inv)).mul hl.neg).prodMk hr.inv
+/-- The affine group `ℤ_[p] ⋊ H` for a subgroup `H ≤ ℤ_[p]ˣ`. -/
+abbrev RestrictedPadicAffineGroup : Type := AffineGroup ℤ_[p] H.subtype
 
 end RestrictedAffineGroup
 

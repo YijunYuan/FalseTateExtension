@@ -33,24 +33,8 @@ open scoped commutatorElement
 /-- The usual affine commutator formula holds in the canonical semidirect product. -/
 theorem padicAffine_commutator_inl (g : PadicAffineGroup p) (m : ℤ_[p]) :
     ⁅g, (SemidirectProduct.inl (Multiplicative.ofAdd m) : PadicAffineGroup p)⁆ =
-      SemidirectProduct.inl (Multiplicative.ofAdd (((g.right : ℤ_[p]) - 1) * m)) := by
-  apply SemidirectProduct.ext
-  · simp only [commutatorElement_def, SemidirectProduct.mul_left,
-      SemidirectProduct.mul_right, SemidirectProduct.inv_left, SemidirectProduct.inv_right,
-      SemidirectProduct.left_inl, SemidirectProduct.right_inl, mul_one, mul_inv_cancel,
-      inv_one, map_one, MulAut.one_apply]
-    apply congrArg Multiplicative.ofAdd
-    change g.left.toAdd + (g.right : ℤ_[p]) * m +
-      (g.right : ℤ_[p]) * ((g.right⁻¹ : (ℤ_[p])ˣ) * -g.left.toAdd) + -m = _
-    have hu := congrArg (fun u : (ℤ_[p])ˣ ↦ (u : ℤ_[p]))
-      (mul_inv_cancel g.right)
-    change (g.right : ℤ_[p]) * (g.right⁻¹ : (ℤ_[p])ˣ) = 1 at hu
-    rw [← mul_assoc, hu, one_mul]
-    ring
-  · simp [commutatorElement_def]
-
-instance padicAffineCompactSpace : CompactSpace (PadicAffineGroup p) :=
-  (padicAffineHomeomorphProd p).symm.compactSpace
+      SemidirectProduct.inl (Multiplicative.ofAdd (((g.right : ℤ_[p]) - 1) * m)) :=
+  AffineGroup.commutator_inl _ g m
 
 /-- The actual right-coordinate homomorphism on a closed affine subgroup. -/
 def affineProjection (G : ClosedSubgroup (PadicAffineGroup p)) : G →* (ℤ_[p])ˣ :=
@@ -68,8 +52,7 @@ def affineTranslationKernel (G : ClosedSubgroup (PadicAffineGroup p)) :
     change IsClosed ((fun a : ℤ_[p] ↦
       (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) ⁻¹' (G : Set _))
     apply G.isClosed'.preimage
-    apply continuous_induced_rng.mpr
-    exact continuous_id.prodMk continuous_const
+    exact AffineGroup.continuous_inl _
 
 /-- The canonical inclusion of the actual translation kernel into the affine subgroup. -/
 def affineTranslationHom (G : ClosedSubgroup (PadicAffineGroup p)) :

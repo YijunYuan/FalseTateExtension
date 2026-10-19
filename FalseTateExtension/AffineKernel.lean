@@ -29,9 +29,8 @@ variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 /-- The actual affine inclusion of the additive p-adic coordinate is continuous. -/
 theorem continuous_padicAffine_inl : Continuous (fun a : ℤ_[p] ↦
-    (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) := by
-  apply continuous_induced_rng.mpr
-  exact continuous_id.prodMk continuous_const
+    (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) :=
+  AffineGroup.continuous_inl _
 
 /-- The closed additive subgroup of coordinates whose affine translation
 belongs to the actual Galois image. -/

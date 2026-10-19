@@ -300,8 +300,7 @@ def affineTranslationIntersection (G : ClosedSubgroup (PadicAffineGroup p))
       (SemidirectProduct.inl (Multiplicative.ofAdd x) : PadicAffineGroup p)) ⁻¹'
         (P.map G.toSubgroup.subtype : Set (PadicAffineGroup p)))
     apply hc.preimage
-    apply continuous_induced_rng.mpr
-    exact continuous_id.prodMk continuous_const
+    exact AffineGroup.continuous_inl _
 
 /-- The actual intersection embeds the same canonical translation preimage,
 without replacing its elements by a certificate or a second kernel. -/

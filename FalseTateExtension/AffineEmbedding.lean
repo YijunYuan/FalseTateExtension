@@ -6,6 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Coordinates.Padic
+public import FalseTateExtension.Affine.Group
+public import FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity
 public import Mathlib.FieldTheory.Galois.Profinite
 public import Mathlib.Algebra.Ring.AddAut
 public import Mathlib.GroupTheory.SemidirectProduct
@@ -31,74 +33,24 @@ noncomputable section
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- The usual action of p-adic units on additive p-adic integers, expressed in
-the canonical multiplicative type tag for the semidirect product. -/
-def padicAffineAction : (ℤ_[p])ˣ →* MulAut (Multiplicative (ℤ_[p])) :=
-  (MulAutMultiplicative (ℤ_[p])).symm.toMonoidHom.comp AddAut.mulLeft
+/-- `ℤ_[p]ˣ` acting on `ℤ_[p]` by multiplication. -/
+abbrev padicAffineAction : ℤ_[p]ˣ →* MulAut (Multiplicative ℤ_[p]) :=
+  affineAction ℤ_[p] (MonoidHom.id ℤ_[p]ˣ)
 
-/-- The canonical affine semidirect product over the p-adic integers. -/
-abbrev PadicAffineGroup :=
-  SemidirectProduct (Multiplicative (ℤ_[p])) (ℤ_[p])ˣ (padicAffineAction p)
+/-- The affine group `ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
+abbrev PadicAffineGroup : Type := AffineGroup ℤ_[p] (MonoidHom.id ℤ_[p]ˣ)
 
-/-- The ordinary additive and unit coordinates of the canonical semidirect product. -/
-def padicAffineEquivProd : PadicAffineGroup p ≃ ℤ_[p] × (ℤ_[p])ˣ :=
-  SemidirectProduct.equivProd.trans
-    (Equiv.prodCongr Multiplicative.toAdd (Equiv.refl _))
-
-/-- The product topology on the canonical semidirect product. -/
-instance padicAffineTopologicalSpace : TopologicalSpace (PadicAffineGroup p) :=
-  (padicAffineEquivProd p).topologicalSpace
-
-/-- The product coordinates identify the chosen topology with the product topology. -/
-def padicAffineHomeomorphProd : PadicAffineGroup p ≃ₜ ℤ_[p] × (ℤ_[p])ˣ :=
-  (padicAffineEquivProd p).homeomorph
-
-instance padicAffineT2Space : T2Space (PadicAffineGroup p) :=
-  (padicAffineHomeomorphProd p).symm.t2Space
+/-- The coordinates `ℤ_[p] ⋊ ℤ_[p]ˣ ≃ₜ ℤ_[p] × ℤ_[p]ˣ`. -/
+abbrev padicAffineHomeomorphProd : PadicAffineGroup p ≃ₜ ℤ_[p] × ℤ_[p]ˣ :=
+  AffineGroup.homeomorphProd _
 
 theorem continuous_padicAffine_left :
     Continuous (fun x : PadicAffineGroup p ↦ x.left.toAdd) :=
-  continuous_fst.comp (padicAffineHomeomorphProd p).continuous
+  AffineGroup.continuous_left _
 
 theorem continuous_padicAffine_right :
     Continuous (fun x : PadicAffineGroup p ↦ x.right) :=
-  continuous_snd.comp (padicAffineHomeomorphProd p).continuous
-
-instance padicAffineIsTopologicalGroup : IsTopologicalGroup (PadicAffineGroup p) where
-  continuous_mul := by
-    apply continuous_induced_rng.mpr
-    change Continuous (fun x : PadicAffineGroup p × PadicAffineGroup p ↦
-      (x.1.left.toAdd + (x.1.right : ℤ_[p]) * x.2.left.toAdd, x.1.right * x.2.right))
-    exact ((continuous_padicAffine_left p |>.comp continuous_fst).add
-      ((Units.continuous_val.comp ((continuous_padicAffine_right p).comp continuous_fst)).mul
-        (continuous_padicAffine_left p |>.comp continuous_snd))).prodMk
-      ((continuous_padicAffine_right p |>.comp continuous_fst).mul
-        (continuous_padicAffine_right p |>.comp continuous_snd))
-  continuous_inv := by
-    apply continuous_induced_rng.mpr
-    change Continuous (fun x : PadicAffineGroup p ↦
-      ((x.right⁻¹ : (ℤ_[p])ˣ) * (-x.left.toAdd), x.right⁻¹))
-    exact ((Units.continuous_val.comp (continuous_padicAffine_right p).inv).mul
-      (continuous_padicAffine_left p).neg).prodMk (continuous_padicAffine_right p).inv
-
-/-- Continuity of every finite residue coordinate suffices for continuity into
-the actual p-adic topology. -/
-theorem _root_.PadicInt.continuous_of_toZModPow {X : Type*} [TopologicalSpace X]
-    (f : X → ℤ_[p])
-    (hf : ∀ n, Continuous (fun x ↦ PadicInt.toZModPow n (f x))) : Continuous f := by
-  rw [continuous_iff_continuousAt]
-  intro x
-  apply Metric.tendsto_nhds.mpr
-  intro ε hε
-  obtain ⟨n, hn⟩ := PadicInt.exists_pow_neg_lt p hε
-  have he : ∀ᶠ y in nhds x,
-      PadicInt.toZModPow n (f y) = PadicInt.toZModPow n (f x) :=
-    ((hf n).continuousAt (x := x)).eventually
-      (p := fun t ↦ t = PadicInt.toZModPow n (f x)) (by simp)
-  filter_upwards [he] with y hy
-  apply lt_of_le_of_lt _ hn
-  rw [dist_eq_norm, PadicInt.norm_le_pow_iff_mem_span_pow,
-    ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, hy, sub_self]
+  AffineGroup.continuous_right _
 
 variable {K : Type*} [Field K] [CharZero K] (π : K)
 
@@ -131,7 +83,7 @@ theorem continuous_infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
 /-- The canonical Kummer coordinate is continuous for the actual Krull topology. -/
 theorem continuous_padicKummerExponent [hπ : NeZero π] :
     Continuous (padicKummerExponent p π) := by
-  apply PadicInt.continuous_of_toZModPow p
+  apply PadicInt.continuous_of_toZModPow
   intro n
   simp_rw [padicKummerExponent_toZModPow]
   exact (continuous_of_discreteTopology : Continuous (finiteKummerExponent p π n)).comp

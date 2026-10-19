@@ -177,12 +177,12 @@ theorem finiteCyclotomicCharacter_mem_range
 
 /-- The usual finite affine action, in multiplicative notation for the
 additive coordinate of the canonical semidirect product. -/
-def finiteAffineAction : (ZMod (p ^ n))ˣ →* MulAut (Multiplicative (ZMod (p ^ n))) :=
-  (MulAutMultiplicative (ZMod (p ^ n))).symm.toMonoidHom.comp AddAut.mulLeft
+abbrev finiteAffineAction : (ZMod (p ^ n))ˣ →* MulAut (Multiplicative (ZMod (p ^ n))) :=
+  affineAction (ZMod (p ^ n)) (MonoidHom.id _)
 
 /-- The canonical finite affine group with an actual specified unit image. -/
-abbrev FiniteAffineGroup (H : Subgroup (ZMod (p ^ n))ˣ) :=
-  SemidirectProduct (Multiplicative (ZMod (p ^ n))) H ((finiteAffineAction p n).comp H.subtype)
+abbrev FiniteAffineGroup (H : Subgroup (ZMod (p ^ n))ˣ) : Type :=
+  AffineGroup (ZMod (p ^ n)) H.subtype
 
 /-- The normalized finite action coordinates in the canonical affine group
 with the original finite cyclotomic image. -/
@@ -275,8 +275,7 @@ theorem mem_finiteRadicalInclusion_fixingSubgroup_iff [hπ : NeZero π]
     exact AlgHom.congr_fun heq y
 
 /-- The canonical finite affine group with the full unit group. -/
-abbrev FullFiniteAffineGroup :=
-  SemidirectProduct (Multiplicative (ZMod (p ^ n))) (ZMod (p ^ n))ˣ (finiteAffineAction p n)
+abbrev FullFiniteAffineGroup : Type := AffineGroup (ZMod (p ^ n)) (MonoidHom.id _)
 
 /-- The canonical inclusion from an actual unit-image affine group into the
 full finite affine group. -/
@@ -298,20 +297,8 @@ omit [Fact p.Prime] in
 /-- The normalized affine commutator gives its actual translation coordinate. -/
 theorem finiteAffine_commutator_inl (g : FullFiniteAffineGroup p n) (b : ZMod (p ^ n)) :
     ⁅g, (SemidirectProduct.inl (Multiplicative.ofAdd b) : FullFiniteAffineGroup p n)⁆ =
-      SemidirectProduct.inl (Multiplicative.ofAdd (((g.right : ZMod (p ^ n)) - 1) * b)) := by
-  apply SemidirectProduct.ext
-  · simp only [commutatorElement_def, SemidirectProduct.mul_left,
-      SemidirectProduct.mul_right, SemidirectProduct.inv_left, SemidirectProduct.inv_right,
-      SemidirectProduct.left_inl, SemidirectProduct.right_inl, mul_one, mul_inv_cancel,
-      inv_one, map_one, MulAut.one_apply]
-    apply congrArg Multiplicative.ofAdd
-    change g.left.toAdd + (g.right : ZMod (p ^ n)) * b +
-      (g.right : ZMod (p ^ n)) * ((g.right⁻¹ : (ZMod (p ^ n))ˣ) * -g.left.toAdd) + -b = _
-    have hu := congrArg (fun u : (ZMod (p ^ n))ˣ => (u : ZMod (p ^ n))) (mul_inv_cancel g.right)
-    change (g.right : ZMod (p ^ n)) * (g.right⁻¹ : (ZMod (p ^ n))ˣ) = 1 at hu
-    rw [← mul_assoc, hu, one_mul]
-    ring
-  · simp [commutatorElement_def]
+      SemidirectProduct.inl (Multiplicative.ofAdd (((g.right : ZMod (p ^ n)) - 1) * b)) :=
+  AffineGroup.commutator_inl _ g b
 
 end FiniteAffineCoordinates
 

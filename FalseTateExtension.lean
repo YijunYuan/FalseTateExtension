@@ -16,6 +16,9 @@ public import FalseTateExtension.Coordinates.Finite
 public import FalseTateExtension.Coordinates.Transitions
 public import FalseTateExtension.Coordinates.Padic
 
+public import FalseTateExtension.Mathlib.Topology.Algebra.SemidirectProduct
+public import FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity
+public import FalseTateExtension.Affine.Group
 public import FalseTateExtension.AffineEmbedding
 public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
