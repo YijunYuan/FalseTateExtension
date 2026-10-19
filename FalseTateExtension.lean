@@ -15,8 +15,16 @@ public import FalseTateExtension.Kummer
 public import FalseTateExtension.FalseTate
 
 /-!
-# False Tate, Kummer, and cyclotomic extensions
+# The false Tate curve extension
 
-This is the project public import interface. No mathematical theorem is asserted here.
-See blueprint/src/content.tex for the source-facing mathematical specification.
+Root module: it imports one aggregate per layer. The six targets of the project and the
+declarations proving them are listed in `README.md`:
+
+1. the layers `K(π^{1/p^m}, ζ_{p^n})`, `K_FT`, `K_Kum`, `K_cyc` (`Layers/Basic`);
+2. `K_FT`, `K_Kum`, `K_cyc` are strictly APF (`FalseTate/StrictAPF`, `Kummer/APF`,
+   `Cyclotomic/APF`);
+3. Liu's Lemma 5.1.2 (`FalseTate/TranslationKernel`, `FalseTate/LiuLemma`);
+4. the generator `τ = kummerGenerator` of `Gal(K_FT/K_cyc)` (`FalseTate/TranslationKernel`);
+5. total ramification of `K_FT/ℚ_p` (`FalseTate/TotalRamification`);
+6. Viviani's Corollary 6.10 (`FalseTate/Viviani/Filtration`, `FalseTate/Viviani/Corollary`).
 -/
