@@ -11,8 +11,7 @@ public import FontaineWintenberger.Ramification.Norm.Valuation
 public import FontaineWintenberger.Ramification.Different.Monogenic
 public import FontaineWintenberger.Ramification.Lower.SpectralMaps
 public import FontaineWintenberger.Ramification.Different.Subextension
-public import Mathlib.RingTheory.Polynomial.Eisenstein.Criterion
-public import Mathlib.RingTheory.Polynomial.GaussLemma
+public import FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniformizer
 
 /-!
 # Ramification in the actual radical tower
@@ -37,59 +36,6 @@ namespace FalseTateExtension
 abbrev absoluteRamificationIdx (p : ℕ) (K : Type*) [NontriviallyNormedField K]
     [IsCompleteDiscreteValuedField K] : ℕ :=
   (addVal 𝒪[K] (p : 𝒪[K])).toNat
-
-section Eisenstein
-
-variable {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-
-/-- Every positive power polynomial with a uniformizer constant term is
-Eisenstein at the actual maximal ideal. -/
-theorem X_pow_sub_uniformizer_isEisensteinAt {π : R} (hπ : Irreducible π)
-    {m : ℕ} (hm : 0 < m) :
-    (X ^ m - C π : R[X]).IsEisensteinAt (IsLocalRing.maximalIdeal R) := by
-  apply (monic_X_pow_sub_C π hm.ne').isEisensteinAt_of_mem_of_notMem
-    (IsLocalRing.maximalIdeal.isMaximal R).ne_top
-  · intro i hi
-    rw [natDegree_X_pow_sub_C] at hi
-    by_cases hi0 : i = 0
-    · subst i
-      simpa [coeff_sub, coeff_X_pow, hm.ne] using
-        (IsLocalRing.maximalIdeal R).neg_mem hπ.not_isUnit
-    · simp [coeff_sub, coeff_X_pow, coeff_C, hi.ne, hi0]
-  · have hc : (X ^ m - C π : R[X]).coeff 0 = -π := by
-      simp [coeff_sub, coeff_X_pow, coeff_C, hm.ne]
-    rw [hc, FontaineWintenberger.mem_maximalIdeal_pow_iff_addVal, AddValuation.map_neg]
-    have hv := hπ.addVal_pow 1
-    simp only [pow_one, Nat.cast_one] at hv
-    rw [hv]
-    norm_num
-
-/-- Gauss's lemma makes the actual Eisenstein power polynomial irreducible
-over the fraction field. -/
-theorem irreducible_X_pow_sub_uniformizer {π : R} (hπ : Irreducible π)
-    {m : ℕ} (hm : 0 < m) (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K] :
-    Irreducible (X ^ m - C (algebraMap R K π) : K[X]) := by
-  have hE := X_pow_sub_uniformizer_isEisensteinAt hπ hm
-  have hI := hE.irreducible (inferInstance : (IsLocalRing.maximalIdeal R).IsPrime)
-    (monic_X_pow_sub_C π hm.ne').isPrimitive (by simpa using hm)
-  have h := (monic_X_pow_sub_C π hm.ne').irreducible_iff_irreducible_map_fraction_map (K := K)
-  simpa only [Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_X, Polynomial.map_C]
-    using h.mp hI
-
-/-- The actual minimal polynomial of any root of a positive power of a
-uniformizer is its Eisenstein polynomial. -/
-theorem minpoly_root_uniformizer {π : R} (hπ : Irreducible π)
-    {m : ℕ} (hm : 0 < m) (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
-    {L : Type*} [Field L] [Algebra K L] (α : L)
-    (hα : α ^ m = algebraMap K L (algebraMap R K π)) :
-    minpoly K α = X ^ m - C (algebraMap R K π) := by
-  symm
-  apply minpoly.eq_of_irreducible_of_monic
-    (irreducible_X_pow_sub_uniformizer hπ hm K)
-    (by simpa only [map_sub, map_pow, aeval_X, aeval_C] using sub_eq_zero.mpr hα)
-    (monic_X_pow_sub_C _ hm.ne')
-
-end Eisenstein
 
 section Layers
 
@@ -121,13 +67,14 @@ theorem finrank_radicalLayer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : �
   have hp : 0 < p ^ n := pow_pos (Fact.out : p.Prime).pos n
   change Module.finrank K (IntermediateField.adjoin K {radical p (π : K) n}) = _
   rw [IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral _),
-    minpoly_root_uniformizer hπ.out hp K _ (radical_pow p (π : K) n), natDegree_X_pow_sub_C]
+    minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out hp K _ (radical_pow p (π : K) n),
+    natDegree_X_pow_sub_C]
 
 /-- The minimal polynomial is computed on the original actual finite
 field rather than a replacement splitting field. -/
 theorem minpoly_radicalLayerRoot (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
     minpoly K (radicalLayerRoot p (π : K) n) = X ^ (p ^ n) - C (π : K) :=
-  minpoly_root_uniformizer hπ.out (pow_pos (Fact.out : p.Prime).pos n) K _
+  minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out (pow_pos (Fact.out : p.Prime).pos n) K _
     (radicalLayerRoot_pow p (π : K) n)
 
 /-- The actual field norm of the chosen radical is a signed original

@@ -6,6 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Padic.InfiniteCharacter
+public import FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality
+public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
@@ -29,29 +31,6 @@ noncomputable section
 namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
-
-/-- The canonical character is natural for actual field embeddings that
-intertwine the automorphisms. No agreement of chosen roots is required. -/
-theorem cyclotomicCharacter_eq_of_intertwines
-    {E E' : Type*} [Field E] [Field E']
-    [∀ n, HasEnoughRootsOfUnity E (p ^ n)] [∀ n, HasEnoughRootsOfUnity E' (p ^ n)]
-    (i : E →+* E') (g : E ≃+* E) (g' : E' ≃+* E')
-    (hi : ∀ x, i (g x) = g' (i x)) :
-    _root_.cyclotomicCharacter E p g = _root_.cyclotomicCharacter E' p g' := by
-  apply Units.ext
-  apply PadicInt.ext_of_toZModPow.mp
-  intro n
-  have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot E (p ^ n)
-  have hζ' := hζ.map_of_injective i.injective
-  apply ZMod.val_injective
-  apply hζ'.pow_inj (ZMod.val_lt _) (ZMod.val_lt _)
-  calc
-    _ = i (ζ ^ (PadicInt.toZModPow n (_root_.cyclotomicCharacter E p g : ℤ_[p])).val) :=
-      (map_pow i _ _).symm
-    _ = i (g ζ) := congrArg i (_root_.cyclotomicCharacter.spec p g ζ hζ.pow_eq_one).symm
-    _ = g' (i ζ) := hi ζ
-    _ = _ := _root_.cyclotomicCharacter.spec p g' (i ζ) hζ'.pow_eq_one
 
 /-- On the actual algebraic closure of the p-adic rationals, the canonical
 character is surjective by restriction to the actual cyclotomic subfield. -/
@@ -88,37 +67,6 @@ theorem cyclotomicCharacter_surjective_of_isAlgClosure
   have hc := cyclotomicCharacter_eq_of_intertwines p e.toRingHom g.toRingEquiv
     (e.autCongr g).toRingEquiv (fun x ↦ by simp)
   exact hc.symm.trans hg
-
-/-- Scalar restriction has exactly the subgroup fixing the actual image
-of the larger scalar field, with no finiteness assumption on the top field. -/
-theorem range_restrictScalarsHom_eq_fixingSubgroup
-    (F K Ω : Type*) [Field F] [Field K] [Field Ω]
-    [Algebra F K] [Algebra K Ω] [Algebra F Ω] [IsScalarTower F K Ω] :
-    (AlgEquiv.restrictScalarsHom F (S := K) (A := Ω)).range =
-      (IsScalarTower.toAlgHom F K Ω).fieldRange.fixingSubgroup := by
-  ext g
-  constructor
-  · rintro ⟨h, rfl⟩
-    rw [IntermediateField.mem_fixingSubgroup_iff]
-    rintro x ⟨k, rfl⟩
-    exact h.commutes k
-  · intro hg
-    let h : Ω ≃ₐ[K] Ω :=
-      { g.toRingEquiv with
-        commutes' := fun k ↦
-          (IntermediateField.mem_fixingSubgroup_iff
-            (IsScalarTower.toAlgHom F K Ω).fieldRange g).mp hg _ ⟨k, rfl⟩ }
-    exact ⟨h, by ext x; rfl⟩
-
-/-- Galois correspondence computes the scalar-restriction index as the
-actual scalar degree, even when the ambient Galois field is infinite. -/
-theorem index_range_restrictScalarsHom
-    (F K Ω : Type*) [Field F] [Field K] [Field Ω]
-    [Algebra F K] [Algebra K Ω] [Algebra F Ω] [IsScalarTower F K Ω] [IsGalois F Ω] :
-    (AlgEquiv.restrictScalarsHom F (S := K) (A := Ω)).range.index = Module.finrank F K := by
-  rw [range_restrictScalarsHom_eq_fixingSubgroup,
-    ← IntermediateField.finrank_eq_fixingSubgroup_index]
-  exact (IsScalarTower.toAlgHom F K Ω).equivFieldRange.toLinearEquiv.finrank_eq.symm
 
 variable {K : Type*} [Field K] [CharZero K]
 
@@ -162,7 +110,7 @@ instance cyclotomicExtensionCharacter_finiteIndex :
     (cyclotomicExtensionCharacter (K := K) p).range.FiniteIndex := by
   let S := (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range
   have hS : S.index = Module.finrank (ℚ_[p]) K :=
-    index_range_restrictScalarsHom (ℚ_[p]) K (AlgebraicClosure K)
+    AlgEquiv.index_range_restrictScalarsHom (ℚ_[p]) K (AlgebraicClosure K)
   let : S.FiniteIndex := ⟨by rw [hS]; exact Module.finrank_pos.ne'⟩
   rw [cyclotomicExtensionCharacter_range_eq_map]
   exact Subgroup.FiniteIndex.map_of_surjective S
@@ -175,7 +123,7 @@ theorem cyclotomicExtensionCharacter_index_dvd :
   have h :=
     (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range.index_map_dvd
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
-  simpa only [index_range_restrictScalarsHom] using h
+  simpa only [AlgEquiv.index_range_restrictScalarsHom] using h
 
 /-- In particular the actual image index is a positive integer. -/
 theorem cyclotomicExtensionCharacter_index_pos :

@@ -9,7 +9,7 @@ public import FalseTateExtension.Padic.FiniteCharacter
 public import FontaineWintenberger.Ramification.Lower.Generator
 public import FontaineWintenberger.Ramification.Lower.Basic
 public import FontaineWintenberger.Ramification.Upper.Basic
-public import Mathlib.Data.ZMod.Units
+public import FalseTateExtension.Mathlib.Data.ZMod.UnitsMap
 
 /-!
 # The actual rational cyclotomic ramification filtration
@@ -249,64 +249,6 @@ theorem mem_lowerRamificationGroupReal_cyclotomic_iff
       ramificationOrder_cyclotomic p n g hg]
     simp only [hg, false_or, ENat.toENNReal_coe, ENNReal.ofReal_le_natCast]
 
-/-- Reduction of the actual finite character unit group has the expected
-kernel index, including reduction to the trivial zeroth level. -/
-theorem cyclotomicUnitReduction_ker_index (n r : ℕ) (hr : r ≤ n + 1) :
-    (ZMod.unitsMap (pow_dvd_pow p hr)).ker.index = (p ^ r).totient := by
-  have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  have : NeZero (p ^ r) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  rw [Subgroup.index_ker,
-    MonoidHom.range_eq_top.mpr (ZMod.unitsMap_surjective (pow_dvd_pow p hr)),
-    Subgroup.card_top, Nat.card_eq_fintype_card, ZMod.card_units_eq_totient]
-
-/-- Every positive-level principal-unit kernel has its exact cardinality
-inside the original finite character unit group. -/
-theorem cyclotomicUnitReduction_ker_card (n r : ℕ)
-    (hr0 : 0 < r) (hr : r ≤ n + 1) :
-    Nat.card (ZMod.unitsMap (pow_dvd_pow p hr)).ker = p ^ (n + 1 - r) := by
-  have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  have : NeZero (p ^ r) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  have hmul := Subgroup.card_ker_mul_card_of_surjective
-    (ZMod.unitsMap_surjective (pow_dvd_pow p hr))
-  simp only [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient] at hmul
-  have hφ : (p ^ r).totient ≠ 0 := by
-    rw [Nat.totient_prime_pow (Fact.out : p.Prime) hr0]
-    exact mul_ne_zero (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)
-      (Nat.sub_ne_zero_of_lt (Fact.out : p.Prime).one_lt)
-  apply mul_right_cancel₀ hφ
-  rw [Nat.card_eq_fintype_card, hmul,
-    Nat.totient_prime_pow (Fact.out : p.Prime) (by omega : 0 < n + 1),
-    Nat.totient_prime_pow (Fact.out : p.Prime) hr0, ← mul_assoc, ← pow_add]
-  congr 2
-  omega
-
-/-- The actual finite-unit reduction kernel is ordinary divisibility of
-the canonical representative minus one; this also covers the identity. -/
-theorem mem_cyclotomicUnitReduction_ker_iff (n r : ℕ) (hr : r ≤ n + 1)
-    (a : (ZMod (p ^ (n + 1)))ˣ) :
-    a ∈ (ZMod.unitsMap (pow_dvd_pow p hr)).ker ↔
-      p ^ r ∣ (a : ZMod (p ^ (n + 1))).val - 1 := by
-  have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  have : Fact (1 < p ^ (n + 1)) :=
-    ⟨one_lt_pow₀ (Fact.out : p.Prime).one_lt (by omega)⟩
-  have ht : 1 ≤ (a : ZMod (p ^ (n + 1))).val :=
-    ZMod.val_pos.mpr (Units.ne_zero a)
-  have hcast : ZMod.castHom (pow_dvd_pow p hr) (ZMod (p ^ r))
-      (a : ZMod (p ^ (n + 1))) =
-        ((a : ZMod (p ^ (n + 1))).val : ZMod (p ^ r)) := by
-    calc
-      _ = ZMod.castHom (pow_dvd_pow p hr) (ZMod (p ^ r))
-          (((a : ZMod (p ^ (n + 1))).val : ℕ) : ZMod (p ^ (n + 1))) :=
-        congrArg _ (ZMod.natCast_zmod_val _).symm
-      _ = _ := map_natCast _ _
-  have hsub : (((a : ZMod (p ^ (n + 1))).val - 1 : ℕ) : ZMod (p ^ r)) =
-      ((a : ZMod (p ^ (n + 1))).val : ZMod (p ^ r)) - 1 := by
-    rw [Nat.cast_sub ht, Nat.cast_one]
-  rw [MonoidHom.mem_ker, Units.ext_iff]
-  change ZMod.castHom (pow_dvd_pow p hr) (ZMod (p ^ r))
-    (a : ZMod (p ^ (n + 1))) = 1 ↔ _
-  rw [hcast, ← sub_eq_zero, ← hsub, ZMod.natCast_eq_zero_iff]
-
 /-- At every integral cyclotomic threshold, the actual lower group is
 the preimage of the canonical finite-unit reduction kernel. -/
 theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
@@ -319,7 +261,7 @@ theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
   have : Fact (1 < p ^ (n + 1)) := ⟨hN⟩
   ext g
   rw [mem_lowerRamificationGroup_cyclotomic_iff, Subgroup.mem_comap,
-    mem_cyclotomicUnitReduction_ker_iff p n r hr]
+    ZMod.mem_ker_unitsMap_prime_pow_iff p n r hr]
   simp only [sub_add_cancel, Int.toNat_natCast]
   by_cases hg : g = 1
   · subst g
@@ -347,7 +289,7 @@ theorem lowerRamificationGroup_cyclotomic_index (n r : ℕ) (hr : r ≤ n + 1) :
         (p ^ r).totient := by
   rw [lowerRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr,
     Subgroup.index_comap_of_surjective _ (cyclotomicLayerCharacter_surjective p (n + 1)),
-    cyclotomicUnitReduction_ker_index p n r hr]
+    ZMod.index_ker_unitsMap_prime_pow p n r hr]
 
 /-- The actual inertia subgroup of every positive rational cyclotomic
 layer is the whole original Galois group. -/
@@ -382,7 +324,7 @@ theorem lowerRamificationGroup_cyclotomic_card (n r : ℕ)
       (Subgroup.card_map_of_injective (cyclotomicLayerCharacter_injective p (n + 1))).symm
     _ = _ := by
       rw [lowerRamificationGroup_cyclotomic_map_character p n r hr,
-        cyclotomicUnitReduction_ker_card p n r hr0 hr]
+        ZMod.card_ker_unitsMap_prime_pow p n r hr0 hr]
 
 /-- Real and integer numbering agree at every cyclotomic lower threshold. -/
 theorem lowerRamificationGroupReal_cyclotomic_threshold (n r : ℕ) :
@@ -585,7 +527,7 @@ theorem upperRamificationGroup_cyclotomic_index
       (p ^ (r + 1)).totient := by
   rw [upperRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr hu0 hu1,
     Subgroup.index_comap_of_surjective _ (cyclotomicLayerCharacter_surjective p (n + 1)),
-    cyclotomicUnitReduction_ker_index p n (r + 1) (by omega)]
+    ZMod.index_ker_unitsMap_prime_pow p n (r + 1) (by omega)]
 
 /-- The exact cardinality of each original finite cyclotomic upper group. -/
 theorem upperRamificationGroup_cyclotomic_card

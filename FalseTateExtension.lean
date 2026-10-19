@@ -18,6 +18,15 @@ public import FalseTateExtension.PadicCoordinates
 
 public import FalseTateExtension.AffineEmbedding
 public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
+public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
+public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
+public import FalseTateExtension.Mathlib.FieldTheory.IntermediateField.Supremum
+public import FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality
+public import FalseTateExtension.Mathlib.NumberTheory.Padics.ClosedAddSubgroup
+public import FalseTateExtension.Mathlib.NumberTheory.Padics.Cyclotomic
+public import FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniformizer
+public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
+public import FalseTateExtension.Mathlib.Data.ZMod.UnitsMap
 
 public import FalseTateExtension.CyclotomicImage
 
@@ -31,6 +40,7 @@ public import FalseTateExtension.Padic.Cyclotomic
 public import FalseTateExtension.Padic.CyclotomicRamification
 public import FalseTateExtension.Padic.CyclotomicUpper
 public import FalseTateExtension.Padic.FiniteCharacter
+public import FalseTateExtension.Padic.CyclotomicRestriction
 public import FalseTateExtension.Padic.InfiniteCharacter
 public import FalseTateExtension.Padic.GeneralCharacter
 public import FalseTateExtension.Padic.CyclotomicResidueBound

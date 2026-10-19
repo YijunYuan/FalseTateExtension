@@ -42,12 +42,6 @@ theorem isPrimitiveRoot_cyclotomicLayerRoot (m : ℕ) :
   (isPrimitiveRoot_rootOfUnity (K := ℚ_[p]) p m).of_map_of_injective
     (f := (cyclotomicLayer (K := ℚ_[p]) p m).val) (cyclotomicLayer p m).val.injective
 
-instance cyclotomicLayer_padic_isCyclotomicExtension (m : ℕ) :
-    IsCyclotomicExtension {p ^ m} (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m) := by
-  have : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
-  have hζ := (isPrimitiveRoot_rootOfUnity (K := ℚ_[p]) p m)
-  exact hζ.intermediateField_adjoin_isCyclotomicExtension (ℚ_[p])
-
 /-- The norm of the actual cyclotomic uniformizer candidate, with its sign
 retained also for `p = 2` at the first level. -/
 theorem norm_cyclotomicLayerRoot_sub_one (n : ℕ) :

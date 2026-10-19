@@ -570,7 +570,7 @@ theorem upperRamificationGroup_falseTate_index (n r : ℕ) (hr : r ≤ n)
     finiteUpperAffine_translation_index π n (by linarith [Nat.cast_nonneg (α := ℝ) r]),
     finiteUpperAffine_unit_interval π n r hr hu0 hu1,
     finiteUnitSubgroup_eq_kernel p _ _ (by omega),
-    cyclotomicUnitReduction_ker_index p n (r + 1) (by omega)]
+    ZMod.index_ker_unitsMap_prime_pow p n (r + 1) (by omega)]
 
 include hp₂ hπ in
 /-- The original upper index after the final cyclotomic break. -/

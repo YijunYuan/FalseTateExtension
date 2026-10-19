@@ -86,7 +86,8 @@ theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
     IntermediateField.adjoin.finrank (hi.tower_top : IsIntegral K (rootOfUnity p m))
   rw [hdim]
   have hd := minpoly.dvd_map_of_isScalarTower (ℚ_[p]) K (rootOfUnity (K := K) p m)
-  rw [Padic.minpoly_primitive_root p m (isPrimitiveRoot_rootOfUnity (K := K) p m)] at hd
+  rw [← (isPrimitiveRoot_rootOfUnity (K := K) p m).minpoly_eq_cyclotomic_of_irreducible
+    (Padic.irreducible_cyclotomic_prime_pow p m)] at hd
   exact (Polynomial.natDegree_le_of_dvd hd ((cyclotomic.monic _ _).map _).ne_zero).trans_eq
     (by rw [Polynomial.natDegree_map, natDegree_cyclotomic])
 
