@@ -13,15 +13,30 @@ public import Mathlib.NumberTheory.Padics.RingHoms
 public import FontaineWintenberger.LocalField.Spectral.Transport
 
 /-!
-# The residue-degree bound for finite cyclotomic layers
+# The residue degree of the cyclotomic layers over a finite extension of `ℚ_[p]`
 
-Inside a cyclotomic layer over a finite extension of the p-adic
-rationals, the same primitive root generates a rational cyclotomic subfield.
-Its total ramification, the minimal-polynomial degree bound and local
-ramification-index towers give the sharp residue-degree bound by the base
-ramification index. Compatible valuation rings are identified explicitly.
+Let `K/ℚ_[p]` be a finite extension with ramification index `e = e(K/ℚ_[p])`. The residue
+degree of `K(ζ_{p^{n+1}})/K` is at most `e`: the subfield `ℚ_[p](ζ_{p^{n+1}})` of
+`K(ζ_{p^{n+1}})` is totally ramified of degree `φ(p^{n+1})` over `ℚ_[p]`, while
+`[K(ζ_{p^{n+1}}) : K] ≤ φ(p^{n+1})`. The file also records that the inertia group of
+`ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]` is the whole Galois group, that every `p^{n+1}`-th cyclotomic
+extension of `ℚ_[p]` is totally ramified, and that the spectral integer ring of
+`K(ζ_{p^{n+1}})` is the valuation ring of every valuation extending the valuation of `K`.
 
-This proves blueprint `ft:cyclotomic-finite-residue-bound`.
+## Main results
+
+* `cyclotomicLayer_padic_upper_zero`: `G^0 = G` for `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]`
+* `rationalCyclotomic_ramificationIdx`: every `p^{n+1}`-th cyclotomic extension of `ℚ_[p]` has
+  ramification index `φ(p^{n+1})`
+* `finrank_cyclotomicLayer_le_totient`: `[K(ζ_{p^m}) : K] ≤ φ(p^m)`
+* `cyclotomicLayer_spectral_residueDegree_le`: `f(K(ζ_{p^{n+1}})/K) ≤ e(K/ℚ_[p])`
+* `cyclotomicLayer_extensionValuationSubring_eq`: the spectral integer ring of
+  `K(ζ_{p^{n+1}})` is the valuation ring of every extension of the valuation of `K`
+
+## References
+
+* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
+* Liu, *On lattices in semi-stable representations*, §5.1.
 -/
 
 @[expose] public section
@@ -34,8 +49,7 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- Rational cyclotomic layers have full inertia, by the
-ramification index and the inertia-cardinality theorem. -/
+/-- The inertia group `G^0` of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]` is the whole Galois group. -/
 theorem cyclotomicLayer_padic_upper_zero (n : ℕ) :
     upperRamificationGroup
       (R := spectralIntegerRing (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
@@ -49,8 +63,8 @@ theorem cyclotomicLayer_padic_upper_zero (n : ℕ) :
   exact h.trans ((finrank_cyclotomicLayer_padic p (n + 1)).symm.trans
     (IsGalois.card_aut_eq_finrank (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1))).symm)
 
-/-- Total ramification transfers to every rational prime-power
-cyclotomic field via its field and integer-ring isomorphisms. -/
+/-- Every `p^{n+1}`-th cyclotomic extension `F/ℚ_[p]` is totally ramified: the ramification
+index of the spectral integer ring of `F` over `𝒪[ℚ_[p]]` is `φ(p^{n+1})`. -/
 theorem rationalCyclotomic_ramificationIdx (n : ℕ)
     (F : Type*) [Field F] [Algebra (ℚ_[p]) F] [FiniteDimensional (ℚ_[p]) F]
     [IsCyclotomicExtension {p ^ (n + 1)} (ℚ_[p]) F] :
@@ -75,8 +89,7 @@ section Fields
 
 variable {K : Type*} [Field K] [CharZero K] [Algebra (ℚ_[p]) K]
 
-/-- The finite cyclotomic layer has degree at most the rational
-prime-power totient, by minimal-polynomial divisibility under scalar extension. -/
+/-- For `K/ℚ_[p]`, `[K(ζ_{p^m}) : K] ≤ φ(p^m)`. -/
 theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
     Module.finrank K (cyclotomicLayer (K := K) p m) ≤ (p ^ m).totient := by
   have hi := (isPrimitiveRoot_rootOfUnity (K := K) p m).isIntegral
@@ -91,14 +104,14 @@ theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
   exact (Polynomial.natDegree_le_of_dvd hd ((cyclotomic.monic _ _).map _).ne_zero).trans_eq
     (by rw [Polynomial.natDegree_map, natDegree_cyclotomic])
 
-/-- The rational cyclotomic subfield inside the same finite layer. -/
+/-- The subfield `ℚ_[p](ζ_{p^m})` of `K(ζ_{p^m})`. -/
 def rationalCyclotomicSubfield (m : ℕ) :
     IntermediateField (ℚ_[p]) (cyclotomicLayer (K := K) p m) :=
   IntermediateField.adjoin (ℚ_[p])
     {(⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)}
 
 omit [Algebra (ℚ_[p]) K] in
-/-- The generator in the finite layer remains primitive. -/
+/-- `ζ_{p^m}` is a primitive `p^m`-th root of unity in `K(ζ_{p^m})`. -/
 theorem isPrimitiveRoot_cyclotomicLayer_generator (m : ℕ) :
     IsPrimitiveRoot
       (⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)
@@ -108,6 +121,8 @@ theorem isPrimitiveRoot_cyclotomicLayer_generator (m : ℕ) :
 
 variable [FiniteDimensional (ℚ_[p]) K]
 
+/-- For `K/ℚ_[p]` finite, the subfield `ℚ_[p](ζ_{p^m})` of `K(ζ_{p^m})` is a `p^m`-th cyclotomic
+extension of `ℚ_[p]`. -/
 instance rationalCyclotomicSubfield_isCyclotomicExtension (m : ℕ) :
     IsCyclotomicExtension {p ^ m} (ℚ_[p]) (rationalCyclotomicSubfield (K := K) p m) := by
   have : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
@@ -117,6 +132,7 @@ instance rationalCyclotomicSubfield_isCyclotomicExtension (m : ℕ) :
   exact hζ.intermediateField_adjoin_isCyclotomicExtension (ℚ_[p])
 
 omit [FiniteDimensional (ℚ_[p]) K] in
+/-- The subfield `ℚ_[p](ζ_{p^m})` of `K(ζ_{p^m})` is finite over `ℚ_[p]`. -/
 instance rationalCyclotomicSubfield_finiteDimensional (m : ℕ) :
     FiniteDimensional (ℚ_[p]) (rationalCyclotomicSubfield (K := K) p m) :=
   IntermediateField.adjoin.finiteDimensional
@@ -131,8 +147,8 @@ variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [IsCompleteDiscreteValuedField K]
     [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The spectral integer ring of the same finite layer
-has residue degree bounded by the base ramification index. -/
+/-- For `K/ℚ_[p]` finite, the residue degree of `K(ζ_{p^{n+1}})/K` is at most the ramification
+index `e(K/ℚ_[p])`. -/
 theorem cyclotomicLayer_spectral_residueDegree_le (n : ℕ) :
     Module.finrank
         (𝓀[K])
@@ -207,8 +223,8 @@ theorem cyclotomicLayer_spectral_residueDegree_le (n : ℕ) :
   exact Nat.le_of_mul_le_mul_left (hb.trans_eq (Nat.mul_comm _ _)) he
 
 omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
-/-- Any compatible extension valuation has exactly the spectral
-integer ring, as a subring of the same finite cyclotomic layer. -/
+/-- The spectral integer ring of `K(ζ_{p^{n+1}})` is the valuation ring of every valuation on
+`K(ζ_{p^{n+1}})` extending the valuation of `K`. -/
 theorem cyclotomicLayer_extensionValuationSubring_eq (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)

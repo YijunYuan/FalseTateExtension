@@ -12,14 +12,26 @@ public import FontaineWintenberger.Ramification.Lower.Basic
 public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 
 /-!
-# Total ramification of the rational cyclotomic layers
+# Total ramification of the cyclotomic layers over `ℚ_[p]`
 
-The norm of a primitive prime-power root minus one is `(-1)^d * p`, retaining
-the sign at order two. The normalized norm-valuation identity then
-forces residue degree one and makes this element a uniformizer of the
-extension valuation ring. The ramification index is the field degree.
-This proves blueprint `ft:cyclotomic-total-ramification`; see Serre,
-*Local Fields*, Chapter IV, Section 4, Proposition 17.
+Let `ζ = ζ_{p^{n+1}}` be a primitive `p^{n+1}`-th root of unity. Then
+`N_{ℚ_[p](ζ)/ℚ_[p]}(ζ - 1) = (-1)^{φ(p^{n+1})} p`, so for every valuation `w` on `ℚ_[p](ζ)`
+extending the valuation of `ℚ_[p]` the residue degree is `1`, `ζ - 1` is a uniformizer of the
+valuation ring of `w`, and the ramification index is `[ℚ_[p](ζ) : ℚ_[p]] = φ(p^{n+1})`: the
+extension `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]` is totally ramified. The same statements hold for the
+spectral integer ring of `ℚ_[p](ζ)`.
+
+## Main results
+
+* `norm_cyclotomicLayerRoot_sub_one`: `N(ζ_{p^{n+1}} - 1) = (-1)^{φ(p^{n+1})} p`
+* `cyclotomicLayer_residueDegree`: the residue degree of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]` is `1`
+* `cyclotomicUniformizer`, `irreducible_cyclotomicUniformizer`: `ζ_{p^{n+1}} - 1` is a uniformizer
+* `cyclotomicLayer_ramificationIdx_eq_totient`: the ramification index is `φ(p^{n+1})`
+* `cyclotomicLayer_spectral_ramificationIdx`: the same for the spectral integer ring
+
+## References
+
+* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
 -/
 
 @[expose] public section
@@ -33,17 +45,17 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- The primitive root, viewed in its finite cyclotomic field. -/
+/-- The primitive `p^m`-th root of unity `ζ_{p^m}` as an element of `ℚ_[p](ζ_{p^m})`. -/
 def cyclotomicLayerRoot (m : ℕ) : cyclotomicLayer (K := ℚ_[p]) p m :=
   ⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩
 
+/-- `ζ_{p^m}` is a primitive `p^m`-th root of unity in `ℚ_[p](ζ_{p^m})`. -/
 theorem isPrimitiveRoot_cyclotomicLayerRoot (m : ℕ) :
     IsPrimitiveRoot (cyclotomicLayerRoot p m) (p ^ m) :=
   (isPrimitiveRoot_rootOfUnity (K := ℚ_[p]) p m).of_map_of_injective
     (f := (cyclotomicLayer (K := ℚ_[p]) p m).val) (cyclotomicLayer p m).val.injective
 
-/-- The norm of the cyclotomic uniformizer candidate, with its sign
-retained also for `p = 2` at the first level. -/
+/-- `N_{ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]}(ζ_{p^{n+1}} - 1) = (-1)^{φ(p^{n+1})} p`. -/
 theorem norm_cyclotomicLayerRoot_sub_one (n : ℕ) :
     Algebra.norm (ℚ_[p]) (cyclotomicLayerRoot p (n + 1) - 1) =
       (-1 : ℚ_[p]) ^ (p ^ (n + 1)).totient * p := by
@@ -58,6 +70,8 @@ theorem norm_cyclotomicLayerRoot_sub_one (n : ℕ) :
   simpa only [coeff_zero_eq_eval_zero, eval_comp, eval_add, eval_X, eval_one,
     zero_add, eval_one_cyclotomic_prime_pow] using hn
 
+/-- The valuation ring of a valuation on `ℚ_[p](ζ_{p^m})` extending the valuation of `ℚ_[p]` is
+a discrete valuation ring. -/
 instance cyclotomicValuationSubring_isDiscreteValuationRing (m : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p m) Γ)
@@ -66,8 +80,8 @@ instance cyclotomicValuationSubring_isDiscreteValuationRing (m : ℕ)
   FontaineWintenberger.extensionValuationSubring_isDiscreteValuationRing
     (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m) w
 
-/-- The field norm identity forces a unit normalized norm valuation
-for the cyclotomic generator, multiplied by the residue degree. -/
+/-- For a valuation `w` on `ℚ_[p](ζ_{p^{n+1}})` extending the valuation of `ℚ_[p]`, with residue
+degree `f`, the normalized valuation `v` of `w` satisfies `v(ζ_{p^{n+1}} - 1)^f = exp (-1)`. -/
 theorem cyclotomicLayer_normalizedValuation_pow (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -83,8 +97,8 @@ theorem cyclotomicLayer_normalizedValuation_pow (n : ℕ)
   simpa only [map_mul, map_pow, Valuation.map_neg, map_one, one_pow, one_mul,
     padicUnitBall_normalizedValuation_p] using hn.symm
 
-/-- Every extension valuation has residue degree one on a positive
-cyclotomic layer. -/
+/-- Every valuation on `ℚ_[p](ζ_{p^{n+1}})` extending the valuation of `ℚ_[p]` has residue
+degree `1`. -/
 theorem cyclotomicLayer_residueDegree (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -99,8 +113,8 @@ theorem cyclotomicLayer_residueDegree (n : ℕ)
       (IsLocalRing.ResidueField w.valuationSubring) : ℤ) ∣ (1 : ℤ) := by simpa using hd
   exact Nat.dvd_one.mp (Int.natCast_dvd_natCast.mp hd')
 
-/-- The normalized extension valuation sends the cyclotomic generator
-minus one to its least positive additive valuation. -/
+/-- For a valuation `w` on `ℚ_[p](ζ_{p^{n+1}})` extending the valuation of `ℚ_[p]`, the
+normalized valuation of `ζ_{p^{n+1}} - 1` is `exp (-1)`. -/
 theorem cyclotomicLayer_normalizedValuation_sub_one (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -110,7 +124,8 @@ theorem cyclotomicLayer_normalizedValuation_sub_one (n : ℕ)
   simpa only [cyclotomicLayer_residueDegree p n w, pow_one] using
     cyclotomicLayer_normalizedValuation_pow p n w
 
-/-- The cyclotomic generator minus one belongs to the integer ring. -/
+/-- `ζ_{p^{n+1}} - 1` lies in the valuation ring of every valuation on `ℚ_[p](ζ_{p^{n+1}})`
+extending the valuation of `ℚ_[p]`. -/
 theorem cyclotomicLayerRoot_sub_one_mem (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -121,15 +136,16 @@ theorem cyclotomicLayerRoot_sub_one_mem (n : ℕ)
   rw [cyclotomicLayer_normalizedValuation_sub_one]
   exact WithZero.exp_le_one_iff.mpr (by norm_num)
 
-/-- The cyclotomic uniformizer as an element of the integer ring. -/
+/-- `ζ_{p^{n+1}} - 1` as an element of the valuation ring of a valuation `w` on
+`ℚ_[p](ζ_{p^{n+1}})` extending the valuation of `ℚ_[p]`. -/
 def cyclotomicUniformizer (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
     [(NormedField.valuation (K := ℚ_[p])).HasExtension w] : w.valuationSubring :=
   ⟨cyclotomicLayerRoot p (n + 1) - 1, cyclotomicLayerRoot_sub_one_mem p n w⟩
 
-/-- The cyclotomic generator minus one is irreducible in the
-extension valuation ring. -/
+/-- `ζ_{p^{n+1}} - 1` is a uniformizer of the valuation ring of every valuation on
+`ℚ_[p](ζ_{p^{n+1}})` extending the valuation of `ℚ_[p]`. -/
 theorem irreducible_cyclotomicUniformizer (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -156,8 +172,8 @@ theorem irreducible_cyclotomicUniformizer (n : ℕ)
     (π : cyclotomicLayer p (n + 1)) = cyclotomicLayerRoot p (n + 1) - 1 at hu
   exact (mul_comm _ _).trans hu
 
-/-- The ramification index of a positive cyclotomic layer equals its
-field degree. -/
+/-- The ramification index of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]`, for any valuation extending the
+valuation of `ℚ_[p]`, equals the degree `[ℚ_[p](ζ_{p^{n+1}}) : ℚ_[p]]`. -/
 theorem cyclotomicLayer_ramificationIdx (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -168,7 +184,8 @@ theorem cyclotomicLayer_ramificationIdx (n : ℕ)
     (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) w
   simpa only [cyclotomicLayer_residueDegree p n w, mul_one] using h
 
-/-- In particular the ramification index is the expected totient. -/
+/-- The ramification index of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]`, for any valuation extending the
+valuation of `ℚ_[p]`, is `φ(p^{n+1})`. -/
 theorem cyclotomicLayer_ramificationIdx_eq_totient (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
@@ -177,8 +194,8 @@ theorem cyclotomicLayer_ramificationIdx_eq_totient (n : ℕ)
       (p ^ (n + 1)).totient := by
   rw [cyclotomicLayer_ramificationIdx, finrank_cyclotomicLayer_padic]
 
-/-- The spectral integer ring of the positive cyclotomic
-layer has residue degree one over the base unit ball. -/
+/-- The spectral integer ring of `ℚ_[p](ζ_{p^{n+1}})` has residue degree `1` over
+`𝒪[ℚ_[p]]`. -/
 theorem cyclotomicLayer_spectral_residueDegree (n : ℕ) :
     Module.finrank (𝓀[ℚ_[p]])
       (IsLocalRing.ResidueField (FontaineWintenberger.spectralIntegerRing (ℚ_[p])
@@ -186,16 +203,15 @@ theorem cyclotomicLayer_spectral_residueDegree (n : ℕ) :
   cyclotomicLayer_residueDegree p n (FontaineWintenberger.spectralValuation (ℚ_[p])
     (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
 
-/-- The same cyclotomic element is a uniformizer in the
-spectral integer ring, including at the first dyadic level. -/
+/-- `ζ_{p^{n+1}} - 1` is a uniformizer of the spectral integer ring of `ℚ_[p](ζ_{p^{n+1}})`. -/
 theorem irreducible_cyclotomicUniformizer_spectral (n : ℕ) :
     Irreducible (cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation (ℚ_[p])
       (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))) :=
   irreducible_cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation (ℚ_[p])
     (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
 
-/-- The spectral cyclotomic extension is totally ramified:
-its ramification index equals its degree, namely the prime-power totient. -/
+/-- `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]` is totally ramified: the ramification index of the spectral
+integer ring of `ℚ_[p](ζ_{p^{n+1}})` over `𝒪[ℚ_[p]]` is `φ(p^{n+1})`. -/
 theorem cyclotomicLayer_spectral_ramificationIdx (n : ℕ) :
     (IsLocalRing.maximalIdeal (FontaineWintenberger.spectralIntegerRing (ℚ_[p])
       (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))).ramificationIdx 𝒪[ℚ_[p]] =

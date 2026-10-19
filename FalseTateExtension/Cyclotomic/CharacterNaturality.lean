@@ -11,17 +11,27 @@ public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
-# Naturality and openness of the cyclotomic character
+# The image of the cyclotomic character over a finite extension of `ℚ_[p]`
 
-The character is natural for field embeddings intertwining
-automorphisms. On the algebraic closure of a finite extension of the
-p-adic rationals, its scalar-restriction image has index equal to the base
-degree. Surjectivity over the rational base therefore makes the
-cyclotomic character image finite index, with index dividing that degree.
-Its closedness then proves openness.
+The cyclotomic character `Gal(Ω/ℚ_[p]) → ℤ_[p]ˣ` of any algebraic closure `Ω` of `ℚ_[p]` is
+surjective. For a field `K` of characteristic zero, the cyclotomic character of `K(ζ_{p^∞})/K`
+is the restriction of the cyclotomic character of `Gal(K̄/K)`. When `K/ℚ_[p]` is finite, the
+image of `χ : Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ` is the image of the subgroup `Gal(K̄/K)` of
+`Gal(K̄/ℚ_[p])`; it is an open subgroup of `ℤ_[p]ˣ` of finite index dividing `[K : ℚ_[p]]`.
 
-This proves blueprint `ft:cyclotomic-character-naturality` and
-`ft:cyclotomic-image-open`.
+## Main results
+
+* `cyclotomicCharacter_surjective_of_isAlgClosure`: the cyclotomic character of `Gal(Ω/ℚ_[p])`
+  is surjective for every algebraic closure `Ω` of `ℚ_[p]`
+* `cyclotomicCharacter_restrict_cyclotomicExtension`: the character of `K(ζ_{p^∞})/K` is the
+  restriction of the character of `K̄/K`
+* `cyclotomicExtensionCharacter_finiteIndex`, `cyclotomicExtensionCharacter_index_dvd`: for
+  `K/ℚ_[p]` finite, the image of `χ` has finite index dividing `[K : ℚ_[p]]`
+* `isOpen_cyclotomicExtensionCharacter_range`: the image of `χ` is open in `ℤ_[p]ˣ`
+
+## References
+
+* Liu, *On lattices in semi-stable representations*, §5.1.
 -/
 
 @[expose] public section
@@ -32,8 +42,8 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- On the algebraic closure of the p-adic rationals, the
-character is surjective by restriction to the cyclotomic subfield. -/
+/-- The cyclotomic character `Gal(ℚ̄_p/ℚ_[p]) → ℤ_[p]ˣ` of `AlgebraicClosure ℚ_[p]` is
+surjective. -/
 theorem cyclotomicCharacter_algebraicClosure_padic_surjective :
     Function.Surjective ((_root_.cyclotomicCharacter (AlgebraicClosure (ℚ_[p])) p).comp
       (MulSemiringAction.toRingAut
@@ -50,8 +60,8 @@ theorem cyclotomicCharacter_algebraicClosure_padic_surjective :
     (AlgEquiv.restrictNormal_commutes h (cyclotomicExtension (K := ℚ_[p]) p))
   exact hc.symm.trans hg
 
-/-- Naturality transfers the rational surjectivity to any
-algebraic closure of the p-adic rationals. -/
+/-- For every algebraic closure `Ω` of `ℚ_[p]`, the cyclotomic character `Gal(Ω/ℚ_[p]) → ℤ_[p]ˣ`
+is surjective. -/
 theorem cyclotomicCharacter_surjective_of_isAlgClosure
     (Ω : Type*) [Field Ω] [Algebra (ℚ_[p]) Ω] [IsAlgClosure (ℚ_[p]) Ω] :
     Function.Surjective ((_root_.cyclotomicCharacter Ω p).comp
@@ -70,8 +80,8 @@ theorem cyclotomicCharacter_surjective_of_isAlgClosure
 
 variable {K : Type*} [Field K] [CharZero K]
 
-/-- The cyclotomic-subfield character is the restriction of the
-character of the same algebraic closure. -/
+/-- For `g ∈ Gal(K̄/K)`, the cyclotomic character of `K(ζ_{p^∞})/K` at the restriction of `g`
+to `K(ζ_{p^∞})` equals the cyclotomic character of `K̄` at `g`. -/
 theorem cyclotomicCharacter_restrict_cyclotomicExtension
     (g : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) :
     cyclotomicExtensionCharacter p (g.restrictNormal (cyclotomicExtension (K := K) p)) =
@@ -84,8 +94,8 @@ theorem cyclotomicCharacter_restrict_cyclotomicExtension
 
 variable [Algebra (ℚ_[p]) K]
 
-/-- The cyclotomic character image is the image of the
-scalar-restriction subgroup in the same algebraic closure. -/
+/-- For `K/ℚ_[p]`, the image of the cyclotomic character of `Gal(K(ζ_{p^∞})/K)` is the image of
+the subgroup `Gal(K̄/K) ≤ Gal(K̄/ℚ_[p])` under the cyclotomic character of `K̄`. -/
 theorem cyclotomicExtensionCharacter_range_eq_map :
     (cyclotomicExtensionCharacter (K := K) p).range =
       (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range.map
@@ -104,8 +114,8 @@ theorem cyclotomicExtensionCharacter_range_eq_map :
 
 variable [FiniteDimensional (ℚ_[p]) K]
 
-/-- The character image has finite index; its index does
-not take the zero value reserved for infinite index. -/
+/-- For `K/ℚ_[p]` finite, the image of the cyclotomic character `Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ`
+has finite index. -/
 instance cyclotomicExtensionCharacter_finiteIndex :
     (cyclotomicExtensionCharacter (K := K) p).range.FiniteIndex := by
   let S := (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range
@@ -116,7 +126,8 @@ instance cyclotomicExtensionCharacter_finiteIndex :
   exact Subgroup.FiniteIndex.map_of_surjective S
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
 
-/-- The cyclotomic image index divides the finite base degree. -/
+/-- For `K/ℚ_[p]` finite, the index of the image of the cyclotomic character
+`Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ` divides `[K : ℚ_[p]]`. -/
 theorem cyclotomicExtensionCharacter_index_dvd :
     (cyclotomicExtensionCharacter (K := K) p).range.index ∣ Module.finrank (ℚ_[p]) K := by
   rw [cyclotomicExtensionCharacter_range_eq_map]
@@ -125,13 +136,14 @@ theorem cyclotomicExtensionCharacter_index_dvd :
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
   simpa only [AlgEquiv.index_range_restrictScalarsHom] using h
 
-/-- In particular the image index is a positive integer. -/
+/-- For `K/ℚ_[p]` finite, the index of the image of the cyclotomic character of
+`Gal(K(ζ_{p^∞})/K)` is positive. -/
 theorem cyclotomicExtensionCharacter_index_pos :
     0 < (cyclotomicExtensionCharacter (K := K) p).range.index :=
   Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
 
-/-- The cyclotomic character image is open at every prime,
-by its finite index and its closed embedding. -/
+/-- For `K/ℚ_[p]` finite, the image of the cyclotomic character `Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ`
+is an open subgroup of `ℤ_[p]ˣ`. -/
 theorem isOpen_cyclotomicExtensionCharacter_range :
     IsOpen ((cyclotomicExtensionCharacter (K := K) p).range : Set (ℤ_[p])ˣ) :=
   Subgroup.isOpen_of_isClosed_of_finiteIndex _

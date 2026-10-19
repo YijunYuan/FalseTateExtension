@@ -11,18 +11,30 @@ public import FontaineWintenberger.Ramification.Lower.SpectralMaps
 public import Mathlib.NumberTheory.Padics.ProperSpace
 
 /-!
-# Completion of the cyclotomic residue and inertia proofs
+# The residue field of `K(ζ_{p^∞})` and the character image of inertia
 
-Inclusions induce compatible local maps on the spectral
-integer rings and injective maps on their residue fields. Exhaustion
-by finite layers and the uniform residue-degree bound show that a finite
-layer already maps isomorphically onto the infinite extension's residue
-field. The character maps inertia onto an open subgroup
-of the p-adic units containing a nonidentity element.
+Let `K/ℚ_[p]` be a finite extension. The residue field of the spectral integer ring of
+`K(ζ_{p^∞})` is the union of the residue fields of the layers `K(ζ_{p^{n+1}})`; since their
+degrees over `𝓀[K]` are bounded by `e(K/ℚ_[p])`, some layer `K(ζ_{p^{N+1}})` has the same
+residue field as `K(ζ_{p^∞})`, and the residue degree of `K(ζ_{p^∞})/K` is finite and at most
+`e(K/ℚ_[p])`. The cyclotomic character `χ : Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ` is an open embedding,
+and the image under `χ` of the inertia subgroup of `Gal(K̄/K)` is an open subgroup of `ℤ_[p]ˣ`
+of finite index.
 
-This completes blueprint `ft:cyclotomic-infinite-residue-bound` and
-`ft:cyclotomic-inertia`. Completion here concerns the proofs, not a
-completion of the infinite cyclotomic field as a valued field.
+## Main results
+
+* `exists_cyclotomicResidueEquiv`: for some `N`, the residue field of `K(ζ_{p^{N+1}})` maps
+  isomorphically onto the residue field of `K(ζ_{p^∞})`
+* `cyclotomicExtension_residue_degree_le`: the residue degree of `K(ζ_{p^∞})/K` is at most
+  `e(K/ℚ_[p])`
+* `cyclotomicInertiaCharacterImage`: the image `χ(Gal(K̄/K)^0) ≤ ℤ_[p]ˣ`
+* `isOpenEmbedding_cyclotomicExtensionCharacter`: `χ` is an open embedding
+* `isOpen_cyclotomicInertiaCharacterImage`, `cyclotomicInertiaCharacterImage_finiteIndex`:
+  `χ(Gal(K̄/K)^0)` is open of finite index in `ℤ_[p]ˣ`
+
+## References
+
+* Liu, *On lattices in semi-stable representations*, §5.1.
 -/
 
 @[expose] public section
@@ -40,8 +52,8 @@ section CyclotomicResidues
 variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [IsCompleteDiscreteValuedField K]
 
-/-- The base-residue algebra map from a positive layer to
-the residue field of the infinite spectral integer ring. -/
+/-- The `𝓀[K]`-algebra map from the residue field of `K(ζ_{p^{n+1}})` to the residue field of
+`K(ζ_{p^∞})`, induced by the inclusion of spectral integer rings. -/
 def cyclotomicResidueToExtension (n : ℕ) :
     IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) →ₐ[
       𝓀[K]]
@@ -49,7 +61,8 @@ def cyclotomicResidueToExtension (n : ℕ) :
   spectralResidueInclusion K (IntermediateField.inclusion
     (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1)))
 
-/-- The residue inclusion between two positive layers. -/
+/-- The `𝓀[K]`-algebra map from the residue field of `K(ζ_{p^{n+1}})` to the residue field of
+`K(ζ_{p^{m+1}})`, `n ≤ m`, induced by the inclusion of spectral integer rings. -/
 def cyclotomicResidueBetweenLayers {n m : ℕ} (h : n ≤ m) :
     IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) →ₐ[
       𝓀[K]]
@@ -57,6 +70,8 @@ def cyclotomicResidueBetweenLayers {n m : ℕ} (h : n ≤ m) :
   spectralResidueInclusion K
     (IntermediateField.inclusion (cyclotomicLayer_mono (K := K) p (Nat.add_le_add_right h 1)))
 
+/-- For `n ≤ m`, the residue map from `K(ζ_{p^{n+1}})` to `K(ζ_{p^∞})` factors through the
+residue field of `K(ζ_{p^{m+1}})`. -/
 theorem cyclotomicResidueToExtension_comp {n m : ℕ} (h : n ≤ m) :
     cyclotomicResidueToExtension p K n =
       (cyclotomicResidueToExtension p K m).comp (cyclotomicResidueBetweenLayers p K h) := by
@@ -64,8 +79,8 @@ theorem cyclotomicResidueToExtension_comp {n m : ℕ} (h : n ≤ m) :
   rw [← spectralResidueInclusion_comp]
   congr 1
 
-/-- Every infinite residue class has an integral representative
-already in a positive finite layer. -/
+/-- Every element of the residue field of `K(ζ_{p^∞})` is the image of an element of the residue
+field of some layer `K(ζ_{p^{n+1}})`. -/
 theorem exists_cyclotomicResidueToExtension_preimage
     (z : IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicExtension (K := K) p))) :
     ∃ n, ∃ x, cyclotomicResidueToExtension p K n x = z := by
@@ -95,6 +110,7 @@ theorem exists_cyclotomicResidueToExtension_preimage
 variable [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
+/-- The residue degrees `f(K(ζ_{p^{n+1}})/K)` are nondecreasing in `n`. -/
 theorem cyclotomicResidue_degree_monotone :
     Monotone (fun n ↦ Module.finrank
       (𝓀[K])
@@ -104,8 +120,8 @@ theorem cyclotomicResidue_degree_monotone :
     (f := (cyclotomicResidueBetweenLayers p K h).toLinearMap)
     (cyclotomicResidueBetweenLayers p K h).injective
 
-/-- Bounded finite residue degrees make the residue map from some
-positive layer bijective onto the infinite residue field. -/
+/-- For `K/ℚ_[p]` finite, the residue map from some layer `K(ζ_{p^{N+1}})` to `K(ζ_{p^∞})` is
+bijective. -/
 theorem exists_cyclotomicResidueToExtension_bijective :
     ∃ N, Function.Bijective (cyclotomicResidueToExtension p K N) := by
   obtain ⟨b, N, hN⟩ := converges_of_monotone_of_bounded
@@ -133,8 +149,8 @@ theorem exists_cyclotomicResidueToExtension_bijective :
       (congrArg (fun f ↦ f x) (cyclotomicResidueToExtension_comp p K (le_max_left m N))).symm
     _ = z := hx
 
-/-- An attained finite layer's residue field is isomorphic to the
-infinite residue field, with its residue-map evaluation. -/
+/-- For `K/ℚ_[p]` finite, the residue map from some layer `K(ζ_{p^{N+1}})` to `K(ζ_{p^∞})` is
+an isomorphism of `𝓀[K]`-algebras. -/
 theorem exists_cyclotomicResidueEquiv :
     ∃ N, ∃ e : IsLocalRing.ResidueField
         (spectralIntegerRing K (cyclotomicLayer (K := K) p (N + 1))) ≃ₐ[
@@ -144,8 +160,7 @@ theorem exists_cyclotomicResidueEquiv :
   obtain ⟨N, hN⟩ := exists_cyclotomicResidueToExtension_bijective p K
   exact ⟨N, AlgEquiv.ofBijective (cyclotomicResidueToExtension p K N) hN, fun _ ↦ rfl⟩
 
-/-- The infinite residue extension is finite-dimensional. This is
-before using a natural-number finrank bound for that extension. -/
+/-- For `K/ℚ_[p]` finite, the residue field of `K(ζ_{p^∞})` is finite over `𝓀[K]`. -/
 theorem cyclotomicExtension_residue_finiteDimensional :
     FiniteDimensional
       (𝓀[K])
@@ -153,8 +168,7 @@ theorem cyclotomicExtension_residue_finiteDimensional :
   obtain ⟨N, e, _⟩ := exists_cyclotomicResidueEquiv p K
   exact Module.Finite.equiv e.toLinearEquiv
 
-/-- The infinite residue degree satisfies the sharp bound by the
-base ramification index. -/
+/-- For `K/ℚ_[p]` finite, the residue degree of `K(ζ_{p^∞})/K` is at most `e(K/ℚ_[p])`. -/
 theorem cyclotomicExtension_residue_degree_le :
     Module.finrank
       (𝓀[K])
@@ -173,15 +187,14 @@ variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZ
     [IsCompleteDiscreteValuedField K]
     [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The character image of absolute zero upper inertia, through
-restriction to the infinite cyclotomic field. -/
+/-- The subgroup `χ(Gal(K̄/K)^0)` of `ℤ_[p]ˣ`: the image of the inertia subgroup of `Gal(K̄/K)`
+under restriction to `K(ζ_{p^∞})` followed by the cyclotomic character. -/
 def cyclotomicInertiaCharacterImage : Subgroup (ℤ_[p])ˣ := by
   exact (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
     ((cyclotomicExtensionCharacter (K := K) p).comp
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)))
 
-/-- Full infinite upper restriction identifies the absolute inertia image
-with the character image of the infinite cyclotomic zero upper group. -/
+/-- `χ(Gal(K̄/K)^0) = χ(Gal(K(ζ_{p^∞})/K)^0)`. -/
 theorem cyclotomicInertiaCharacterImage_eq_map :
     cyclotomicInertiaCharacterImage p K =
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).map
@@ -190,8 +203,7 @@ theorem cyclotomicInertiaCharacterImage_eq_map :
   rw [← Subgroup.map_map, cyclotomic_inertia_eq_absolute_image p K]
 
 omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
-/-- Naturality identifies the same image with the
-character acting on the algebraic closure. -/
+/-- `χ(Gal(K̄/K)^0)` is the image of `Gal(K̄/K)^0` under the cyclotomic character of `K̄`. -/
 theorem cyclotomicInertiaCharacterImage_eq_absolute_character :
     cyclotomicInertiaCharacterImage p K =
       (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
@@ -210,20 +222,21 @@ theorem cyclotomicInertiaCharacterImage_eq_absolute_character :
   rw [hc]
 
 omit [IsCompleteDiscreteValuedField K] in
-/-- The character is an open embedding because its
-closed image has already been open. -/
+/-- For `K/ℚ_[p]` finite, the cyclotomic character `Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ` is an open
+embedding. -/
 theorem isOpenEmbedding_cyclotomicExtensionCharacter :
     Topology.IsOpenEmbedding (cyclotomicExtensionCharacter (K := K) p) :=
   ⟨(isClosedEmbedding_cyclotomicExtensionCharacter p).isEmbedding,
     isOpen_cyclotomicExtensionCharacter_range p⟩
 
-/-- Absolute inertia has open character image in the p-adic units. -/
+/-- `χ(Gal(K̄/K)^0)` is an open subgroup of `ℤ_[p]ˣ`. -/
 theorem isOpen_cyclotomicInertiaCharacterImage :
     IsOpen (cyclotomicInertiaCharacterImage p K : Set (ℤ_[p])ˣ) := by
   rw [cyclotomicInertiaCharacterImage_eq_map]
   exact (isOpenEmbedding_cyclotomicExtensionCharacter p K).isOpenMap _
     (isOpen_cyclotomic_inertia p K)
 
+/-- `χ(Gal(K̄/K)^0)` has finite index in `ℤ_[p]ˣ`. -/
 theorem cyclotomicInertiaCharacterImage_finiteIndex :
     (cyclotomicInertiaCharacterImage p K).FiniteIndex := by
   let := (cyclotomicInertiaCharacterImage p K).quotient_finite_of_isOpen

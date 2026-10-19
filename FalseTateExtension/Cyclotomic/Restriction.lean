@@ -12,8 +12,17 @@ public import Mathlib.FieldTheory.Galois.Profinite
 /-!
 # Restriction between cyclotomic layers
 
-Restriction of `K`-automorphisms from `K(ζ_{p^∞})` to the finite layer `K(ζ_{p^m})`, and between
-two finite layers. These are continuous surjections compatible with the inclusions of layers.
+For a field `K` of characteristic zero, restriction of `K`-automorphisms from `K(ζ_{p^∞})` to
+the finite layer `K(ζ_{p^m})`, and from `K(ζ_{p^n})` to `K(ζ_{p^m})` for `m ≤ n`, are surjective
+group homomorphisms compatible with the inclusions of the layers; restriction from `K(ζ_{p^∞})`
+is continuous for the Krull topology and factors through every intermediate layer.
+
+## Main results
+
+* `cyclotomicRestrictionToLayer`: `Gal(K(ζ_{p^∞})/K) →* Gal(K(ζ_{p^m})/K)`
+* `cyclotomicRestrictionBetweenLayers`: `Gal(K(ζ_{p^n})/K) →* Gal(K(ζ_{p^m})/K)` for `m ≤ n`
+* `cyclotomicRestrictionToLayer_surjective`, `continuous_cyclotomicRestrictionToLayer`
+* `cyclotomicRestrictionToLayer_comp`: restriction to `K(ζ_{p^m})` factors through `K(ζ_{p^n})`
 -/
 
 @[expose] public section
@@ -24,12 +33,13 @@ namespace FalseTateExtension
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
-/-- Restriction from `K(ζ_{p^∞})` to the layer `K(ζ_{p^m})`. -/
+/-- The restriction homomorphism `Gal(K(ζ_{p^∞})/K) →* Gal(K(ζ_{p^m})/K)`. -/
 def cyclotomicRestrictionToLayer (m : ℕ) :
     (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →*
       (cyclotomicLayer (K := K) p m ≃ₐ[K] cyclotomicLayer (K := K) p m) :=
   IntermediateField.restrictNormalHomOfLE (cyclotomicLayer_le_cyclotomicExtension p m)
 
+/-- The restriction of `g` to `K(ζ_{p^m})` agrees with `g` on `K(ζ_{p^m}) ⊆ K(ζ_{p^∞})`. -/
 theorem cyclotomicRestrictionToLayer_commutes (m : ℕ)
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)
     (x : cyclotomicLayer (K := K) p m) :
@@ -38,11 +48,12 @@ theorem cyclotomicRestrictionToLayer_commutes (m : ℕ)
       g (IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m) x) :=
   IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
+/-- Restriction `Gal(K(ζ_{p^∞})/K) → Gal(K(ζ_{p^m})/K)` is surjective. -/
 theorem cyclotomicRestrictionToLayer_surjective (m : ℕ) :
     Function.Surjective (cyclotomicRestrictionToLayer (K := K) p m) :=
   IntermediateField.restrictNormalHomOfLE_surjective _
 
-/-- Restriction to a finite layer is continuous for the Krull topologies. -/
+/-- Restriction `Gal(K(ζ_{p^∞})/K) → Gal(K(ζ_{p^m})/K)` is continuous for the Krull topology. -/
 theorem continuous_cyclotomicRestrictionToLayer (m : ℕ) :
     Continuous (cyclotomicRestrictionToLayer (K := K) p m) := by
   let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := K) p m)
@@ -66,12 +77,13 @@ theorem continuous_cyclotomicRestrictionToLayer (m : ℕ) :
   rw [he]
   exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
 
-/-- Restriction from the layer `K(ζ_{p^n})` to `K(ζ_{p^m})`, `m ≤ n`. -/
+/-- The restriction homomorphism `Gal(K(ζ_{p^n})/K) →* Gal(K(ζ_{p^m})/K)` for `m ≤ n`. -/
 def cyclotomicRestrictionBetweenLayers {m n : ℕ} (h : m ≤ n) :
     (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) →*
       (cyclotomicLayer (K := K) p m ≃ₐ[K] cyclotomicLayer (K := K) p m) :=
   IntermediateField.restrictNormalHomOfLE (cyclotomicLayer_mono p h)
 
+/-- The restriction of `g` to `K(ζ_{p^m})` agrees with `g` on `K(ζ_{p^m}) ⊆ K(ζ_{p^n})`. -/
 theorem cyclotomicRestrictionBetweenLayers_commutes {m n : ℕ} (h : m ≤ n)
     (g : cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n)
     (x : cyclotomicLayer (K := K) p m) :
@@ -80,6 +92,8 @@ theorem cyclotomicRestrictionBetweenLayers_commutes {m n : ℕ} (h : m ≤ n)
       g (IntermediateField.inclusion (cyclotomicLayer_mono p h) x) :=
   IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
+/-- For `m ≤ n`, restriction from `K(ζ_{p^∞})` to `K(ζ_{p^m})` is restriction to `K(ζ_{p^n})`
+followed by restriction to `K(ζ_{p^m})`. -/
 theorem cyclotomicRestrictionToLayer_comp {m n : ℕ} (h : m ≤ n) :
     cyclotomicRestrictionToLayer (K := K) p m =
       (cyclotomicRestrictionBetweenLayers p h).comp (cyclotomicRestrictionToLayer p n) :=

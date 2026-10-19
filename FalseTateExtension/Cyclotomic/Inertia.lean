@@ -12,17 +12,31 @@ public import FontaineWintenberger.Ramification.Infinite.Restriction
 public import Mathlib.FieldTheory.IntermediateField.Adjoin.Algebra
 
 /-!
-# Stabilization of cyclotomic inertia preimages
+# The inertia subgroup of `Gal(K(ζ_{p^∞})/K)`
 
-Restriction to the finite cyclotomic layers gives decreasing
-open normal subgroups. Their indices are the finite residue degrees,
-uniformly bounded by the base ramification index. Their stabilization and
-cofinality of the layers prove openness of the infinite zero
-upper group. Infinite restriction identifies it with the image of
-the zero upper group of the algebraic closure.
+Let `K/ℚ_[p]` be a finite extension. The preimages in `G = Gal(K(ζ_{p^∞})/K)` of the inertia
+subgroups of the finite layers `K(ζ_{p^{n+1}})/K` form a decreasing sequence of open normal
+subgroups `I_n` whose indices are the residue degrees `f(K(ζ_{p^{n+1}})/K) ≤ e(K/ℚ_[p])`. The
+sequence is eventually constant, its intersection is the inertia subgroup `G^0`, and therefore
+`G^0` is open in `G` of index at most `e(K/ℚ_[p])`. The restriction `Gal(K̄/K) → G` maps the
+inertia subgroup of `Gal(K̄/K)` onto `G^0`.
 
-This proves blueprint `ft:cyclotomic-inertia-preimages`. No identification
-with an infinite residue quotient is asserted here.
+## Main results
+
+* `cyclotomicFiniteLayer`, `exists_le_cyclotomicFiniteLayer`: the layers `K(ζ_{p^{n+1}})` are
+  cofinal among the finite subextensions of `K(ζ_{p^∞})/K`
+* `cyclotomicInertiaPreimage`, `cyclotomicInertiaPreimage_index_le`: the subgroups `I_n`, of
+  index `f(K(ζ_{p^{n+1}})/K) ≤ e(K/ℚ_[p])`
+* `upperRamificationGroupInfinite_cyclotomic_eq_iInf`: `G^0 = ⋂ I_n`
+* `exists_cyclotomic_inertia_eq_preimage`: `G^0 = I_N` for some `N`
+* `isOpen_cyclotomic_inertia`, `cyclotomic_inertia_index_le`: `G^0` is open of index at most
+  `e(K/ℚ_[p])`
+* `cyclotomic_inertia_eq_absolute_image`: `G^0` is the image of the inertia subgroup of
+  `Gal(K̄/K)`
+
+## References
+
+* Liu, *On lattices in semi-stable representations*, §5.1.
 -/
 
 @[expose] public section
@@ -37,8 +51,7 @@ section Fields
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
-/-- The positive layer, viewed by its inclusion as a finite
-Galois intermediate field of the infinite cyclotomic field. -/
+/-- The layer `K(ζ_{p^{n+1}})` as a finite Galois intermediate field of `K(ζ_{p^∞})/K`. -/
 def cyclotomicFiniteLayer (n : ℕ) :
     FiniteGaloisIntermediateField K (cyclotomicExtension (K := K) p) := by
   let i := IntermediateField.inclusion
@@ -47,14 +60,14 @@ def cyclotomicFiniteLayer (n : ℕ) :
   let : IsGalois K i.fieldRange := IsGalois.of_algEquiv i.equivFieldRange
   exact .mk i.fieldRange
 
-/-- The inclusion is an isomorphism onto the finite field range. -/
+/-- The `K`-algebra isomorphism `K(ζ_{p^{n+1}}) ≃ₐ[K] cyclotomicFiniteLayer p n`. -/
 def cyclotomicFiniteLayerEquiv (n : ℕ) :
     cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicFiniteLayer (K := K) p n :=
   (IntermediateField.inclusion
     (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1))).equivFieldRange
 
-/-- Restriction to the field range is conjugate to restriction to the
-finite layer through the inclusion isomorphism. -/
+/-- Restriction `Gal(K(ζ_{p^∞})/K) → Gal(cyclotomicFiniteLayer p n / K)` is
+`cyclotomicRestrictionToLayer p (n + 1)` transported along `cyclotomicFiniteLayerEquiv p n`. -/
 theorem restrictNormal_cyclotomicFiniteLayer (n : ℕ)
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
     g.restrictNormal (cyclotomicFiniteLayer (K := K) p n) =
@@ -73,8 +86,7 @@ theorem restrictNormal_cyclotomicFiniteLayer (n : ℕ)
   exact (AlgEquiv.restrictNormal_commutes g (cyclotomicFiniteLayer (K := K) p n) (e y)).trans
     (cyclotomicRestrictionToLayer_commutes p (n + 1) g y).symm
 
-/-- Every finite intermediate field is contained in a positive
-cyclotomic layer. No finiteness of the infinite field is needed. -/
+/-- Every finite subextension of `K(ζ_{p^∞})/K` is contained in some `K(ζ_{p^{n+1}})`. -/
 theorem exists_le_cyclotomicFiniteLayer
     (E : IntermediateField K (cyclotomicExtension (K := K) p)) [FiniteDimensional K E] :
     ∃ n, E ≤ (cyclotomicFiniteLayer (K := K) p n).toIntermediateField := by
@@ -105,16 +117,15 @@ variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZ
 
 include p in
 omit [CharZero K] in
-/-- The residue field of a finite compatible extension of the
-p-adic rationals is finite. -/
+/-- The residue field of a finite extension `K/ℚ_[p]` is finite. -/
 theorem cyclotomicBase_residueFinite :
     Finite (𝓀[K]) := by
   have := normedAlgebra_residueField_finiteDimensional (ℚ_[p]) K
   exact Module.finite_of_finite
     (𝓀[ℚ_[p]])
 
-/-- The finite Galois quotient by zero upper inertia has order the
-residue degree, via the residue automorphism group. -/
+/-- The index of the inertia subgroup `G^0` of `Gal(K(ζ_{p^{n+1}})/K)` is the residue degree
+`f(K(ζ_{p^{n+1}})/K)`. -/
 theorem cyclotomicLayer_inertia_index (n : ℕ) :
     (upperRamificationGroup
       (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
@@ -130,8 +141,8 @@ theorem cyclotomicLayer_inertia_index (n : ℕ) :
   exact (Nat.card_congr (localResidueGaloisEquiv R S G).toEquiv).trans
     (IsGalois.card_aut_eq_finrank (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField S))
 
-/-- The preimage of finite zero upper inertia in the infinite
-cyclotomic Galois group. Its index is numbered by the positive level `n+1`. -/
+/-- The subgroup `I_n` of `Gal(K(ζ_{p^∞})/K)`: the preimage of the inertia subgroup of
+`Gal(K(ζ_{p^{n+1}})/K)` under restriction. -/
 def cyclotomicInertiaPreimage (n : ℕ) :
     Subgroup (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) := by
   exact (upperRamificationGroup
@@ -139,22 +150,26 @@ def cyclotomicInertiaPreimage (n : ℕ) :
     (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0).comap
       (cyclotomicRestrictionToLayer p (n + 1))
 
+/-- `I_n` has finite index in `Gal(K(ζ_{p^∞})/K)`. -/
 instance cyclotomicInertiaPreimage_finiteIndex (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).FiniteIndex := by
   unfold cyclotomicInertiaPreimage
   infer_instance
 
+/-- `I_n` is a normal subgroup of `Gal(K(ζ_{p^∞})/K)`. -/
 instance cyclotomicInertiaPreimage_normal (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).Normal := by
   unfold cyclotomicInertiaPreimage
   infer_instance
 
 omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
+/-- `I_n` is open in `Gal(K(ζ_{p^∞})/K)`. -/
 theorem isOpen_cyclotomicInertiaPreimage (n : ℕ) :
     IsOpen (cyclotomicInertiaPreimage p K n :
       Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
   exact (isOpen_discrete _).preimage (continuous_cyclotomicRestrictionToLayer p (n + 1))
 
+/-- The index of `I_n` in `Gal(K(ζ_{p^∞})/K)` is the residue degree `f(K(ζ_{p^{n+1}})/K)`. -/
 theorem cyclotomicInertiaPreimage_index (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).index = Module.finrank
       (𝓀[K])
@@ -163,6 +178,7 @@ theorem cyclotomicInertiaPreimage_index (n : ℕ) :
     (cyclotomicRestrictionToLayer_surjective p (n + 1))]
   exact cyclotomicLayer_inertia_index p K n
 
+/-- The index of `I_n` in `Gal(K(ζ_{p^∞})/K)` is at most `e(K/ℚ_[p])`. -/
 theorem cyclotomicInertiaPreimage_index_le (n : ℕ) :
     (cyclotomicInertiaPreimage p K n).index ≤
       (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx
@@ -170,7 +186,7 @@ theorem cyclotomicInertiaPreimage_index_le (n : ℕ) :
   rw [cyclotomicInertiaPreimage_index]
   exact cyclotomicLayer_spectral_residueDegree_le p K n
 
-/-- Finite upper restriction makes the inertia preimages decrease. -/
+/-- `I_n ⊇ I_m` for `n ≤ m`. -/
 theorem cyclotomicInertiaPreimage_antitone : Antitone (cyclotomicInertiaPreimage p K) := by
   let := cyclotomicBase_residueFinite p K
   intro m n h g hg
@@ -191,13 +207,13 @@ theorem cyclotomicInertiaPreimage_antitone : Antitone (cyclotomicInertiaPreimage
     (by norm_num : (-1 : ℝ) ≤ 0)]
   exact Subgroup.mem_map.mpr ⟨cyclotomicRestrictionToLayer p (n + 1) g, hg, rfl⟩
 
+/-- The index of `I_n` in `Gal(K(ζ_{p^∞})/K)` is nondecreasing in `n`. -/
 theorem cyclotomicInertiaPreimage_index_monotone :
     Monotone (fun n ↦ (cyclotomicInertiaPreimage p K n).index) := by
   intro m n h
   exact Subgroup.index_antitone (cyclotomicInertiaPreimage_antitone p K h)
 
-/-- Uniformly bounded positive indices force stabilization of the
-decreasing subgroups, and their intersection is an attained preimage. -/
+/-- There is an `N` with `I_n = I_N` for all `n ≥ N`, and `⋂ I_n = I_N`. -/
 theorem exists_cyclotomicInertiaPreimage_stable :
     ∃ N, (∀ n, N ≤ n → cyclotomicInertiaPreimage p K n = cyclotomicInertiaPreimage p K N) ∧
       (⨅ n, cyclotomicInertiaPreimage p K n) = cyclotomicInertiaPreimage p K N := by
@@ -212,8 +228,7 @@ theorem exists_cyclotomicInertiaPreimage_stable :
   · rw [hstable n hn]
   · exact cyclotomicInertiaPreimage_antitone p K hn
 
-/-- Cofinality of the positive layers identifies the infinite
-zero upper group with the intersection of the inertia preimages. -/
+/-- The inertia subgroup `G^0` of `Gal(K(ζ_{p^∞})/K)` is `⋂ I_n`. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
     upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
       ⨅ n, cyclotomicInertiaPreimage p K n := by
@@ -254,8 +269,8 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
       (by norm_num : (-1 : ℝ) ≤ 0)]
     exact Subgroup.mem_map.mpr ⟨g.restrictNormal (cyclotomicFiniteLayer (K := K) p n), hD, hres⟩
 
-/-- The infinite inertia group is already an attained finite-layer
-inertia preimage, and all subsequent preimages are the same subgroup. -/
+/-- There is an `N` with `G^0 = I_N` for the inertia subgroup `G^0` of `Gal(K(ζ_{p^∞})/K)`,
+and `I_n = I_N` for all `n ≥ N`. -/
 theorem exists_cyclotomic_inertia_eq_preimage :
     ∃ N, upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
         cyclotomicInertiaPreimage p K N ∧
@@ -263,13 +278,14 @@ theorem exists_cyclotomic_inertia_eq_preimage :
   obtain ⟨N, hstable, hinf⟩ := exists_cyclotomicInertiaPreimage_stable p K
   exact ⟨N, (upperRamificationGroupInfinite_cyclotomic_eq_iInf p K).trans hinf, hstable⟩
 
+/-- The inertia subgroup `G^0` of `Gal(K(ζ_{p^∞})/K)` has finite index. -/
 theorem cyclotomic_inertia_finiteIndex :
     (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).FiniteIndex := by
   obtain ⟨N, hN, _⟩ := exists_cyclotomic_inertia_eq_preimage p K
   rw [hN]
   infer_instance
 
-/-- The infinite inertia index retains the sharp finite-layer bound. -/
+/-- The index of the inertia subgroup `G^0` of `Gal(K(ζ_{p^∞})/K)` is at most `e(K/ℚ_[p])`. -/
 theorem cyclotomic_inertia_index_le :
     (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).index ≤
       (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx
@@ -278,8 +294,7 @@ theorem cyclotomic_inertia_index_le :
   rw [hN]
   exact cyclotomicInertiaPreimage_index_le p K N
 
-/-- The zero upper group is open in the Krull Galois group of the
-infinite cyclotomic extension. -/
+/-- The inertia subgroup `G^0` of `Gal(K(ζ_{p^∞})/K)` is open. -/
 theorem isOpen_cyclotomic_inertia :
     IsOpen (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 :
       Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
@@ -287,8 +302,8 @@ theorem isOpen_cyclotomic_inertia :
   rw [hN]
   exact isOpen_cyclotomicInertiaPreimage p K N
 
-/-- Full infinite restriction identifies the cyclotomic
-inertia with the image of the algebraic closure's zero upper group. -/
+/-- Restriction `Gal(K̄/K) → Gal(K(ζ_{p^∞})/K)` maps the inertia subgroup of `Gal(K̄/K)` onto
+the inertia subgroup of `Gal(K(ζ_{p^∞})/K)`. -/
 theorem cyclotomic_inertia_eq_absolute_image :
     (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)) =

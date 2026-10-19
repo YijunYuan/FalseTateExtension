@@ -12,10 +12,34 @@ public import FontaineWintenberger.Ramification.Upper.Basic
 public import FalseTateExtension.Mathlib.Data.ZMod.UnitsMap
 
 /-!
-# The rational cyclotomic ramification filtration
+# The ramification filtration of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]`
 
-The cyclotomic uniformizer and its conjugates determine the integer
-and real lower groups, supplying the finite input for the Herbrand integrals.
+Let `G = Gal(ℚ_[p](ζ_{p^{n+1}})/ℚ_[p])` with cyclotomic character `χ : G ≃ (ℤ/p^{n+1})ˣ`, and
+let `G^{(r)} = ker((ℤ/p^{n+1})ˣ → (ℤ/p^r)ˣ)` for `0 ≤ r ≤ n + 1`. For `g ≠ 1` with
+`v_p(χ(g) - 1) = s`, the displacement `g(ζ) - ζ` has additive valuation `p^s`, so the
+ramification order `i_G(g)` is `p^s`. Hence the lower numbering filtration is
+`G_t = G^{(r+1)}` for `p^r - 1 < t ≤ p^{r+1} - 1`, with `G_0 = G` and `G_{p^r - 1}` of index
+`φ(p^r)` and order `p^{n+1-r}`; the Herbrand function sends `p^r - 1` to `r`; and the upper
+numbering filtration is `G^u = G^{(r+1)}` for `r < u ≤ r + 1`, with `G^0 = G` and `G^u = 1` for
+`u > n`.
+
+## Main results
+
+* `ramificationOrder_cyclotomic`: `i_G(g) = p^{v_p(χ(g) - 1)}` for `g ≠ 1`
+* `lowerRamificationGroup_cyclotomic_eq_comap_unitReduction`: `G_{p^r - 1} = G^{(r)}`
+* `lowerRamificationGroupReal_cyclotomic_constant`: `G_t` is constant for
+  `p^r - 1 < t ≤ p^{r+1} - 1`
+* `herbrandFunction_cyclotomic_threshold`: the Herbrand function sends `p^r - 1` to `r`
+* `upperRamificationGroup_cyclotomic_eq_comap_unitReduction`: `G^u = G^{(r+1)}` for
+  `r < u ≤ r + 1`
+* `upperRamificationGroup_cyclotomic_index`, `upperRamificationGroup_cyclotomic_card`:
+  `(G : G^u) = φ(p^{r+1})` and `|G^u| = p^{n-r}` for `r < u ≤ r + 1`
+* `upperRamificationGroup_cyclotomic_zero`, `upperRamificationGroup_cyclotomic_eq_bot`:
+  `G^0 = G` and `G^u = 1` for `u > n`
+
+## References
+
+* Serre, *Local Fields*, Chapter IV, §4, Propositions 17 and 18.
 -/
 
 @[expose] public section
@@ -29,7 +53,7 @@ open FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
 
--- `(1 : ℕ)` elaborates the eagerly. A bare `n + 1` leaves a postponed `OfNat ℕ 1`
+-- `(1 : ℕ)` elaborates eagerly. A bare `n + 1` leaves a postponed `OfNat ℕ 1`
 -- metavariable in the index, so instance goals on the integer-ring tower below contain a
 -- metavariable, bypass the instance cache and unfold `cyclotomicLayer` at every unification.
 local notation "L(" n ")" => cyclotomicLayer (K := ℚ_[p]) p (n + (1 : ℕ))
@@ -42,8 +66,8 @@ local instance (n : ℕ) : IsDiscreteValuationRing O(n) :=
 local notation "v(" n ")" =>
   IsDedekindDomain.HeightOneSpectrum.valuation L(n) (maximalIdeal O(n))
 
-/-- Every primitive root in the layer has the signed cyclotomic
-norm; the sign is retained at the first dyadic level. -/
+/-- For every primitive `p^{n+1}`-th root of unity `ζ ∈ ℚ_[p](ζ_{p^{n+1}})`,
+`N_{ℚ_[p](ζ)/ℚ_[p]}(ζ - 1) = (-1)^{φ(p^{n+1})} p`. -/
 theorem norm_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
     (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) :
     Algebra.norm ℚ_[p] (ζ - 1) = (-1 : ℚ_[p]) ^ (p ^ (n + 1)).totient * p := by
@@ -57,8 +81,8 @@ theorem norm_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
   simpa only [coeff_zero_eq_eval_zero, eval_comp, eval_add, eval_X, eval_one,
     zero_add, eval_one_cyclotomic_prime_pow] using hn
 
-/-- The normalized spectral valuation of any primitive root minus
-one is the uniformizer value, at every positive layer and every prime. -/
+/-- For every primitive `p^{n+1}`-th root of unity `ζ ∈ ℚ_[p](ζ_{p^{n+1}})`, the normalized
+valuation of `ζ - 1` is `exp (-1)`. -/
 theorem normalizedValuation_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
     (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) :
     v(n) (ζ - 1) = WithZero.exp (-1 : ℤ) := by
@@ -69,8 +93,8 @@ theorem normalizedValuation_primitive_cyclotomic_sub_one (n : ℕ) {ζ : L(n)}
   simpa only [map_mul, map_pow, Valuation.map_neg, map_one, one_pow, one_mul,
     padicUnitBall_normalizedValuation_p] using hn.symm
 
-/-- Prime-power powers of a primitive root have their exact normalized
-displacement valuation in the layer, including the first dyadic layer. -/
+/-- For a primitive `p^{n+1}`-th root of unity `ζ ∈ ℚ_[p](ζ_{p^{n+1}})` and `s ≤ n`, the
+normalized valuation of `ζ^{p^s} - 1` is `exp (-p^s)`. -/
 theorem normalizedValuation_primitive_cyclotomic_pow_sub_one
     (n s : ℕ) (hs : s ≤ n) {ζ : L(n)}
     (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) :
@@ -89,8 +113,8 @@ theorem normalizedValuation_primitive_cyclotomic_pow_sub_one
       padicUnitBall_normalizedValuation_p] at hv
     simpa using hv.symm
 
-/-- A nonidentity unit exponent has a prime-power displacement with a
-coprime remaining factor, strictly below the cyclotomic level. -/
+/-- Every unit `a ≠ 1` of `ℤ/p^{n+1}` has representative `1 + p^s b` with `s = v_p(a - 1) ≤ n`
+and `p ∤ b`. -/
 theorem cyclotomic_exponent_decomposition (n : ℕ)
     (a : (ZMod (p ^ (n + 1)))ˣ) (ha : a ≠ 1) :
     ∃ b : ℕ, padicValNat p ((a : ZMod (p ^ (n + 1))).val - 1) ≤ n ∧ ¬ p ∣ b ∧
@@ -121,16 +145,16 @@ theorem cyclotomic_exponent_decomposition (n : ℕ)
   dsimp [d]
   omega
 
-/-- A root of unity has unit value for the normalized spectral
-valuation. -/
+/-- A primitive `p^{n+1}`-th root of unity in `ℚ_[p](ζ_{p^{n+1}})` has normalized valuation
+`1`. -/
 theorem normalizedValuation_primitive_cyclotomic_root (n : ℕ) {ζ : L(n)}
     (hζ : IsPrimitiveRoot ζ (p ^ (n + 1))) : v(n) ζ = 1 := by
   apply (pow_eq_one_iff_of_nonneg (show 0 ≤ v(n) ζ from zero_le)
     (pow_ne_zero (n + 1) (Fact.out : p.Prime).ne_zero)).mp
   rw [← map_pow, hζ.pow_eq_one, map_one]
 
-/-- The finite character computes the exact normalized displacement
-of the cyclotomic root in its field. -/
+/-- If `χ(g) = 1 + p^s b` with `s ≤ n` and `p ∤ b`, then the normalized valuation of
+`g(ζ_{p^{n+1}}) - ζ_{p^{n+1}}` is `exp (-p^s)`. -/
 theorem normalizedValuation_cyclotomic_displacement_of_exponent
     (n s b : ℕ) (hs : s ≤ n) (hb : ¬ p ∣ b)
     (g : L(n) ≃ₐ[ℚ_[p]] L(n))
@@ -151,8 +175,8 @@ theorem normalizedValuation_cyclotomic_displacement_of_exponent
   rw [heq, map_mul, normalizedValuation_primitive_cyclotomic_root p n hζ, one_mul]
   exact hv
 
-/-- Every nonidentity automorphism has a cyclotomic displacement
-with a prime-power order below the level. -/
+/-- For `g ≠ 1`, the normalized valuation of `g(ζ_{p^{n+1}}) - ζ_{p^{n+1}}` is `exp (-p^s)` for
+some `s ≤ n`. -/
 theorem normalizedValuation_cyclotomic_displacement
     (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (hg : g ≠ 1) :
     ∃ s : ℕ, s ≤ n ∧
@@ -165,8 +189,7 @@ theorem normalizedValuation_cyclotomic_displacement
   obtain ⟨b, hs, hb, ha⟩ := cyclotomic_exponent_decomposition p n _ ha
   exact ⟨_, hs, normalizedValuation_cyclotomic_displacement_of_exponent p n _ b hs hb g ha⟩
 
-/-- The cyclotomic uniformizer generates the spectral
-integer ring over the p-adic base integers. -/
+/-- The spectral integer ring of `ℚ_[p](ζ_{p^{n+1}})` is `𝒪[ℚ_[p]][ζ_{p^{n+1}} - 1]`. -/
 theorem cyclotomicUniformizer_adjoin_spectral (n : ℕ) :
     Algebra.adjoin 𝒪[ℚ_[p]]
       {cyclotomicUniformizer p n (FontaineWintenberger.spectralValuation ℚ_[p] L(n))} = ⊤ :=
@@ -175,8 +198,8 @@ theorem cyclotomicUniformizer_adjoin_spectral (n : ℕ) :
     (cyclotomicLayer_ramificationIdx p n _)
     (irreducible_cyclotomicUniformizer_spectral p n)
 
-/-- The ramification order is exactly the prime-power displacement
-read from the finite character. -/
+/-- If `χ(g) = 1 + p^s b` with `s ≤ n` and `p ∤ b`, then the ramification order `i_G(g)` is
+`p^s`. -/
 theorem ramificationOrder_cyclotomic_of_exponent
     (n s b : ℕ) (hs : s ≤ n) (hb : ¬ p ∣ b)
     (g : L(n) ≃ₐ[ℚ_[p]] L(n))
@@ -207,8 +230,7 @@ theorem ramificationOrder_cyclotomic_of_exponent
   simp
   norm_cast
 
-/-- The ramification order of a nonidentity automorphism is the
-prime power specified by the p-adic order of its character minus one. -/
+/-- For `g ≠ 1`, the ramification order `i_G(g)` is `p^{v_p(χ(g) - 1)}`. -/
 theorem ramificationOrder_cyclotomic (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (hg : g ≠ 1) :
     FontaineWintenberger.ramificationOrder (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) g =
       (p ^ padicValNat p
@@ -220,8 +242,7 @@ theorem ramificationOrder_cyclotomic (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (
   obtain ⟨b, hs, hb, ha⟩ := cyclotomic_exponent_decomposition p n _ ha
   exact ramificationOrder_cyclotomic_of_exponent p n _ b hs hb g ha
 
-/-- The integer lower groups, expressed by the finite
-cyclotomic character, with the identity handled separately. -/
+/-- `g ∈ G_m` if and only if `g = 1` or `m + 1 ≤ p^{v_p(χ(g) - 1)}`. -/
 theorem mem_lowerRamificationGroup_cyclotomic_iff
     (n : ℕ) (m : ℤ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) :
     g ∈ FontaineWintenberger.lowerRamificationGroup
@@ -236,8 +257,7 @@ theorem mem_lowerRamificationGroup_cyclotomic_iff
       ramificationOrder_cyclotomic p n g hg]
     simp only [hg, false_or, ENat.natCast_le_natCast]
 
-/-- The real lower groups, with their closed break endpoints, are
-computed by the finite cyclotomic character. -/
+/-- For real `t`, `g ∈ G_t` if and only if `g = 1` or `t + 1 ≤ p^{v_p(χ(g) - 1)}`. -/
 theorem mem_lowerRamificationGroupReal_cyclotomic_iff
     (n : ℕ) (t : ℝ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) :
     g ∈ FontaineWintenberger.lowerRamificationGroupReal
@@ -252,8 +272,7 @@ theorem mem_lowerRamificationGroupReal_cyclotomic_iff
       ramificationOrder_cyclotomic p n g hg]
     simp only [hg, false_or, ENat.toENNReal_coe, ENNReal.ofReal_le_natCast]
 
-/-- At every integral cyclotomic threshold, the lower group is
-the preimage of the finite-unit reduction kernel. -/
+/-- For `r ≤ n + 1`, `G_{p^r - 1} = χ⁻¹(ker((ℤ/p^{n+1})ˣ → (ℤ/p^r)ˣ))`. -/
 theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
     (n r : ℕ) (hr : r ≤ n + 1) :
     FontaineWintenberger.lowerRamificationGroup
@@ -284,8 +303,7 @@ theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
     rw [pow_le_pow_iff_right₀ (Fact.out : p.Prime).one_lt,
       Nat.pow_dvd_iff_le_padicValNat (Fact.out : p.Prime).ne_one hd]
 
-/-- The exact full index of a cyclotomic lower group at a
-prime-power threshold. -/
+/-- For `r ≤ n + 1`, `(G : G_{p^r - 1}) = φ(p^r)`. -/
 theorem lowerRamificationGroup_cyclotomic_index (n r : ℕ) (hr : r ≤ n + 1) :
     (FontaineWintenberger.lowerRamificationGroup
       (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).index =
@@ -294,8 +312,7 @@ theorem lowerRamificationGroup_cyclotomic_index (n r : ℕ) (hr : r ≤ n + 1) :
     Subgroup.index_comap_of_surjective _ (cyclotomicLayerCharacter_surjective p (n + 1)),
     ZMod.index_ker_unitsMap_prime_pow p n r hr]
 
-/-- The inertia subgroup of every positive rational cyclotomic
-layer is the whole Galois group. -/
+/-- `G_0 = G`: the inertia subgroup of `Gal(ℚ_[p](ζ_{p^{n+1}})/ℚ_[p])` is the whole group. -/
 theorem lowerRamificationGroup_cyclotomic_zero (n : ℕ) :
     FontaineWintenberger.lowerRamificationGroup
       (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) 0 = ⊤ := by
@@ -303,8 +320,7 @@ theorem lowerRamificationGroup_cyclotomic_zero (n : ℕ) :
   simpa only [pow_zero, Nat.cast_one, sub_self, Nat.totient_one] using
     lowerRamificationGroup_cyclotomic_index p n 0 (by omega)
 
-/-- The finite character maps a lower threshold group onto the
-finite-unit reduction kernel. -/
+/-- For `r ≤ n + 1`, `χ(G_{p^r - 1}) = ker((ℤ/p^{n+1})ˣ → (ℤ/p^r)ˣ)`. -/
 theorem lowerRamificationGroup_cyclotomic_map_character (n r : ℕ) (hr : r ≤ n + 1) :
     (FontaineWintenberger.lowerRamificationGroup
       (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).map
@@ -314,7 +330,7 @@ theorem lowerRamificationGroup_cyclotomic_map_character (n r : ℕ) (hr : r ≤ 
     Subgroup.map_comap_eq,
     MonoidHom.range_eq_top.mpr (cyclotomicLayerCharacter_surjective p (n + 1)), top_inf_eq]
 
-/-- Exact cardinalities of the lower threshold groups. -/
+/-- For `0 < r ≤ n + 1`, `|G_{p^r - 1}| = p^{n+1-r}`. -/
 theorem lowerRamificationGroup_cyclotomic_card (n r : ℕ)
     (hr0 : 0 < r) (hr : r ≤ n + 1) :
     Nat.card (FontaineWintenberger.lowerRamificationGroup
@@ -329,7 +345,8 @@ theorem lowerRamificationGroup_cyclotomic_card (n r : ℕ)
       rw [lowerRamificationGroup_cyclotomic_map_character p n r hr,
         ZMod.card_ker_unitsMap_prime_pow p n r hr0 hr]
 
-/-- Real and integer numbering agree at every cyclotomic lower threshold. -/
+/-- The real-indexed lower group at `p^r - 1` is the integer-indexed lower group
+`G_{p^r - 1}`. -/
 theorem lowerRamificationGroupReal_cyclotomic_threshold (n r : ℕ) :
     FontaineWintenberger.lowerRamificationGroupReal
         (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℝ) - 1) =
@@ -339,8 +356,7 @@ theorem lowerRamificationGroupReal_cyclotomic_threshold (n r : ℕ) :
   rw [mem_lowerRamificationGroupReal_cyclotomic_iff, mem_lowerRamificationGroup_cyclotomic_iff]
   simp only [sub_add_cancel, Int.toNat_natCast, Nat.cast_le]
 
-/-- The real lower group is constant between consecutive
-prime-power thresholds, open on the left and closed on the right. -/
+/-- For `p^r - 1 < t ≤ p^{r+1} - 1`, `G_t = G_{p^{r+1} - 1}`. -/
 theorem lowerRamificationGroupReal_cyclotomic_constant (n r : ℕ) {t : ℝ}
     (ht0 : ((p ^ r : ℕ) : ℝ) - 1 < t)
     (ht1 : t ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1) :
@@ -370,7 +386,7 @@ theorem lowerRamificationGroupReal_cyclotomic_constant (n r : ℕ) {t : ℝ}
     · intro h
       linarith
 
-/-- Exact lower-group cardinality on each cyclotomic interval. -/
+/-- For `r ≤ n` and `p^r - 1 < t ≤ p^{r+1} - 1`, `|G_t| = p^{n-r}`. -/
 theorem lowerRamificationGroupReal_cyclotomic_card_on (n r : ℕ) (hr : r ≤ n) {t : ℝ}
     (ht0 : ((p ^ r : ℕ) : ℝ) - 1 < t)
     (ht1 : t ≤ ((p ^ (r + 1) : ℕ) : ℝ) - 1) :
@@ -382,8 +398,7 @@ theorem lowerRamificationGroupReal_cyclotomic_card_on (n r : ℕ) (hr : r ≤ n)
   congr 1
   omega
 
-/-- Each consecutive cyclotomic lower interval has Herbrand
-length one, at every prime and including the first interval. -/
+/-- For `r ≤ n`, `∫_{p^r - 1}^{p^{r+1} - 1} |G_t| / |G_0| dt = 1`. -/
 theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
     (∫ t in (((p ^ r : ℕ) : ℝ) - 1)..(((p ^ (r + 1) : ℕ) : ℝ) - 1),
       (Nat.card (FontaineWintenberger.lowerRamificationGroupReal
@@ -427,8 +442,8 @@ theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
       ring
     _ = _ := by rw [hpower]
 
-/-- The integral-defined Herbrand function sends every
-prime-power lower threshold to its integer upper threshold. -/
+/-- The Herbrand function of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]` sends `p^r - 1` to `r` for
+`r ≤ n + 1`. -/
 theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
     FontaineWintenberger.herbrandFunction (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n))
       (((p ^ r : ℕ) : ℝ) - 1) = r := by
@@ -482,8 +497,7 @@ theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
     rw [hstep] at hadd
     simpa only [Nat.cast_add, Nat.cast_one] using hadd.symm
 
-/-- The upper group on each unit upper interval is the preimage
-of the finite-character principal-unit kernel. -/
+/-- For `r ≤ n` and `r < u ≤ r + 1`, `G^u = χ⁻¹(ker((ℤ/p^{n+1})ˣ → (ℤ/p^{r+1})ˣ))`. -/
 theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u =
@@ -516,8 +530,7 @@ theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
     lowerRamificationGroupReal_cyclotomic_threshold,
     lowerRamificationGroup_cyclotomic_eq_comap_unitReduction p n (r + 1) (by omega)]
 
-/-- The finite upper index is the expected prime-power totient
-on every closed upper interval. -/
+/-- For `r ≤ n` and `r < u ≤ r + 1`, `(G : G^u) = φ(p^{r+1})`. -/
 theorem upperRamificationGroup_cyclotomic_index
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     (FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u).index =
@@ -526,7 +539,7 @@ theorem upperRamificationGroup_cyclotomic_index
     Subgroup.index_comap_of_surjective _ (cyclotomicLayerCharacter_surjective p (n + 1)),
     ZMod.index_ker_unitsMap_prime_pow p n (r + 1) (by omega)]
 
-/-- The exact cardinality of each finite cyclotomic upper group. -/
+/-- For `r ≤ n` and `r < u ≤ r + 1`, `|G^u| = p^{n-r}`. -/
 theorem upperRamificationGroup_cyclotomic_card
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     Nat.card (FontaineWintenberger.upperRamificationGroup
@@ -537,15 +550,14 @@ theorem upperRamificationGroup_cyclotomic_card
   congr 1
   omega
 
-/-- The upper inertia group is full, including the trivial first
-dyadic layer. -/
+/-- `G^0 = G` for `G = Gal(ℚ_[p](ζ_{p^{n+1}})/ℚ_[p])`. -/
 theorem upperRamificationGroup_cyclotomic_zero (n : ℕ) :
     FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) 0 = ⊤ := by
   simpa only [FontaineWintenberger.upperRamificationGroup_zero,
     FontaineWintenberger.lowerRamificationGroup_zero] using
       lowerRamificationGroup_cyclotomic_zero p n
 
-/-- The finite upper group is trivial after the final upper break. -/
+/-- `G^u = 1` for `u > n`, where `G = Gal(ℚ_[p](ζ_{p^{n+1}})/ℚ_[p])`. -/
 theorem upperRamificationGroup_cyclotomic_eq_bot (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u = ⊥ := by
   by_cases hu1 : u ≤ (n : ℝ) + 1
