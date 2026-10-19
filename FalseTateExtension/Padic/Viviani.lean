@@ -412,7 +412,7 @@ section ActualUpper
 variable {p} (π : 𝒪[ℚ_[p]])
   [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
 
-local notation "D(" n ")" => falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
+local notation "D(" n ")" => falseTateLayer p (π : ℚ_[p]) (n + (1 : ℕ)) (n + (1 : ℕ))
 local notation "O(" n ")" => spectralIntegerRing ℚ_[p] D(n)
 local notation "G(" n ")" => D(n) ≃ₐ[ℚ_[p]] D(n)
 

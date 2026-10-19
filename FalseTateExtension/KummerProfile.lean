@@ -37,7 +37,7 @@ variable (π : 𝒪[K])
     [hπ : Fact (Irreducible π)] (n : ℕ)
 
 local notation "F₀" => radicalLayer (K := K) p (π : K) n
-local notation "F₁" => radicalLayer (K := K) p (π : K) (n + 1)
+local notation "F₁" => radicalLayer (K := K) p (π : K) (n + (1 : ℕ))
 local notation "O₀" => spectralIntegerRing K F₀
 local notation "O₁" => spectralIntegerRing K F₁
 
@@ -160,7 +160,7 @@ attribute [local instance] kummerBaseNormedField kummerBaseNormedAlgebra kummerB
   kummerStepFinite kummerStepValuation kummerStepOwnValuation
 
 local notation "F₀" => radicalLayer (K := K) p (π : K) n
-local notation "F₁" => radicalLayer (K := K) p (π : K) (n + 1)
+local notation "F₁" => radicalLayer (K := K) p (π : K) (n + (1 : ℕ))
 
 /-- The index of the radical layer `n + 1` over `K` is that of the layer `n` times the index of
 the step, evaluated at `ψ_n(u)`; the step has index `1` below its break and `p` above it. -/
