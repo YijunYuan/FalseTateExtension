@@ -348,13 +348,20 @@ FalseTateExtension.lean        每层一个聚合文件；docstring 列出六个
 | F3 | FW 分支 `false-tate-upstream`（`~/FontaineWintenberger`，提交 `6c9e973`，**尚未推送到 GitHub**；本项目 `lakefile.toml`/`lake-manifest.json` 已指向该提交，`.lake/packages/FontaineWintenberger` 从本地仓库 fetch）：A5.3 九个新叶子模块 + `irreducible_of_valuation_eq_exp_neg_one`；A2.2 (b) 失败退回 (a)。**完成后需要：推送 FW 分支并合并，使 GitHub 上存在该提交** | FW + 本项目 |
 | F4 | A2.1/A2.3/A7：`𝒪[K]`、`𝓀[K]`、`ℚ_[p]`、`ℤ_[p]` 替换；`Padic/Basic.lean`；删 `OK`/`A`/`Zp₀`/`Qp`/`eK`；所有 p 进基域 section 统一为 `[NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]`，`cyclotomicBase_isCompleteDiscreteValuedField` 与 49 处 `let :=` 删除；新定义 `falseTateDiagonalLayer`、`FalseTateGaloisGroup`（abbrev，先定义，使用随 F8 文件拆分进行）、`absoluteRamificationIdx`。**执行时调整**：Viviani 的 `D(n)`/`O(n)`/`G(n)`/`Ψ(n)`/`δ` 与 `vivianiOffset` 推迟到 F8 拆分 Viviani 时处理（这些记号同时出现在约 80 条陈述和证明中，拆文件时逐段改写比全局替换安全）；`cyclotomicBase_residueFinite` 保留为定理（`p` 不在结论中，无法成为 instance）。【已完成 2026-10-19】 | 本项目 |
 | F5 | A3：`[NeZero π]`、`[Fact (Irreducible π)]`、`[Fact (p ≠ 2)]`；`IsGalois`/`IsAPF`/`IsStrictlyAPF` 实例化；去 `hπ`/`hp₂` 穿参。**执行时调整**：(1) p 进层的 `π : 𝒪[K]` 由隐式改为**显式**变量（`Fact (Irreducible π)` 在 `rw`/`simp` 中若 π 未定会 stuck），调用点插入 `π`；(2) `RadicalRamification` 的三条通用 Eisenstein 引理（`{π : R}`，Mathlib 风格）保留显式 `(hπ : Irreducible π)`；(3) Viviani 整数参数节改为 `[Fact (padicValInt p a = 1)]` + instance `Fact (Irreducible (a : 𝒪[ℚ_[p]]))`；(4) 为做签名转储，除 `KummerProfile` 外所有 `private` 暂时去掉，F7 重新收缩接口。【已完成 2026-10-19】 | 本项目 |
-| F6 | A4 + A5.1/A5.2：`Affine/Group.lean` 与半直积拓扑；`Mathlib/` 层；`restrictNormalHomOfLE`；`autEquivPow` 替换 | 本项目 |
+| F6 | A4 + A5.1/A5.2：`Affine/Group.lean` 与半直积拓扑；`Mathlib/` 层；`restrictNormalHomOfLE`；`autEquivPow` 替换。【已完成 2026-10-20】`Mathlib/Topology/Algebra/SemidirectProduct`（一般 `N ⋊[φ] G` 的积拓扑与拓扑群实例，`ContinuousAct` 类）、`Affine/Group`（`AffineGroup A ι`），三套仿射群改为其实例化；`Mathlib/` 层 12 个文件（见 `MATHLIB_REUSE.md`）；`FiniteCharacter` 改用 `autEquivPow`；限制映射全部经 `restrictNormalHomOfLE` | 本项目 |
 | F7 | E：删除清单、合并重复（含 `SeparableTower`）、`private` 化、`set_option` 归零、陈述拆分。**执行记录**：`SeparableTower` 删除（KummerProfile 1090→762 行，88 s→32 s，20 个 `set_option` 消失）；`RadicalRamification.Relative` 的 `letI` 链提升为 section 级 local instance（2 对 `set_option` 消失，剩 1 个 `synthInstance.maxHeartbeats 100000` 在 `Module.Finite O₀ O₁` 实例上，根因是 `spectralIntegerRing` 的 `Semiring`/`AddCommMonoid` 实例查询各 1.2 s）；`kummerRamificationBreak_*` 家族**不压缩**（FalseTateNonliftability 使用 `_growth`、`_succ_dvd`、`_tendsto_real`）；`CyclotomicUpper` 两条、`CyclotomicAPF` 一条去掉 `maxHeartbeats` 后仍超时，待单独重写 | 本项目 |
-| F8 | B：目录重组与文件拆分（脚本，记录旧→新映射） | 本项目 |
-| F9 | A6：批量重命名（脚本），`τ` scoped notation | 本项目 |
-| F10 | D：docstring 重写、References、删 blueprint 引用；补目标 (5)(6) 总结定理；README 目标表 | 本项目 |
+| F8 | B：目录重组与文件拆分。【已完成 2026-10-20】`scripts/f8_move.py`、`scripts/split_file.py`；每层一个聚合文件，`check_layers.py` 启用分层检查并进 CI。**与 B 节的差异**：`Cyclotomic/Filtration` 未再拆（无 section 边界，6 s）；`Cyclotomic/APF` 未拆（顶层声明与 section 交错）；`Viviani` 拆为 `Preliminaries`/`Filtration`/`Corollary` 三文件而非六个（`Upper` 节 720 行共用局部记号）；`Coordinates/AffineImage` 实际放在 `FalseTate/AffineImage`（它用到分圆特征的开性，属 Cyclotomic 之后）；`CyclotomicImage`、`AffineKernel` 保持独立文件 | 本项目 |
+| F9 | A6：批量重命名。【已完成 2026-10-20】`scripts/f9_rename.py`（整词）+ `scripts/f9_rename_components.py`（下划线分段）。**未做**：`padicCyclotomicCharacter`/`cyclotomicExtensionCharacter` 合并、`cyclotomicLayerCharacter`/`…Over` 合并、`finiteCoordinates`/`padicCoordinates` 定义、`affineAdditiveKernel`/`affineTranslationKernel` 统一、`vivianiOffset`/`falseTateDiagonalLayer` 在 Viviani 中的使用（`D(n)`/`δ` 等局部记号仍在 `Viviani/Filtration` 的陈述中）——这些是代码级改动，留作后续 | 本项目 |
+| F10 | D：docstring 重写、References、删 blueprint 引用；目标 (6) 的整数参数版本补全（`Viviani/Corollary`，上/下分歧群与 ψ 表各档拆成单独定理）；README 目标表。【进行中 2026-10-20】`scripts/strip_filler.py` 机械去词后，docstring 按目录分四批由子任务重写 | 本项目 |
 | F11 | FalseTateNonliftability 同步：升级 FW 与本项目 rev，吸收 F2 删除的文件并按新 API 重写。**另行计划** | FalseTateNonliftability |
 
 ## 决策记录
 
 A1–A7、B、C、D、E、F 全部于 2026-10-19 与作者逐项定稿，决定写在各节开头的 **决定** 段落。
+
+## 执行后遗留（2026-10-20）
+
+- E.3 `private` 收缩：未做。理由：FalseTateNonliftability 要按新 API 重写，提前把"未被本项目其他文件引用"的 ~450 条引理设为 private 会迫使那边再逐条打开；建议在 F11 完成后，以两个项目的实际引用为准再收缩。
+- 发现并消除的编译慢根因（供 CLAUDE.md 参考）：`local notation` 里写 `(n + 1)` 时字面量 `1` 是延迟的 `OfNat` 元变量，使 `spectralIntegerRing`/`IntermediateField` 塔上的实例查询无法命中缓存（单次 1–3 s）；写 `(n + (1 : ℕ))` 即可。`CyclotomicUpper` 49 s → 6 s，`Viviani` 78 s → 31 s。
+- `kummerRamificationBreak_*` 家族保留完整（FalseTateNonliftability 使用 `_growth`、`_succ_dvd`、`_tendsto_real`）；`_tendsto_padic` 随 `PadicLimit` 节删除，那边迁移时需重建。
+- FW 分支 `false-tate-upstream`（`6c9e973`）尚未推送；`lakefile.toml` 指向该提交。
