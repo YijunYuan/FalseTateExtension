@@ -314,28 +314,29 @@ theorem rationalCyclotomicEmbedding_adjoin_base :
   have heq : y = x := Subtype.ext hxy
   exact heq ▸ hy
 
-set_option maxHeartbeats 1000000 in
--- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
+/-- In a tower `K / E / F`, if `K` is generated over `E` by an intermediate field of `K / F`
+that is finite over `F`, then `K` is finite over `E`. -/
+theorem finiteDimensional_of_adjoin_intermediateField_eq_top
+    {F E K : Type*} [Field F] [Field E] [Field K] [Algebra F E] [Algebra F K] [Algebra E K]
+    [IsScalarTower F E K] (L : IntermediateField F K) [FiniteDimensional F L]
+    (h : IntermediateField.adjoin E (L : Set K) = ⊤) : FiniteDimensional E K :=
+  have : FiniteDimensional E (IntermediateField.adjoin E (L : Set K)) :=
+    Module.rank_lt_aleph0_iff.mp
+      ((IntermediateField.adjoin_rank_le_of_isAlgebraic_right E L).trans_lt
+        (Module.rank_lt_aleph0 F L))
+  ((IntermediateField.equivOfEq h).trans
+    IntermediateField.topEquiv).toLinearEquiv.finiteDimensional
+
 /-- The actual compositum has finite degree over the embedded rational
 cyclotomic extension, because the original base is finite over `Qp`. -/
 theorem rationalCyclotomicEmbedding_finiteDimensional :
-    FiniteDimensional Cyc (cyclotomicExtension (K := K) p) := by
-  let L := (IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).fieldRange
-  let : FiniteDimensional ℚ_[p] L := Module.Finite.equiv
-    (IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).equivFieldRange.toLinearEquiv
-  let A := IntermediateField.adjoin Cyc (L : Set (cyclotomicExtension (K := K) p))
-  let : Module.Free Cyc A := Module.Free.of_divisionRing Cyc A
-  have hr := IntermediateField.adjoin_rank_le_of_isAlgebraic_right Cyc L
-  have hfinite : FiniteDimensional Cyc A :=
-    (Module.rank_lt_aleph0_iff (R := Cyc) (M := A)).mp
-      (hr.trans_lt (Module.rank_lt_aleph0 ℚ_[p] L))
-  let := hfinite
-  apply Module.Finite.of_surjective A.val.toLinearMap
-  intro x
-  refine ⟨⟨x, ?_⟩, rfl⟩
-  change x ∈ IntermediateField.adjoin Cyc (L : Set (cyclotomicExtension (K := K) p))
-  rw [rationalCyclotomicEmbedding_adjoin_base (K := K) p]
-  trivial
+    FiniteDimensional Cyc (cyclotomicExtension (K := K) p) :=
+  let : FiniteDimensional ℚ_[p]
+      (IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).fieldRange :=
+    Module.Finite.equiv (IsScalarTower.toAlgHom ℚ_[p] K
+      (cyclotomicExtension (K := K) p)).equivFieldRange.toLinearEquiv
+  finiteDimensional_of_adjoin_intermediateField_eq_top _
+    (rationalCyclotomicEmbedding_adjoin_base (K := K) p)
 
 /-- The original cyclotomic field over a finite base remains strictly APF
 over the rational base, by the proved actual finite compositum. -/

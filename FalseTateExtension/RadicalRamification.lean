@@ -369,7 +369,10 @@ variable (π : 𝒪[K])
     [hπ : Fact (Irreducible π)] (n : ℕ)
 
 local notation "F₀" => radicalLayer (K := K) p (π : K) n
-local notation "F₁" => radicalLayer (K := K) p (π : K) (n + 1)
+-- `(1 : ℕ)` elaborates the literal eagerly. A bare `n + 1` leaves a postponed `OfNat ℕ 1`
+-- metavariable in the index, so instance goals on the integer-ring tower below contain a
+-- metavariable, bypass the instance cache and unfold `radicalLayer` at every unification.
+local notation "F₁" => radicalLayer (K := K) p (π : K) (n + (1 : ℕ))
 local notation "O₀" => FontaineWintenberger.spectralIntegerRing K F₀
 local notation "O₁" => FontaineWintenberger.spectralIntegerRing K F₁
 
@@ -389,8 +392,6 @@ local instance radicalStepIntegerScalarTower : IsScalarTower 𝒪[K] O₀ O₁ :
   Valuation.HasExtension.valuationSubring_isScalarTower (NormedField.valuation (K := K))
     (FontaineWintenberger.spectralValuation K F₀) (FontaineWintenberger.spectralValuation K F₁)
 
-set_option synthInstance.maxHeartbeats 100000 in
--- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
 local instance radicalStepIntegerFinite : Module.Finite O₀ O₁ :=
   Module.Finite.of_restrictScalars_finite 𝒪[K] O₀ O₁
 

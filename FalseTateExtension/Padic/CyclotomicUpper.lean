@@ -29,7 +29,10 @@ open FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
 
-local notation "L(" n ")" => cyclotomicLayer (K := ℚ_[p]) p (n + 1)
+-- `(1 : ℕ)` elaborates the literal eagerly. A bare `n + 1` leaves a postponed `OfNat ℕ 1`
+-- metavariable in the index, so instance goals on the integer-ring tower below contain a
+-- metavariable, bypass the instance cache and unfold `cyclotomicLayer` at every unification.
+local notation "L(" n ")" => cyclotomicLayer (K := ℚ_[p]) p (n + (1 : ℕ))
 local notation "O(" n ")" => FontaineWintenberger.spectralIntegerRing (ℚ_[p]) L(n)
 
 local instance (n : ℕ) : IsDiscreteValuationRing O(n) :=
@@ -437,8 +440,6 @@ theorem lowerRamificationGroupReal_cyclotomic_card_on (n r : ℕ) (hr : r ≤ n)
   congr 1
   omega
 
-set_option maxHeartbeats 1000000 in
--- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
 /-- Each consecutive cyclotomic lower interval has actual Herbrand
 length one, at every prime and including the first interval. -/
 theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
@@ -484,8 +485,6 @@ theorem integral_cyclotomic_lower_slope (n r : ℕ) (hr : r ≤ n) :
       ring
     _ = _ := by rw [hpower]
 
-set_option maxHeartbeats 1000000 in
--- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
 /-- The actual integral-defined Herbrand function sends every
 prime-power lower threshold to its integer upper threshold. -/
 theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
@@ -541,8 +540,6 @@ theorem herbrandFunction_cyclotomic_threshold (n r : ℕ) (hr : r ≤ n + 1) :
     rw [hstep] at hadd
     simpa only [Nat.cast_add, Nat.cast_one] using hadd.symm
 
-set_option maxHeartbeats 1000000 in
--- TODO: instance synthesis on spectral integer-ring towers; to be rewritten without this option.
 /-- The actual upper group on each unit upper interval is the preimage
 of the canonical finite-character principal-unit kernel. -/
 theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
