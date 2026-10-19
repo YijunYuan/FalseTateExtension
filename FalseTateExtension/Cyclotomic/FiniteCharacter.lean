@@ -27,21 +27,21 @@ variable (p : ℕ) [Fact p.Prime] (m : ℕ)
 
 local instance : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
 
-/-- The actual finite rational cyclotomic character, defined by its action on
-the existing chosen primitive root in the actual cyclotomic layer. -/
+/-- The finite rational cyclotomic character, defined by its action on
+the primitive root in the cyclotomic layer. -/
 def cyclotomicLayerCharacter :
     (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) →*
       (ZMod (p ^ m))ˣ :=
   (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow (ℚ_[p])
 
-/-- The defining action of the actual finite character. -/
+/-- The defining action of the finite character. -/
 theorem cyclotomicLayerCharacter_spec
     (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) :
     g (cyclotomicLayerRoot p m) = cyclotomicLayerRoot p m ^
       (cyclotomicLayerCharacter p m g : ZMod (p ^ m)).val :=
   ((isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_spec (ℚ_[p]) g).symm
 
-/-- The action on the actual primitive root uniquely specifies the unit. -/
+/-- The action on the primitive root uniquely specifies the unit. -/
 theorem cyclotomicLayerCharacter_unique
     (g : cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m)
     (u : (ZMod (p ^ m))ˣ)
@@ -52,8 +52,8 @@ theorem cyclotomicLayerCharacter_unique
   exact (isPrimitiveRoot_cyclotomicLayerRoot p m).pow_inj (ZMod.val_lt _) (ZMod.val_lt _)
     ((cyclotomicLayerCharacter_spec p m g).symm.trans hu)
 
-/-- Faithfulness follows because the actual primitive root generates the
-actual cyclotomic field. -/
+/-- Faithfulness follows because the primitive root generates the
+cyclotomic field. -/
 theorem cyclotomicLayerCharacter_injective : Function.Injective (cyclotomicLayerCharacter p m) :=
   (isPrimitiveRoot_cyclotomicLayerRoot p m).autToPow_injective (ℚ_[p])
 

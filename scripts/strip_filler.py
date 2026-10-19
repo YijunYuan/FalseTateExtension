@@ -8,14 +8,25 @@ comments, fixes the resulting double spaces and dangling articles, and renames s
 import re, glob, sys
 
 WORDS = r'(actual|actually|original|originally|canonical|canonically|ordinary|literal|literally|intrinsic|intrinsically|prescribed|genuine|genuinely|usual|existing|corrected|true|proved|displayed|chosen)'
-ARTICLE_FIX = [(r'\ba ((?:[aeiouAEIOU])\w)', r'an \1'), (r'\ban ((?:[^aeiouAEIOU\s])\w)', r'a \1')]
+VOWEL_WORDS = r'(actual|actually|original|originally|ordinary|intrinsic|intrinsically|existing)'
+CONS_WORDS = r'(canonical|canonically|literal|literally|prescribed|genuine|genuinely|usual|corrected|true|proved|displayed|chosen)'
+CONSONANT_SOUND = ('uniformizer', 'unit', 'union', 'unique', 'usual', 'one', 'universal', 'unramified')
+
+def article(word):
+    return 'a' if word.lower().startswith(CONSONANT_SOUND) or word[0].lower() not in 'aeiou' else 'an'
 
 def clean(txt: str) -> str:
-    t = re.sub(r'\b[Tt]he same ' + WORDS + r' ', 'the same ', txt)
-    t = re.sub(r'\b' + WORDS + r' ', '', t)
+    # articles before a deleted adjective
+    t = re.sub(r'\b([Aa])n ' + VOWEL_WORDS + r'\s+(\w+)', lambda m: (m.group(1) if article(m.group(3)) == 'a' else m.group(1) + 'n') + ' ' + m.group(3), txt)
+    t = re.sub(r'\b([Aa]) ' + CONS_WORDS + r'\s+(\w+)', lambda m: (m.group(1) if article(m.group(3)) == 'a' else m.group(1) + 'n') + ' ' + m.group(3), t)
+    t = re.sub(r'\b(original|actual)-base\b', 'base', t)
+    t = re.sub(r'\b' + WORDS + r'\s+', lambda m: '' if m.group(0).endswith(' ') else '\n', t)
+    # sentence-initial capitalized filler: drop it and capitalize the next word
+    t = re.sub(r'\b(Actual|Actually|Original|Originally|Canonical|Ordinary|Literal|Intrinsic|Genuine|Genuinely|Prescribed|Usual|Existing|Corrected)\s+(\w)', lambda m: m.group(2).upper(), t)
     t = re.sub(r' ' + WORDS + r'\b(?=[.,;:])', '', t)
     t = re.sub(r'[ \t]{2,}', ' ', t)
-    for a, b in ARTICLE_FIX: t = re.sub(a, b, t)
+    t = re.sub(r'[ \t]+\n', '\n', t)
+    t = re.sub(r'\n[ \t]*\n(?=[^\n])', '\n', t) if False else t
     return t
 
 def process(path):

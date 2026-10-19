@@ -13,11 +13,11 @@ public import Mathlib.NumberTheory.Padics.ProperSpace
 /-!
 # Completion of the cyclotomic residue and inertia proofs
 
-Original inclusions induce compatible local maps on the actual spectral
-integer rings and injective maps on their actual residue fields. Exhaustion
+Inclusions induce compatible local maps on the spectral
+integer rings and injective maps on their residue fields. Exhaustion
 by finite layers and the uniform residue-degree bound show that a finite
 layer already maps isomorphically onto the infinite extension's residue
-field. The canonical character maps actual inertia onto an open subgroup
+field. The character maps inertia onto an open subgroup
 of the p-adic units containing a nonidentity element.
 
 This completes blueprint `ft:cyclotomic-infinite-residue-bound` and
@@ -40,8 +40,8 @@ section CyclotomicResidues
 variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [IsCompleteDiscreteValuedField K]
 
-/-- The actual base-residue algebra map from a positive chosen layer to
-the residue field of the actual infinite spectral integer ring. -/
+/-- The base-residue algebra map from a positive layer to
+the residue field of the infinite spectral integer ring. -/
 def cyclotomicResidueToExtension (n : ℕ) :
     IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) →ₐ[
       𝓀[K]]
@@ -49,7 +49,7 @@ def cyclotomicResidueToExtension (n : ℕ) :
   spectralResidueInclusion K (IntermediateField.inclusion
     (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1)))
 
-/-- The actual residue inclusion between two positive chosen layers. -/
+/-- The residue inclusion between two positive layers. -/
 def cyclotomicResidueBetweenLayers {n m : ℕ} (h : n ≤ m) :
     IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) →ₐ[
       𝓀[K]]
@@ -64,8 +64,8 @@ theorem cyclotomicResidueToExtension_comp {n m : ℕ} (h : n ≤ m) :
   rw [← spectralResidueInclusion_comp]
   congr 1
 
-/-- Every actual infinite residue class has an integral representative
-already in a positive chosen finite layer. -/
+/-- Every infinite residue class has an integral representative
+already in a positive finite layer. -/
 theorem exists_cyclotomicResidueToExtension_preimage
     (z : IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicExtension (K := K) p))) :
     ∃ n, ∃ x, cyclotomicResidueToExtension p K n x = z := by
@@ -104,8 +104,8 @@ theorem cyclotomicResidue_degree_monotone :
     (f := (cyclotomicResidueBetweenLayers p K h).toLinearMap)
     (cyclotomicResidueBetweenLayers p K h).injective
 
-/-- Bounded finite residue degrees make the actual residue map from some
-positive chosen layer bijective onto the actual infinite residue field. -/
+/-- Bounded finite residue degrees make the residue map from some
+positive layer bijective onto the infinite residue field. -/
 theorem exists_cyclotomicResidueToExtension_bijective :
     ∃ N, Function.Bijective (cyclotomicResidueToExtension p K N) := by
   obtain ⟨b, N, hN⟩ := converges_of_monotone_of_bounded
@@ -133,8 +133,8 @@ theorem exists_cyclotomicResidueToExtension_bijective :
       (congrArg (fun f ↦ f x) (cyclotomicResidueToExtension_comp p K (le_max_left m N))).symm
     _ = z := hx
 
-/-- An attained finite layer's actual residue field is isomorphic to the
-actual infinite residue field, with its original residue-map evaluation. -/
+/-- An attained finite layer's residue field is isomorphic to the
+infinite residue field, with its residue-map evaluation. -/
 theorem exists_cyclotomicResidueEquiv :
     ∃ N, ∃ e : IsLocalRing.ResidueField
         (spectralIntegerRing K (cyclotomicLayer (K := K) p (N + 1))) ≃ₐ[
@@ -144,8 +144,8 @@ theorem exists_cyclotomicResidueEquiv :
   obtain ⟨N, hN⟩ := exists_cyclotomicResidueToExtension_bijective p K
   exact ⟨N, AlgEquiv.ofBijective (cyclotomicResidueToExtension p K N) hN, fun _ ↦ rfl⟩
 
-/-- The actual infinite residue extension is finite-dimensional. This is
-proved before using a natural-number finrank bound for that extension. -/
+/-- The infinite residue extension is finite-dimensional. This is
+before using a natural-number finrank bound for that extension. -/
 theorem cyclotomicExtension_residue_finiteDimensional :
     FiniteDimensional
       (𝓀[K])
@@ -153,8 +153,8 @@ theorem cyclotomicExtension_residue_finiteDimensional :
   obtain ⟨N, e, _⟩ := exists_cyclotomicResidueEquiv p K
   exact Module.Finite.equiv e.toLinearEquiv
 
-/-- The actual infinite residue degree satisfies the sharp bound by the
-original base ramification index. -/
+/-- The infinite residue degree satisfies the sharp bound by the
+base ramification index. -/
 theorem cyclotomicExtension_residue_degree_le :
     Module.finrank
       (𝓀[K])
@@ -173,15 +173,15 @@ variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZ
     [IsCompleteDiscreteValuedField K]
     [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The character image of actual absolute zero upper inertia, through
-ordinary restriction to the original infinite cyclotomic field. -/
+/-- The character image of absolute zero upper inertia, through
+restriction to the infinite cyclotomic field. -/
 def cyclotomicInertiaCharacterImage : Subgroup (ℤ_[p])ˣ := by
   exact (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
     ((cyclotomicExtensionCharacter (K := K) p).comp
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)))
 
 /-- Full infinite upper restriction identifies the absolute inertia image
-with the character image of the actual infinite cyclotomic zero upper group. -/
+with the character image of the infinite cyclotomic zero upper group. -/
 theorem cyclotomicInertiaCharacterImage_eq_map :
     cyclotomicInertiaCharacterImage p K =
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).map
@@ -190,8 +190,8 @@ theorem cyclotomicInertiaCharacterImage_eq_map :
   rw [← Subgroup.map_map, cyclotomic_inertia_eq_absolute_image p K]
 
 omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
-/-- Naturality identifies the same image with the original canonical
-character acting on the actual algebraic closure. -/
+/-- Naturality identifies the same image with the
+character acting on the algebraic closure. -/
 theorem cyclotomicInertiaCharacterImage_eq_absolute_character :
     cyclotomicInertiaCharacterImage p K =
       (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
@@ -210,14 +210,14 @@ theorem cyclotomicInertiaCharacterImage_eq_absolute_character :
   rw [hc]
 
 omit [IsCompleteDiscreteValuedField K] in
-/-- The existing canonical character is an open embedding because its
-actual closed image has already been proved open. -/
+/-- The character is an open embedding because its
+closed image has already been open. -/
 theorem isOpenEmbedding_cyclotomicExtensionCharacter :
     Topology.IsOpenEmbedding (cyclotomicExtensionCharacter (K := K) p) :=
   ⟨(isClosedEmbedding_cyclotomicExtensionCharacter p).isEmbedding,
     isOpen_cyclotomicExtensionCharacter_range p⟩
 
-/-- Actual absolute inertia has open character image in the p-adic units. -/
+/-- Absolute inertia has open character image in the p-adic units. -/
 theorem isOpen_cyclotomicInertiaCharacterImage :
     IsOpen (cyclotomicInertiaCharacterImage p K : Set (ℤ_[p])ˣ) := by
   rw [cyclotomicInertiaCharacterImage_eq_map]

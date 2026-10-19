@@ -13,11 +13,11 @@ public import Mathlib.NumberTheory.Padics.RingHoms
 public import FontaineWintenberger.LocalField.Spectral.Transport
 
 /-!
-# The residue-degree bound for actual finite cyclotomic layers
+# The residue-degree bound for finite cyclotomic layers
 
-Inside an actual cyclotomic layer over a finite extension of the p-adic
+Inside a cyclotomic layer over a finite extension of the p-adic
 rationals, the same primitive root generates a rational cyclotomic subfield.
-Its total ramification, the minimal-polynomial degree bound and actual local
+Its total ramification, the minimal-polynomial degree bound and local
 ramification-index towers give the sharp residue-degree bound by the base
 ramification index. Compatible valuation rings are identified explicitly.
 
@@ -34,8 +34,8 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- Rational cyclotomic layers have full inertia, by the proved actual
-ramification index and the actual inertia-cardinality theorem. -/
+/-- Rational cyclotomic layers have full inertia, by the
+ramification index and the inertia-cardinality theorem. -/
 theorem cyclotomicLayer_padic_upper_zero (n : ℕ) :
     upperRamificationGroup
       (R := spectralIntegerRing (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
@@ -49,8 +49,8 @@ theorem cyclotomicLayer_padic_upper_zero (n : ℕ) :
   exact h.trans ((finrank_cyclotomicLayer_padic p (n + 1)).symm.trans
     (IsGalois.card_aut_eq_finrank (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1))).symm)
 
-/-- Total ramification transfers to every actual rational prime-power
-cyclotomic field via its canonical field and integer-ring isomorphisms. -/
+/-- Total ramification transfers to every rational prime-power
+cyclotomic field via its field and integer-ring isomorphisms. -/
 theorem rationalCyclotomic_ramificationIdx (n : ℕ)
     (F : Type*) [Field F] [Algebra (ℚ_[p]) F] [FiniteDimensional (ℚ_[p]) F]
     [IsCyclotomicExtension {p ^ (n + 1)} (ℚ_[p]) F] :
@@ -75,7 +75,7 @@ section Fields
 
 variable {K : Type*} [Field K] [CharZero K] [Algebra (ℚ_[p]) K]
 
-/-- The actual finite cyclotomic layer has degree at most the rational
+/-- The finite cyclotomic layer has degree at most the rational
 prime-power totient, by minimal-polynomial divisibility under scalar extension. -/
 theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
     Module.finrank K (cyclotomicLayer (K := K) p m) ≤ (p ^ m).totient := by
@@ -91,14 +91,14 @@ theorem finrank_cyclotomicLayer_le_totient (m : ℕ) :
   exact (Polynomial.natDegree_le_of_dvd hd ((cyclotomic.monic _ _).map _).ne_zero).trans_eq
     (by rw [Polynomial.natDegree_map, natDegree_cyclotomic])
 
-/-- The rational cyclotomic subfield inside the same actual finite layer. -/
+/-- The rational cyclotomic subfield inside the same finite layer. -/
 def rationalCyclotomicSubfield (m : ℕ) :
     IntermediateField (ℚ_[p]) (cyclotomicLayer (K := K) p m) :=
   IntermediateField.adjoin (ℚ_[p])
     {(⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)}
 
 omit [Algebra (ℚ_[p]) K] in
-/-- The generator in the original finite layer remains primitive. -/
+/-- The generator in the finite layer remains primitive. -/
 theorem isPrimitiveRoot_cyclotomicLayer_generator (m : ℕ) :
     IsPrimitiveRoot
       (⟨rootOfUnity p m, rootOfUnity_mem_cyclotomicLayer p m⟩ : cyclotomicLayer (K := K) p m)
@@ -131,8 +131,8 @@ variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [IsCompleteDiscreteValuedField K]
     [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The canonical spectral integer ring of the same actual finite layer
-has residue degree bounded by the actual base ramification index. -/
+/-- The spectral integer ring of the same finite layer
+has residue degree bounded by the base ramification index. -/
 theorem cyclotomicLayer_spectral_residueDegree_le (n : ℕ) :
     Module.finrank
         (𝓀[K])
@@ -207,8 +207,8 @@ theorem cyclotomicLayer_spectral_residueDegree_le (n : ℕ) :
   exact Nat.le_of_mul_le_mul_left (hb.trans_eq (Nat.mul_comm _ _)) he
 
 omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
-/-- Any compatible extension valuation has exactly the original spectral
-integer ring, as an actual subring of the same finite cyclotomic layer. -/
+/-- Any compatible extension valuation has exactly the spectral
+integer ring, as a subring of the same finite cyclotomic layer. -/
 theorem cyclotomicLayer_extensionValuationSubring_eq (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)

@@ -14,11 +14,11 @@ public import FontaineWintenberger.Ramification.Different.Subextension
 public import FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniformizer
 
 /-!
-# Ramification in the actual radical tower
+# Ramification in the radical tower
 
-Eisenstein polynomials compute the degrees of the actual radical layers.
-The actual norm valuation then supplies residue degree one and an actual
-uniformizer; the monogenic different formula computes its different.
+Eisenstein polynomials compute the degrees of the radical layers.
+The norm valuation then supplies residue degree one and a uniformizer; the monogenic different
+formula computes its different.
 
 This implements the finite producers in blueprint `ft:direct-radical-step`.
 -/
@@ -41,11 +41,11 @@ section Layers
 
 variable {K : Type*} [Field K] (p : ℕ) [Fact p.Prime]
 
-/-- The chosen radical in its actual finite intermediate field. -/
+/-- The radical in its finite intermediate field. -/
 def radicalLayerRoot (π : K) (n : ℕ) : radicalLayer p π n :=
   ⟨radical p π n, radical_mem_radicalLayer p π n⟩
 
-/-- The root relation holds in the actual finite field, with its original
+/-- The root relation holds in the finite field, with its
 base algebra. -/
 theorem radicalLayerRoot_pow (π : K) (n : ℕ) :
     radicalLayerRoot p π n ^ (p ^ n) = algebraMap K (radicalLayer p π n) π := by
@@ -60,7 +60,7 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime]
 
 
-/-- Eisenstein computes the degree of the actual radical layer, including
+/-- Eisenstein computes the degree of the radical layer, including
 the base layer at index zero and every prime. -/
 theorem finrank_radicalLayer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
     Module.finrank K (radicalLayer p (π : K) n) = p ^ n := by
@@ -70,14 +70,14 @@ theorem finrank_radicalLayer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : �
     minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out hp K _ (radical_pow p (π : K) n),
     natDegree_X_pow_sub_C]
 
-/-- The minimal polynomial is computed on the original actual finite
+/-- The minimal polynomial is computed on the finite
 field rather than a replacement splitting field. -/
 theorem minpoly_radicalLayerRoot (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
     minpoly K (radicalLayerRoot p (π : K) n) = X ^ (p ^ n) - C (π : K) :=
   minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible hπ.out (pow_pos (Fact.out : p.Prime).pos n) K _
     (radicalLayerRoot_pow p (π : K) n)
 
-/-- The actual field norm of the chosen radical is a signed original
+/-- The field norm of the radical is a signed
 uniformizer. The sign is retained at every prime and at level zero. -/
 theorem norm_radicalLayerRoot (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
     Algebra.norm K (radicalLayerRoot p (π : K) n) = (-1 : K) ^ (p ^ n + 1) * π := by
@@ -91,8 +91,8 @@ theorem norm_radicalLayerRoot (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : 
   rw [hgen, hdim, minpoly_radicalLayerRoot p π, hc] at hn
   simpa only [pow_succ, mul_neg, mul_neg_one, mul_one, neg_mul] using hn
 
-/-- The original inclusion between consecutive actual radical fields has
-degree exactly `p`, by their proved absolute Eisenstein degrees. -/
+/-- The inclusion between consecutive radical fields has
+degree exactly `p`, by their absolute Eisenstein degrees. -/
 theorem radicalLayer_step_finrank (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
     letI : Algebra (radicalLayer p (π : K) n) (radicalLayer p (π : K) (n + 1)) :=
       (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
@@ -117,8 +117,8 @@ variable (p : ℕ) [Fact p.Prime]
 
 variable [CharZero K]
 
-/-- Norm valuation on the actual finite radical field has exponent the
-actual residue-field degree and right side the least positive additive
+/-- Norm valuation on the finite radical field has exponent the
+residue-field degree and right side the least positive additive
 valuation. -/
 theorem radicalLayer_normalizedValuation_pow (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
@@ -141,7 +141,7 @@ theorem radicalLayer_normalizedValuation_pow (π : 𝒪[K]) [hπ : Fact (Irreduc
     exact (maximalIdeal 𝒪[K]).intValuation_singleton hπ.out.ne_zero hπ.out.maximalIdeal_eq
   simpa only [map_mul, map_pow, Valuation.map_neg, map_one, one_pow, one_mul, hπv] using hn.symm
 
-/-- Every actual extension valuation has residue degree one on every
+/-- Every extension valuation has residue degree one on every
 radical layer. -/
 theorem radicalLayer_residueDegree (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
@@ -157,7 +157,7 @@ theorem radicalLayer_residueDegree (π : 𝒪[K]) [hπ : Fact (Irreducible π)] 
       (IsLocalRing.ResidueField w.valuationSubring) : ℤ) ∣ (1 : ℤ) := by simpa using hd
   exact Nat.dvd_one.mp (Int.natCast_dvd_natCast.mp hd')
 
-/-- The actual normalized extension valuation of the radical is that of
+/-- The normalized extension valuation of the radical is that of
 a uniformizer. -/
 theorem radicalLayer_normalizedValuation_root (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
@@ -172,7 +172,7 @@ theorem radicalLayer_normalizedValuation_root (π : 𝒪[K]) [hπ : Fact (Irredu
   simpa only [radicalLayer_residueDegree p π n w, pow_one] using
     radicalLayer_normalizedValuation_pow p π n w
 
-/-- The actual chosen radical belongs to every compatible extension
+/-- The radical belongs to every compatible extension
 valuation ring. -/
 theorem radicalLayerRoot_mem (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
@@ -186,15 +186,15 @@ theorem radicalLayerRoot_mem (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : �
   rw [radicalLayer_normalizedValuation_root p π]
   exact WithZero.exp_le_one_iff.mpr (by norm_num)
 
-/-- The chosen radical as an element of the actual chosen integer ring. -/
+/-- The radical as an element of the integer ring. -/
 def radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
     [(NormedField.valuation (K := K)).HasExtension w] : w.valuationSubring :=
   ⟨radicalLayerRoot p (π : K) n, radicalLayerRoot_mem p π n w⟩
 
-/-- The chosen radical is an actual uniformizer, not merely an element
-with a prescribed fractional norm in a larger closure. -/
+/-- The radical is a uniformizer, not merely an element
+with a fractional norm in a larger closure. -/
 theorem irreducible_radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
@@ -221,8 +221,8 @@ theorem irreducible_radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible �
     (ϖ : radicalLayer p (π : K) n) = radicalLayerRoot p (π : K) n at hu
   exact (mul_comm _ _).trans hu
 
-/-- Every actual compatible valuation makes the radical layer totally
-ramified of the proved Eisenstein degree. -/
+/-- Every compatible valuation makes the radical layer totally
+ramified of the Eisenstein degree. -/
 theorem radicalLayer_ramificationIdx (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
@@ -232,7 +232,7 @@ theorem radicalLayer_ramificationIdx (π : 𝒪[K]) [hπ : Fact (Irreducible π)
     K (radicalLayer p (π : K) n) w
   simpa only [radicalLayer_residueDegree p π n w, mul_one, finrank_radicalLayer p π n] using hd
 
-/-- The actual root uniformizer generates the full actual integer ring. -/
+/-- The root uniformizer generates the full integer ring. -/
 theorem adjoin_radicalUniformizer_eq_top (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
@@ -244,8 +244,8 @@ theorem adjoin_radicalUniformizer_eq_top (π : 𝒪[K]) [hπ : Fact (Irreducible
   exact FontaineWintenberger.extensionValuationSubring_adjoin_uniformizer_eq_top
     K (radicalLayer p (π : K) n) w he (irreducible_radicalUniformizer p π n w)
 
-/-- The minimal polynomial over the actual base integers is recovered
-from the actual field minimal polynomial by integral closedness. -/
+/-- The minimal polynomial over the base integers is recovered
+from the field minimal polynomial by integral closedness. -/
 theorem minpoly_radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
@@ -260,8 +260,8 @@ theorem minpoly_radicalUniformizer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] 
   rw [← hfield, Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_X, Polynomial.map_C]
   exact minpoly_radicalLayerRoot p π n
 
-/-- The actual different of a radical layer is computed by the literal
-derivative of its proved monogenic Eisenstein polynomial. -/
+/-- The different of a radical layer is computed by the
+derivative of its monogenic Eisenstein polynomial. -/
 theorem radicalLayer_different_order (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (radicalLayer p (π : K) n) Γ)
@@ -284,8 +284,8 @@ theorem radicalLayer_different_order (π : 𝒪[K]) [hπ : Fact (Irreducible π)
   rw [FontaineWintenberger.addVal_algebraMap, radicalLayer_ramificationIdx p π n w,
     (irreducible_radicalUniformizer p π n w).addVal_pow]
 
-/-- The same actual different order in natural numbers, using the actual
-base additive valuation of `p`, with finiteness proved from characteristic
+/-- The same different order in natural numbers, using the
+base additive valuation of `p`, with finiteness from characteristic
 zero. -/
 theorem radicalLayer_different_order_toNat (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
@@ -316,7 +316,7 @@ variable (π : 𝒪[K])
     [hπ : Fact (Irreducible π)] (n : ℕ)
 
 local notation "F₀" => radicalLayer (K := K) p (π : K) n
--- `(1 : ℕ)` elaborates the literal eagerly. A bare `n + 1` leaves a postponed `OfNat ℕ 1`
+-- `(1 : ℕ)` elaborates the eagerly. A bare `n + 1` leaves a postponed `OfNat ℕ 1`
 -- metavariable in the index, so instance goals on the integer-ring tower below contain a
 -- metavariable, bypass the instance cache and unfold `radicalLayer` at every unification.
 local notation "F₁" => radicalLayer (K := K) p (π : K) (n + (1 : ℕ))
@@ -353,8 +353,8 @@ local instance radicalStepIntegerScalarTower'' : IsScalarTower O₀ O₁ F₁ :=
 include hπ
 
 
-/-- The canonical integer-ring inclusion in a consecutive radical step
-has ramification index `p`; both rings retain their original spectral
+/-- The integer-ring inclusion in a consecutive radical step
+has ramification index `p`; both rings retain their spectral
 valuations over `K`. -/
 theorem radicalLayer_step_ramificationIdx :
     (IsLocalRing.maximalIdeal O₁).ramificationIdx O₀ = p := by
@@ -363,16 +363,16 @@ theorem radicalLayer_step_ramificationIdx :
     pow_succ] at he
   exact Nat.eq_of_mul_eq_mul_left (pow_pos (Fact.out : p.Prime).pos n) he.symm
 
-/-- The residue fields of two consecutive actual radical layers have
-degree one, with the original canonical residue inclusion. -/
+/-- The residue fields of two consecutive radical layers have
+degree one, with the residue inclusion. -/
 theorem radicalLayer_step_residueDegree :
     Module.finrank (IsLocalRing.ResidueField O₀) (IsLocalRing.ResidueField O₁) = 1 := by
   have hd := FontaineWintenberger.local_ramificationIdx_mul_residueDegree_eq_finrank O₀ O₁ F₀ F₁
   rw [radicalLayer_step_ramificationIdx p π n, radicalLayer_step_finrank p π n] at hd
   exact Nat.eq_of_mul_eq_mul_left (Fact.out : p.Prime).pos (by simpa only [mul_one] using hd)
 
-/-- The actual relative different exponent follows from canonical
-different transitivity and the two actual absolute exponents. -/
+/-- The relative different exponent follows from
+different transitivity and the two absolute exponents. -/
 theorem radicalLayer_step_different_order :
     (emultiplicity (IsLocalRing.maximalIdeal O₁) (differentIdeal O₀ O₁)).toNat =
       p ^ (n + 1) * (addVal 𝒪[K] (p : 𝒪[K])).toNat + (p - 1) := by
@@ -402,8 +402,8 @@ variable [Algebra (ℚ_[p]) K]
     [(NormedField.valuation (K := ℚ_[p])).HasExtension (NormedField.valuation (K := K))]
 
 
-/-- On the actual base integer ring over `ℚp`, the normalized additive
-valuation of `p` is its canonical absolute ramification index. -/
+/-- On the base integer ring over `ℚp`, the normalized additive
+valuation of `p` is its absolute ramification index. -/
 theorem addVal_p_eq_padic_ramificationIdx :
     addVal 𝒪[K] (p : 𝒪[K]) = ((IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx 𝒪[ℚ_[p]] : ℕ∞) := by
   have hpπ : Irreducible (p : 𝒪[ℚ_[p]]) := by
@@ -414,7 +414,7 @@ theorem addVal_p_eq_padic_ramificationIdx :
   simpa only [map_natCast, addVal_uniformizer hpπ, mul_one] using h
 
 /-- The natural-valued normalized additive valuation of `p` is the same
-actual ramification index. -/
+ramification index. -/
 theorem addVal_p_toNat_eq_padic_ramificationIdx :
     (addVal 𝒪[K] (p : 𝒪[K])).toNat = (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx 𝒪[ℚ_[p]] := by
   rw [addVal_p_eq_padic_ramificationIdx p]

@@ -9,10 +9,10 @@ public import FalseTateExtension.Coordinates.Transitions
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
 
 /-!
-# Actual p-adic cyclotomic and Kummer coordinates
+# P-adic cyclotomic and Kummer coordinates
 
-The infinite false Tate extension contains the chosen primitive roots of unity
-at every p-power order. Its usual cyclotomic character and a p-adic Kummer
+The infinite false Tate extension contains the primitive roots of unity
+at every p-power order. Its cyclotomic character and a p-adic Kummer
 coordinate recover the previously constructed finite coordinates. The Kummer
 coordinate satisfies the cocycle identity, and the two coordinates determine
 the automorphism.
@@ -63,7 +63,7 @@ theorem infiniteLayerRestriction_comp [hπ : NeZero π] {n m : ℕ} (h : n ≤ m
   IntermediateField.restrictNormalHomOfLE_comp _ _
 
 /-- All finite restrictions together determine an automorphism, since their
-actual diagonal fields exhaust the infinite field. -/
+diagonal fields exhaust the infinite field. -/
 theorem infiniteLayerRestriction_jointly_injective [hπ : NeZero π]
     {g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π}
     (heq : ∀ n, infiniteLayerRestriction p π n g = infiniteLayerRestriction p π n h) :
@@ -77,7 +77,7 @@ theorem infiniteLayerRestriction_jointly_injective [hπ : NeZero π]
   rw [← hx, ← infiniteLayerRestriction_commutes p π n g,
     ← infiniteLayerRestriction_commutes p π n h, heq n]
 
-/-- The chosen primitive root of unity viewed in the actual infinite field. -/
+/-- The primitive root of unity viewed in the infinite field. -/
 def extensionRootOfUnity (n : ℕ) : falseTateExtension p π :=
   IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
     (layerRootOfUnity p π n)
@@ -92,14 +92,14 @@ theorem isPrimitiveRoot_extensionRootOfUnity (n : ℕ) :
     (f := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n))
     (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)).injective
 
-/-- The infinite false Tate field actually contains enough roots at every
+/-- The infinite false Tate field contains enough roots at every
 p-power order, ruling out the cyclotomic character's missing-roots branch. -/
 instance falseTateExtension_hasEnoughRootsOfUnity (n : ℕ) :
     HasEnoughRootsOfUnity (falseTateExtension p π) (p ^ n) :=
   ⟨⟨extensionRootOfUnity p π n, isPrimitiveRoot_extensionRootOfUnity p π n⟩,
     rootsOfUnity.isCyclic _ _⟩
 
-/-- The usual Mathlib cyclotomic character of the actual infinite field,
+/-- The Mathlib cyclotomic character of the infinite field,
 restricted to its K-algebra automorphisms. -/
 def padicCyclotomicCharacter :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* (ℤ_[p])ˣ :=
@@ -107,7 +107,7 @@ def padicCyclotomicCharacter :
     (MulSemiringAction.toRingAut
       (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (falseTateExtension p π))
 
-/-- Every finite projection of the usual cyclotomic character is the actual
+/-- Every finite projection of the cyclotomic character is the
 finite cyclotomic coordinate of the corresponding restriction. -/
 theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
@@ -122,14 +122,14 @@ theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
   exact _root_.cyclotomicCharacter.spec p g.toRingEquiv (extensionRootOfUnity p π n)
     (isPrimitiveRoot_extensionRootOfUnity p π n).pow_eq_one
 
-/-- The canonical nonnegative integer representative of a finite Kummer
+/-- The nonnegative integer representative of a finite Kummer
 coordinate of an infinite-field automorphism. -/
 def kummerRepresentative [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) : ℤ :=
   (finiteKummerExponent p π n (infiniteLayerRestriction p π n g)).val
 
 /-- Successive integer representatives differ by a multiple of p^n, as a
-consequence of actual finite restriction compatibility. -/
+consequence of finite restriction compatibility. -/
 theorem kummerRepresentative_step [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     (p : ℤ) ^ n ∣ kummerRepresentative p π g (n + 1) - kummerRepresentative p π g n := by
@@ -147,7 +147,7 @@ theorem kummerRepresentative_step [hπ : NeZero π]
   have hd := (ZMod.intCast_eq_intCast_iff_dvd_sub ..).mp he
   simpa only [Nat.cast_pow] using hd
 
-/-- The p-adic Kummer coordinate is the actual limit of the compatible integer
+/-- The p-adic Kummer coordinate is the limit of the compatible integer
 representatives supplied by the finite coordinates. -/
 def padicKummerExponent [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) : ℤ_[p] :=
@@ -155,8 +155,8 @@ def padicKummerExponent [hπ : NeZero π]
     (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (kummerRepresentative p π g) p
       (kummerRepresentative_step p π g))
 
-/-- Every finite projection of the p-adic Kummer coordinate is the prescribed
-Kummer coordinate on the actual finite restriction. -/
+/-- Every finite projection of the p-adic Kummer coordinate is the
+Kummer coordinate on the finite restriction. -/
 theorem padicKummerExponent_toZModPow [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     PadicInt.toZModPow n (padicKummerExponent p π g) =
@@ -177,8 +177,8 @@ theorem padicKummerExponent_unique [hπ : NeZero π]
   intro n
   rw [padicKummerExponent_toZModPow, ha n]
 
-/-- The finite cocycles pass to the actual p-adic coordinates through their
-proved projections. -/
+/-- The finite cocycles pass to the p-adic coordinates through their
+projections. -/
 theorem padicKummerExponent_mul [hπ : NeZero π]
     (g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     padicKummerExponent p π (g * h) = padicKummerExponent p π g +
@@ -192,7 +192,7 @@ theorem padicKummerExponent_mul [hπ : NeZero π]
   exact finiteKummerExponent_mul p π n
     (infiniteLayerRestriction p π n g) (infiniteLayerRestriction p π n h)
 
-/-- The actual p-adic Kummer and cyclotomic coordinates determine every
+/-- The p-adic Kummer and cyclotomic coordinates determine every
 automorphism of the infinite false Tate field. -/
 theorem padicCoordinates_injective [hπ : NeZero π] :
     Function.Injective (fun g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π ↦

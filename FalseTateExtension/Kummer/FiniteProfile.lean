@@ -36,8 +36,8 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[K])
 
-/-- Each actual finite radical Herbrand function is affine after its
-last original-base threshold, with its true degree as slope. -/
+/-- Each finite radical Herbrand function is affine after its
+last base threshold, with its degree as slope. -/
 theorem radicalLayer_apfPsi_tail [hπ : Fact (Irreducible π)] (n : ℕ) (u : ℝ)
     (hu : radicalUpperBreak (K := K) p n ≤ u) :
     apfPsi K (radicalLayer p (π : K) n) u =
@@ -84,7 +84,7 @@ theorem radicalLayer_apfPsi_tail [hπ : Fact (Irreducible π)] (n : ℕ) (u : �
       field_simp
       ring
 
-/-- The next relative break is attained at the next original-base threshold. -/
+/-- The next relative break is attained at the next base threshold. -/
 theorem radicalLayer_apfPsi_next_break [hπ : Fact (Irreducible π)] (n : ℕ) :
     apfPsi K (radicalLayer p (π : K) n) (radicalUpperBreak (K := K) p (n + 1)) =
       radicalRelativeBreak (K := K) p n := by
@@ -92,8 +92,8 @@ theorem radicalLayer_apfPsi_next_break [hπ : Fact (Irreducible π)] (n : ℕ) :
     rw [radicalUpperBreak_succ]
     exact le_add_of_nonneg_right (Nat.cast_nonneg _)), radicalRelativeBreak_eq_affine]
 
-/-- The actual new index factor changes precisely at the next threshold
-in the normalization of the original base field. -/
+/-- The new index factor changes precisely at the next threshold
+in the normalization of the base field. -/
 theorem radicalLayer_apfIndex_succ_threshold [hπ : Fact (Irreducible π)] (n : ℕ)
     {u : ℝ} (hu : 0 ≤ u) :
     apfIndex K (radicalLayer p (π : K) (n + 1)) u =
@@ -109,7 +109,7 @@ theorem radicalLayer_apfIndex_succ_threshold [hπ : Fact (Irreducible π)] (n : 
   · rw [ite_eq_left (hiff.mpr h), ite_eq_left h]
   · rw [ite_eq_right (fun hψ => h (hiff.mp hψ)), ite_eq_right h]
 
-/-- After its last threshold, the actual finite radical index is its degree. -/
+/-- After its last threshold, the finite radical index is its degree. -/
 theorem radicalLayer_apfIndex_tail [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ}
     (hu : radicalUpperBreak (K := K) p n < u) :
     apfIndex K (radicalLayer p (π : K) n) u = p ^ n := by
@@ -149,7 +149,7 @@ theorem radicalLayer_apfIndex_interval [hπ : Fact (Irreducible π)] (n j : ℕ)
       ((radicalUpperBreak_mono p (le_of_not_ge h)).trans_lt hlo),
       min_eq_left (le_of_not_ge h)]
 
-/-- The actual finite radical index stays one through the first threshold. -/
+/-- The finite radical index stays one through the first threshold. -/
 theorem radicalLayer_apfIndex_initial [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ}
     (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p 1) :
     apfIndex K (radicalLayer p (π : K) n) u = 1 := by
@@ -157,7 +157,7 @@ theorem radicalLayer_apfIndex_initial [hπ : Fact (Irreducible π)] (n : ℕ) {u
     radicalLayer_zero, apfIndex_algEquiv K _ (IntermediateField.botEquiv K _),
     apfIndex_eq_one_of_bound_eq_top K K (apfRamificationBound_self K) hu]
 
-/-- Shifting the upper parameter by the actual base valuation of `p`
+/-- Shifting the upper parameter by the base valuation of `p`
 crosses at most one jump, uniformly in the finite radical layer. -/
 theorem radicalLayer_apfIndex_growth [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     apfIndex K (radicalLayer p (π : K) n) (u + absoluteRamificationIdx p K) ≤
@@ -207,8 +207,8 @@ attribute [local instance] kummerBaseNormedField kummerBaseNormedAlgebra kummerB
   kummerStepAlgebra kummerStepScalarTower
   kummerStepFinite kummerStepValuation kummerStepOwnValuation
 
-/-- The intrinsic extended first bound of the actual consecutive radical
-step equals the break determined by its original different, without normality. -/
+/-- The extended first bound of the consecutive radical
+step equals the break determined by its different, without normality. -/
 theorem radicalLayer_step_apfRamificationBound [hπ : Fact (Irreducible π)] (n : ℕ) :
     apfRamificationBound (radicalLayer p (π : K) n) (radicalLayer p (π : K) (n + 1)) =
       (((p : ℝ) ^ (n + 1) * (addVal 𝒪[K] (p : 𝒪[K])).toNat / ((p : ℝ) - 1) : ℝ) : EReal) := by

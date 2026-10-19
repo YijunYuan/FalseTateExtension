@@ -12,7 +12,7 @@ public import Mathlib.Data.ZMod.Units
 /-!
 # Transition maps for finite false Tate coordinates
 
-Ordinary finite Galois restriction between the actual diagonal layers is
+Finite Galois restriction between the diagonal layers is
 compatible with reduction of the Kummer and cyclotomic coordinates. Iterated
 radical and root-of-unity power relations identify the smaller generators
 inside the larger fields.
@@ -84,7 +84,7 @@ theorem radical_pow_sub {n m : ℕ} (h : n ≤ m) :
   have he : n + (m - n) = m := by omega
   simpa only [he] using radical_add_pow p π n (m - n)
 
-/-- Iterated compatibility of the chosen roots of unity. -/
+/-- Iterated compatibility of the roots of unity. -/
 theorem rootOfUnity_add_pow (n k : ℕ) :
     rootOfUnity (K := K) p (n + k) ^ (p ^ k) = rootOfUnity p n := by
   induction k with
@@ -157,8 +157,8 @@ theorem layerRootOfUnity_pow_reduction {n m : ℕ} (h : n ≤ m) (a : ZMod (p ^ 
     simpa only [← (isPrimitiveRoot_layerRootUnit p π n).eq_orderOf] using hm
   simpa only [Units.val_pow_eq_pow_val, coe_layerRootUnit] using congrArg Units.val hu
 
-/-- The finite Kummer exponents are compatible under the actual finite Galois
-restriction and canonical residue-ring reduction. -/
+/-- The finite Kummer exponents are compatible under the finite Galois
+restriction and residue-ring reduction. -/
 theorem finiteKummerExponent_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :
     finiteKummerExponent p π n (finiteLayerRestriction p π h g) =
@@ -169,7 +169,7 @@ theorem finiteKummerExponent_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m
   exact congrArg (· * layerRadical p π n)
     (layerRootOfUnity_pow_reduction p π h (finiteKummerExponent p π m g)).symm
 
-/-- The finite cyclotomic characters are compatible with canonical reduction
+/-- The finite cyclotomic characters are compatible with reduction
 on units. This includes transitions to the zeroth layer. -/
 theorem finiteCyclotomicCharacter_restrict [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)
     (g : falseTateLayer p π m m ≃ₐ[K] falseTateLayer p π m m) :

@@ -10,11 +10,11 @@ public import FontaineWintenberger.Ramification.Lower.Generator
 public import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!
-# Stable finite ramification of the prescribed Kummer generator
+# Stable finite ramification of the Kummer generator
 
-The actual restriction of tau^(p^k) to diagonal level N has stable shifted
+The restriction of tau^(p^k) to diagonal level N has stable shifted
 lower break d_k when N≥k+2. Its unshifted integral order is d_k+1.
-The original spectral integer rings and every actual uniformizer are retained.
+The spectral integer rings and every uniformizer are retained.
 -/
 
 @[expose] public section
@@ -23,7 +23,7 @@ noncomputable section
 
 namespace FalseTateExtension
 
-/-- The stable shifted lower break of the prescribed `p^k`-th Kummer power. -/
+/-- The stable shifted lower break of the `p^k`-th Kummer power. -/
 def kummerRamificationBreak (p k : ℕ) : ℕ :=
   1 + 2 * (p - 1) * ∑ j ∈ Finset.range (k + 1), p ^ (2 * j)
 
@@ -147,7 +147,7 @@ lemma kummerRamificationBreak_add_one_le_integer (p k : ℕ) (hp : 3 ≤ p) :
   have hpow : (1 : ℝ) ≤ (p : ℝ) ^ (2 * (k + 1)) := one_le_pow₀ (by linarith)
   nlinarith
 
-section ActualGenerator
+section Generator
 
 open IsDiscreteValuationRing FontaineWintenberger
 
@@ -155,14 +155,14 @@ variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[ℚ_[p]])
 variable [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
 
-/-- The ordinary finite restriction of the prescribed original generator power. -/
+/-- The finite restriction of the generator power. -/
 def kummerTauFinite (N k : ℕ) :
     (falseTateLayer p (π : ℚ_[p]) N N) ≃ₐ[ℚ_[p]]
       (falseTateLayer p (π : ℚ_[p]) N N) :=
   infiniteLayerRestriction p (π : ℚ_[p]) N
     ((tau p π).val ^ (p ^ k))
 
-/-- Powers in the actual character kernel have their prescribed additive coordinate. -/
+/-- Powers in the character kernel have their additive coordinate. -/
 lemma padicKummerExponent_tau_pow (m : ℕ) :
     padicKummerExponent p (π : ℚ_[p])
       ((tau p π).val ^ m) = m := by
@@ -172,7 +172,7 @@ lemma padicKummerExponent_tau_pow (m : ℕ) :
   rw [padicKummerExponent_tau]
   simp
 
-/-- Under the checked finite affine isomorphism the actual restriction is
+/-- Under the checked finite affine isomorphism the restriction is
 the translation by `p^k`; the unit coordinate is exactly one. -/
 lemma finiteDiagonalGaloisEquiv_kummerTauFinite (N k : ℕ) :
     finiteDiagonalGaloisEquiv_padic p π N (kummerTauFinite p π N k) =
@@ -215,7 +215,7 @@ lemma primePower_notMem_finiteTranslationSubgroup (N k : ℕ) (hk : k < N) :
   have := (Nat.pow_dvd_pow_iff_le_right (Fact.out : p.Prime).one_lt).mp hd
   omega
 
-/-- The original generator power belongs to the actual lower group at its break. -/
+/-- The generator power belongs to the lower group at its break. -/
 lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
     kummerTauFinite p π (n + 1) k ∈
       lowerRamificationGroupReal
@@ -248,7 +248,7 @@ lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
   have hge : g = kummerTauFinite p π (n + 1) k := e.injective he
   simpa only [lowerRamificationGroupReal, Int.ceil_natCast, hge, SetLike.mem_coe] using hg
 
-/-- Immediately beyond that break the actual restriction leaves the lower group. -/
+/-- Immediately beyond that break the restriction leaves the lower group. -/
 lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) :
     kummerTauFinite p π (n + 1) k ∉
       lowerRamificationGroupReal
@@ -271,7 +271,7 @@ lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) 
   rw [finiteDiagonalGaloisEquiv_kummerTauFinite] at hm
   exact primePower_notMem_finiteTranslationSubgroup p (n + 1) k (by omega) hm.1
 
-/-- The unshifted order on the original spectral integer ring is `d_k + 1`. -/
+/-- The unshifted order on the spectral integer ring is `d_k + 1`. -/
 theorem ramificationOrder_kummerTauFinite_succ (n k : ℕ) (hk : k + 1 ≤ n) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))
@@ -295,7 +295,7 @@ theorem ramificationOrder_kummerTauFinite_succ (n k : ℕ) (hk : k + 1 ≤ n) :
   · exact (ENat.lt_add_one_iff (by simp)).mp (lt_of_not_ge hhi)
   · exact hlo
 
-/-- The stable order at every diagonal level `N ≥ k + 2`, with the true cutoff. -/
+/-- The stable order at every diagonal level `N ≥ k + 2`, with the cutoff. -/
 theorem ramificationOrder_kummerTauFinite (N k : ℕ) (hk : k + 2 ≤ N) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))
@@ -304,7 +304,7 @@ theorem ramificationOrder_kummerTauFinite (N k : ℕ) (hk : k + 2 ≤ N) :
   obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (show N ≠ 0 by omega)
   exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
-/-- Every actual uniformizer attains that same integral displacement order. -/
+/-- Every uniformizer attains that same integral displacement order. -/
 theorem addVal_kummerTauFinite_uniformizer (N k : ℕ) (hk : k + 2 ≤ N)
     {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
     (hϖ : Irreducible ϖ) :
@@ -318,7 +318,7 @@ theorem addVal_kummerTauFinite_uniformizer (N k : ℕ) (hk : k + 2 ≤ N)
   rw [← ramificationOrder_eq_generator (D ≃ₐ[ℚ_[p]] D) hgen]
   exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
-/-- Exact normalized displacement on the original finite field, for every uniformizer. -/
+/-- Exact normalized displacement on the finite field, for every uniformizer. -/
 theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2 ≤ N)
     {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
     (hϖ : Irreducible ϖ) :
@@ -344,6 +344,6 @@ theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2
   rw [hc] at hv
   exact hv
 
-end ActualGenerator
+end Generator
 
 end FalseTateExtension

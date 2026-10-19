@@ -18,9 +18,9 @@ public import FontaineWintenberger.APF.Tower.Stages
 public import FontaineWintenberger.APF.Finite.Slope
 
 /-!
-# The actual cyclotomic upper groups and APF property
+# The cyclotomic upper groups and APF property
 
-The original finite-layer restrictions identify the actual infinite rational
+The finite-layer restrictions identify the infinite rational
 cyclotomic upper groups with principal-unit kernels. The resulting indices
 supply the quantitative growth criterion for strict APF.
 -/
@@ -37,8 +37,8 @@ variable (p : ℕ) [Fact p.Prime]
 
 local notation "Cyc" => cyclotomicExtension (K := ℚ_[p]) p
 
-/-- The original positive cyclotomic layers test the actual infinite upper
-condition, through their original inclusion isomorphisms. -/
+/-- The positive cyclotomic layers test the infinite upper
+condition, through their inclusion isomorphisms. -/
 theorem mem_upperRamificationGroupInfinite_cyclotomic_iff
     {u : ℝ} (hu : -1 ≤ u) (g : Cyc ≃ₐ[ℚ_[p]] Cyc) :
     g ∈ upperRamificationGroupInfinite ℚ_[p] Cyc u ↔
@@ -57,8 +57,8 @@ theorem mem_upperRamificationGroupInfinite_cyclotomic_iff
     Subgroup.mem_map_equiv]
   simp only [MulEquiv.symm_apply_apply]
 
-/-- At every positive upper interval the actual infinite group is the
-kernel of restriction to the original finite cyclotomic layer. -/
+/-- At every positive upper interval the infinite group is the
+kernel of restriction to the finite cyclotomic layer. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     upperRamificationGroupInfinite ℚ_[p] Cyc u = (cyclotomicRestrictionToLayer p (r + 1)).ker := by
@@ -92,7 +92,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
       rw [hg, map_one] at hchar
       exact congrArg Units.val hchar.symm
 
-/-- The actual infinite rational cyclotomic extension is totally ramified
+/-- The infinite rational cyclotomic extension is totally ramified
 at the level of its full upper inertia subgroup. -/
 theorem upperRamificationGroupInfinite_cyclotomic_zero :
     upperRamificationGroupInfinite ℚ_[p] Cyc 0 = ⊤ := by
@@ -103,7 +103,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_zero :
   rw [upperRamificationGroup_cyclotomic_zero]
   trivial
 
-/-- Nonpositive upper parameters retain the whole actual cyclotomic group. -/
+/-- Nonpositive upper parameters retain the whole cyclotomic group. -/
 theorem upperRamificationGroupInfinite_cyclotomic_of_nonpos
     {u : ℝ} (hu : -1 ≤ u) (hu0 : u ≤ 0) :
     upperRamificationGroupInfinite ℚ_[p] Cyc u = ⊤ := by
@@ -121,7 +121,7 @@ theorem exists_cyclotomic_upper_interval {u : ℝ} (hu : 0 < u) :
   linarith
 
 /-- The restriction kernel is precisely the principal-unit condition in the
-original infinite cyclotomic character. -/
+infinite cyclotomic character. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_character_ker
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     upperRamificationGroupInfinite ℚ_[p] Cyc u =
@@ -138,8 +138,8 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_character_ker
     rw [map_one, cyclotomicLayerCharacter_restrict]
     exact h
 
-/-- The actual character image of each positive upper group is the full
-kernel of reduction on the original p-adic unit group. -/
+/-- The character image of each positive upper group is the full
+kernel of reduction on the p-adic unit group. -/
 theorem upperRamificationGroupInfinite_cyclotomic_map_character
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     (upperRamificationGroupInfinite ℚ_[p] Cyc u).map (cyclotomicExtensionCharacter p) =
@@ -150,8 +150,8 @@ theorem upperRamificationGroupInfinite_cyclotomic_map_character
   rw [Subgroup.map_comap_eq, MonoidHom.range_eq_top.mpr
     (cyclotomicExtensionCharacter_surjective_padic p), top_inf_eq]
 
-/-- The full actual upper index on a positive unit interval is the
-prime-power totient of the original finite layer. -/
+/-- The full upper index on a positive unit interval is the
+prime-power totient of the finite layer. -/
 theorem upperRamificationGroupInfinite_cyclotomic_index
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     (upperRamificationGroupInfinite ℚ_[p] Cyc u).index = (p ^ (r + 1)).totient := by
@@ -162,7 +162,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_index
   rw [Subgroup.index_comap_of_surjective _ (cyclotomicRestrictionToLayer_surjective p (r + 1)),
     Subgroup.index_bot, card_cyclotomicLayer_galois]
 
-/-- All actual upper groups of the infinite rational cyclotomic extension
+/-- All upper groups of the infinite rational cyclotomic extension
 have finite index. -/
 theorem upperRamificationGroupInfinite_cyclotomic_finiteIndex
     {u : ℝ} (hu : -1 ≤ u) : (upperRamificationGroupInfinite ℚ_[p] Cyc u).FiniteIndex := by
@@ -173,14 +173,14 @@ theorem upperRamificationGroupInfinite_cyclotomic_finiteIndex
     rw [upperRamificationGroupInfinite_cyclotomic_eq_ker p r hr0 hr1]
     infer_instance
 
-/-- APF for the original infinite rational cyclotomic extension, as an
+/-- APF for the infinite rational cyclotomic extension, as an
 abstract separable field extension. -/
 instance isAPF_cyclotomicExtension_padic : IsAPF ℚ_[p] Cyc := by
   rw [isAPF_iff_upperInfinite_finiteIndex]
   exact fun _ hu ↦ upperRamificationGroupInfinite_cyclotomic_finiteIndex p hu
 
-/-- The intrinsic inertia-relative index has the same explicit positive
-profile because the actual rational cyclotomic inertia is full. -/
+/-- The inertia-relative index has the same explicit positive
+profile because the rational cyclotomic inertia is full. -/
 theorem apfIndex_cyclotomicExtension_padic
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     apfIndex ℚ_[p] Cyc u = (p ^ (r + 1)).totient := by
@@ -189,7 +189,7 @@ theorem apfIndex_cyclotomicExtension_padic
     upperRamificationGroupInfinite_cyclotomic_zero p, Subgroup.relIndex_top_right]
   exact upperRamificationGroupInfinite_cyclotomic_index p r hu0 hu1
 
-/-- Shifting a positive upper parameter by one multiplies the actual
+/-- Shifting a positive upper parameter by one multiplies the
 rational cyclotomic index by `p`, at every prime. -/
 theorem upperRamificationGroupInfinite_cyclotomic_index_add_one
     {u : ℝ} (hu : 0 < u) :
@@ -203,7 +203,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_index_add_one
     Nat.totient_prime_pow_succ (Fact.out : p.Prime), pow_succ]
   ring
 
-/-- The same exact growth holds for the public intrinsic APF index. -/
+/-- The same exact growth holds for the public APF index. -/
 theorem apfIndex_cyclotomicExtension_padic_add_one {u : ℝ} (hu : 0 < u) :
     apfIndex ℚ_[p] Cyc (u + 1) = p * apfIndex ℚ_[p] Cyc u := by
   rw [apfIndex_eq_upperInfiniteRelIndex ℚ_[p] Cyc (by linarith : 0 ≤ u + 1),
@@ -212,8 +212,8 @@ theorem apfIndex_cyclotomicExtension_padic_add_one {u : ℝ} (hu : 0 < u) :
     Subgroup.relIndex_top_right, Subgroup.relIndex_top_right]
   exact upperRamificationGroupInfinite_cyclotomic_index_add_one p hu
 
-/-- Strict APF for the original infinite rational cyclotomic extension
-follows from the proved growth of its actual intrinsic index. -/
+/-- Strict APF for the infinite rational cyclotomic extension
+follows from the growth of its index. -/
 instance isStrictlyAPF_cyclotomicExtension_padic : IsStrictlyAPF ℚ_[p] Cyc := by
   let := isAPF_cyclotomicExtension_padic p
   apply isStrictlyAPF_of_apfIndex_boundedGrowth ℚ_[p] Cyc
@@ -229,8 +229,8 @@ variable {K : Type*} [Field K] [CharZero K]
     [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
 omit [Algebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K] in
-/-- Every root of the indicated prime-power equation lies in the original
-finite cyclotomic layer, independently of the chosen primitive root. -/
+/-- Every root of the indicated prime-power equation lies in the
+finite cyclotomic layer, independently of the primitive root. -/
 theorem mem_cyclotomicLayer_of_pow_eq_one (n : ℕ) {ζ : AlgebraicClosure K}
     (hζ : ζ ^ (p ^ n) = 1) : ζ ∈ cyclotomicLayer (K := K) p n := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
@@ -238,8 +238,8 @@ theorem mem_cyclotomicLayer_of_pow_eq_one (n : ℕ) {ζ : AlgebraicClosure K}
   exact (cyclotomicLayer (K := K) p n).toSubalgebra.pow_mem
     (rootOfUnity_mem_cyclotomicLayer p n) j
 
-/-- One actual rational closure embedding sends the entire original
-rational cyclotomic field into the original cyclotomic field over `K`. -/
+/-- One rational closure embedding sends the entire
+rational cyclotomic field into the cyclotomic field over `K`. -/
 def rationalCyclotomicEmbedding : Cyc →ₐ[ℚ_[p]] cyclotomicExtension (K := K) p := by
   let e := IsAlgClosure.equiv ℚ_[p] (AlgebraicClosure ℚ_[p]) (AlgebraicClosure K)
   let f := e.toAlgHom.comp (cyclotomicExtension (K := ℚ_[p]) p).val
@@ -255,7 +255,7 @@ def rationalCyclotomicEmbedding : Cyc →ₐ[ℚ_[p]] cyclotomicExtension (K := 
     IntermediateField.adjoin_simple_le_iff.mpr hroot
   exact hle hn
 
-/-- The embedded rational cyclotomic field contains every original chosen
+/-- The embedded rational cyclotomic field contains every
 root over `K`; the two choices need not agree term by term. -/
 theorem cyclotomicRootOfUnity_mem_rationalCyclotomicEmbedding (n : ℕ) :
     cyclotomicRootOfUnity (K := K) p n ∈
@@ -281,8 +281,8 @@ local instance rationalCyclotomicBase_isAlgebraic :
     Algebra.IsAlgebraic ℚ_[p] (cyclotomicExtension (K := K) p) :=
   Algebra.IsAlgebraic.trans ℚ_[p] K (cyclotomicExtension (K := K) p)
 
-/-- The original cyclotomic field over `K` is the actual compositum of
-the embedded rational cyclotomic field and the original image of `K`. -/
+/-- The cyclotomic field over `K` is the compositum of
+the embedded rational cyclotomic field and the image of `K`. -/
 theorem rationalCyclotomicEmbedding_adjoin_base :
     IntermediateField.adjoin Cyc
       ((IsScalarTower.toAlgHom ℚ_[p] K (cyclotomicExtension (K := K) p)).fieldRange :
@@ -324,8 +324,8 @@ theorem finiteDimensional_of_adjoin_intermediateField_eq_top
   ((IntermediateField.equivOfEq h).trans
     IntermediateField.topEquiv).toLinearEquiv.finiteDimensional
 
-/-- The actual compositum has finite degree over the embedded rational
-cyclotomic extension, because the original base is finite over `Qp`. -/
+/-- The compositum has finite degree over the embedded rational
+cyclotomic extension, because the base is finite over `Qp`. -/
 theorem rationalCyclotomicEmbedding_finiteDimensional :
     FiniteDimensional Cyc (cyclotomicExtension (K := K) p) :=
   let : FiniteDimensional ℚ_[p]
@@ -335,8 +335,8 @@ theorem rationalCyclotomicEmbedding_finiteDimensional :
   finiteDimensional_of_adjoin_intermediateField_eq_top _
     (rationalCyclotomicEmbedding_adjoin_base (K := K) p)
 
-/-- The original cyclotomic field over a finite base remains strictly APF
-over the rational base, by the proved actual finite compositum. -/
+/-- The cyclotomic field over a finite base remains strictly APF
+over the rational base, by the finite compositum. -/
 theorem isStrictlyAPF_cyclotomicExtension_over_padic :
     IsStrictlyAPF ℚ_[p] (cyclotomicExtension (K := K) p) := by
   let := rationalCyclotomicEmbedding_finiteDimensional (K := K) p
@@ -351,7 +351,7 @@ variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [IsCompleteDiscreteValuedField K]
     [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- The original cyclotomic extension of every finite compatible normed
+/-- The cyclotomic extension of every finite compatible normed
 extension of `Qp` is strictly APF, at every prime. -/
 instance isStrictlyAPF_cyclotomicExtension :
     IsStrictlyAPF K (cyclotomicExtension (K := K) p) := by
@@ -360,7 +360,7 @@ instance isStrictlyAPF_cyclotomicExtension :
     (cyclotomicExtension (K := K) p)).mp
       (isStrictlyAPF_cyclotomicExtension_over_padic (K := K) p)
 
-/-- Public APF for the original cyclotomic field over its original finite
+/-- Public APF for the cyclotomic field over its finite
 normed base, with no normality or finiteness restriction on the top. -/
 instance isAPF_cyclotomicExtension :
     IsAPF K (cyclotomicExtension (K := K) p) := by
@@ -374,8 +374,8 @@ variable (F : Type*) [NontriviallyNormedField F] [IsCompleteDiscreteValuedField 
     [PerfectField (𝓀[F])]
 
 omit [PerfectField (𝓀[F])] in
-/-- Actual upper character images are preserved by an algebra isomorphism
-of the top fields. The characters are the canonical characters on those fields. -/
+/-- Upper character images are preserved by an algebra isomorphism
+of the top fields. The characters are the characters on those fields. -/
 theorem cyclotomicCharacter_map_upper_autCongr
     {E E' : Type*} [Field E] [Field E'] [Algebra F E] [Algebra F E']
     [∀ n, HasEnoughRootsOfUnity E (p ^ n)] [∀ n, HasEnoughRootsOfUnity E' (p ^ n)]
@@ -396,8 +396,8 @@ theorem cyclotomicCharacter_map_upper_autCongr
 
 variable [CharZero F]
 
-/-- Ordinary upper restriction to the original cyclotomic subfield preserves
-the canonical character image at every allowed upper parameter. -/
+/-- Upper restriction to the cyclotomic subfield preserves
+the character image at every allowed upper parameter. -/
 theorem cyclotomicExtension_map_upper_from_algebraicClosure
     {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite F (cyclotomicExtension (K := F) p) u).map
@@ -415,10 +415,10 @@ theorem cyclotomicExtension_map_upper_from_algebraicClosure
 
 end CharacterTransport
 
-/-- In any actual algebraic closure of the rational base, the canonical
-character sends the actual positive upper group onto the whole indicated
-principal-unit kernel. The proof uses ordinary restriction to the image of
-the original rational cyclotomic field. -/
+/-- In any algebraic closure of the rational base, the
+character sends the positive upper group onto the whole indicated
+principal-unit kernel. The proof uses restriction to the image of
+the rational cyclotomic field. -/
 theorem cyclotomicCharacter_map_upperRamificationGroupInfinite
     (Ω : Type*) [Field Ω] [Algebra ℚ_[p] Ω] [IsAlgClosure ℚ_[p] Ω]
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
@@ -467,9 +467,9 @@ variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [Algebra K (SeparableClosure (ℚ_[p]))]
     [IsScalarTower (ℚ_[p]) K (SeparableClosure (ℚ_[p]))]
 
-/-- Actual finite base change identifies the upper character image with
-the character image of the old upper group intersected with the actual
-fixing subgroup of the embedded original base. -/
+/-- Finite base change identifies the upper character image with
+the character image of the old upper group intersected with the
+fixing subgroup of the embedded base. -/
 theorem cyclotomicCharacter_map_upper_finiteBase {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite K (SeparableClosure K) (apfPsi ℚ_[p] K u)).map
         ((_root_.cyclotomicCharacter (SeparableClosure K) p).comp
@@ -502,7 +502,7 @@ theorem cyclotomicCharacter_map_upper_finiteBase {u : ℝ} (hu : -1 ≤ u) :
     Subgroup.map_comap_eq, AbstractFiniteBase.closureHom_range ℚ_[p] K]
 
 /-- The same finite-base identity computes the character image of the
-original cyclotomic subfield, with its original base and scalar maps. -/
+cyclotomic subfield, with its base and scalar maps. -/
 theorem cyclotomicExtension_map_upper_finiteBase {u : ℝ} (hu : -1 ≤ u) :
     (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) (apfPsi ℚ_[p] K u)).map
         (cyclotomicExtensionCharacter p) =
@@ -527,9 +527,9 @@ variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
     [IsCompleteDiscreteValuedField K]
     [NormedAlgebra (ℚ_[p]) K] [FiniteDimensional (ℚ_[p]) K]
 
-/-- After a genuine finite cutoff, the actual upper character image over
-the original finite base is the full rational principal-unit kernel at the
-actual finite-base inverse-Herbrand parameter. -/
+/-- After a finite cutoff, the upper character image over
+the finite base is the full rational principal-unit kernel at the
+finite-base inverse-Herbrand parameter. -/
 theorem exists_cyclotomicExtension_upper_principal_finiteBase :
     ∃ U : ℝ, 1 ≤ U ∧ ∀ u : ℝ, U ≤ u → ∀ r : ℕ,
       (r : ℝ) < u → u ≤ (r : ℝ) + 1 →
@@ -554,8 +554,8 @@ theorem exists_cyclotomicExtension_upper_principal_finiteBase :
   exact cyclotomicCharacter_map_upperRamificationGroupInfinite p (SeparableClosure ℚ_[p])
     r hr0 hr1
 
-/-- The actual full upper index over the original finite base differs from
-the rational index by exactly the fixed actual cyclotomic image index. -/
+/-- The full upper index over the finite base differs from
+the rational index by exactly the fixed cyclotomic image index. -/
 theorem exists_cyclotomicExtension_upper_index_finiteBase :
     ∃ U : ℝ, 1 ≤ U ∧ ∀ u : ℝ, U ≤ u →
       (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p)
@@ -572,7 +572,7 @@ theorem exists_cyclotomicExtension_upper_index_finiteBase :
       cyclotomicExtensionCharacter_surjective_padic p⟩] at h
   exact h
 
-/-- In the original finite base's upper parameter, shifting by its actual
+/-- In the finite base's upper parameter, shifting by its
 ramification index eventually multiplies the full cyclotomic upper index by
 exactly `p`. This includes the dyadic case and arbitrary finite residue degree. -/
 theorem exists_upperRamificationGroupInfinite_cyclotomic_index_add_ramificationIdx :

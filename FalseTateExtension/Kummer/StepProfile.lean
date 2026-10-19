@@ -23,7 +23,7 @@ inverse Herbrand function, and the successor formulas for the index and inverse 
 ## References
 
 * Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, 1.2.3.
+ applications*, 1.2.3.
 -/
 
 @[expose] public section
@@ -82,8 +82,8 @@ local instance kummerStepOwnValuation :
 include hπ n
 
 omit [PerfectField (𝓀[K])] in
-/-- On its own actual spectral integers, a consecutive radical step has
-canonical ramification index `p`. -/
+/-- On its own spectral integers, a consecutive radical step has
+ramification index `p`. -/
 theorem radicalLayer_step_own_ramificationIdx :
     (IsLocalRing.maximalIdeal (spectralIntegerRing F₀ F₁)).ramificationIdx
       (NormedField.valuation (K := F₀)).valuationSubring = p := by
@@ -93,7 +93,7 @@ theorem radicalLayer_step_own_ramificationIdx :
   rw [← h]
   exact radicalLayer_step_ramificationIdx p π n
 
-/-- The same actual relative different is computed on the own spectral
+/-- The same relative different is computed on the own spectral
 integer ring of the relative base field. -/
 theorem radicalLayer_step_own_different_order :
     (emultiplicity (IsLocalRing.maximalIdeal (spectralIntegerRing F₀ F₁))
@@ -106,7 +106,7 @@ theorem radicalLayer_step_own_different_order :
   rw [← h]
   exact radicalLayer_step_different_order p π n
 
-/-- The intrinsic upper index of the actual nonnormal prime step has
+/-- The upper index of the nonnormal prime step has
 break `p^(n+1) v_K(p)/(p-1)`, with its right endpoint included. -/
 theorem radicalLayer_step_apfIndex {u : ℝ} (hu : 0 ≤ u) :
     apfIndex F₀ F₁ u =
@@ -133,7 +133,7 @@ theorem radicalLayer_step_apfIndex {u : ℝ} (hu : 0 ≤ u) :
   rw [hb] at h
   exact h.2 u hu
 
-/-- The actual inverse Herbrand function of a consecutive radical step,
+/-- The inverse Herbrand function of a consecutive radical step,
 including its identity continuation for all nonpositive arguments. -/
 theorem radicalLayer_step_apfPsi (u : ℝ) :
     let t := (p : ℝ) ^ (n + 1) * (addVal 𝒪[K] (p : 𝒪[K])).toNat / ((p : ℝ) - 1)

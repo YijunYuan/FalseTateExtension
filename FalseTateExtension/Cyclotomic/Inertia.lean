@@ -12,13 +12,13 @@ public import FontaineWintenberger.Ramification.Infinite.Restriction
 public import Mathlib.FieldTheory.IntermediateField.Adjoin.Algebra
 
 /-!
-# Stabilization of actual cyclotomic inertia preimages
+# Stabilization of cyclotomic inertia preimages
 
-Ordinary restriction to the actual finite cyclotomic layers gives decreasing
-open normal subgroups. Their indices are the actual finite residue degrees,
+Restriction to the finite cyclotomic layers gives decreasing
+open normal subgroups. Their indices are the finite residue degrees,
 uniformly bounded by the base ramification index. Their stabilization and
-cofinality of the chosen layers prove openness of the actual infinite zero
-upper group. Ordinary infinite restriction identifies it with the image of
+cofinality of the layers prove openness of the infinite zero
+upper group. Infinite restriction identifies it with the image of
 the zero upper group of the algebraic closure.
 
 This proves blueprint `ft:cyclotomic-inertia-preimages`. No identification
@@ -37,8 +37,8 @@ section Fields
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
-/-- The positive chosen layer, viewed by its original inclusion as a finite
-Galois intermediate field of the actual infinite cyclotomic field. -/
+/-- The positive layer, viewed by its inclusion as a finite
+Galois intermediate field of the infinite cyclotomic field. -/
 def cyclotomicFiniteLayer (n : ℕ) :
     FiniteGaloisIntermediateField K (cyclotomicExtension (K := K) p) := by
   let i := IntermediateField.inclusion
@@ -47,14 +47,14 @@ def cyclotomicFiniteLayer (n : ℕ) :
   let : IsGalois K i.fieldRange := IsGalois.of_algEquiv i.equivFieldRange
   exact .mk i.fieldRange
 
-/-- The original inclusion is an isomorphism onto the actual finite field range. -/
+/-- The inclusion is an isomorphism onto the finite field range. -/
 def cyclotomicFiniteLayerEquiv (n : ℕ) :
     cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicFiniteLayer (K := K) p n :=
   (IntermediateField.inclusion
     (cyclotomicLayer_le_cyclotomicExtension (K := K) p (n + 1))).equivFieldRange
 
 /-- Restriction to the field range is conjugate to restriction to the
-original finite layer through the original inclusion isomorphism. -/
+finite layer through the inclusion isomorphism. -/
 theorem restrictNormal_cyclotomicFiniteLayer (n : ℕ)
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
     g.restrictNormal (cyclotomicFiniteLayer (K := K) p n) =
@@ -73,8 +73,8 @@ theorem restrictNormal_cyclotomicFiniteLayer (n : ℕ)
   exact (AlgEquiv.restrictNormal_commutes g (cyclotomicFiniteLayer (K := K) p n) (e y)).trans
     (cyclotomicRestrictionToLayer_commutes p (n + 1) g y).symm
 
-/-- Every actual finite intermediate field is contained in a positive
-chosen cyclotomic layer. No finiteness of the infinite field is needed. -/
+/-- Every finite intermediate field is contained in a positive
+cyclotomic layer. No finiteness of the infinite field is needed. -/
 theorem exists_le_cyclotomicFiniteLayer
     (E : IntermediateField K (cyclotomicExtension (K := K) p)) [FiniteDimensional K E] :
     ∃ n, E ≤ (cyclotomicFiniteLayer (K := K) p n).toIntermediateField := by
@@ -105,7 +105,7 @@ variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZ
 
 include p in
 omit [CharZero K] in
-/-- The original residue field of a finite compatible extension of the
+/-- The residue field of a finite compatible extension of the
 p-adic rationals is finite. -/
 theorem cyclotomicBase_residueFinite :
     Finite (𝓀[K]) := by
@@ -113,8 +113,8 @@ theorem cyclotomicBase_residueFinite :
   exact Module.finite_of_finite
     (𝓀[ℚ_[p]])
 
-/-- The actual finite Galois quotient by zero upper inertia has order the
-actual residue degree, via the actual residue automorphism group. -/
+/-- The finite Galois quotient by zero upper inertia has order the
+residue degree, via the residue automorphism group. -/
 theorem cyclotomicLayer_inertia_index (n : ℕ) :
     (upperRamificationGroup
       (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
@@ -130,7 +130,7 @@ theorem cyclotomicLayer_inertia_index (n : ℕ) :
   exact (Nat.card_congr (localResidueGaloisEquiv R S G).toEquiv).trans
     (IsGalois.card_aut_eq_finrank (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField S))
 
-/-- The actual preimage of finite zero upper inertia in the infinite
+/-- The preimage of finite zero upper inertia in the infinite
 cyclotomic Galois group. Its index is numbered by the positive level `n+1`. -/
 def cyclotomicInertiaPreimage (n : ℕ) :
     Subgroup (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) := by
@@ -170,7 +170,7 @@ theorem cyclotomicInertiaPreimage_index_le (n : ℕ) :
   rw [cyclotomicInertiaPreimage_index]
   exact cyclotomicLayer_spectral_residueDegree_le p K n
 
-/-- Finite upper restriction makes the actual inertia preimages decrease. -/
+/-- Finite upper restriction makes the inertia preimages decrease. -/
 theorem cyclotomicInertiaPreimage_antitone : Antitone (cyclotomicInertiaPreimage p K) := by
   let := cyclotomicBase_residueFinite p K
   intro m n h g hg
@@ -196,7 +196,7 @@ theorem cyclotomicInertiaPreimage_index_monotone :
   intro m n h
   exact Subgroup.index_antitone (cyclotomicInertiaPreimage_antitone p K h)
 
-/-- Uniformly bounded positive indices force stabilization of the actual
+/-- Uniformly bounded positive indices force stabilization of the
 decreasing subgroups, and their intersection is an attained preimage. -/
 theorem exists_cyclotomicInertiaPreimage_stable :
     ∃ N, (∀ n, N ≤ n → cyclotomicInertiaPreimage p K n = cyclotomicInertiaPreimage p K N) ∧
@@ -212,8 +212,8 @@ theorem exists_cyclotomicInertiaPreimage_stable :
   · rw [hstable n hn]
   · exact cyclotomicInertiaPreimage_antitone p K hn
 
-/-- Cofinality of the chosen positive layers identifies the actual infinite
-zero upper group with the intersection of the actual inertia preimages. -/
+/-- Cofinality of the positive layers identifies the infinite
+zero upper group with the intersection of the inertia preimages. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
     upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
       ⨅ n, cyclotomicInertiaPreimage p K n := by
@@ -254,7 +254,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_iInf :
       (by norm_num : (-1 : ℝ) ≤ 0)]
     exact Subgroup.mem_map.mpr ⟨g.restrictNormal (cyclotomicFiniteLayer (K := K) p n), hD, hres⟩
 
-/-- The actual infinite inertia group is already an attained finite-layer
+/-- The infinite inertia group is already an attained finite-layer
 inertia preimage, and all subsequent preimages are the same subgroup. -/
 theorem exists_cyclotomic_inertia_eq_preimage :
     ∃ N, upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 =
@@ -269,7 +269,7 @@ theorem cyclotomic_inertia_finiteIndex :
   rw [hN]
   infer_instance
 
-/-- The actual infinite inertia index retains the sharp finite-layer bound. -/
+/-- The infinite inertia index retains the sharp finite-layer bound. -/
 theorem cyclotomic_inertia_index_le :
     (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0).index ≤
       (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx
@@ -278,7 +278,7 @@ theorem cyclotomic_inertia_index_le :
   rw [hN]
   exact cyclotomicInertiaPreimage_index_le p K N
 
-/-- The actual zero upper group is open in the Krull Galois group of the
+/-- The zero upper group is open in the Krull Galois group of the
 infinite cyclotomic extension. -/
 theorem isOpen_cyclotomic_inertia :
     IsOpen (upperRamificationGroupInfinite K (cyclotomicExtension (K := K) p) 0 :
@@ -287,8 +287,8 @@ theorem isOpen_cyclotomic_inertia :
   rw [hN]
   exact isOpen_cyclotomicInertiaPreimage p K N
 
-/-- Full ordinary infinite restriction identifies the actual cyclotomic
-inertia with the image of the actual algebraic closure's zero upper group. -/
+/-- Full infinite restriction identifies the cyclotomic
+inertia with the image of the algebraic closure's zero upper group. -/
 theorem cyclotomic_inertia_eq_absolute_image :
     (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)) =

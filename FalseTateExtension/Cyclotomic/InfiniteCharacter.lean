@@ -10,13 +10,13 @@ public import FalseTateExtension.CyclotomicImage
 public import FalseTateExtension.Cyclotomic.Restriction
 
 /-!
-# The actual infinite rational cyclotomic character
+# The infinite rational cyclotomic character
 
-Finite cyclotomic characters and ordinary restriction make the closed fibers
-of every finite residue coordinate nonempty. Compactness of the actual Krull
-Galois group yields surjectivity of its canonical p-adic character and hence
+Finite cyclotomic characters and restriction make the closed fibers
+of every finite residue coordinate nonempty. Compactness of the Krull
+Galois group yields surjectivity of its p-adic character and hence
 a topological group isomorphism with the p-adic units. The unbounded degrees
-of the actual finite layers also prove that the extension has infinite degree.
+of the finite layers also prove that the extension has infinite degree.
 
 This proves blueprint `ft:infinite-cyclotomic-character`.
 -/
@@ -30,7 +30,7 @@ namespace FalseTateExtension
 variable (p : ℕ) [Fact p.Prime]
 
 /-- The finite character is exactly the corresponding residue coordinate
-of the existing canonical infinite character. -/
+of the infinite character. -/
 theorem cyclotomicLayerCharacter_restrict (m : ℕ)
     (g : cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p) :
     cyclotomicLayerCharacter p m (cyclotomicRestrictionToLayer p m g) =
@@ -45,13 +45,13 @@ theorem cyclotomicLayerCharacter_restrict (m : ℕ)
   rw [cyclotomicRestrictionToLayer_commutes]
   exact cyclotomicExtensionCharacter_spec p m g
 
-/-- The actual residue-coordinate fiber of the existing infinite character. -/
+/-- The residue-coordinate fiber of the infinite character. -/
 def cyclotomicCharacterFiber (u : (ℤ_[p])ˣ) (m : ℕ) :
     Set (cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p) :=
   {g | PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p]) =
     PadicInt.toZModPow m (u : ℤ_[p])}
 
-/-- The finite coordinate fibers are closed in the actual Krull topology. -/
+/-- The finite coordinate fibers are closed in the Krull topology. -/
 theorem isClosed_cyclotomicCharacterFiber (u : (ℤ_[p])ˣ) (m : ℕ) :
     IsClosed (cyclotomicCharacterFiber p u m) := by
   have hc : Continuous (fun g ↦
@@ -66,7 +66,7 @@ theorem isClosed_cyclotomicCharacterFiber (u : (ℤ_[p])ˣ) (m : ℕ) :
   rw [he] at hc
   exact isClosed_eq hc continuous_const
 
-/-- Finite-character surjectivity and actual normal restriction make each
+/-- Finite-character surjectivity and normal restriction make each
 residue fiber nonempty. -/
 theorem cyclotomicCharacterFiber_nonempty (u : (ℤ_[p])ˣ) (m : ℕ) :
     (cyclotomicCharacterFiber p u m).Nonempty := by
@@ -78,7 +78,7 @@ theorem cyclotomicCharacterFiber_nonempty (u : (ℤ_[p])ˣ) (m : ℕ) :
   rw [cyclotomicLayerCharacter_restrict p m g] at hh
   exact congrArg Units.val hh
 
-/-- The residue fibers are nested, by the canonical reduction compatibility. -/
+/-- The residue fibers are nested, by the reduction compatibility. -/
 theorem cyclotomicCharacterFiber_succ_subset (u : (ℤ_[p])ˣ) (m : ℕ) :
     cyclotomicCharacterFiber p u (m + 1) ⊆ cyclotomicCharacterFiber p u m := by
   intro g hg
@@ -89,8 +89,8 @@ theorem cyclotomicCharacterFiber_succ_subset (u : (ℤ_[p])ˣ) (m : ℕ) :
   change PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p]) = _
   exact (hf _).symm.trans ((congrArg f hg).trans (hf _))
 
-/-- Compactness of the actual Krull Galois group produces an automorphism
-realizing every p-adic unit under the existing canonical character. -/
+/-- Compactness of the Krull Galois group produces an automorphism
+realizing every p-adic unit under the character. -/
 theorem cyclotomicExtensionCharacter_surjective_padic :
     Function.Surjective (cyclotomicExtensionCharacter (K := ℚ_[p]) p) := by
   intro u
@@ -105,8 +105,8 @@ theorem cyclotomicExtensionCharacter_surjective_padic :
   intro m
   exact Set.mem_iInter.mp hg m
 
-/-- The canonical infinite rational cyclotomic character is an isomorphism
-of the actual Krull Galois group with the p-adic units, with continuous inverse. -/
+/-- The infinite rational cyclotomic character is an isomorphism
+of the Krull Galois group with the p-adic units, with continuous inverse. -/
 def cyclotomicExtensionGaloisEquivUnits :
     (cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p) ≃ₜ*
       (ℤ_[p])ˣ := by
@@ -126,13 +126,13 @@ def cyclotomicExtensionGaloisEquivUnits :
       continuous_toFun := hc
       continuous_invFun := hi }
 
-/-- The topological isomorphism evaluates as the original canonical character. -/
+/-- The topological isomorphism evaluates as the character. -/
 @[simp]
 theorem cyclotomicExtensionGaloisEquivUnits_apply
     (g : cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p) :
     cyclotomicExtensionGaloisEquivUnits p g = cyclotomicExtensionCharacter p g := rfl
 
-/-- The degrees of the actual rational cyclotomic layers are unbounded. -/
+/-- The degrees of the rational cyclotomic layers are unbounded. -/
 theorem cyclotomicLayer_padic_degrees_unbounded (N : ℕ) :
     ∃ m, N < Module.finrank (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m) := by
   refine ⟨N + 1, ?_⟩
@@ -140,7 +140,7 @@ theorem cyclotomicLayer_padic_degrees_unbounded (N : ℕ) :
   exact (show N < p ^ N from Nat.lt_pow_self (Fact.out : p.Prime).one_lt).trans_le
     (Nat.le_mul_of_pos_right _ (by have := (Fact.out : p.Prime).two_le; omega))
 
-/-- The actual infinite rational cyclotomic extension is not finite dimensional. -/
+/-- The infinite rational cyclotomic extension is not finite dimensional. -/
 theorem not_finiteDimensional_cyclotomicExtension_padic :
     ¬FiniteDimensional (ℚ_[p]) (cyclotomicExtension (K := ℚ_[p]) p) := by
   intro h

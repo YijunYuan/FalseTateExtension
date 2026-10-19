@@ -11,12 +11,12 @@ public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
-# Naturality and openness of the actual cyclotomic character
+# Naturality and openness of the cyclotomic character
 
-The canonical character is natural for actual field embeddings intertwining
-automorphisms. On the actual algebraic closure of a finite extension of the
+The character is natural for field embeddings intertwining
+automorphisms. On the algebraic closure of a finite extension of the
 p-adic rationals, its scalar-restriction image has index equal to the base
-degree. Surjectivity over the rational base therefore makes the existing
+degree. Surjectivity over the rational base therefore makes the
 cyclotomic character image finite index, with index dividing that degree.
 Its closedness then proves openness.
 
@@ -32,8 +32,8 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- On the actual algebraic closure of the p-adic rationals, the canonical
-character is surjective by restriction to the actual cyclotomic subfield. -/
+/-- On the algebraic closure of the p-adic rationals, the
+character is surjective by restriction to the cyclotomic subfield. -/
 theorem cyclotomicCharacter_algebraicClosure_padic_surjective :
     Function.Surjective ((_root_.cyclotomicCharacter (AlgebraicClosure (ℚ_[p])) p).comp
       (MulSemiringAction.toRingAut
@@ -50,7 +50,7 @@ theorem cyclotomicCharacter_algebraicClosure_padic_surjective :
     (AlgEquiv.restrictNormal_commutes h (cyclotomicExtension (K := ℚ_[p]) p))
   exact hc.symm.trans hg
 
-/-- Naturality transfers the actual rational surjectivity to any actual
+/-- Naturality transfers the rational surjectivity to any
 algebraic closure of the p-adic rationals. -/
 theorem cyclotomicCharacter_surjective_of_isAlgClosure
     (Ω : Type*) [Field Ω] [Algebra (ℚ_[p]) Ω] [IsAlgClosure (ℚ_[p]) Ω] :
@@ -70,8 +70,8 @@ theorem cyclotomicCharacter_surjective_of_isAlgClosure
 
 variable {K : Type*} [Field K] [CharZero K]
 
-/-- The actual cyclotomic-subfield character is the restriction of the
-canonical character of the same actual algebraic closure. -/
+/-- The cyclotomic-subfield character is the restriction of the
+character of the same algebraic closure. -/
 theorem cyclotomicCharacter_restrict_cyclotomicExtension
     (g : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) :
     cyclotomicExtensionCharacter p (g.restrictNormal (cyclotomicExtension (K := K) p)) =
@@ -84,8 +84,8 @@ theorem cyclotomicCharacter_restrict_cyclotomicExtension
 
 variable [Algebra (ℚ_[p]) K]
 
-/-- The existing actual cyclotomic character image is the image of the
-actual scalar-restriction subgroup in the same algebraic closure. -/
+/-- The cyclotomic character image is the image of the
+scalar-restriction subgroup in the same algebraic closure. -/
 theorem cyclotomicExtensionCharacter_range_eq_map :
     (cyclotomicExtensionCharacter (K := K) p).range =
       (AlgEquiv.restrictScalarsHom (ℚ_[p]) (S := K) (A := AlgebraicClosure K)).range.map
@@ -104,7 +104,7 @@ theorem cyclotomicExtensionCharacter_range_eq_map :
 
 variable [FiniteDimensional (ℚ_[p]) K]
 
-/-- The actual character image has genuinely finite index; its index does
+/-- The character image has finite index; its index does
 not take the zero value reserved for infinite index. -/
 instance cyclotomicExtensionCharacter_finiteIndex :
     (cyclotomicExtensionCharacter (K := K) p).range.FiniteIndex := by
@@ -116,7 +116,7 @@ instance cyclotomicExtensionCharacter_finiteIndex :
   exact Subgroup.FiniteIndex.map_of_surjective S
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
 
-/-- The actual cyclotomic image index divides the finite base degree. -/
+/-- The cyclotomic image index divides the finite base degree. -/
 theorem cyclotomicExtensionCharacter_index_dvd :
     (cyclotomicExtensionCharacter (K := K) p).range.index ∣ Module.finrank (ℚ_[p]) K := by
   rw [cyclotomicExtensionCharacter_range_eq_map]
@@ -125,13 +125,13 @@ theorem cyclotomicExtensionCharacter_index_dvd :
     (cyclotomicCharacter_surjective_of_isAlgClosure p (AlgebraicClosure K))
   simpa only [AlgEquiv.index_range_restrictScalarsHom] using h
 
-/-- In particular the actual image index is a positive integer. -/
+/-- In particular the image index is a positive integer. -/
 theorem cyclotomicExtensionCharacter_index_pos :
     0 < (cyclotomicExtensionCharacter (K := K) p).range.index :=
   Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
 
-/-- The existing actual cyclotomic character image is open at every prime,
-by its proved finite index and its existing actual closed embedding. -/
+/-- The cyclotomic character image is open at every prime,
+by its finite index and its closed embedding. -/
 theorem isOpen_cyclotomicExtensionCharacter_range :
     IsOpen ((cyclotomicExtensionCharacter (K := K) p).range : Set (ℤ_[p])ˣ) :=
   Subgroup.isOpen_of_isClosed_of_finiteIndex _

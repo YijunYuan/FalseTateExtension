@@ -24,7 +24,7 @@ and the indices grow by a factor `p` at every break.
 ## References
 
 * Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, 1.2.3.
+ applications*, 1.2.3.
 -/
 
 @[expose] public section
@@ -106,7 +106,7 @@ theorem radicalSeparable_apfSubgroup_eq_layer [hπ : Fact (Irreducible π)] (N :
   · rw [hstable n hn]
   · exact hanti hn
 
-/-- Every actual embedding of the infinite radical extension has full
+/-- Every embedding of the infinite radical extension has full
 zero-level APF product. No positivity assumption on the valuation of `p`
 is needed for this assertion. -/
 theorem apfSubgroup_kummerExtension_zero_eq_top [hπ : Fact (Irreducible π)]
@@ -155,8 +155,8 @@ theorem radicalSeparable_isAPF [hπ : Fact (Irreducible π)]
     rw [top_unique hle]
     exact isOpen_univ
 
-/-- The actual infinite radical extension is APF whenever the residue
-characteristic is `p`, expressed by the positive actual valuation of `p`. -/
+/-- The infinite radical extension is APF whenever the residue
+characteristic is `p`, expressed by the positive valuation of `p`. -/
 theorem isAPF_kummerExtension_of_addVal_p_pos [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) : IsAPF K (kummerExtension p (π : K)) := by
   let j := (radicalClosureEmbedding (K := K)).comp (kummerExtension p (π : K)).val
@@ -169,7 +169,7 @@ theorem isAPF_kummerExtension_of_addVal_p_pos [hπ : Fact (Irreducible π)]
   rw [hr]
   exact radicalSeparable_isAPF p π he
 
-/-- At every fixed upper parameter before the next threshold, the actual
+/-- At every fixed upper parameter before the next threshold, the
 infinite radical index is exactly its attained finite-layer index. -/
 theorem kummerExtension_apfIndex_eq_layer [hπ : Fact (Irreducible π)] (N : ℕ)
     {u : ℝ} (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p (N + 1)) :
@@ -190,8 +190,8 @@ theorem kummerExtension_apfIndex_eq_layer [hπ : Fact (Irreducible π)] (N : ℕ
     apfInertiaSubgroup_eq_inf K _ u hu, apfInertiaSubgroup_eq_inf K _ u hu,
     radicalSeparable_apfSubgroup_eq_layer p π N hu hb]
 
-/-- The full APF-product index for any actual separable embedding equals
-the intrinsic inertia index of the original infinite radical extension. -/
+/-- The full APF-product index for any separable embedding equals
+the inertia index of the infinite radical extension. -/
 theorem kummerExtension_apfSubgroup_fieldRange_index [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat)
     (j : kummerExtension p (π : K) →ₐ[K] SeparableClosure K)
@@ -209,14 +209,14 @@ theorem kummerExtension_apfSubgroup_fieldRange_index [hπ : Fact (Irreducible π
     radicalSeparable_apfSubgroup_index p π N hu,
     kummerExtension_apfIndex_eq_layer p π N hu hN]
 
-/-- The actual infinite radical index is one through the first threshold. -/
+/-- The infinite radical index is one through the first threshold. -/
 theorem kummerExtension_apfIndex_initial [hπ : Fact (Irreducible π)] {u : ℝ}
     (hu : 0 ≤ u) (hb : u ≤ radicalUpperBreak (K := K) p 1) :
     apfIndex K (kummerExtension p (π : K)) u = 1 := by
   rw [kummerExtension_apfIndex_eq_layer p π 0 hu hb,
     radicalLayer_apfIndex_initial p π 0 hu hb]
 
-/-- The actual infinite radical index on each interval between consecutive
+/-- The infinite radical index on each interval between consecutive
 thresholds includes the right endpoint. -/
 theorem kummerExtension_apfIndex_interval [hπ : Fact (Irreducible π)] (j : ℕ) {u : ℝ}
     (hlo : radicalUpperBreak (K := K) p j < u)
@@ -226,7 +226,7 @@ theorem kummerExtension_apfIndex_interval [hπ : Fact (Irreducible π)] (j : ℕ
     ((radicalUpperBreak_nonneg p j).trans hlo.le) hhi,
     radicalLayer_apfIndex_tail p π j hlo]
 
-/-- Shifting by the actual positive base valuation of `p` crosses at most
+/-- Shifting by the positive base valuation of `p` crosses at most
 one jump in the infinite radical extension. -/
 theorem kummerExtension_apfIndex_growth [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) {u : ℝ} (hu : 0 ≤ u) :
@@ -240,7 +240,7 @@ theorem kummerExtension_apfIndex_growth [hπ : Fact (Irreducible π)]
       ((le_add_of_nonneg_right (Nat.cast_nonneg _)).trans hN)]
   exact radicalLayer_apfIndex_growth p π N hu
 
-/-- The actual inverse Herbrand integral of the infinite radical extension
+/-- The inverse Herbrand integral of the infinite radical extension
 has the explicit geometric values at its affine upper thresholds. -/
 theorem kummerExtension_apfPsi_break [hπ : Fact (Irreducible π)] (j : ℕ) :
     apfPsi K (kummerExtension p (π : K)) (radicalUpperBreak (K := K) p j) =
@@ -298,8 +298,8 @@ theorem kummerExtension_apfPsi_div_index_ge [hπ : Fact (Irreducible π)]
   obtain ⟨N, hN⟩ := exists_radicalUpperBreak_ge p he u
   exact hratio N hN
 
-/-- The actual infinite radical extension is strictly APF at every prime
-when the actual base valuation of `p` is positive. -/
+/-- The infinite radical extension is strictly APF at every prime
+when the base valuation of `p` is positive. -/
 theorem isStrictlyAPF_kummerExtension_of_addVal_p_pos [hπ : Fact (Irreducible π)]
     (he : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toNat) :
     IsStrictlyAPF K (kummerExtension p (π : K)) := by
@@ -326,13 +326,13 @@ theorem addVal_p_toNat_pos_of_padicBase : 0 < (addVal 𝒪[K] (p : 𝒪[K])).toN
   exact local_ramificationIdx_pos
     𝒪[ℚ_[p]] 𝒪[K]
 
-/-- The actual infinite radical extension over a norm-compatible `p`-adic
-base is APF; positivity comes from its canonical ramification index. -/
+/-- The infinite radical extension over a norm-compatible `p`-adic
+base is APF; positivity comes from its ramification index. -/
 instance isAPF_kummerExtension [hπ : Fact (Irreducible π)] :
     IsAPF K (kummerExtension p (π : K)) :=
   isAPF_kummerExtension_of_addVal_p_pos p π (addVal_p_toNat_pos_of_padicBase p)
 
-/-- The actual infinite radical extension over a norm-compatible `p`-adic
+/-- The infinite radical extension over a norm-compatible `p`-adic
 base is strictly APF, including the prime two. -/
 instance isStrictlyAPF_kummerExtension [hπ : Fact (Irreducible π)] :
     IsStrictlyAPF K (kummerExtension p (π : K)) :=

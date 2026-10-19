@@ -32,12 +32,12 @@ section Breaks
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
 variable (p : ℕ) [Fact p.Prime]
 
-/-- The original-base upper thresholds; `j=0` is also useful for the
+/-- The base upper thresholds; `j=0` is also useful for the
 initial affine identity before any nontrivial radical layer. -/
 def radicalUpperBreak (j : ℕ) : ℝ :=
   (absoluteRamificationIdx p K : ℝ) * ((j : ℝ) + 1 / ((p : ℝ) - 1))
 
-/-- The actual relative upper break in `F_(n+1)/F_n`. -/
+/-- The relative upper break in `F_(n+1)/F_n`. -/
 def radicalRelativeBreak (n : ℕ) : ℝ :=
   (p : ℝ) ^ (n + 1) * (absoluteRamificationIdx p K : ℝ) / ((p : ℝ) - 1)
 

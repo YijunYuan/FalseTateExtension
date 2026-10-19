@@ -23,7 +23,7 @@ infinite.
 * `padicUnitBallEquiv : 𝒪[ℚ_[p]] ≃+* ℤ_[p]`
 * `padicUnitBallResidueEquiv : 𝓀[ℚ_[p]] ≃+* ZMod p`
 * instances `IsCompleteDiscreteValuedField ℚ_[p]`, `IsPerfectResidueLocalField ℚ_[p]`,
-  `Finite 𝓀[ℚ_[p]]`, `CharP 𝓀[ℚ_[p]] p`, `Infinite ℤ_[p]ˣ`
+ `Finite 𝓀[ℚ_[p]]`, `CharP 𝓀[ℚ_[p]] p`, `Infinite ℤ_[p]ˣ`
 * `residueChar_padic : residueChar ℚ_[p] = p`
 * `padicUnitBall_normalizedValuation_p`
 -/

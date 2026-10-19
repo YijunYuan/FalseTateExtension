@@ -12,7 +12,7 @@ public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 In an algebraically closed field of characteristic zero, every element admits
 a compatible sequence of p-power radicals, and primitive p-power roots of unity
-can be chosen compatibly. The construction includes `p = 2` and a zero initial
+can be compatibly. The construction includes `p = 2` and a zero initial
 radicand.
 
 This supplies the choices in blueprint `ft:compatible-roots`, following the
@@ -53,8 +53,8 @@ theorem exists_compatible_radicals (p : ℕ) [Fact p.Prime] (π : Ω) :
 
 variable [CharZero Ω]
 
-/-- Primitive p-power roots of unity can be chosen compatibly, with the
-zeroth root equal to one. The initial primitive pth root is chosen separately
+/-- Primitive p-power roots of unity can be compatibly, with the
+zeroth root equal to one. The initial primitive pth root is separately
 before taking successive pth roots, ensuring primitivity at every level. -/
 theorem exists_compatible_primitive_roots (p : ℕ) [Fact p.Prime] :
     ∃ ζ : ℕ → Ω, ζ 0 = 1 ∧
