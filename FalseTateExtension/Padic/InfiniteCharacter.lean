@@ -7,6 +7,7 @@ module
 
 public import FalseTateExtension.Padic.FiniteCharacter
 public import FalseTateExtension.CyclotomicImage
+public import FalseTateExtension.Padic.CyclotomicRestriction
 
 /-!
 # The actual infinite rational cyclotomic character
@@ -28,83 +29,20 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- Ordinary restriction from the actual infinite cyclotomic field to one
-of its original finite layers. -/
-def cyclotomicLayerRestriction (m : ℕ) :
-    (cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p) →*
-      (cyclotomicLayer (K := ℚ_[p]) p m ≃ₐ[ℚ_[p]] cyclotomicLayer (K := ℚ_[p]) p m) := by
-  let : Algebra (cyclotomicLayer (K := ℚ_[p]) p m) (cyclotomicExtension (K := ℚ_[p]) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
-  let : IsScalarTower (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m)
-      (cyclotomicExtension (K := ℚ_[p]) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := ℚ_[p]) p m)
-
-/-- Restriction uses the original inclusion into the infinite field. -/
-theorem cyclotomicLayerRestriction_commutes (m : ℕ)
-    (g : cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p)
-    (x : cyclotomicLayer (K := ℚ_[p]) p m) :
-    IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m)
-        (cyclotomicLayerRestriction p m g x) =
-      g (IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m) x) := by
-  let : Algebra (cyclotomicLayer (K := ℚ_[p]) p m) (cyclotomicExtension (K := ℚ_[p]) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
-  let : IsScalarTower (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m)
-      (cyclotomicExtension (K := ℚ_[p]) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := ℚ_[p]) p m) x
-
-/-- Every actual finite cyclotomic automorphism extends to the infinite
-cyclotomic extension. -/
-theorem cyclotomicLayerRestriction_surjective (m : ℕ) :
-    Function.Surjective (cyclotomicLayerRestriction p m) := by
-  let : Algebra (cyclotomicLayer (K := ℚ_[p]) p m) (cyclotomicExtension (K := ℚ_[p]) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
-  let : IsScalarTower (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p m)
-      (cyclotomicExtension (K := ℚ_[p]) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom_surjective (cyclotomicExtension (K := ℚ_[p]) p)
-
-/-- Ordinary finite-layer restriction is continuous for the actual Krull
-topologies. The intermediate field in the infinite field is the original
-inclusion's field range. -/
-theorem continuous_cyclotomicLayerRestriction (m : ℕ) :
-    Continuous (cyclotomicLayerRestriction p m) := by
-  let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := ℚ_[p]) p m)
-  let e := i.equivFieldRange
-  have : Module.Finite (ℚ_[p]) i.fieldRange := Module.Finite.equiv e.toLinearEquiv
-  have : IsGalois (ℚ_[p]) i.fieldRange := IsGalois.of_algEquiv e
-  have hc : Continuous (fun g : cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]]
-      cyclotomicExtension (K := ℚ_[p]) p ↦
-      e.symm.autCongr (AlgEquiv.restrictNormalHom i.fieldRange g)) :=
-    continuous_of_discreteTopology.comp (InfiniteGalois.restrictNormalHom_continuous i.fieldRange)
-  convert hc using 1
-  funext g
-  apply AlgEquiv.ext
-  intro x
-  apply (show Function.Injective i from i.injective)
-  rw [cyclotomicLayerRestriction_commutes]
-  change g (i x) = i (e.symm ((g.restrictNormal i.fieldRange) (e x)))
-  have he (y : i.fieldRange) : i (e.symm y) = y := by
-    change (e (e.symm y) : cyclotomicExtension (K := ℚ_[p]) p) = _
-    rw [e.apply_symm_apply]
-  rw [he]
-  exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
-
 /-- The finite character is exactly the corresponding residue coordinate
 of the existing canonical infinite character. -/
 theorem cyclotomicLayerCharacter_restrict (m : ℕ)
     (g : cyclotomicExtension (K := ℚ_[p]) p ≃ₐ[ℚ_[p]] cyclotomicExtension (K := ℚ_[p]) p) :
-    cyclotomicLayerCharacter p m (cyclotomicLayerRestriction p m g) =
+    cyclotomicLayerCharacter p m (cyclotomicRestrictionToLayer p m g) =
       Units.map (PadicInt.toZModPow m).toMonoidHom (cyclotomicExtensionCharacter p g) := by
   apply cyclotomicLayerCharacter_unique p m
   let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := ℚ_[p]) p m)
   apply i.injective
   rw [map_pow]
-  change i (cyclotomicLayerRestriction p m g (cyclotomicLayerRoot p m)) =
+  change i (cyclotomicRestrictionToLayer p m g (cyclotomicLayerRoot p m)) =
     cyclotomicRootOfUnity p m ^
       (PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p])).val
-  rw [cyclotomicLayerRestriction_commutes]
+  rw [cyclotomicRestrictionToLayer_commutes]
   exact cyclotomicExtensionCharacter_spec p m g
 
 /-- The actual residue-coordinate fiber of the existing infinite character. -/
@@ -117,10 +55,10 @@ def cyclotomicCharacterFiber (u : (ℤ_[p])ˣ) (m : ℕ) :
 theorem isClosed_cyclotomicCharacterFiber (u : (ℤ_[p])ˣ) (m : ℕ) :
     IsClosed (cyclotomicCharacterFiber p u m) := by
   have hc : Continuous (fun g ↦
-      (cyclotomicLayerCharacter p m (cyclotomicLayerRestriction p m g) : ZMod (p ^ m))) :=
+      (cyclotomicLayerCharacter p m (cyclotomicRestrictionToLayer p m g) : ZMod (p ^ m))) :=
     (Units.continuous_val.comp (continuous_of_discreteTopology :
-      Continuous (cyclotomicLayerCharacter p m))).comp (continuous_cyclotomicLayerRestriction p m)
-  have he : (fun g ↦ (cyclotomicLayerCharacter p m (cyclotomicLayerRestriction p m g) :
+      Continuous (cyclotomicLayerCharacter p m))).comp (continuous_cyclotomicRestrictionToLayer p m)
+  have he : (fun g ↦ (cyclotomicLayerCharacter p m (cyclotomicRestrictionToLayer p m g) :
       ZMod (p ^ m))) =
       (fun g ↦ PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p])) := by
     funext g
@@ -134,7 +72,7 @@ theorem cyclotomicCharacterFiber_nonempty (u : (ℤ_[p])ˣ) (m : ℕ) :
     (cyclotomicCharacterFiber p u m).Nonempty := by
   obtain ⟨h, hh⟩ := cyclotomicLayerCharacter_surjective p m
     (Units.map (PadicInt.toZModPow m).toMonoidHom u)
-  obtain ⟨g, rfl⟩ := cyclotomicLayerRestriction_surjective p m h
+  obtain ⟨g, rfl⟩ := cyclotomicRestrictionToLayer_surjective p m h
   refine ⟨g, ?_⟩
   change PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p]) = _
   rw [cyclotomicLayerCharacter_restrict p m g] at hh

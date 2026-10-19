@@ -6,6 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Padic.CyclotomicResidueBound
+public import FalseTateExtension.Padic.CyclotomicRestriction
 public import FontaineWintenberger.LocalField.Residue.Basic
 public import FontaineWintenberger.Ramification.Infinite.Restriction
 public import Mathlib.FieldTheory.IntermediateField.Adjoin.Algebra
@@ -35,98 +36,6 @@ namespace FalseTateExtension
 section Fields
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
-
-/-- Ordinary restriction along the original inclusion of a chosen finite
-cyclotomic layer in the actual infinite cyclotomic extension. -/
-def cyclotomicRestrictionToLayer (m : ℕ) :
-    (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →*
-      (cyclotomicLayer (K := K) p m ≃ₐ[K] cyclotomicLayer (K := K) p m) := by
-  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := K) p m)
-
-theorem cyclotomicRestrictionToLayer_commutes (m : ℕ)
-    (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)
-    (x : cyclotomicLayer (K := K) p m) :
-    IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m)
-        (cyclotomicRestrictionToLayer p m g x) =
-      g (IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p m) x) := by
-  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := K) p m) x
-
-theorem cyclotomicRestrictionToLayer_surjective (m : ℕ) :
-    Function.Surjective (cyclotomicRestrictionToLayer (K := K) p m) := by
-  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p m))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicExtension (K := K) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom_surjective (cyclotomicExtension (K := K) p)
-
-/-- Ordinary restriction is continuous for the actual Krull topologies. -/
-theorem continuous_cyclotomicRestrictionToLayer (m : ℕ) :
-    Continuous (cyclotomicRestrictionToLayer (K := K) p m) := by
-  let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := K) p m)
-  let e := i.equivFieldRange
-  have : Module.Finite K i.fieldRange := Module.Finite.equiv e.toLinearEquiv
-  have : IsGalois K i.fieldRange := IsGalois.of_algEquiv e
-  have hc : Continuous (fun g : cyclotomicExtension (K := K) p ≃ₐ[K]
-      cyclotomicExtension (K := K) p ↦
-      e.symm.autCongr (AlgEquiv.restrictNormalHom i.fieldRange g)) :=
-    continuous_of_discreteTopology.comp (InfiniteGalois.restrictNormalHom_continuous i.fieldRange)
-  convert hc using 1
-  funext g
-  apply AlgEquiv.ext
-  intro x
-  apply (show Function.Injective i from i.injective)
-  rw [cyclotomicRestrictionToLayer_commutes]
-  change g (i x) = i (e.symm ((g.restrictNormal i.fieldRange) (e x)))
-  have he (y : i.fieldRange) : i (e.symm y) = y := by
-    change (e (e.symm y) : cyclotomicExtension (K := K) p) = _
-    rw [e.apply_symm_apply]
-  rw [he]
-  exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
-
-/-- Ordinary restriction between the original chosen finite layers. -/
-def cyclotomicRestrictionBetweenLayers {m n : ℕ} (h : m ≤ n) :
-    (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) →*
-      (cyclotomicLayer (K := K) p m ≃ₐ[K] cyclotomicLayer (K := K) p m) := by
-  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_mono p h))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := K) p m)
-
-theorem cyclotomicRestrictionBetweenLayers_commutes {m n : ℕ} (h : m ≤ n)
-    (g : cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n)
-    (x : cyclotomicLayer (K := K) p m) :
-    IntermediateField.inclusion (cyclotomicLayer_mono p h)
-        (cyclotomicRestrictionBetweenLayers p h g x) =
-      g (IntermediateField.inclusion (cyclotomicLayer_mono p h) x) := by
-  let : Algebra (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_mono p h))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p m) (cyclotomicLayer (K := K) p n) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := K) p m) x
-
-theorem cyclotomicRestrictionToLayer_comp {m n : ℕ} (h : m ≤ n) :
-    cyclotomicRestrictionToLayer (K := K) p m =
-      (cyclotomicRestrictionBetweenLayers p h).comp (cyclotomicRestrictionToLayer p n) := by
-  apply MonoidHom.ext
-  intro g
-  apply AlgEquiv.ext
-  intro x
-  apply Subtype.ext
-  have hm := congrArg Subtype.val (cyclotomicRestrictionToLayer_commutes p m g x)
-  have hn := congrArg Subtype.val (cyclotomicRestrictionToLayer_commutes p n g
-    (IntermediateField.inclusion (cyclotomicLayer_mono p h) x))
-  have hmn := congrArg Subtype.val (cyclotomicRestrictionBetweenLayers_commutes p h
-    (cyclotomicRestrictionToLayer p n g) x)
-  exact hm.trans (hn.symm.trans hmn.symm)
 
 /-- The positive chosen layer, viewed by its original inclusion as a finite
 Galois intermediate field of the actual infinite cyclotomic field. -/
@@ -266,10 +175,10 @@ theorem cyclotomicInertiaPreimage_antitone : Antitone (cyclotomicInertiaPreimage
   let := cyclotomicBase_residueFinite p K
   intro m n h g hg
   let : Algebra (cyclotomicLayer (K := K) p (m + 1)) (cyclotomicLayer (K := K) p (n + 1)) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_mono p (Nat.add_le_add_right h 1)))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p (m + 1))
+    IntermediateField.algebraOfLE (cyclotomicLayer_mono p (Nat.add_le_add_right h 1))
+  have : IsScalarTower K (cyclotomicLayer (K := K) p (m + 1))
       (cyclotomicLayer (K := K) p (n + 1)) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
+    IntermediateField.isScalarTower_of_le (cyclotomicLayer_mono p (Nat.add_le_add_right h 1))
   change cyclotomicRestrictionToLayer p (n + 1) g ∈
     upperRamificationGroup (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
       (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0 at hg

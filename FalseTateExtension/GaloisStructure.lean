@@ -10,6 +10,8 @@ public import FalseTateExtension.AffineKernel
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
+public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
+public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
 
 /-!
 # Odd-prime false Tate Galois structure
@@ -34,19 +36,6 @@ open FontaineWintenberger
 section FiniteCyclotomic
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
-
-theorem intermediateField_eq_of_cyclic_finrank_eq
-    {F E : Type*} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
-    [IsGalois F E] [IsCyclic (E ≃ₐ[F] E)]
-    (A B : IntermediateField F E) (h : Module.finrank F A = Module.finrank F B) : A = B := by
-  have hfix : A.fixingSubgroup = B.fixingSubgroup := by
-    apply IsCyclic.subgroup_eq_iff_index_eq.mpr
-    simpa only [← IntermediateField.finrank_eq_fixingSubgroup_index] using h
-  calc
-    A = IntermediateField.fixedField A.fixingSubgroup :=
-      (InfiniteGalois.fixedField_fixingSubgroup A).symm
-    _ = IntermediateField.fixedField B.fixingSubgroup := congrArg IntermediateField.fixedField hfix
-    _ = B := InfiniteGalois.fixedField_fixingSubgroup B
 
 /-- The actual cyclotomic layer over the original base is abelian Galois. -/
 theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
@@ -179,7 +168,7 @@ theorem exists_eq_first_cyclotomicLayer_of_finrank_prime [hp₂ : Fact (p ≠ 2)
   let j := IntermediateField.inclusion (cyclotomicLayer_mono (K := K) p hrm)
   let := cyclotomicLayer_isCyclic (K := K) p m
   have heq : i.fieldRange = j.fieldRange := by
-    apply intermediateField_eq_of_cyclic_finrank_eq
+    apply IntermediateField.eq_of_finrank_eq_of_isCyclic
     calc
       _ = Module.finrank K F := i.equivFieldRange.toLinearEquiv.finrank_eq.symm
       _ = p := hd
@@ -192,59 +181,6 @@ theorem exists_eq_first_cyclotomicLayer_of_finrank_prime [hp₂ : Fact (p ≠ 2)
   simpa only [AlgHom.map_fieldRange, hi, hj, IntermediateField.fieldRange_val] using hmap
 
 end FiniteCyclotomic
-
-theorem powerBasis_eigenvector_eq_smul_pow
-    {F E : Type*} [Field F] [Field E] [Algebra F E]
-    (B : PowerBasis F E) (σ : E ≃ₐ[F] E) {ζ μ : F}
-    (hζ : IsPrimitiveRoot ζ B.dim) (hgen : σ B.gen = ζ • B.gen)
-    {x : E} (hx : x ≠ 0) (heigen : σ x = μ • x) :
-    ∃ i : Fin B.dim, ∃ a : F, x = a • B.gen ^ (i : ℕ) := by
-  classical
-  have hb (j : Fin B.dim) : σ (B.basis j) = ζ ^ (j : ℕ) • B.basis j := by
-    simp only [B.basis_eq_pow, map_pow, hgen, smul_pow]
-  have hcoord (i : Fin B.dim) : (B.basis.coord i).comp σ.toLinearMap =
-      ζ ^ (i : ℕ) • B.basis.coord i := by
-    apply B.basis.ext
-    intro j
-    change B.basis.coord i (σ (B.basis j)) = ζ ^ (i : ℕ) * B.basis.coord i (B.basis j)
-    rw [hb, map_smul]
-    simp only [Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply,
-      smul_eq_mul]
-    by_cases hj : j = i
-    · subst j
-      simp only [ite_true]
-    · simp only [hj, ite_false, mul_zero]
-  have hc (i : Fin B.dim) :
-      (ζ ^ (i : ℕ) - μ) * B.basis.repr x i = 0 := by
-    have hi := congrArg (fun f : E →ₗ[F] F => f x) (hcoord i)
-    change B.basis.repr (σ x) i = ζ ^ (i : ℕ) * B.basis.repr x i at hi
-    rw [heigen, map_smul] at hi
-    change μ * B.basis.repr x i = ζ ^ (i : ℕ) * B.basis.repr x i at hi
-    linear_combination -hi
-  have hsome : ∃ i : Fin B.dim, B.basis.repr x i ≠ 0 := by
-    by_contra! h
-    apply hx
-    apply B.basis.repr.injective
-    ext i
-    simp [h]
-  obtain ⟨i, hi⟩ := hsome
-  have hμ : ζ ^ (i : ℕ) = μ :=
-    sub_eq_zero.mp ((mul_eq_zero.mp (hc i)).resolve_right hi)
-  have hz (j : Fin B.dim) (hj : j ≠ i) : B.basis.repr x j = 0 := by
-    apply (mul_eq_zero.mp (hc j)).resolve_left
-    intro heq
-    apply hj
-    exact Fin.ext (hζ.pow_inj j.isLt i.isLt ((sub_eq_zero.mp heq).trans hμ.symm))
-  refine ⟨i, B.basis.repr x i, ?_⟩
-  rw [← B.basis_eq_pow i]
-  apply B.basis.repr.injective
-  ext j
-  simp only [map_smul, Finsupp.smul_apply, Module.Basis.repr_self, Finsupp.single_apply,
-    smul_eq_mul]
-  by_cases hj : j = i
-  · subst j
-    simp only [ite_true, mul_one]
-  · simp only [Ne.symm hj, ite_false, mul_zero, hz j hj]
 
 section RadicalNormality
 
@@ -424,7 +360,7 @@ theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
   have heigen : σ α = (z ^ b) • α := by
     rw [Algebra.smul_def]
     rw [map_pow, hbeq, div_mul_cancel₀ _ hα₀]
-  obtain ⟨i, a, ha⟩ := powerBasis_eigenvector_eq_smul_pow B σ hprimitive hgen hα₀ heigen
+  obtain ⟨i, a, ha⟩ := B.eigenvector_eq_smul_pow σ hprimitive hgen hα₀ heigen
   have heq : (π : K) = a ^ p * u ^ (i : ℕ) := by
     apply (algebraMap K C).injective
     rw [map_mul, map_pow, map_pow]
@@ -502,20 +438,6 @@ theorem extensionRadical_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
   rw [padicKummerExponent_spec p π, hb]
   simp
 
-theorem mem_of_fixed_by_inclusion
-    {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
-    {A B : IntermediateField F Ω} [IsGalois F B] (hAB : A ≤ B) (x : B)
-    (hf : ∀ g ∈ (IntermediateField.inclusion hAB).fieldRange.fixingSubgroup, g x = x) :
-    (x : Ω) ∈ A := by
-  let i := IntermediateField.inclusion hAB
-  have hm : x ∈ IntermediateField.fixedField i.fieldRange.fixingSubgroup := by
-    rw [IntermediateField.mem_fixedField_iff]
-    exact hf
-  rw [InfiniteGalois.fixedField_fixingSubgroup] at hm
-  obtain ⟨y, hy⟩ := hm
-  have hy' : (y : Ω) = x := congrArg Subtype.val hy
-  exact hy' ▸ y.property
-
 /-- Fixing by the actual character kernel places an original radical in the
 actual cyclotomic subfield, by infinite Galois correspondence. -/
 theorem radical_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
@@ -523,7 +445,8 @@ theorem radical_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
       g.val (extensionRadical p π n) = extensionRadical p π n) :
     radical p π n ∈ cyclotomicExtension (K := K) p := by
   have := falseTateExtension_isGalois p π
-  apply mem_of_fixed_by_inclusion (cyclotomicExtension_le_falseTateExtension p π)
+  apply IntermediateField.mem_of_fixed_by_inclusion
+    (cyclotomicExtension_le_falseTateExtension p π)
     (extensionRadical p π n)
   intro g hg
   have hg' : g ∈ (padicCyclotomicCharacter p π).ker := by
@@ -619,74 +542,6 @@ theorem continuous_restrictedAffineGaloisHom [hπ : NeZero π] :
     ((continuous_padicCyclotomicCharacter p π).subtype_mk _)
 
 end RestrictedCoordinates
-
-section RelativeKrullTopology
-
-open scoped Topology
-open IntermediateField
-
-/-- Scalar restriction is continuous for the actual relative Krull topologies
-when the extension over the larger base is algebraic. -/
-theorem continuous_restrictScalars_of_isAlgebraic
-    (F M Ω : Type*) [Field F] [Field M] [Field Ω]
-    [Algebra F M] [Algebra F Ω] [Algebra M Ω] [IsScalarTower F M Ω]
-    [Algebra.IsAlgebraic M Ω] :
-    Continuous (AlgEquiv.restrictScalarsHom F (S := M) (A := Ω)) := by
-  classical
-  apply continuous_of_continuousAt_one (AlgEquiv.restrictScalarsHom F (S := M) (A := Ω))
-  rw [ContinuousAt, map_one]
-  refine ((galGroupBasis M Ω).nhds_one_hasBasis.tendsto_iff
-    (galGroupBasis F Ω).nhds_one_hasBasis).mpr ?_
-  rintro _ ⟨_, ⟨E, hE : FiniteDimensional F E, rfl⟩, rfl⟩
-  refine ⟨_, ⟨_, ⟨adjoin M (E : Set Ω), ?_, rfl⟩, rfl⟩, fun σ hσ x => ?_⟩
-  · suffices Algebra.EssFiniteType M (adjoin M (E : Set Ω)) by
-      apply Algebra.finite_of_essFiniteType_of_isAlgebraic
-    have hfin : Algebra.EssFiniteType F E := inferInstance
-    rw [essFiniteType_iff] at hfin ⊢
-    obtain ⟨s, rfl⟩ := hfin
-    exact ⟨s, by rw [adjoin_adjoin_right]⟩
-  · exact hσ ⟨x, subset_adjoin _ _ x.property⟩
-
-/-- The fixing subgroup of the original scalar image is the original relative
-Galois group, with the inherited and relative Krull topologies. -/
-def relativeGaloisFixingKrullEquiv (F M Ω : Type*) [Field F] [Field M] [Field Ω]
-    [Algebra F M] [Algebra F Ω] [Algebra M Ω] [IsScalarTower F M Ω]
-    [IsGalois F Ω] (i : M →ₐ[F] Ω) (hi : ∀ x, algebraMap M Ω x = i x) :
-    i.fieldRange.fixingSubgroup ≃ₜ* (Ω ≃ₐ[M] Ω) := by
-  let R := i.fieldRange
-  let e : R.fixingSubgroup ≃* (Ω ≃ₐ[M] Ω) :=
-    { toFun := fun g =>
-        { g.val.toRingEquiv with
-          commutes' := fun x => by
-            rw [hi]
-            exact (IntermediateField.mem_fixingSubgroup_iff R g.val).mp
-              g.property _ ⟨x, rfl⟩ }
-      invFun := fun g => ⟨g.restrictScalars F, by
-        rw [IntermediateField.mem_fixingSubgroup_iff]
-        rintro x ⟨y, rfl⟩
-        change g (i y) = i y
-        rw [← hi]
-        exact g.commutes y⟩
-      left_inv := fun g => Subtype.ext (AlgEquiv.ext (fun _ => rfl))
-      right_inv := fun g => AlgEquiv.ext (fun _ => rfl)
-      map_mul' := fun g h => AlgEquiv.ext (fun _ => rfl) }
-  have : IsGalois M Ω := IsGalois.tower_top_of_isGalois F M Ω
-  have hc : Continuous e.symm := by
-    apply Continuous.subtype_mk
-    exact continuous_restrictScalars_of_isAlgebraic F M Ω
-  exact { e with
-    continuous_toFun := hc.continuous_symm_of_equiv_compact_to_t2
-    continuous_invFun := hc }
-
-/-- The relative Krull equivalence preserves evaluation on the original field. -/
-theorem relativeGaloisFixingKrullEquiv_apply
-    (F M Ω : Type*) [Field F] [Field M] [Field Ω]
-    [Algebra F M] [Algebra F Ω] [Algebra M Ω] [IsScalarTower F M Ω]
-    [IsGalois F Ω] (i : M →ₐ[F] Ω) (hi : ∀ x, algebraMap M Ω x = i x)
-    (g : i.fieldRange.fixingSubgroup) (x : Ω) :
-    relativeGaloisFixingKrullEquiv F M Ω i hi g x = g.val x := rfl
-
-end RelativeKrullTopology
 
 section FullTranslation
 
@@ -851,37 +706,12 @@ theorem cyclotomicKernel_sup_kummerFixing [hp₂ : Fact (p ≠ 2)] [hπ : Fact (
   have h := Subgroup.mul_mem_sup ht hs
   simpa only [inv_mul_cancel_right] using h
 
-theorem inf_eq_bot_of_inclusion_fixing_sup_eq_top
-    {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
-    {A B C : IntermediateField F Ω} [IsGalois F C] (hAC : A ≤ C) (hBC : B ≤ C)
-    (hsup : (IntermediateField.inclusion hAC).fieldRange.fixingSubgroup ⊔
-      (IntermediateField.inclusion hBC).fieldRange.fixingSubgroup = ⊤) : A ⊓ B = ⊥ := by
-  apply le_antisymm _ bot_le
-  intro x hx
-  let z : C := ⟨x, hAC hx.1⟩
-  have hle : (IntermediateField.inclusion hAC).fieldRange.fixingSubgroup ⊔
-      (IntermediateField.inclusion hBC).fieldRange.fixingSubgroup ≤
-        MulAction.stabilizer (C ≃ₐ[F] C) z := by
-    apply sup_le
-    · intro g hg
-      change g z = z
-      exact (IntermediateField.mem_fixingSubgroup_iff _ g).mp hg z ⟨⟨x, hx.1⟩, rfl⟩
-    · intro g hg
-      change g z = z
-      exact (IntermediateField.mem_fixingSubgroup_iff _ g).mp hg z ⟨⟨x, hx.2⟩, rfl⟩
-  have hz : z ∈ (⊥ : IntermediateField F C) := by
-    apply (InfiniteGalois.mem_bot_iff_fixed z).mpr
-    intro g
-    exact hle (by rw [hsup]; trivial)
-  obtain ⟨a, ha⟩ := IntermediateField.mem_bot.mp hz
-  exact IntermediateField.mem_bot.mpr ⟨a, congrArg Subtype.val ha⟩
-
 /-- The original infinite radical and cyclotomic subfields meet exactly in
 the original base field, for every odd prime and every actual uniformizer. -/
 theorem kummerExtension_inf_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     kummerExtension p (π : K) ⊓ cyclotomicExtension (K := K) p = ⊥ := by
   have := falseTateExtension_isGalois p (π : K)
-  apply inf_eq_bot_of_inclusion_fixing_sup_eq_top
+  apply IntermediateField.inf_eq_bot_of_inclusion_fixingSubgroup_sup_eq_top
     (kummerExtension_le_falseTateExtension p (π : K))
     (cyclotomicExtension_le_falseTateExtension p (π : K))
   rw [cyclotomicInclusion_fixingSubgroup, sup_comm]
@@ -1072,12 +902,11 @@ variable (π : 𝒪[K])
 /-- The original inclusion defines the relative cyclotomic scalar action. -/
 local instance cyclotomicRelativeAlgebra :
     Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) :=
-  RingHom.toAlgebra (Subsemiring.inclusion
-    (cyclotomicExtension_le_falseTateExtension p (π : K)))
+  IntermediateField.algebraOfLE (cyclotomicExtension_le_falseTateExtension p (π : K))
 
 local instance cyclotomicRelativeScalarTower :
     IsScalarTower K (cyclotomicExtension (K := K) p) (falseTateExtension p (π : K)) :=
-  IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  IntermediateField.isScalarTower_of_le (cyclotomicExtension_le_falseTateExtension p (π : K))
 
 omit [Algebra (ℚ_[p]) K] in
 /-- The relative scalar homomorphism is exactly the original cyclotomic inclusion. -/
@@ -1100,7 +929,7 @@ def cyclotomicKernelRelativeEquiv [hπ : Fact (Irreducible π)] :
     { MulEquiv.subgroupCongr (cyclotomicInclusion_fixingSubgroup p (π : K)).symm with
       continuous_toFun := continuous_subtype_val.subtype_mk _
       continuous_invFun := continuous_subtype_val.subtype_mk _ }
-  exact e.trans (relativeGaloisFixingKrullEquiv K (cyclotomicExtension (K := K) p)
+  exact e.trans (AlgEquiv.fixingSubgroupContinuousMulEquiv K (cyclotomicExtension (K := K) p)
     (falseTateExtension p (π : K)) i (AlgHom.congr_fun (cyclotomicRelative_scalarHom_eq p π)))
 
 /-- The original relative cyclotomic Galois group is the full p-adic
@@ -1168,11 +997,11 @@ variable (π : 𝒪[K])
 /-- The original inclusion defines the relative radical scalar action. -/
 local instance kummerRelativeAlgebra :
     Algebra (kummerExtension p (π : K)) (falseTateExtension p (π : K)) :=
-  RingHom.toAlgebra (Subsemiring.inclusion (kummerExtension_le_falseTateExtension p (π : K)))
+  IntermediateField.algebraOfLE (kummerExtension_le_falseTateExtension p (π : K))
 
 local instance kummerRelativeScalarTower :
     IsScalarTower K (kummerExtension p (π : K)) (falseTateExtension p (π : K)) :=
-  IsScalarTower.of_algebraMap_eq (congrFun rfl)
+  IntermediateField.isScalarTower_of_le (kummerExtension_le_falseTateExtension p (π : K))
 
 omit [Algebra (ℚ_[p]) K] in
 /-- The relative scalar homomorphism is exactly the original radical inclusion. -/
@@ -1189,7 +1018,7 @@ def kummerRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible 
     (falseTateExtension p (π : K) ≃ₐ[kummerExtension p (π : K)]
       falseTateExtension p (π : K)) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by
   have := falseTateExtension_isGalois p (π : K)
-  exact (relativeGaloisFixingKrullEquiv K (kummerExtension p (π : K))
+  exact (AlgEquiv.fixingSubgroupContinuousMulEquiv K (kummerExtension p (π : K))
     (falseTateExtension p (π : K)) (falseTateKummerInclusion p (π : K))
     (AlgHom.congr_fun (kummerRelative_scalarHom_eq p π))).symm.trans
       (kummerFixingEquivCyclotomicImage p π)

@@ -86,32 +86,20 @@ theorem cyclotomicLayerCharacterOver_injective :
 finite cyclotomic field, over the same base. -/
 def cyclotomicLayerRestrictionOver :
     (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →*
-      (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
-  let : Algebra (cyclotomicLayer (K := K) p n) (cyclotomicExtension (K := K) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p n))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p n) (cyclotomicExtension (K := K) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := K) p n)
+      (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) :=
+  IntermediateField.restrictNormalHomOfLE (cyclotomicLayer_le_cyclotomicExtension p n)
 
 theorem cyclotomicLayerRestrictionOver_commutes
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)
     (x : cyclotomicLayer (K := K) p n) :
     IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p n)
       (cyclotomicLayerRestrictionOver p n g x) =
-        g (IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p n) x) := by
-  let : Algebra (cyclotomicLayer (K := K) p n) (cyclotomicExtension (K := K) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p n))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p n) (cyclotomicExtension (K := K) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := K) p n) x
+        g (IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension p n) x) :=
+  IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
 theorem cyclotomicLayerRestrictionOver_surjective :
-    Function.Surjective (cyclotomicLayerRestrictionOver (K := K) p n) := by
-  let : Algebra (cyclotomicLayer (K := K) p n) (cyclotomicExtension (K := K) p) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicLayer_le_cyclotomicExtension p n))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p n) (cyclotomicExtension (K := K) p) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom_surjective (cyclotomicExtension (K := K) p)
+    Function.Surjective (cyclotomicLayerRestrictionOver (K := K) p n) :=
+  IntermediateField.restrictNormalHomOfLE_surjective _
 
 /-- Reduction of the original infinite character is precisely the original
 finite character of ordinary restriction. -/
@@ -156,25 +144,16 @@ def finiteRadicalInclusion : radicalLayer p π n →ₐ[K] falseTateLayer p π n
 finite cyclotomic subfield. -/
 def diagonalCyclotomicRestriction :
     (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) →*
-      (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
-  let : Algebra (cyclotomicLayer (K := K) p n) (falseTateLayer p π n n) :=
-    RingHom.toAlgebra (Subsemiring.inclusion
-      (le_sup_right : cyclotomicLayer p n ≤ falseTateLayer p π n n))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p n) (falseTateLayer p π n n) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom (cyclotomicLayer (K := K) p n)
+      (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) :=
+  IntermediateField.restrictNormalHomOfLE
+    (le_sup_right : cyclotomicLayer p n ≤ falseTateLayer p π n n)
 
 theorem diagonalCyclotomicRestriction_commutes
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n)
     (x : cyclotomicLayer (K := K) p n) :
     finiteCyclotomicInclusion p π n (diagonalCyclotomicRestriction p π n g x) =
-      g (finiteCyclotomicInclusion p π n x) := by
-  let : Algebra (cyclotomicLayer (K := K) p n) (falseTateLayer p π n n) :=
-    RingHom.toAlgebra (Subsemiring.inclusion
-      (le_sup_right : cyclotomicLayer p n ≤ falseTateLayer p π n n))
-  let : IsScalarTower K (cyclotomicLayer (K := K) p n) (falseTateLayer p π n n) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (cyclotomicLayer (K := K) p n) x
+      g (finiteCyclotomicInclusion p π n x) :=
+  IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
 /-- The diagonal character is the character on the original cyclotomic
 subfield under ordinary restriction. -/

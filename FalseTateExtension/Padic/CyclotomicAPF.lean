@@ -42,7 +42,7 @@ condition, through their original inclusion isomorphisms. -/
 theorem mem_upperRamificationGroupInfinite_cyclotomic_iff
     {u : ℝ} (hu : -1 ≤ u) (g : Cyc ≃ₐ[ℚ_[p]] Cyc) :
     g ∈ upperRamificationGroupInfinite ℚ_[p] Cyc u ↔
-      ∀ n, cyclotomicLayerRestriction p (n + 1) g ∈
+      ∀ n, cyclotomicRestrictionToLayer p (n + 1) g ∈
         upperRamificationGroup
           (R := spectralIntegerRing ℚ_[p] (cyclotomicLayer (K := ℚ_[p]) p (n + 1)))
           (cyclotomicLayer (K := ℚ_[p]) p (n + 1) ≃ₐ[ℚ_[p]]
@@ -56,13 +56,12 @@ theorem mem_upperRamificationGroupInfinite_cyclotomic_iff
     ← upperRamificationGroup_map_autCongr ℚ_[p] (cyclotomicFiniteLayerEquiv (K := ℚ_[p]) p n) hu,
     Subgroup.mem_map_equiv]
   simp only [MulEquiv.symm_apply_apply]
-  rfl
 
 /-- At every positive upper interval the actual infinite group is the
 kernel of restriction to the original finite cyclotomic layer. -/
 theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
     (r : ℕ) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
-    upperRamificationGroupInfinite ℚ_[p] Cyc u = (cyclotomicLayerRestriction p (r + 1)).ker := by
+    upperRamificationGroupInfinite ℚ_[p] Cyc u = (cyclotomicRestrictionToLayer p (r + 1)).ker := by
   have hu : -1 ≤ u := by linarith [Nat.cast_nonneg (α := ℝ) r]
   ext g
   rw [mem_upperRamificationGroupInfinite_cyclotomic_iff p hu, MonoidHom.mem_ker]
@@ -73,12 +72,9 @@ theorem upperRamificationGroupInfinite_cyclotomic_eq_ker
     exact h
   · intro hg n
     by_cases hn : n ≤ r
-    · have hres : cyclotomicLayerRestriction p (n + 1) g = 1 := by
-        change cyclotomicRestrictionToLayer p (n + 1) g = 1
-        rw [cyclotomicRestrictionToLayer_comp p (by omega : n + 1 ≤ r + 1)]
-        change cyclotomicRestrictionBetweenLayers p (by omega : n + 1 ≤ r + 1)
-          (cyclotomicLayerRestriction p (r + 1) g) = 1
-        rw [hg, map_one]
+    · have hres : cyclotomicRestrictionToLayer p (n + 1) g = 1 := by
+        rw [cyclotomicRestrictionToLayer_comp p (by omega : n + 1 ≤ r + 1), MonoidHom.comp_apply,
+          hg, map_one]
       rw [hres]
       exact Subgroup.one_mem _
     · rw [upperRamificationGroup_cyclotomic_eq_comap_unitReduction p n r (by omega) hu0 hu1,
@@ -161,8 +157,9 @@ theorem upperRamificationGroupInfinite_cyclotomic_index
     (upperRamificationGroupInfinite ℚ_[p] Cyc u).index = (p ^ (r + 1)).totient := by
   rw [upperRamificationGroupInfinite_cyclotomic_eq_ker p r hu0 hu1]
   change ((⊥ : Subgroup (cyclotomicLayer (K := ℚ_[p]) p (r + 1) ≃ₐ[ℚ_[p]]
-    cyclotomicLayer (K := ℚ_[p]) p (r + 1))).comap (cyclotomicLayerRestriction p (r + 1))).index = _
-  rw [Subgroup.index_comap_of_surjective _ (cyclotomicLayerRestriction_surjective p (r + 1)),
+    cyclotomicLayer (K := ℚ_[p]) p (r + 1))).comap
+      (cyclotomicRestrictionToLayer p (r + 1))).index = _
+  rw [Subgroup.index_comap_of_surjective _ (cyclotomicRestrictionToLayer_surjective p (r + 1)),
     Subgroup.index_bot, card_cyclotomicLayer_galois]
 
 /-- All actual upper groups of the infinite rational cyclotomic extension

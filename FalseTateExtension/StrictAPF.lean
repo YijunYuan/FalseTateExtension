@@ -11,6 +11,7 @@ public import FalseTateExtension.Padic.CyclotomicInertiaCompletion
 public import FalseTateExtension.KummerProfile
 public import FontaineWintenberger.APF.Galois
 public import FontaineWintenberger.APF.Galois.Restriction
+public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
 
 /-!
 # Strict APF of the actual false Tate extension
@@ -28,27 +29,6 @@ noncomputable section
 namespace FalseTateExtension
 
 open FontaineWintenberger
-
-theorem intermediateField_eq_of_inclusion_fixing_eq_bot
-    {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
-    {S T : IntermediateField F Ω} [IsGalois F T] (hST : S ≤ T)
-    (hfix : (IntermediateField.inclusion hST).fieldRange.fixingSubgroup = ⊥) : T = S := by
-  let i := IntermediateField.inclusion hST
-  have htop : i.fieldRange = ⊤ := by
-    calc
-      i.fieldRange = IntermediateField.fixedField i.fieldRange.fixingSubgroup :=
-        (InfiniteGalois.fixedField_fixingSubgroup i.fieldRange).symm
-      _ = IntermediateField.fixedField (⊥ : Subgroup (T ≃ₐ[F] T)) :=
-        congrArg IntermediateField.fixedField hfix
-      _ = ⊤ := IntermediateField.fixedField_bot
-  apply le_antisymm _ hST
-  intro x hx
-  have hx' : (⟨x, hx⟩ : T) ∈ i.fieldRange := by
-    rw [htop]
-    trivial
-  obtain ⟨y, hy⟩ := hx'
-  have hy' : (y : Ω) = x := congrArg Subtype.val hy
-  exact hy' ▸ y.property
 
 section AffineImage
 
@@ -245,7 +225,7 @@ theorem falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot
     (hM : (affineTranslationKernel (falseTateAffineImage p π)).toAddSubgroup = ⊥) :
     falseTateExtension p π = cyclotomicExtension (K := K) p := by
   have := falseTateExtension_isGalois p π
-  exact intermediateField_eq_of_inclusion_fixing_eq_bot
+  exact IntermediateField.eq_of_inclusion_fixingSubgroup_eq_bot
     (cyclotomicExtension_le_falseTateExtension p π)
     (falseTate_cyclotomicFixing_eq_bot_of_translationKernel_eq_bot p π hM)
 

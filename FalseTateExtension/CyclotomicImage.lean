@@ -6,6 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.AffineEmbedding
+public import FalseTateExtension.Mathlib.FieldTheory.RestrictNormal
 
 /-!
 # The actual cyclotomic projection image
@@ -102,12 +103,8 @@ theorem cyclotomicExtension_le_falseTateExtension :
 /-- Ordinary restriction to the actual infinite cyclotomic subfield. -/
 def cyclotomicRestriction :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →*
-      (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) := by
-  let : Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicExtension_le_falseTateExtension p π))
-  let : IsScalarTower K (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)
+      (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :=
+  IntermediateField.restrictNormalHomOfLE (cyclotomicExtension_le_falseTateExtension p π)
 
 /-- Restriction is evaluated using the original inclusion of fields. -/
 theorem cyclotomicRestriction_commutes
@@ -115,23 +112,14 @@ theorem cyclotomicRestriction_commutes
     (x : cyclotomicExtension (K := K) p) :
     IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π)
         (cyclotomicRestriction p π g x) =
-      g (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π) x) := by
-  let : Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicExtension_le_falseTateExtension p π))
-  let : IsScalarTower K (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormal_commutes g (cyclotomicExtension (K := K) p) x
+      g (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p π) x) :=
+  IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
 /-- Every automorphism of the actual cyclotomic field extends to the false
 Tate field with nonzero radicand. -/
 theorem cyclotomicRestriction_surjective [hπ : NeZero π] :
-    Function.Surjective (cyclotomicRestriction p π) := by
-  have := falseTateExtension_isGalois p π
-  let : Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
-    RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicExtension_le_falseTateExtension p π))
-  let : IsScalarTower K (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
-    IsScalarTower.of_algebraMap_eq (congrFun rfl)
-  exact AlgEquiv.restrictNormalHom_surjective (falseTateExtension p π)
+    Function.Surjective (cyclotomicRestriction p π) :=
+  IntermediateField.restrictNormalHomOfLE_surjective _
 
 /-- The actual false Tate character factors through ordinary restriction to
 the actual cyclotomic field. -/
