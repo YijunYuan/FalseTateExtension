@@ -12,6 +12,8 @@ public import FontaineWintenberger.Ramification.Lower.Inertia
 public import FontaineWintenberger.Ramification.Different.Subextension
 public import FontaineWintenberger.Ramification.Upper.ResidueEquiv
 public import FontaineWintenberger.APF.Tower.Residue
+public import FontaineWintenberger.APF.Tower.TotallyRamified
+public import FontaineWintenberger.Ramification.Lower.FiniteResidue
 public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.Data.ZMod.Units
 
@@ -536,55 +538,6 @@ theorem finiteDiagonalGaloisEquiv_padic_mem_units
 
 end RationalFiniteAffine
 
-section RationalResidueCommutators
-
-open FontaineWintenberger
-open scoped commutatorElement
-
-variable (p : ℕ) [Fact p.Prime] (E : Type*) [Field E] [Algebra (Padic p) E]
-    [FiniteDimensional (Padic p) E] [IsGalois (Padic p) E]
-
-local notation "R" => Valuation.valuationSubring (NormedField.valuation (K := Padic p))
-local notation "S" => spectralIntegerRing (Padic p) E
-local notation "G" => E ≃ₐ[Padic p] E
-
-/-- The actual residue field of a finite rational Galois extension is finite. -/
-theorem finite_spectralResidue_padic : Finite (IsLocalRing.ResidueField S) := by
-  have : Module.Finite R S := spectralIntegerRing_moduleFinite (Padic p) E
-  have : Module.Finite (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField S) := inferInstance
-  exact Module.finite_of_finite (IsLocalRing.ResidueField R)
-
-/-- The image of the actual residue action is cyclic. Surjectivity of the
-residue action is not needed. -/
-theorem isCyclic_rationalResidueGaloisImage : IsCyclic (localResidueGaloisHom R S G).range := by
-  have := finite_spectralResidue_padic p E
-  infer_instance
-
-/-- Every commutator acts trivially on the actual finite residue extension,
-and therefore belongs to the original inertia subgroup. -/
-theorem commutator_mem_inertia_padic (g h : G) :
-    ⁅g, h⁆ ∈ lowerRamificationGroup G (IsLocalRing.maximalIdeal S) 0 := by
-  have := finite_spectralResidue_padic p E
-  let := IsCyclic.commGroup
-    (α := IsLocalRing.ResidueField S ≃ₐ[IsLocalRing.ResidueField R] IsLocalRing.ResidueField S)
-  rw [← ker_localResidueGaloisHom R S G, MonoidHom.mem_ker, map_commutatorElement]
-  simp [commutatorElement_def]
-
-/-- The intrinsic residue degree is the actual zero orbit index in the
-original finite rational Galois overfield. -/
-theorem fixingSubgroup_sup_inertia_index_eq_residueDegree_padic
-    (M : IntermediateField (Padic p) E) :
-    (M.fixingSubgroup ⊔ lowerRamificationGroup G (IsLocalRing.maximalIdeal S) 0).index =
-      Module.finrank (IsLocalRing.ResidueField R)
-        (IsLocalRing.ResidueField (spectralIntegerRing (Padic p) M)) := by
-  let j : E →ₐ[Padic p] SeparableClosure (Padic p) := IsSepClosed.lift
-  have h := apfSubgroup_index_zero_eq_residueDegree_of_finiteGalois (Padic p) E M j
-  rw [apfSubgroup_fieldRange_index_eq_fixingSubgroup_sup_upper_index (Padic p) E M j (by norm_num),
-    upperRamificationGroup_zero, ← lowerRamificationGroup_zero] at h
-  exact h
-
-end RationalResidueCommutators
-
 section RationalTotalRamification
 
 open FontaineWintenberger
@@ -621,7 +574,8 @@ theorem finiteDiagonal_translation_mem_inertia
   let e := finiteDiagonalGaloisEquiv_padic p hp₂ hπ n
   let δ := e.symm (SemidirectProduct.inr (finiteAffineTwo p hp₂ n))
   let τ := e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b))
-  have h := commutator_mem_inertia_padic p (falseTateLayer p (π : Padic p) n n) δ τ
+  have h := commutatorElement_mem_lowerRamificationGroup_zero (Padic p)
+    (falseTateLayer p (π : Padic p) n n) δ τ
   have heq : ⁅δ, τ⁆ = τ := by
     apply e.injective
     rw [map_commutatorElement]
@@ -663,7 +617,8 @@ theorem lowerRamificationGroup_falseTateLayer_zero
   let i := finiteCyclotomicInclusion p (π : Padic p) (n + 1)
   let I := lowerRamificationGroup (D ≃ₐ[Padic p] D)
     (IsLocalRing.maximalIdeal (spectralIntegerRing (Padic p) D)) 0
-  have hidx := fixingSubgroup_sup_inertia_index_eq_residueDegree_padic p D i.fieldRange
+  have hidx := fixingSubgroup_sup_lowerRamificationGroup_zero_index_eq_residueDegree (Padic p)
+    D i.fieldRange
   rw [sup_eq_right.mpr (finiteCyclotomicFixing_le_inertia p hp₂ hπ (n + 1)),
     spectral_residueDegree_algEquiv (Padic p) (cyclotomicLayer (K := Padic p) p (n + 1))
       i.equivFieldRange,
@@ -680,7 +635,7 @@ theorem falseTateLayer_spectral_residueDegree
         (falseTateLayer p (π : Padic p) (n + 1) (n + 1)))) = 1 := by
   let D := falseTateLayer p (π : Padic p) (n + 1) (n + 1)
   have := falseTateLayer_isGalois p (π : Padic p) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
-  have h := fixingSubgroup_sup_inertia_index_eq_residueDegree_padic p D
+  have h := fixingSubgroup_sup_lowerRamificationGroup_zero_index_eq_residueDegree (Padic p) D
     (⊤ : IntermediateField (Padic p) D)
   rw [lowerRamificationGroup_falseTateLayer_zero p hp₂ hπ n, sup_top_eq, Subgroup.index_top,
     spectral_residueDegree_algEquiv (Padic p) D (IntermediateField.topEquiv :

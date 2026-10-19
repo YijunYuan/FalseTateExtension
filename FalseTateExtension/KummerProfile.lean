@@ -9,6 +9,8 @@ public import FalseTateExtension.RadicalRamification
 public import FontaineWintenberger.APF.Elementary.PrimeDegree
 public import FontaineWintenberger.APF.BaseChange.Basic
 public import FontaineWintenberger.APF.Strict
+public import FontaineWintenberger.APF.Galois.Union
+public import FontaineWintenberger.APF.Tower.TotallyRamified
 
 /-!
 # Intrinsic APF profiles in the actual radical tower
@@ -645,35 +647,6 @@ theorem radicalLayer_apfIndex_growth (hπ : Irreducible π) (n : ℕ) {u : ℝ} 
 
 end FiniteProfiles
 
-section CompactProducts
-
-private theorem iInf_sup_closed_normal
-    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-    (H : ℕ → Subgroup G) (hH : Antitone H) (hclosed : ∀ n, IsClosed (H n : Set G))
-    (U : Subgroup G) [U.Normal] (hU : IsClosed (U : Set G)) :
-    (⨅ n, H n) ⊔ U = ⨅ n, H n ⊔ U := by
-  apply le_antisymm
-  · exact le_iInf fun n => sup_le_sup_right (iInf_le H n) U
-  · intro g hg
-    let C : ℕ → Set G := fun n => {h | h ∈ H n ∧ h⁻¹ * g ∈ U}
-    have hCclosed (n : ℕ) : IsClosed (C n) :=
-      (hclosed n).inter (hU.preimage (continuous_inv.mul continuous_const))
-    have hCnonempty (n : ℕ) : (C n).Nonempty := by
-      obtain ⟨h, hh, u, hu, hhu⟩ :=
-        Subgroup.mem_sup_of_normal_right.mp (Subgroup.mem_iInf.mp hg n)
-      refine ⟨h, hh, ?_⟩
-      rw [← hhu]
-      simpa only [inv_mul_cancel_left] using hu
-    obtain ⟨h, hh⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C
-      (fun n x hx => ⟨hH (Nat.le_succ n) hx.1, hx.2⟩) hCnonempty
-      (hCclosed 0).isCompact hCclosed
-    have hh' : ∀ n, h ∈ C n := Set.mem_iInter.mp hh
-    apply Subgroup.mem_sup_of_normal_right.mpr
-    exact ⟨h, Subgroup.mem_iInf.mpr (fun n => (hh' n).1), h⁻¹ * g, (hh' 0).2,
-      mul_inv_cancel_left h g⟩
-
-end CompactProducts
-
 section InfiniteProfiles
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
@@ -682,79 +655,6 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
 
 local notation "G" => SeparableClosure K ≃ₐ[K] SeparableClosure K
 local notation "A" => Valuation.valuationSubring (NormedField.valuation (K := K))
-
-omit [PerfectField (IsLocalRing.ResidueField
-  (NormedField.valuation (K := K)).valuationSubring)] in
-private theorem apfSubgroup_iSup_eq_iInf
-    (D : ℕ → IntermediateField K (SeparableClosure K)) (hD : Monotone D) (u : ℝ) :
-    apfSubgroup K (⨆ n, D n) u = ⨅ n, apfSubgroup K (D n) u := by
-  let : T2Space G := krullTopology_t2
-  have hfix : (⨆ n, D n).fixingSubgroup = ⨅ n, (D n).fixingSubgroup := by
-    change fixingSubgroup G ((⨆ n, D n : IntermediateField K (SeparableClosure K)) :
-      Set (SeparableClosure K)) = ⨅ n, fixingSubgroup G (D n : Set (SeparableClosure K))
-    rw [IntermediateField.coe_iSup_of_directed hD.directed_le, fixingSubgroup_iUnion]
-  unfold apfSubgroup
-  rw [hfix]
-  exact iInf_sup_closed_normal (fun n => (D n).fixingSubgroup)
-    (fun m n hmn => IntermediateField.fixingSubgroup_le (hD hmn))
-    (fun n => InfiniteGalois.fixingSubgroup_isClosed (D n))
-    (absoluteUpperRamificationGroup K u)
-    (isCompact_upperRamificationGroupInfinite K (SeparableClosure K) u).isClosed
-
-set_option synthInstance.maxHeartbeats 100000 in
--- Comparing the two spectral integer rings requires extra dependent instance synthesis.
-set_option maxHeartbeats 1000000 in
-private theorem finite_totalRam_apfSubgroup_index
-    (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra.IsSeparable K L]
-    (j : L →ₐ[K] SeparableClosure K)
-    (he : (IsLocalRing.maximalIdeal (spectralIntegerRing K L)).ramificationIdx A =
-      Module.finrank K L) {u : ℝ} (hu : 0 ≤ u) :
-    (apfSubgroup K j.fieldRange u).index = apfIndex K L u := by
-  let E := IntermediateField.normalClosure K L (SeparableClosure K)
-  let i : L →ₐ[K] E :=
-    j.codRestrict E.toSubalgebra (fun x => j.fieldRange_le_normalClosure ⟨x, rfl⟩)
-  let M := i.fieldRange
-  let e : L ≃ₐ[K] M := i.equivFieldRange
-  let : FiniteDimensional K M := Module.Finite.equiv e.toLinearEquiv
-  let w := (spectralValuation K E).comap (algebraMap M E)
-  have : (NormedField.valuation (K := K)).HasExtension w :=
-    intermediate_spectral_hasExtension K E M
-  have := intermediate_spectral_isDiscreteValuationRing K E M
-  have : IsScalarTower A K M :=
-    Valuation.HasExtension.instIsScalarTower_valuationSubring
-      (L := M) (NormedField.valuation (K := K))
-  have : IsScalarTower A w.valuationSubring M :=
-    Valuation.HasExtension.instIsScalarTower_valuationSubring'
-      (NormedField.valuation (K := K)) w
-  have : Module.Finite A w.valuationSubring := extensionValuationSubring_moduleFinite K M w
-  have hn : Module.finrank K M = Module.finrank K L := e.toLinearEquiv.finrank_eq.symm
-  have heB : (IsLocalRing.maximalIdeal w.valuationSubring).ramificationIdx A =
-      Module.finrank K M := by
-    rw [extensionValuationSubring_ramificationIdx_eq_spectral K M w,
-      spectral_ramificationIdx_algEquiv K e, he, hn]
-  have hf : Module.finrank (IsLocalRing.ResidueField A)
-      (IsLocalRing.ResidueField w.valuationSubring) = 1 := by
-    have hd := local_ramificationIdx_mul_residueDegree_eq_finrank A w.valuationSubring K M
-    rw [heB] at hd
-    exact Nat.eq_of_mul_eq_mul_left (Module.finrank_pos : 0 < Module.finrank K M)
-      (by simpa only [mul_one] using hd)
-  have hz : (M.fixingSubgroup ⊔ lowerRamificationGroup (E ≃ₐ[K] E)
-      (IsLocalRing.maximalIdeal (spectralIntegerRing K E)) 0).index = 1 := by
-    rw [intermediate_spectral_zeroOrbitIndex_eq_residueDegree K E M, hf]
-  have hrange : (E.val.comp M.val).fieldRange = j.fieldRange := by
-    ext x
-    constructor
-    · rintro ⟨a, rfl⟩
-      obtain ⟨l, hl⟩ := a.property
-      exact ⟨l, congrArg (fun y : E => (y : SeparableClosure K)) hl⟩
-    · rintro ⟨l, rfl⟩
-      exact ⟨⟨i l, ⟨l, rfl⟩⟩, rfl⟩
-  rw [← hrange, apfSubgroup_fieldRange_index_eq_fixingSubgroup_sup_upper_index
-    K E M E.val (by linarith : -1 ≤ u),
-    upperOrbitIndex_eq_zeroIndex_mul_upperRelIndex (R := spectralIntegerRing K E)
-      (E ≃ₐ[K] E) M.fixingSubgroup hu, hz, one_mul,
-    apfIndex_algEquiv K L e u, apfIndex_eq_subgroupRelIndex_of_finiteGalois K E M hu,
-    upperRamificationGroup_zero, lowerRamificationGroup_zero]
 
 variable (p : ℕ) [Fact p.Prime]
 variable {π : Valuation.valuationSubring (NormedField.valuation (K := K))}
@@ -768,7 +668,7 @@ private theorem radicalSeparable_apfSubgroup_index (hπ : Irreducible π) (n : �
     rw [IntermediateField.fieldRange_comp_val]
     rfl
   rw [← hr]
-  apply finite_totalRam_apfSubgroup_index _ j _ hu
+  apply apfSubgroup_fieldRange_index_eq_apfIndex_of_ramificationIdx_eq_finrank K _ j _ hu
   rw [radicalLayer_ramificationIdx p hπ n (spectralValuation K _), finrank_radicalLayer p hπ n]
 
 private theorem radicalSeparable_apfSubgroup_zero (hπ : Irreducible π) (n : ℕ) :
@@ -793,7 +693,7 @@ private theorem radicalSeparable_apfSubgroup_eq_layer (hπ : Irreducible π) (N 
     rw [radicalSeparable_apfSubgroup_index p hπ n hu,
       radicalSeparable_apfSubgroup_index p hπ N hu,
       radicalLayer_apfIndex_stable p hπ hn hu hb]
-  rw [apfSubgroup_iSup_eq_iInf _ (radicalSeparableLayer_mono p (π : K)) u]
+  rw [apfSubgroup_iSup_eq_iInf K _ (radicalSeparableLayer_mono p (π : K)) u]
   change (⨅ n, S n) = S N
   refine le_antisymm (iInf_le S N) (le_iInf fun n => ?_)
   rcases le_total N n with hn | hn
@@ -1069,7 +969,8 @@ theorem radicalLayer_step_apfRamificationBound (hπ : Irreducible π) (n : ℕ) 
       (NormedField.valuation (K := E)).valuationSubring = Module.finrank E F := by
     rw [radicalLayer_step_own_ramificationIdx p hπ n, radicalLayer_step_finrank p hπ n]
   have hiff (u : ℝ) (hu : 0 ≤ u) : apfSubgroup E j.fieldRange u = ⊤ ↔ u ≤ t := by
-    rw [← Subgroup.index_eq_one, finite_totalRam_apfSubgroup_index F j he hu,
+    rw [← Subgroup.index_eq_one,
+      apfSubgroup_fieldRange_index_eq_apfIndex_of_ramificationIdx_eq_finrank E F j he hu,
       radicalLayer_step_apfIndex p hπ n hu]
     change (if u ≤ t then 1 else p) = 1 ↔ u ≤ t
     split_ifs with h

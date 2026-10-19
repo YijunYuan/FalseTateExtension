@@ -10,6 +10,7 @@ public import FalseTateExtension.Padic.CyclotomicAPF
 public import FalseTateExtension.Padic.CyclotomicInertiaCompletion
 public import FalseTateExtension.KummerProfile
 public import FontaineWintenberger.APF.Galois
+public import FontaineWintenberger.APF.Galois.Restriction
 
 /-!
 # Strict APF of the actual false Tate extension
@@ -256,35 +257,6 @@ variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField 
     [PerfectField (IsLocalRing.ResidueField
       (NormedField.valuation (K := K)).valuationSubring)] [CharZero K]
 
-private theorem apfSubgroup_map_eq_comap_upper_infinite
-    (E : IntermediateField K (SeparableClosure K)) [IsGalois K E]
-    (M : IntermediateField K E) {u : ℝ} (hu : -1 ≤ u) :
-    apfSubgroup K (M.map E.val) u =
-      (M.fixingSubgroup ⊔ upperRamificationGroupInfinite K E u).comap
-        (AlgEquiv.restrictNormalHom E) := by
-  let ρ : (SeparableClosure K ≃ₐ[K] SeparableClosure K) →* (E ≃ₐ[K] E) :=
-    AlgEquiv.restrictNormalHom E
-  have hfix : (M.map E.val).fixingSubgroup = M.fixingSubgroup.comap ρ :=
-    IntermediateField.map_fixingSubgroup (F := K) (E := E)
-      (E' := SeparableClosure K) (L := M)
-  have hker : E.fixingSubgroup ≤ M.fixingSubgroup.comap ρ := by
-    rw [← IntermediateField.restrictNormalHom_ker E]
-    intro g hg
-    change ρ g ∈ M.fixingSubgroup
-    rw [MonoidHom.mem_ker.mp hg]
-    exact M.fixingSubgroup.one_mem
-  unfold apfSubgroup
-  rw [hfix]
-  calc
-    _ = M.fixingSubgroup.comap ρ ⊔
-        (E.fixingSubgroup ⊔ absoluteUpperRamificationGroup K u) := by
-      rw [← sup_assoc, sup_eq_left.mpr hker]
-    _ = M.fixingSubgroup.comap ρ ⊔
-        (upperRamificationGroupInfinite K E u).comap ρ := by
-      rw [← apfSubgroup, apfSubgroup_eq_comap_upperInfinite K E hu]
-    _ = _ := Subgroup.comap_sup_eq ρ _ _
-      (AlgEquiv.restrictNormalHom_surjective (F := K) (K₁ := E) (SeparableClosure K))
-
 variable (p : ℕ) [Fact p.Prime] (π : K)
 
 /-- Actual infinite upper restriction identifies the full APF product
@@ -301,7 +273,8 @@ theorem apfSubgroup_fieldRange_index_eq_falseTateFixing_sup_upper
   have hr : (j.comp M.val).fieldRange = (M.map e.toAlgHom).map j.fieldRange.val := by
     rw [IntermediateField.fieldRange_comp_val, IntermediateField.map_map]
     rfl
-  rw [hr, apfSubgroup_map_eq_comap_upper_infinite j.fieldRange (M.map e.toAlgHom) hu,
+  rw [hr, apfSubgroup_map_eq_comap_upperRamificationGroupInfinite K j.fieldRange
+    (M.map e.toAlgHom) hu,
     Subgroup.index_comap_of_surjective _
       (AlgEquiv.restrictNormalHom_surjective (F := K) (K₁ := j.fieldRange) (SeparableClosure K)),
     ← fixingSubgroup_map_autCongr e M,

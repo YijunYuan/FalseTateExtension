@@ -115,3 +115,41 @@ Total: 4 min 58 s wall, 769 s CPU, 30 modules.
 | FalseTateExtension.Padic.FiniteCharacter | 1.9 |
 | FalseTateExtension.Padic.Cyclotomic | 1.4 |
 | FalseTateExtension | 1.3 |
+
+## After F3 (generic lemmas upstreamed to FontaineWintenberger 6c9e973)
+
+Total: 5:21.10 wall, 812.24 s CPU, 31 modules.
+
+| module | seconds |
+|---|---|
+| FalseTateExtension.KummerProfile | 95.0 |
+| FalseTateExtension.Padic.Viviani | 76.0 |
+| FalseTateExtension.Padic.CyclotomicUpper | 60.0 |
+| FalseTateExtension.RadicalRamification | 35.0 |
+| FalseTateExtension.GaloisLayers | 34.0 |
+| FalseTateExtension.Padic.FiniteGaloisStructure | 17.0 |
+| FalseTateExtension.Padic.CyclotomicRamification | 17.0 |
+| FalseTateExtension.Padic.CyclotomicInertia | 17.0 |
+| FalseTateExtension.Padic.CyclotomicAPF | 16.0 |
+| FalseTateExtension.Padic.CyclotomicInertiaCompletion | 12.0 |
+| FalseTateExtension.Padic.CyclotomicResidueBound | 11.0 |
+| FalseTateExtension.Padic.KummerRamification | 8.4 |
+| FalseTateExtension.GaloisStructure | 8.3 |
+| FalseTateExtension.CyclotomicImage | 7.5 |
+| FalseTateExtension.StrictAPF | 5.6 |
+| FalseTateExtension.Padic.InfiniteCharacter | 5.2 |
+| FalseTateExtension.AffineEmbedding | 3.7 |
+| FalseTateExtension.AffineIndex | 3.3 |
+| FalseTateExtension.AffineCommutator | 3.2 |
+| FalseTateExtension.AffineKernel | 2.9 |
+| FalseTateExtension.Padic.GeneralCharacter | 2.5 |
+| FalseTateExtension.FiniteCoordinates | 2.2 |
+| FalseTateExtension.Padic.FiniteCharacter | 1.9 |
+| FalseTateExtension.Mathlib.FieldTheory.RestrictNormal | 1.9 |
+| FalseTateExtension.PadicCoordinates | 1.8 |
+| FalseTateExtension.Layers | 1.7 |
+| FalseTateExtension.CoordinateTransitions | 1.7 |
+| FalseTateExtension.Padic.ClosedAddSubgroup | 1.6 |
+| FalseTateExtension.CompatibleRoots | 1.6 |
+| FalseTateExtension.Padic.Cyclotomic | 1.4 |
+| FalseTateExtension | 1.2 |

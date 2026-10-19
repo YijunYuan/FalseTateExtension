@@ -10,6 +10,7 @@ public import FontaineWintenberger.Ramification.Upper.Transport
 public import FontaineWintenberger.Ramification.Lower.Inertia
 public import FontaineWintenberger.APF.BaseChange.UpperGroups
 public import Mathlib.NumberTheory.Padics.RingHoms
+public import FontaineWintenberger.LocalField.Spectral.Transport
 
 /-!
 # The residue-degree bound for actual finite cyclotomic layers
@@ -250,84 +251,6 @@ theorem cyclotomicLayer_extensionValuationSubring_eq (n : ℕ)
     spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)) = w.valuationSubring := by
   let := cyclotomicBase_isCompleteDiscreteValuedField p K
   exact spectralIntegerRing_eq_extension_valuationSubring K _ w
-
-/-- Equal compatible valuation subrings are identified over the original
-base integer ring by the identity on the common ambient field. -/
-def compatibleSpectralIntegerRingEquiv
-    (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L]
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] (w : Valuation L Γ)
-    [(NormedField.valuation (K := K)).HasExtension w]
-    (h : spectralIntegerRing K L = w.valuationSubring) :
-    spectralIntegerRing K L ≃ₐ[(NormedField.valuation (K := K)).valuationSubring]
-      w.valuationSubring := by
-  let e : spectralIntegerRing K L ≃+* w.valuationSubring :=
-    RingEquiv.subringCongr (congrArg ValuationSubring.toSubring h)
-  exact { e with commutes' a := by apply Subtype.ext; rfl }
-
-/-- The identity on the original field identifies the spectral integer ring
-with the integer ring of every compatible extension valuation over the base. -/
-def cyclotomicLayerIntegerRingEquiv (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
-    [(NormedField.valuation (K := K)).HasExtension w] :=
-  compatibleSpectralIntegerRingEquiv K _ w (cyclotomicLayer_extensionValuationSubring_eq p K n w)
-
-@[simp]
-theorem coe_cyclotomicLayerIntegerRingEquiv (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
-    [(NormedField.valuation (K := K)).HasExtension w]
-    (x : spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) :
-    ((cyclotomicLayerIntegerRingEquiv p K n w x : w.valuationSubring) :
-      cyclotomicLayer (K := K) p (n + 1)) = x := rfl
-
-/-- The integer-ring identification induces a base-residue-field linear
-isomorphism of the actual residue fields. -/
-def cyclotomicLayerResidueEquiv (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
-    [(NormedField.valuation (K := K)).HasExtension w] :
-    IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) ≃ₐ[
-      IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring]
-        IsLocalRing.ResidueField w.valuationSubring :=
-  IsLocalRing.ResidueField.mapAlgEquiv' (cyclotomicLayerIntegerRingEquiv p K n w)
-
-@[simp]
-theorem cyclotomicLayerResidueEquiv_residue (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
-    [(NormedField.valuation (K := K)).HasExtension w]
-    (x : spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1))) :
-    cyclotomicLayerResidueEquiv p K n w (IsLocalRing.residue _ x) =
-      IsLocalRing.residue _ (cyclotomicLayerIntegerRingEquiv p K n w x) := rfl
-
-/-- Residue degree is independent of the compatible extension valuation,
-with the original base residue algebra retained. -/
-theorem cyclotomicLayer_residueDegree_eq (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
-    [(NormedField.valuation (K := K)).HasExtension w] :
-    Module.finrank
-        (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
-        (IsLocalRing.ResidueField w.valuationSubring) =
-      Module.finrank
-        (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
-        (IsLocalRing.ResidueField (spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))) :=
-  (cyclotomicLayerResidueEquiv p K n w).toLinearEquiv.finrank_eq.symm
-
-/-- For every positive cyclotomic level and every compatible extension
-valuation, the actual residue degree is at most the base ramification index. -/
-theorem cyclotomicLayer_residueDegree_le (n : ℕ)
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (w : Valuation (cyclotomicLayer (K := K) p (n + 1)) Γ)
-    [(NormedField.valuation (K := K)).HasExtension w] :
-    Module.finrank
-        (IsLocalRing.ResidueField (NormedField.valuation (K := K)).valuationSubring)
-        (IsLocalRing.ResidueField w.valuationSubring) ≤
-      (IsLocalRing.maximalIdeal (NormedField.valuation (K := K)).valuationSubring).ramificationIdx
-        (NormedField.valuation (K := Padic p)).valuationSubring := by
-  rw [cyclotomicLayer_residueDegree_eq p K n w]
-  exact cyclotomicLayer_spectral_residueDegree_le p K n
 
 end Valued
 

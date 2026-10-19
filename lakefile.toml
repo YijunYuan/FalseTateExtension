@@ -17,7 +17,7 @@ rev = "1e75e9dd53d483fa01eff9ac7d4ea0472ce9d1fa"
 [[require]]
 name = "FontaineWintenberger"
 git = "https://github.com/YijunYuan/FontaineWintenberger"
-rev = "9d1b347c56de186b3b0984303ceb901fd697ba11"
+rev = "6c9e97361f7f9a8ff5cb00d955284c7648c3fef1"
 
 [[lean_lib]]
 name = "FalseTateExtension"

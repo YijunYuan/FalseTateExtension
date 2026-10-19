@@ -8,6 +8,8 @@ module
 public import FalseTateExtension.Padic.FiniteGaloisStructure
 public import FalseTateExtension.KummerProfile
 public import FontaineWintenberger.Ramification.Upper.Transport
+public import FontaineWintenberger.Ramification.Herbrand.Interval
+public import FontaineWintenberger.APF.Finite.ConstantIndex
 public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
@@ -628,20 +630,10 @@ private theorem viviani_inverse_affine (n : ℕ) {a b : ℝ} (ha : 0 ≤ a) (hab
       (upperRamificationGroup (R := O(n)) G(n) u).index = c) :
     Ψ(n) b - Ψ(n) a = (b - a) * c := by
   have := falseTateLayer_isGalois p (π : Qp) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
-  have hadd := intervalIntegral.integral_add_adjacent_intervals
-    (IsAPF.intervalIntegrable_apfHerbrandSlope Qp D(n) 0 a)
-    (IsAPF.intervalIntegrable_apfHerbrandSlope Qp D(n) a b)
-  have heq : (∫ u in a..b, apfHerbrandSlope Qp D(n) u) = ∫ _u in a..b, (c : ℝ) := by
-    apply intervalIntegral.integral_congr_ae
-    filter_upwards [] with u hu
-    rw [Set.uIoc_of_le hab] at hu
-    rw [apfHerbrandSlope, max_eq_left (ha.trans hu.1.le),
-      apfIndex_falseTateLayer_eq_upperIndex hp₂ hπ n (ha.trans hu.1.le), hc u hu]
-  change apfPsi Qp D(n) a + _ = apfPsi Qp D(n) b at hadd
-  rw [heq, intervalIntegral.integral_const, smul_eq_mul,
-    apfPsi_eq_inverseHerbrandFunction Qp D(n) (by linarith : -1 ≤ a),
-    apfPsi_eq_inverseHerbrandFunction Qp D(n) (by linarith : -1 ≤ b)] at hadd
-  linarith
+  rw [← apfPsi_eq_inverseHerbrandFunction Qp D(n) (by linarith : -1 ≤ a),
+    ← apfPsi_eq_inverseHerbrandFunction Qp D(n) (by linarith : -1 ≤ b)]
+  exact apfPsi_sub_apfPsi_of_apfIndex_eq Qp D(n) ha hab c fun u hu =>
+    (apfIndex_falseTateLayer_eq_upperIndex hp₂ hπ n (ha.trans hu.1.le)).trans (hc u hu)
 
 include hp₂ hπ in
 theorem upperRamificationGroup_falseTate_index_initial (n : ℕ) {u : ℝ}
@@ -922,15 +914,8 @@ theorem upperRamificationGroup_falseTate_nonpos (n : ℕ) {u : ℝ}
 private theorem viviani_lower_parameter (n : ℕ) {a b t : ℝ}
     (ha : -1 ≤ a) (hb : -1 ≤ b) (ht0 : Ψ(n) a < t) (ht1 : t ≤ Ψ(n) b) :
     a < herbrandFunction (R := O(n)) G(n) t ∧
-      herbrandFunction (R := O(n)) G(n) t ≤ b := by
-  have ht : -1 ≤ t := (inverseHerbrandFunction_mem_Ici (R := O(n)) G(n) a).trans ht0.le
-  have hφ := herbrandFunction_mem_Ici (R := O(n)) G(n) ht
-  have he := inverseHerbrandFunction_herbrandFunction (R := O(n)) G(n) ht
-  constructor
-  · apply ((strictMonoOn_inverseHerbrandFunction (R := O(n)) G(n)).lt_iff_lt ha hφ).mp
-    simpa only [he] using ht0
-  · apply ((strictMonoOn_inverseHerbrandFunction (R := O(n)) G(n)).le_iff_le hφ hb).mp
-    simpa only [he] using ht1
+      herbrandFunction (R := O(n)) G(n) t ≤ b :=
+  herbrandFunction_mem_Ioc_of_inverseHerbrandFunction G(n) ha hb ht0 ht1
 
 private theorem viviani_lower_map (n : ℕ) {t : ℝ} (ht : -1 ≤ t) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map

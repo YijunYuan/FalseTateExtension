@@ -65,7 +65,7 @@
 
 **决定**：
 - A2.1 基域记号：`𝒪[K]`、`𝓀[K]` 全面替换手写项和 `OK`/`A`/`R`/`S`/`Zp₀`。
-- A2.2 有限扩张整数环：**先试 (b)**，在 FW 补 scoped instance `[IsCompleteDiscreteValuedField K] [FiniteDimensional K L] → NontriviallyNormedField L`（FW 当前并无 `LocalField/Spectral/Instances.lean`，其自身 250 余处仍写 `spectralIntegerRing K E`），验证 `𝒪[L] = spectralIntegerRing K L` 为 rfl 且无 diamond 后两个项目改用 `𝒪[L]`；出问题则退回 (a) 保持 `spectralIntegerRing K L`。
+- A2.2 有限扩张整数环：**(b) 已试验失败，退回 (a)**（2026-10-19 F3）：Lean 4 拒绝 `[FiniteDimensional K L] → NontriviallyNormedField L` 形式的实例（"cannot find synthesization order: all remaining arguments have metavariables K"），`K` 不出现在结论里就无法作为实例。保持 `spectralIntegerRing K L`。原计划：先试 (b)，在 FW 补 scoped instance `[IsCompleteDiscreteValuedField K] [FiniteDimensional K L] → NontriviallyNormedField L`（FW 当前并无 `LocalField/Spectral/Instances.lean`，其自身 250 余处仍写 `spectralIntegerRing K E`），验证 `𝒪[L] = spectralIntegerRing K L` 为 rfl 且无 diamond 后两个项目改用 `𝒪[L]`；出问题则退回 (a) 保持 `spectralIntegerRing K L`。
 - A2.3 `Padic/Basic.lean` 集中 ℚ_p 实例；有限 `K/ℚ_p` 的 `IsCompleteDiscreteValuedField` 改为 instance。
 - A2.4 **保留显式 `(p : ℕ) [Fact p.Prime]`**，不用 `residueChar K`（项目始终在特征 0 的 p 进域上，`residueChar` 损害可读性）；边界上提供 `residueChar (Padic p) = p`、`residueChar K = p` simp 引理。
 
@@ -345,7 +345,7 @@ FalseTateExtension.lean        每层一个聚合文件；docstring 列出六个
 | F0 | 工程底座：`LICENSE`、`README`、`CLAUDE.md`、`.gitignore` 加 pdf、`scripts/check_layers.py`、`docs/BUILD_TIMES.md` 基线 | 本项目 |
 | F1 | 性能速赢，不改接口：两处 `:= rfl` → `restrictNormalHom` 定义；`cyclotomicBase_isCompleteDiscreteValuedField` 改 instance；`NeZero (p^n)` 实例；8 处 `unfold; infer_instance`。预期 1115 s → 约 900 s | 本项目 |
 | F2 | A1：删 NormField*、TameUnits、TameGenerator、`KummerRamification:222–447`；留下的引理归位；根文件更新 | 本项目 |
-| F3 | FW 分支：A2.2 scoped instance（rfl / diamond 验证）+ A5.3 六组引理上游 + `irreducible_of_normalizedValuation_eq_exp_neg_one`；本项目升级 FW rev。A2.2 失败则退回 (a) | FW + 本项目 |
+| F3 | FW 分支 `false-tate-upstream`（`~/FontaineWintenberger`，提交 `6c9e973`，**尚未推送到 GitHub**；本项目 `lakefile.toml`/`lake-manifest.json` 已指向该提交，`.lake/packages/FontaineWintenberger` 从本地仓库 fetch）：A5.3 九个新叶子模块 + `irreducible_of_valuation_eq_exp_neg_one`；A2.2 (b) 失败退回 (a)。**完成后需要：推送 FW 分支并合并，使 GitHub 上存在该提交** | FW + 本项目 |
 | F4 | A2.1/A2.3/A7：`𝒪[K]`、`𝓀[K]`、`ℚ_[p]`、`ℤ_[p]` 替换；`Padic/Basic.lean`；删旧记号；引入 `falseTateDiagonalLayer`、`FalseTateGaloisGroup`、`absoluteRamificationIdx`、`vivianiOffset` | 本项目 |
 | F5 | A3：`[NeZero π]`、`[Fact (Irreducible π)]`、`[Fact (p ≠ 2)]`；`IsGalois`/`IsAPF`/`IsStrictlyAPF` 实例化；去 `hπ`/`hp₂` 穿参 | 本项目 |
 | F6 | A4 + A5.1/A5.2：`Affine/Group.lean` 与半直积拓扑；`Mathlib/` 层；`restrictNormalHomOfLE`；`autEquivPow` 替换 | 本项目 |
