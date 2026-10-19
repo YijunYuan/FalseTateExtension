@@ -15,9 +15,33 @@ public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 /-!
 # Preliminaries for Viviani's filtration
 
-The radical thresholds `r + 1 + 1/(p-1)` over `ℚ_p`, the number of thresholds below a real
-parameter, the normal subgroups of the finite affine group `ℤ/p^n ⋊ (ℤ/p^n)ˣ` for `p ≠ 2`, and the
-translation and principal-unit subgroups that appear in the ramification filtration.
+Over `ℚ_p` the upper ramification breaks of `ℚ_p(π^{1/p^∞})/ℚ_p` are `u_j = j + 1/(p-1)`,
+`j ≥ 1`, and the APF index of `ℚ_p(π^{1/p^n})/ℚ_p` at `u ≥ 0` is `p^d`, where
+`d = radicalTranslationDepth p n u` is the number of breaks `u_1, …, u_n` below `u`: `d = min(n, j)`
+for `u_j < u ≤ u_{j+1}`, so `d = i - 1` at `u = u_i` and `d = i` at `u = i + 1`.
+
+In the affine group `G = ℤ/p^n ⋊ (ℤ/p^n)ˣ` with `p ≠ 2`, the commutator of `(0, 2)` with `(a, u)`
+is `(a, 1)`, so a normal subgroup `N` containing `(a, u)` contains `(a, 1)` and `(0, u)`; hence
+`N = (N ∩ T) ⋊ ρ(N)` with `T = ℤ/p^n ⋊ 1` the translations and `ρ : G → (ℤ/p^n)ˣ` the projection,
+and `(G : N) = ((ℤ/p^n)ˣ : ρ(N)) (ℤ/p^n : N ∩ T)`. The subgroups of `G` appearing in the
+ramification filtration of `ℚ_p(π^{1/p^n}, ζ_{p^n})/ℚ_p` are `p^k ℤ/p^n ⋊ V` for a subgroup `V` of
+principal units `1 + p^r ℤ/p^n`.
+
+## Main results
+
+* `radicalTranslationDepth`, `radicalLayer_apfIndex_eq_pow_translationDepth`: the number `d` of
+  breaks `u_j < u`, `1 ≤ j ≤ n`, and `apfIndex ℚ_p ℚ_p(π^{1/p^n}) u = p^d` for `u ≥ 0`.
+* `radicalTranslationDepth_interval`: `d = min(n, j)` for `u_j < u ≤ u_{j+1}`.
+* `finiteTranslationSubgroup`, `finiteUnitSubgroup`, `finiteAffineSubgroup`: the subgroups
+  `p^k ℤ/p^n`, `1 + p^r ℤ/p^n` and `p^k ℤ/p^n ⋊ V`.
+* `finiteAffine_commutator_two`: `[(0, 2), (a, u)] = (a, 1)` for `p ≠ 2`.
+* `mem_finiteAffine_normal_iff`: `(a, u) ∈ N ↔ (a, 1) ∈ N ∧ u ∈ ρ(N)` for `N` normal, `p ≠ 2`.
+* `finiteAffine_normal_index`: `(G : N) = ((ℤ/p^n)ˣ : ρ(N)) (ℤ/p^n : N ∩ T)` for `N` normal.
+
+## References
+
+* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6.
+* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux*, §1.2.
 -/
 
 @[expose] public section
@@ -30,33 +54,37 @@ open IsDiscreteValuationRing FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- The normalized additive valuation of the rational base prime is one. -/
+/-- `v_p(p) = 1` in `𝒪[ℚ_p] = ℤ_p`. -/
 theorem addVal_padicUnitBall_p : addVal 𝒪[ℚ_[p]] (p : 𝒪[ℚ_[p]]) = 1 := by
   apply addVal_uniformizer
   have h := (MulEquiv.irreducible_iff (f := (padicValuationSubringEquiv p).symm)).mpr
     PadicInt.irreducible_p
   simpa only [map_natCast] using h
 
-/-- The radical thresholds over the rational base have absolute scale one. -/
+/-- The upper ramification breaks of `ℚ_p(π^{1/p^∞})/ℚ_p` are `u_r = r + 1/(p-1)`. -/
 theorem radicalUpperBreak_padic (r : ℕ) :
     radicalUpperBreak (K := ℚ_[p]) p r = (r : ℝ) + 1 / ((p : ℝ) - 1) := by
   simp [radicalUpperBreak, absoluteRamificationIdx, addVal_padicUnitBall_p]
 
-/-- The number of radical thresholds strictly below the upper parameter.
-The strict inequality retains each right endpoint in the preceding group. -/
+/-- The number of breaks `u_j = j + 1/(p-1)`, `1 ≤ j ≤ n`, of `ℚ_p(π^{1/p^∞})/ℚ_p` lying below
+`u`. -/
 def radicalTranslationDepth (n : ℕ) (u : ℝ) : ℕ :=
   ((Finset.range n).filter (fun r : ℕ => (r : ℝ) + 1 + 1 / ((p : ℝ) - 1) < u)).card
 
 omit [Fact p.Prime] in
+/-- No break of `ℚ_p(π^{1/p^0})` lies below any `u`. -/
 theorem radicalTranslationDepth_zero (u : ℝ) : radicalTranslationDepth p 0 u = 0 := by
   simp [radicalTranslationDepth]
 
 omit [Fact p.Prime] in
+/-- At most `n` of the breaks `u_1, …, u_n` lie below `u`. -/
 theorem radicalTranslationDepth_le (n : ℕ) (u : ℝ) :
     radicalTranslationDepth p n u ≤ n := by
   exact (Finset.card_filter_le ..).trans_eq (Finset.card_range n)
 
 omit [Fact p.Prime] in
+/-- The number of breaks `u_1, …, u_{n+1}` below `u` is the number of breaks `u_1, …, u_n` below
+`u`, plus one if `u_{n+1} = n + 1 + 1/(p-1) < u`. -/
 theorem radicalTranslationDepth_succ (n : ℕ) (u : ℝ) :
     radicalTranslationDepth p (n + 1) u = radicalTranslationDepth p n u +
       if u ≤ (n + 1 : ℝ) + 1 / ((p : ℝ) - 1) then 0 else 1 := by
@@ -67,8 +95,8 @@ theorem radicalTranslationDepth_succ (n : ℕ) (u : ℝ) :
   · rw [ite_eq_left (lt_of_not_ge h), ite_eq_right h, Finset.card_insert_of_notMem]
     exact fun hn => Nat.lt_irrefl n (Finset.mem_range.mp (Finset.mem_filter.mp hn).1)
 
-/-- The complete index profile of the nonnormal radical fields,
-including the zeroth layer, all finite truncations, and every right endpoint. -/
+/-- The APF index of `ℚ_p(π^{1/p^n})/ℚ_p` at `u ≥ 0` is `p^d`, where `d` is the number of breaks
+`u_1, …, u_n` below `u`. -/
 theorem radicalLayer_apfIndex_eq_pow_translationDepth
     (π : 𝒪[ℚ_[p]]) [hπ : Fact (Irreducible π)] (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     apfIndex ℚ_[p] (radicalLayer p (π : ℚ_[p]) n) u = p ^ radicalTranslationDepth p n u := by
@@ -86,7 +114,8 @@ theorem radicalLayer_apfIndex_eq_pow_translationDepth
     · rw [ite_eq_right h, ite_eq_right h, pow_succ]
 
 omit [Fact p.Prime] in
-/-- The strict-threshold count on every interval, with finite truncation. -/
+/-- For `j + 1/(p-1) < u ≤ j + 1 + 1/(p-1)`, exactly `min(n, j)` of the breaks `u_1, …, u_n` lie
+below `u`. -/
 theorem radicalTranslationDepth_interval (n j : ℕ) {u : ℝ}
     (hlo : (j : ℝ) + 1 / ((p : ℝ) - 1) < u)
     (hhi : u ≤ (j : ℝ) + 1 + 1 / ((p : ℝ) - 1)) :
@@ -105,6 +134,7 @@ theorem radicalTranslationDepth_interval (n j : ℕ) {u : ℝ}
   rw [radicalTranslationDepth, hs, Finset.card_range]
 
 omit [Fact p.Prime] in
+/-- For `u ≤ 1 + 1/(p-1)` no break lies below `u`. -/
 theorem radicalTranslationDepth_initial (n : ℕ) {u : ℝ}
     (hu : u ≤ 1 + 1 / ((p : ℝ) - 1)) : radicalTranslationDepth p n u = 0 := by
   classical
@@ -115,6 +145,7 @@ theorem radicalTranslationDepth_initial (n : ℕ) {u : ℝ}
   linarith [Nat.cast_nonneg (α := ℝ) r]
 
 omit [Fact p.Prime] in
+/-- For `u > n + 1/(p-1)` all `n` breaks `u_1, …, u_n` lie below `u`. -/
 theorem radicalTranslationDepth_tail (n : ℕ) {u : ℝ}
     (hu : (n : ℝ) + 1 / ((p : ℝ) - 1) < u) :
     radicalTranslationDepth p n u = n := by
@@ -125,7 +156,7 @@ theorem radicalTranslationDepth_tail (n : ℕ) {u : ℝ}
     exact_mod_cast (Nat.succ_le_of_lt (Finset.mem_range.mp hr))
   linarith
 
-/-- The odd-prime fractional offset is strictly between zero and one. -/
+/-- `0 < 1/(p-1) < 1` for `p ≠ 2`. -/
 theorem viviani_fraction_pos_lt_one [hp₂ : Fact (p ≠ 2)] :
     0 < 1 / ((p : ℝ) - 1) ∧ 1 / ((p : ℝ) - 1) < 1 := by
   have hp : 2 < p := lt_of_le_of_ne (Fact.out : p.Prime).two_le (Ne.symm hp₂.out)
@@ -135,6 +166,7 @@ theorem viviani_fraction_pos_lt_one [hp₂ : Fact (p ≠ 2)] :
   · exact (div_lt_one (by linarith)).mpr (by linarith)
 
 omit [Fact p.Prime] in
+/-- For `1 ≤ i ≤ n`, exactly `i - 1` of the breaks `u_1, …, u_n` lie below `u_i = i + 1/(p-1)`. -/
 theorem radicalTranslationDepth_fractional (n i : ℕ) (hi : 1 ≤ i) (hin : i ≤ n) :
     radicalTranslationDepth p n ((i : ℝ) + 1 / ((p : ℝ) - 1)) = i - 1 := by
   have hi' : (i - 1 : ℕ) + 1 = i := Nat.sub_add_cancel hi
@@ -142,16 +174,17 @@ theorem radicalTranslationDepth_fractional (n i : ℕ) (hi : 1 ≤ i) (hin : i �
   rw [radicalTranslationDepth_interval p n (i - 1) (by linarith) (by linarith),
     Nat.min_eq_right (by omega : i - 1 ≤ n)]
 
+/-- For `p ≠ 2` and `i ≤ n`, exactly `i` of the breaks `u_1, …, u_n` lie below `i + 1`. -/
 theorem radicalTranslationDepth_integer [hp₂ : Fact (p ≠ 2)] (n i : ℕ) (hin : i ≤ n) :
     radicalTranslationDepth p n ((i : ℝ) + 1) = i := by
   have hδ := viviani_fraction_pos_lt_one p
   rw [radicalTranslationDepth_interval p n i (by linarith) (by linarith), Nat.min_eq_right hin]
 
-/-- The subgroup of translations divisible by p^k, represented as
-the range of the power homomorphism on the multiplicative type tag. -/
+/-- The subgroup `p^k ℤ/p^n` of the additive group `ℤ/p^n`. -/
 def finiteTranslationSubgroup (n k : ℕ) : Subgroup (Multiplicative (ZMod (p ^ n))) :=
   (powMonoidHom (p ^ k) : Multiplicative (ZMod (p ^ n)) →* _).range
 
+/-- `(ℤ/p^n : p^k ℤ/p^n) = p^k` for `k ≤ n`. -/
 theorem finiteTranslationSubgroup_index (n k : ℕ) (hk : k ≤ n) :
     (finiteTranslationSubgroup p n k).index = p ^ k := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
@@ -160,12 +193,14 @@ theorem finiteTranslationSubgroup_index (n k : ℕ) (hk : k ≤ n) :
   exact Nat.gcd_eq_right (Nat.pow_dvd_pow p hk)
 
 omit [Fact p.Prime] in
+/-- `p^0 ℤ/p^n = ℤ/p^n`. -/
 theorem finiteTranslationSubgroup_zero (n : ℕ) : finiteTranslationSubgroup p n 0 = ⊤ := by
   ext b
   simp only [Subgroup.mem_top, iff_true]
   exact ⟨b, by simp [powMonoidHom]⟩
 
 omit [Fact p.Prime] in
+/-- `p^n ℤ/p^n = 0`. -/
 theorem finiteTranslationSubgroup_self (n : ℕ) : finiteTranslationSubgroup p n n = ⊥ := by
   ext b
   constructor
@@ -178,12 +213,13 @@ theorem finiteTranslationSubgroup_self (n : ℕ) : finiteTranslationSubgroup p n
     rw [hb']
     exact Subgroup.one_mem _
 
-/-- The principal-unit subgroup, truncated at the finite level.
-At depth zero it is the full unit group; at depth n it is trivial. -/
+/-- The principal units `1 + p^r ℤ/p^n = ker((ℤ/p^n)ˣ → (ℤ/p^r)ˣ)` for `r ≤ n`; for `r ≥ n` the
+trivial group. -/
 def finiteUnitSubgroup (n r : ℕ) : Subgroup (ZMod (p ^ n))ˣ :=
   (ZMod.unitsMap (pow_dvd_pow p (Nat.min_le_right r n))).ker
 
 omit [Fact p.Prime] in
+/-- For `r ≤ n`, `finiteUnitSubgroup p n r = ker((ℤ/p^n)ˣ → (ℤ/p^r)ˣ)`. -/
 theorem finiteUnitSubgroup_eq_kernel (n r : ℕ) (hr : r ≤ n) :
     finiteUnitSubgroup p n r = (ZMod.unitsMap (pow_dvd_pow p hr)).ker := by
   let f : {j : ℕ // j ≤ n} → Subgroup (ZMod (p ^ n))ˣ :=
@@ -192,6 +228,7 @@ theorem finiteUnitSubgroup_eq_kernel (n r : ℕ) (hr : r ≤ n) :
     ⟨r, hr⟩ from Subtype.ext (Nat.min_eq_left hr))
 
 omit [Fact p.Prime] in
+/-- For `r ≥ n`, `finiteUnitSubgroup p n r` is trivial. -/
 theorem finiteUnitSubgroup_eq_bot (n r : ℕ) (hr : n ≤ r) :
     finiteUnitSubgroup p n r = ⊥ := by
   let f : {j : ℕ // j ≤ n} → Subgroup (ZMod (p ^ n))ˣ :=
@@ -203,7 +240,7 @@ theorem finiteUnitSubgroup_eq_bot (n r : ℕ) (hr : n ≤ r) :
   exact MonoidHom.ker_id
 
 omit [Fact p.Prime] in
-/-- Each p-power translation subgroup is stable under every unit. -/
+/-- `p^k ℤ/p^n` is stable under multiplication by every unit of `ℤ/p^n`. -/
 theorem finiteTranslationSubgroup_action (n k : ℕ) (u : (ZMod (p ^ n))ˣ)
     {b : Multiplicative (ZMod (p ^ n))} (hb : b ∈ finiteTranslationSubgroup p n k) :
     finiteAffineAction p n u b ∈ finiteTranslationSubgroup p n k := by
@@ -213,7 +250,7 @@ theorem finiteTranslationSubgroup_action (n k : ℕ) (u : (ZMod (p ^ n))ˣ)
   change (finiteAffineAction p n u a) ^ (p ^ k) = finiteAffineAction p n u b
   rw [← map_pow, ha]
 
-/-- The indicated subgroup of the finite affine group. -/
+/-- The subgroup `p^k ℤ/p^n ⋊ V` of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`, for a subgroup `V ≤ (ℤ/p^n)ˣ`. -/
 def finiteAffineSubgroup (n k : ℕ) (V : Subgroup (ZMod (p ^ n))ˣ) :
     Subgroup (FullFiniteAffineGroup p n) where
   carrier := {g | g.left ∈ finiteTranslationSubgroup p n k ∧ g.right ∈ V}
@@ -228,6 +265,7 @@ def finiteAffineSubgroup (n k : ℕ) (V : Subgroup (ZMod (p ^ n))ˣ) :
       V.inv_mem ha.2⟩
 
 omit [Fact p.Prime] in
+/-- `ℤ/p^n ⋊ 1` is the group of translations of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`. -/
 theorem finiteAffineSubgroup_zero_bot (n : ℕ) :
     finiteAffineSubgroup p n 0 ⊥ =
       (SemidirectProduct.inl : Multiplicative (ZMod (p ^ n)) →*
@@ -239,6 +277,7 @@ theorem finiteAffineSubgroup_zero_bot (n : ℕ) :
   exact and_iff_right (Subgroup.mem_top _)
 
 omit [Fact p.Prime] in
+/-- `p^n ℤ/p^n ⋊ 1` is the trivial subgroup of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`. -/
 theorem finiteAffineSubgroup_self_bot (n : ℕ) : finiteAffineSubgroup p n n ⊥ = ⊥ := by
   ext g
   change (g.left ∈ finiteTranslationSubgroup p n n ∧ g.right = 1) ↔ g = 1
@@ -255,7 +294,7 @@ open scoped commutatorElement
 
 variable {p} (n : ℕ)
 
-/-- Conjugation by the unit two extracts the translation coordinate. -/
+/-- `[(0, 2), (a, u)] = (a, 1)` in `ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `p ≠ 2`. -/
 theorem finiteAffine_commutator_two [hp₂ : Fact (p ≠ 2)] (g : FullFiniteAffineGroup p n) :
     ⁅(SemidirectProduct.inr (unitTwo p n) : FullFiniteAffineGroup p n), g⁆ =
       SemidirectProduct.inl g.left := by
@@ -285,8 +324,7 @@ theorem finiteAffine_commutator_two [hp₂ : Fact (p ≠ 2)] (g : FullFiniteAffi
       _ = g.left.toAdd := by rw [htwo, hu]; ring
   · simp [commutatorElement_def, mul_comm]
 
-/-- Every odd-prime normal affine subgroup contains the translation coordinate
-of each of its elements, by the commutator with two. -/
+/-- A normal subgroup of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `p ≠ 2`, containing `(a, u)` contains `(a, 1)`. -/
 theorem finiteAffine_normal_inl_left [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     {g : FullFiniteAffineGroup p n} (hg : g ∈ N) :
@@ -294,7 +332,7 @@ theorem finiteAffine_normal_inl_left [hp₂ : Fact (p ≠ 2)]
   rw [← finiteAffine_commutator_two n g, commutatorElement_def]
   exact N.mul_mem ((inferInstance : N.Normal).conj_mem g hg _) (N.inv_mem hg)
 
-/-- Its unit coordinate also belongs to the same normal subgroup. -/
+/-- A normal subgroup of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `p ≠ 2`, containing `(a, u)` contains `(0, u)`. -/
 theorem finiteAffine_normal_inr_right [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     {g : FullFiniteAffineGroup p n} (hg : g ∈ N) :
@@ -305,8 +343,8 @@ theorem finiteAffine_normal_inr_right [hp₂ : Fact (p ≠ 2)]
   rw [← he]
   exact N.mul_mem (N.inv_mem (finiteAffine_normal_inl_left n N hg)) hg
 
-/-- The normal subgroup splits into its translation intersection and
-its unit projection; no assumed semidirect filtration is used. -/
+/-- For a normal subgroup `N` of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `p ≠ 2`: `(a, u) ∈ N` if and only if
+`(a, 1) ∈ N` and `u` is the unit coordinate of some element of `N`. -/
 theorem mem_finiteAffine_normal_iff [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     (g : FullFiniteAffineGroup p n) :
@@ -322,8 +360,8 @@ theorem mem_finiteAffine_normal_iff [hp₂ : Fact (p ≠ 2)]
     have hprod := N.mul_mem hb hh'
     simpa only [SemidirectProduct.inl_left_mul_inr_right] using hprod
 
-/-- Multiplying a normal affine subgroup by all pure units keeps precisely
-its translation intersection. -/
+/-- For a normal subgroup `N` of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `p ≠ 2`: `(a, u) ∈ (0 ⋊ (ℤ/p^n)ˣ) N` if and
+only if `(a, 1) ∈ N`. -/
 theorem mem_finiteAffine_units_sup_iff [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal]
     (g : FullFiniteAffineGroup p n) :
@@ -348,7 +386,8 @@ theorem mem_finiteAffine_units_sup_iff [hp₂ : Fact (p ≠ 2)]
     simpa only [SemidirectProduct.inl_left_mul_inr_right] using
       Subgroup.mul_mem _ hleft hright
 
-/-- The pure-unit product index equals the translation-intersection index. -/
+/-- For a normal subgroup `N` of `G = ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `p ≠ 2`:
+`(G : (0 ⋊ (ℤ/p^n)ˣ) N) = (ℤ/p^n : N ∩ (ℤ/p^n ⋊ 1))`. -/
 theorem finiteAffine_units_sup_index [hp₂ : Fact (p ≠ 2)]
     (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal] :
     ((SemidirectProduct.inr : (ZMod (p ^ n))ˣ →* FullFiniteAffineGroup p n).range ⊔ N).index =
@@ -377,7 +416,8 @@ theorem finiteAffine_units_sup_index [hp₂ : Fact (p ≠ 2)]
   exact h'.trans T.card_mul_index.symm
 
 omit [Fact p.Prime] in
-/-- The index product for a normal affine subgroup. -/
+/-- For a normal subgroup `N` of `G = ℤ/p^n ⋊ (ℤ/p^n)ˣ` with image `ρ(N)` in `(ℤ/p^n)ˣ`:
+`(G : N) = ((ℤ/p^n)ˣ : ρ(N)) (ℤ/p^n : N ∩ (ℤ/p^n ⋊ 1))`. -/
 theorem finiteAffine_normal_index (N : Subgroup (FullFiniteAffineGroup p n)) [N.Normal] :
     N.index = (N.map SemidirectProduct.rightHom).index *
       (N.comap SemidirectProduct.inl).index := by

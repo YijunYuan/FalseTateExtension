@@ -16,15 +16,52 @@ public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 /-!
 # Viviani's ramification filtration
 
-The upper and lower ramification groups and the Herbrand functions of `ℚ_p(π^{1/p^{n+1}},
-ζ_{p^{n+1}})/ℚ_p`, `p ≠ 2`: the upper group on `(r, r + 1]` and on `(r + 1, r + 1 + 1/(p-1)]` is the
-product of the translation subgroup of level `r + 1` with a principal-unit subgroup; the inverse
-Herbrand function at the breaks is `(2p^{2i} + p - 1)/(p + 1)` and `(p-1)(p^{2i+1} + 1)/(p + 1)`.
+Let `p ≠ 2`, `π` a uniformizer of `ℚ_p`, `D_n = ℚ_p(π^{1/p^{n+1}}, ζ_{p^{n+1}})` and
+`G = Gal(D_n/ℚ_p)`, identified with the affine group `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` by
+`g ↦ (b_{n+1}(g), χ_{n+1}(g))` (`finiteDiagonalGaloisEquiv_padic`). Write `δ = 1/(p-1)`,
+`U_r = 1 + p^r ℤ/p^{n+1}` for the principal units (`finiteUnitSubgroup`, trivial for
+`r ≥ n + 1`) and `p^k ℤ/p^{n+1} ⋊ V` for the subgroups `finiteAffineSubgroup p (n+1) k V`.
+
+The upper numbering filtration of `G` is: `G^u = G` for `u ≤ 0`;
+`G^u = p^d ℤ/p^{n+1} ⋊ U_{r+1}` for `r < u ≤ r + 1`, `r ≤ n`, where `d` is the number of
+breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u` (`radicalTranslationDepth`); and `G^u = 1` for
+`u > n + 1 + δ`. Explicitly, `G^u = ℤ/p^{n+1} ⋊ U_1` for `0 < u ≤ 1`,
+`G^u = p^i ℤ/p^{n+1} ⋊ U_{i+2}` for `i + 1 < u ≤ i + 1 + δ`, `G^u = p^i ℤ/p^{n+1} ⋊ U_{i+1}` for
+`i + δ < u ≤ i + 1`, and `G^u = p^n ℤ/p^{n+1} ⋊ 1` for `n + δ < u ≤ n + 1 + δ`. The index
+`(G : G^u)` is the APF index of `D_n/ℚ_p`, and it equals `p - 1` on `(0, 1]`, `(p-1) p^{2i}` on
+`(i + δ, i + 1]` and `(p-1) p^{2i+1}` on `(i + 1, i + 1 + δ]`. Integrating the index gives the
+inverse Herbrand function `ψ` at the breaks: `ψ(i + δ) = (2p^{2i} + p - 1)/(p + 1)`,
+`ψ(i + 1) = (p-1)(p^{2i+1} + 1)/(p + 1)` and `ψ(n + 1 + δ) = (p^{2n+2} + p^{2n} + p - 1)/(p + 1)`,
+and the lower numbering filtration `G_t = G^{φ(t)}` on the corresponding intervals: for example
+`G_t = ℤ/p^{n+1} ⋊ U_1` for `0 < t ≤ p - 1`, and `G_t` is the group `p^n ℤ/p^{n+1} ⋊ 1` of order
+`p` for `ψ(n + δ) < t ≤ ψ(n + 1 + δ)` and trivial beyond. For `n = 0`, `G^u = ℤ/p ⋊ 1` for
+`0 < u ≤ p/(p-1)`, `ψ(u) = (p-1) u` there, and `G_t = ℤ/p ⋊ 1` for `0 < t ≤ p`.
+
+## Main results
+
+* `finiteUpperAffineGroup`, `finiteUpperAffine_eq_interval`: the image of `G^u` in
+  `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` is `p^d ℤ/p^{n+1} ⋊ U_{r+1}` for `r < u ≤ r + 1`, `r ≤ n`.
+* `finiteUpperAffine_fractional`, `finiteUpperAffine_integer`:
+  `G^{i+δ} = p^{i-1} ℤ/p^{n+1} ⋊ U_{i+1}` and `G^{i+1} = p^i ℤ/p^{n+1} ⋊ U_{i+1}`.
+* `upperRamificationGroup_falseTate_nonpos`, `upperRamificationGroup_falseTate_eq_bot`: `G^u = G`
+  for `-1 ≤ u ≤ 0` and `G^u = 1` for `u > n + 1 + δ`.
+* `apfIndex_falseTateLayer_eq_upperIndex`, `upperRamificationGroup_falseTate_index`: the APF index
+  of `D_n/ℚ_p` at `u ≥ 0` is `(G : G^u) = φ(p^{r+1}) p^d` for `r < u ≤ r + 1`.
+* `inverseHerbrandFunction_falseTate_fractional`, `inverseHerbrandFunction_falseTate_integer`,
+  `inverseHerbrandFunction_falseTate_final`: `ψ` at the breaks `i + δ`, `i + 1` and `n + 1 + δ`.
+* `lowerRamificationGroupReal_falseTate_fractional_integer`,
+  `lowerRamificationGroupReal_falseTate_integer_fractional`,
+  `lowerRamificationGroupReal_falseTate_final_interval`,
+  `lowerRamificationGroupReal_falseTate_eq_bot`: the lower numbering filtration.
+* `finiteUpperAffine_first_layer_filtration`,
+  `lowerRamificationGroupReal_falseTate_first_layer_filtration`: both filtrations of
+  `ℚ_p(π^{1/p}, ζ_p)/ℚ_p`.
 
 ## References
 
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, Corollary 6.10,
-  with the correction of FalseTateLift, Remark 5.2.
+* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6 and
+  Corollary 6.10, with the correction of FalseTateLift, Remark 5.2.
+* Serre, *Local Fields*, Chapter IV, §3 (Herbrand functions and upper numbering).
 -/
 
 @[expose] public section
@@ -46,16 +83,18 @@ local notation "D(" n ")" => falseTateLayer p (π : ℚ_[p]) (n + (1 : ℕ)) (n 
 local notation "O(" n ")" => spectralIntegerRing ℚ_[p] D(n)
 local notation "G(" n ")" => D(n) ≃ₐ[ℚ_[p]] D(n)
 
+/-- The `ℚ_p(ζ_{p^{n+1}})`-algebra structure on `D_n` given by the inclusion. -/
 local instance vivianiCyclotomicAlgebra (n : ℕ) :
     Algebra (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) :=
   (finiteCyclotomicInclusion p (π : ℚ_[p]) (n + 1)).toRingHom.toAlgebra
 
+/-- `ℚ_p ⊆ ℚ_p(ζ_{p^{n+1}}) ⊆ D_n` is a tower of fields. -/
 local instance vivianiCyclotomicScalarTower (n : ℕ) :
     IsScalarTower ℚ_[p] (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) :=
   IsScalarTower.of_algebraMap_eq (congrFun rfl)
 
-/-- The image of the upper group under the checked finite
-affine isomorphism. This retains its spectral integer ring. -/
+/-- The image of the upper ramification group `G^u` of `D_n/ℚ_p` in `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ`
+under `g ↦ (b_{n+1}(g), χ_{n+1}(g))`. -/
 def finiteUpperAffineGroup (n : ℕ) (u : ℝ) :
     Subgroup (FullFiniteAffineGroup p (n + 1)) := by
   let e : G(n) ≃* FullFiniteAffineGroup p (n + 1) :=
@@ -63,12 +102,14 @@ def finiteUpperAffineGroup (n : ℕ) (u : ℝ) :
   let U : Subgroup G(n) := upperRamificationGroup (R := O(n)) G(n) u
   exact U.map e.toMonoidHom
 
+/-- The image of `G^u` in `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` is a normal subgroup. -/
 instance finiteUpperAffineGroup_normal (n : ℕ) (u : ℝ) :
     (finiteUpperAffineGroup π n u).Normal :=
   Subgroup.Normal.map inferInstance _
     (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective
 
-/-- The pure radical fixer becomes precisely the pure-unit factor. -/
+/-- The image of `Gal(D_n/ℚ_p(π^{1/p^{n+1}}))` in `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` is the group of units
+`0 ⋊ (ℤ/p^{n+1})ˣ`. -/
 theorem finiteRadicalFixing_map_affine (n : ℕ) :
     ((finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).fieldRange.fixingSubgroup : Subgroup G(n)).map
       (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
@@ -82,8 +123,8 @@ theorem finiteRadicalFixing_map_affine (n : ℕ) :
     obtain ⟨g, rfl⟩ := (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective x
     exact ⟨g, (finiteDiagonalGaloisEquiv_padic_mem_units p π (n + 1) g).mp hx, rfl⟩
 
-/-- The index of the nonnormal radical subfield measures
-the translation intersection of the upper group. -/
+/-- For `u ≥ 0`, the translations in the image of `G^u` form a subgroup of `ℤ/p^{n+1}` of index
+`p^d`, where `d` is the number of breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u`. -/
 theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     ((finiteUpperAffineGroup π n u).comap SemidirectProduct.inl).index =
       p ^ radicalTranslationDepth p (n + 1) u := by
@@ -110,8 +151,8 @@ theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
         (finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).equivFieldRange u).symm
     _ = _ := radicalLayer_apfIndex_eq_pow_translationDepth p π (n + 1) hu
 
-/-- Cyclic subgroup uniqueness turns the index into the
-translation subgroup, without a separate assumed depth certificate. -/
+/-- For `u ≥ 0`, the translations in the image of `G^u` form the subgroup `p^d ℤ/p^{n+1}`, where
+`d` is the number of breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u`. -/
 theorem finiteUpperAffine_translation (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     (finiteUpperAffineGroup π n u).comap SemidirectProduct.inl =
       finiteTranslationSubgroup p (n + 1) (radicalTranslationDepth p (n + 1) u) := by
@@ -119,8 +160,8 @@ theorem finiteUpperAffine_translation (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
   rw [finiteUpperAffine_translation_index π n hu,
     finiteTranslationSubgroup_index p _ _ (radicalTranslationDepth_le p _ _)]
 
-/-- The unit projection is exactly the upper group of the finite
-cyclotomic field, by restriction with its own spectral integers. -/
+/-- For `u ≥ -1`, the unit coordinates of the image of `G^u` form the image under the cyclotomic
+character of the upper ramification group `Gal(ℚ_p(ζ_{p^{n+1}})/ℚ_p)^u`. -/
 theorem finiteUpperAffine_unit_projection (n : ℕ) {u : ℝ} (hu : -1 ≤ u) :
     (finiteUpperAffineGroup π n u).map SemidirectProduct.rightHom =
       (upperRamificationGroup (R := spectralIntegerRing ℚ_[p]
@@ -142,8 +183,8 @@ theorem finiteUpperAffine_unit_projection (n : ℕ) {u : ℝ} (hu : -1 ≤ u) :
     (diagonalCyclotomicRestriction p (π : ℚ_[p]) (n + 1)) = _ at hr
   rw [finiteUpperAffineGroup, Subgroup.map_map, hc, ← Subgroup.map_map, hr]
 
-/-- Every positive finite cyclotomic interval has its exact principal-unit
-projection, including its right endpoint. -/
+/-- For `r ≤ n` and `r < u ≤ r + 1`, the unit coordinates of the image of `G^u` form the
+principal units `U_{r+1} = 1 + p^{r+1} ℤ/p^{n+1}`. -/
 theorem finiteUpperAffine_unit_interval (n r : ℕ) (hr : r ≤ n)
     {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     (finiteUpperAffineGroup π n u).map SemidirectProduct.rightHom =
@@ -154,15 +195,15 @@ theorem finiteUpperAffine_unit_interval (n r : ℕ) (hr : r ≤ n)
     Subgroup.map_comap_eq_self_of_surjective (cyclotomicLayerCharacter_surjective p (n + 1))]
   exact (finiteUnitSubgroup_eq_kernel p (n + 1) (r + 1) (by omega)).symm
 
-/-- After the final cyclotomic break the unit projection is trivial. -/
+/-- For `u > n`, every element of the image of `G^u` has unit coordinate `1`. -/
 theorem finiteUpperAffine_unit_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     (finiteUpperAffineGroup π n u).map SemidirectProduct.rightHom = ⊥ := by
   rw [finiteUpperAffine_unit_projection π n (by
     linarith [Nat.cast_nonneg (α := ℝ) n]),
     upperRamificationGroup_cyclotomic_eq_bot p n hu, Subgroup.map_bot]
 
-/-- The finite upper group in affine coordinates on every positive
-cyclotomic interval, with its strict-threshold translation depth. -/
+/-- For `r ≤ n` and `r < u ≤ r + 1`, the image of `G^u` is `p^d ℤ/p^{n+1} ⋊ U_{r+1}`, where `d` is
+the number of breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u`. -/
 theorem finiteUpperAffine_eq_interval (n r : ℕ) (hr : r ≤ n)
     {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     finiteUpperAffineGroup π n u =
@@ -175,8 +216,8 @@ theorem finiteUpperAffine_eq_interval (n r : ℕ) (hr : r ≤ n)
     finiteUpperAffine_unit_interval π n r hr hu0 hu1]
   rfl
 
-/-- The finite upper group after the final cyclotomic break is its
-translation subgroup with the same base depth. -/
+/-- For `u > n`, the image of `G^u` is `p^d ℤ/p^{n+1} ⋊ 1`, where `d` is the number of breaks
+`j + δ`, `1 ≤ j ≤ n + 1`, below `u`. -/
 theorem finiteUpperAffine_eq_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     finiteUpperAffineGroup π n u =
       finiteAffineSubgroup p (n + 1) (radicalTranslationDepth p (n + 1) u) ⊥ := by
@@ -188,7 +229,8 @@ theorem finiteUpperAffine_eq_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
   rfl
 
 include hp₂ hπ in
-/-- The upper index on each closed cyclotomic interval. -/
+/-- For `r ≤ n` and `r < u ≤ r + 1`, `(G : G^u) = φ(p^{r+1}) p^d`, where `d` is the number of
+breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u`. -/
 theorem upperRamificationGroup_falseTate_index (n r : ℕ) (hr : r ≤ n)
     {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     (upperRamificationGroup (R := O(n)) G(n) u).index =
@@ -203,7 +245,8 @@ theorem upperRamificationGroup_falseTate_index (n r : ℕ) (hr : r ≤ n)
     ZMod.index_ker_unitsMap_prime_pow p n (r + 1) (by omega)]
 
 include hp₂ hπ in
-/-- The upper index after the final cyclotomic break. -/
+/-- For `u > n`, `(G : G^u) = φ(p^{n+1}) p^d`, where `d` is the number of breaks `j + δ`,
+`1 ≤ j ≤ n + 1`, below `u`. -/
 theorem upperRamificationGroup_falseTate_index_tail (n : ℕ) {u : ℝ} (hu : (n : ℝ) < u) :
     (upperRamificationGroup (R := O(n)) G(n) u).index =
       (p ^ (n + 1)).totient * p ^ radicalTranslationDepth p (n + 1) u := by
@@ -216,8 +259,8 @@ theorem upperRamificationGroup_falseTate_index_tail (n : ℕ) {u : ℝ} (hu : (n
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
   simp only [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient]
 
-/-- The upper group at every fractional Kummer break, including both final
-breaks and the single first-layer break, with the finite truncation. -/
+/-- For `1 ≤ i ≤ n + 1`, the image of `G^{i+δ}` is `p^{i-1} ℤ/p^{n+1} ⋊ U_{i+1}`; for `i = n + 1`
+the unit factor `U_{n+2}` is trivial. -/
 theorem finiteUpperAffine_fractional (n i : ℕ) (hi : 1 ≤ i) (hin : i ≤ n + 1) :
     finiteUpperAffineGroup π n ((i : ℝ) + 1 / ((p : ℝ) - 1)) =
       finiteAffineSubgroup p (n + 1) (i - 1) (finiteUnitSubgroup p (n + 1) (i + 1)) := by
@@ -232,7 +275,7 @@ theorem finiteUpperAffine_fractional (n i : ℕ) (hi : 1 ≤ i) (hin : i ≤ n +
         linarith)), radicalTranslationDepth_fractional p (n + 1) i hi hin,
       finiteUnitSubgroup_eq_bot p (n + 1) (i + 1) (by omega)]
 
-/-- The integer-break upper group; i=0 includes upper index one. -/
+/-- For `i ≤ n`, the image of `G^{i+1}` is `p^i ℤ/p^{n+1} ⋊ U_{i+1}`. -/
 theorem finiteUpperAffine_integer (n i : ℕ) (hi : i ≤ n) :
     finiteUpperAffineGroup π n ((i : ℝ) + 1) =
       finiteAffineSubgroup p (n + 1) i (finiteUnitSubgroup p (n + 1) (i + 1)) := by
@@ -243,7 +286,7 @@ local notation "δ" => 1 / ((p : ℝ) - 1)
 local notation "Ψ(" n ")" => inverseHerbrandFunction (R := O(n)) G(n)
 
 include hp₂ hπ in
-/-- Full inertia identifies the index with the full upper index. -/
+/-- The APF index of `D_n/ℚ_p` at `u ≥ 0` is `(G : G^u)`. -/
 theorem apfIndex_falseTateLayer_eq_upperIndex (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
     apfIndex ℚ_[p] D(n) u = (upperRamificationGroup (R := O(n)) G(n) u).index := by
   have := falseTateLayer_isGalois p (π : ℚ_[p]) (n + 1)
@@ -253,6 +296,7 @@ theorem apfIndex_falseTateLayer_eq_upperIndex (n : ℕ) {u : ℝ} (hu : 0 ≤ u)
   rw [apfIndex_eq_upperRelIndex ℚ_[p] D(n) hu, hz, Subgroup.relIndex_top_right]
 
 include hp₂ hπ in
+/-- If `(G : G^u) = c` for all `u ∈ (a, b]`, `0 ≤ a ≤ b`, then `ψ(b) - ψ(a) = (b - a) c`. -/
 theorem viviani_inverse_affine (n : ℕ) {a b : ℝ} (ha : 0 ≤ a) (hab : a ≤ b)
     (c : ℕ) (hc : ∀ u ∈ Set.Ioc a b,
       (upperRamificationGroup (R := O(n)) G(n) u).index = c) :
@@ -264,6 +308,7 @@ theorem viviani_inverse_affine (n : ℕ) {a b : ℝ} (ha : 0 ≤ a) (hab : a ≤
     (apfIndex_falseTateLayer_eq_upperIndex π n (ha.trans hu.1.le)).trans (hc u hu)
 
 include hp₂ hπ in
+/-- `(G : G^u) = p - 1` for `0 < u ≤ 1`. -/
 theorem upperRamificationGroup_falseTate_index_initial (n : ℕ) {u : ℝ}
     (hu : 0 < u) (hu1 : u ≤ 1) :
     (upperRamificationGroup (R := O(n)) G(n) u).index = p - 1 := by
@@ -274,7 +319,7 @@ theorem upperRamificationGroup_falseTate_index_initial (n : ℕ) {u : ℝ}
     Nat.zero_add, pow_one, Nat.totient_prime (Fact.out : p.Prime)]
 
 include hp₂ hπ in
-/-- Constant upper index from a fractional break to the following integer. -/
+/-- `(G : G^u) = (p - 1) p^{2i}` for `i ≤ n` and `i + δ < u ≤ i + 1`. -/
 theorem upperRamificationGroup_falseTate_index_fractional_integer
     (n i : ℕ) (hi : i ≤ n) {u : ℝ} (hu0 : (i : ℝ) + δ < u) (hu1 : u ≤ (i : ℝ) + 1) :
     (upperRamificationGroup (R := O(n)) G(n) u).index = (p - 1) * p ^ (2 * i) := by
@@ -287,7 +332,7 @@ theorem upperRamificationGroup_falseTate_index_fractional_integer
   ring
 
 include hp₂ hπ in
-/-- Constant upper index from an integer to the next fractional break. -/
+/-- `(G : G^u) = (p - 1) p^{2i+1}` for `i + 1 ≤ n` and `i + 1 < u ≤ i + 1 + δ`. -/
 theorem upperRamificationGroup_falseTate_index_integer_fractional
     (n i : ℕ) (hi : i + 1 ≤ n) {u : ℝ} (hu0 : (i : ℝ) + 1 < u)
     (hu1 : u ≤ (i : ℝ) + 1 + δ) :
@@ -302,8 +347,7 @@ theorem upperRamificationGroup_falseTate_index_integer_fractional
   ring
 
 include hp₂ hπ in
-/-- On the final fractional interval both cyclotomic and radical truncation
-are retained; this also includes n=0, the first layer. -/
+/-- `(G : G^u) = (p - 1) p^{2n}` for `n + δ < u ≤ n + 1 + δ`. -/
 theorem upperRamificationGroup_falseTate_index_final (n : ℕ) {u : ℝ}
     (hu0 : (n : ℝ) + δ < u) (hu1 : u ≤ (n : ℝ) + 1 + δ) :
     (upperRamificationGroup (R := O(n)) G(n) u).index = (p - 1) * p ^ (2 * n) := by
@@ -315,7 +359,7 @@ theorem upperRamificationGroup_falseTate_index_final (n : ℕ) {u : ℝ}
   ring
 
 include hp₂ hπ in
-/-- The first integer upper parameter has lower parameter p-1. -/
+/-- `ψ(1) = p - 1`. -/
 theorem inverseHerbrandFunction_falseTate_one (n : ℕ) : Ψ(n) 1 = (p : ℝ) - 1 := by
   have h := viviani_inverse_affine π n (a := 0) (b := 1) le_rfl zero_le_one
     (p - 1) (fun u hu => upperRamificationGroup_falseTate_index_initial π n hu.1 hu.2)
@@ -324,8 +368,7 @@ theorem inverseHerbrandFunction_falseTate_one (n : ℕ) : Ψ(n) 1 = (p : ℝ) - 
   simpa only [Nat.cast_sub (Fact.out : p.Prime).one_le, Nat.cast_one] using h
 
 include hp₂ hπ in
-/-- Every fractional lower break before the last one. The auxiliary i=0
-value is included to make the uniform recurrence start without an empty-row case. -/
+/-- `ψ(i + δ) = (2p^{2i} + p - 1)/(p + 1)` for `i ≤ n`; in particular `ψ(δ) = 1`. -/
 theorem inverseHerbrandFunction_falseTate_fractional (n i : ℕ) (hi : i ≤ n) :
     Ψ(n) ((i : ℝ) + δ) =
       (2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1) := by
@@ -370,7 +413,7 @@ theorem inverseHerbrandFunction_falseTate_fractional (n i : ℕ) (hi : i ≤ n) 
         ring
 
 include hp₂ hπ in
-/-- The integer-break formula has exponent 2i+1. -/
+/-- `ψ(i + 1) = (p - 1)(p^{2i+1} + 1)/(p + 1)` for `i ≤ n`. -/
 theorem inverseHerbrandFunction_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     Ψ(n) ((i : ℝ) + 1) =
       ((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1) := by
@@ -394,7 +437,7 @@ theorem inverseHerbrandFunction_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
       ring
 
 include hp₂ hπ in
-/-- The final lower break, valid also in the first layer n=0. -/
+/-- `ψ(n + 1 + δ) = (p^{2n+2} + p^{2n} + p - 1)/(p + 1)`. -/
 theorem inverseHerbrandFunction_falseTate_final (n : ℕ) :
     Ψ(n) ((n : ℝ) + 1 + δ) =
       ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) / ((p : ℝ) + 1) := by
@@ -416,7 +459,8 @@ theorem inverseHerbrandFunction_falseTate_final (n : ℕ) :
       ring
 
 include hp₂ hπ in
-/-- The real lower groups at the fractional table entries. -/
+/-- For `1 ≤ i ≤ n`, the image of `G_t` at `t = ψ(i + δ) = (2p^{2i} + p - 1)/(p + 1)` is
+`p^{i-1} ℤ/p^{n+1} ⋊ U_{i+1}`. -/
 theorem lowerRamificationGroupReal_falseTate_fractional (n i : ℕ)
     (hi : 1 ≤ i) (hin : i ≤ n) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
@@ -427,7 +471,8 @@ theorem lowerRamificationGroupReal_falseTate_fractional (n i : ℕ)
   exact finiteUpperAffine_fractional π n i hi (by omega)
 
 include hp₂ hπ in
-/-- The real lower groups at the integer table entries. -/
+/-- For `i ≤ n`, the image of `G_t` at `t = ψ(i + 1) = (p - 1)(p^{2i+1} + 1)/(p + 1)` is
+`p^i ℤ/p^{n+1} ⋊ U_{i+1}`. -/
 theorem lowerRamificationGroupReal_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       (((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1))).map
@@ -437,7 +482,8 @@ theorem lowerRamificationGroupReal_falseTate_integer (n i : ℕ) (hi : i ≤ n) 
   exact finiteUpperAffine_integer π n i hi
 
 include hp₂ hπ in
-/-- The final lower group is the order-p translation subgroup. -/
+/-- The image of `G_t` at `t = ψ(n + 1 + δ) = (p^{2n+2} + p^{2n} + p - 1)/(p + 1)` is the group
+`p^n ℤ/p^{n+1} ⋊ 1` of order `p`. -/
 theorem lowerRamificationGroupReal_falseTate_final (n : ℕ) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       (((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
@@ -451,6 +497,7 @@ theorem lowerRamificationGroupReal_falseTate_final (n : ℕ) :
   exact h
 
 include hp₂ hπ in
+/-- The Herbrand function `φ` sends `(2p^{2i} + p - 1)/(p + 1)` to `i + δ` for `i ≤ n`. -/
 theorem herbrandFunction_falseTate_fractional (n i : ℕ) (hi : i ≤ n) :
     herbrandFunction (R := O(n)) G(n)
       ((2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1)) = (i : ℝ) + δ := by
@@ -459,6 +506,7 @@ theorem herbrandFunction_falseTate_fractional (n i : ℕ) (hi : i ≤ n) :
     herbrandFunction_inverseHerbrandFunction G(n) (by linarith [Nat.cast_nonneg (α := ℝ) i])]
 
 include hp₂ hπ in
+/-- The Herbrand function `φ` sends `(p - 1)(p^{2i+1} + 1)/(p + 1)` to `i + 1` for `i ≤ n`. -/
 theorem herbrandFunction_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     herbrandFunction (R := O(n)) G(n)
       (((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1)) = (i : ℝ) + 1 := by
@@ -466,6 +514,7 @@ theorem herbrandFunction_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     herbrandFunction_inverseHerbrandFunction G(n) (by linarith [Nat.cast_nonneg (α := ℝ) i])]
 
 include hp₂ hπ in
+/-- The Herbrand function `φ` sends `(p^{2n+2} + p^{2n} + p - 1)/(p + 1)` to `n + 1 + δ`. -/
 theorem herbrandFunction_falseTate_final (n : ℕ) :
     herbrandFunction (R := O(n)) G(n)
       (((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
@@ -474,7 +523,7 @@ theorem herbrandFunction_falseTate_final (n : ℕ) :
   rw [← inverseHerbrandFunction_falseTate_final π n,
     herbrandFunction_inverseHerbrandFunction G(n) (by linarith [Nat.cast_nonneg (α := ℝ) n])]
 
-/-- The complete initial positive upper interval, retaining its right endpoint. -/
+/-- For `0 < u ≤ 1`, the image of `G^u` is `ℤ/p^{n+1} ⋊ U_1`. -/
 theorem finiteUpperAffine_initial (n : ℕ) {u : ℝ} (hu : 0 < u) (hu1 : u ≤ 1) :
     finiteUpperAffineGroup π n u =
       finiteAffineSubgroup p (n + 1) 0 (finiteUnitSubgroup p (n + 1) 1) := by
@@ -483,7 +532,7 @@ theorem finiteUpperAffine_initial (n : ℕ) {u : ℝ} (hu : 0 < u) (hu1 : u ≤ 
     (by simpa using hu) (by simpa using hu1),
     radicalTranslationDepth_initial p (n + 1) (by linarith), Nat.zero_add]
 
-/-- Every open-left, closed-right upper interval after a fractional break. -/
+/-- For `i ≤ n` and `i + δ < u ≤ i + 1`, the image of `G^u` is `p^i ℤ/p^{n+1} ⋊ U_{i+1}`. -/
 theorem finiteUpperAffine_fractional_integer (n i : ℕ) (hi : i ≤ n)
     {u : ℝ} (hu0 : (i : ℝ) + δ < u) (hu1 : u ≤ (i : ℝ) + 1) :
     finiteUpperAffineGroup π n u =
@@ -493,7 +542,8 @@ theorem finiteUpperAffine_fractional_integer (n i : ℕ) (hi : i ≤ n)
     radicalTranslationDepth_interval p (n + 1) i hu0 (by linarith),
     Nat.min_eq_right (by omega : i ≤ n + 1)]
 
-/-- Every open-left, closed-right upper interval after an integer break. -/
+/-- For `i + 1 ≤ n` and `i + 1 < u ≤ i + 1 + δ`, the image of `G^u` is
+`p^i ℤ/p^{n+1} ⋊ U_{i+2}`. -/
 theorem finiteUpperAffine_integer_fractional (n i : ℕ) (hi : i + 1 ≤ n)
     {u : ℝ} (hu0 : (i : ℝ) + 1 < u) (hu1 : u ≤ (i : ℝ) + 1 + δ) :
     finiteUpperAffineGroup π n u =
@@ -504,7 +554,7 @@ theorem finiteUpperAffine_integer_fractional (n i : ℕ) (hi : i + 1 ≤ n)
     radicalTranslationDepth_interval p (n + 1) i (by linarith) hu1,
     Nat.min_eq_right (by omega : i ≤ n + 1)]
 
-/-- The final entire fractional upper interval, including the first layer. -/
+/-- For `n + δ < u ≤ n + 1 + δ`, the image of `G^u` is `p^n ℤ/p^{n+1} ⋊ 1`. -/
 theorem finiteUpperAffine_final_interval (n : ℕ) {u : ℝ}
     (hu0 : (n : ℝ) + δ < u) (hu1 : u ≤ (n : ℝ) + 1 + δ) :
     finiteUpperAffineGroup π n u = finiteAffineSubgroup p (n + 1) n ⊥ := by
@@ -512,7 +562,7 @@ theorem finiteUpperAffine_final_interval (n : ℕ) {u : ℝ}
   rw [finiteUpperAffine_eq_tail π n (by linarith),
     radicalTranslationDepth_interval p (n + 1) n hu0 hu1, Nat.min_eq_right (Nat.le_succ n)]
 
-/-- The finite upper groups vanish strictly after the final break. -/
+/-- For `u > n + 1 + δ`, the image of `G^u` is trivial. -/
 theorem finiteUpperAffine_eq_bot (n : ℕ) {u : ℝ} (hu : (n : ℝ) + 1 + δ < u) :
     finiteUpperAffineGroup π n u = ⊥ := by
   have hδ := viviani_fraction_pos_lt_one p
@@ -521,6 +571,7 @@ theorem finiteUpperAffine_eq_bot (n : ℕ) {u : ℝ} (hu : (n : ℝ) + 1 + δ < 
     finiteAffineSubgroup_self_bot]
 
 include hp₂ hπ in
+/-- `G_t = G` for `t ≤ 0`. -/
 theorem lowerRamificationGroupReal_falseTate_nonpos (n : ℕ) {t : ℝ} (ht : t ≤ 0) :
     lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t = ⊤ := by
   have hz : lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) 0 = ⊤ := by
@@ -531,25 +582,28 @@ theorem lowerRamificationGroupReal_falseTate_nonpos (n : ℕ) {t : ℝ} (ht : t 
   exact lowerRamificationGroupReal_antitone G(n) _ ht
 
 include hp₂ hπ in
+/-- `G^u = G` for `-1 ≤ u ≤ 0`. -/
 theorem upperRamificationGroup_falseTate_nonpos (n : ℕ) {u : ℝ}
     (hu : -1 ≤ u) (hu0 : u ≤ 0) : upperRamificationGroup (R := O(n)) G(n) u = ⊤ := by
   rw [upperRamificationGroup, inverseHerbrandFunction_of_nonpos G(n) hu hu0]
   exact lowerRamificationGroupReal_falseTate_nonpos π n hu0
 
 omit hp₂ hπ in
+/-- For `a, b ≥ -1` and `ψ(a) < t ≤ ψ(b)`, the Herbrand function satisfies `a < φ(t) ≤ b`. -/
 theorem viviani_lower_parameter (n : ℕ) {a b t : ℝ}
     (ha : -1 ≤ a) (hb : -1 ≤ b) (ht0 : Ψ(n) a < t) (ht1 : t ≤ Ψ(n) b) :
     a < herbrandFunction (R := O(n)) G(n) t ∧
       herbrandFunction (R := O(n)) G(n) t ≤ b :=
   herbrandFunction_mem_Ioc_of_inverseHerbrandFunction G(n) ha hb ht0 ht1
 
+/-- For `t ≥ -1`, the image of `G_t` in `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` is the image of `G^{φ(t)}`. -/
 theorem viviani_lower_map (n : ℕ) {t : ℝ} (ht : -1 ≤ t) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
       (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
       finiteUpperAffineGroup π n (herbrandFunction (R := O(n)) G(n) t) := by
   rw [finiteUpperAffineGroup, upperRamificationGroup_herbrandFunction G(n) ht]
 
-/-- The initial lower interval is exactly 0<t≤p-1. -/
+/-- For `0 < t ≤ p - 1`, the image of `G_t` is `ℤ/p^{n+1} ⋊ U_1`. -/
 theorem lowerRamificationGroupReal_falseTate_initial (n : ℕ) {t : ℝ}
     (ht0 : 0 < t) (ht1 : t ≤ (p : ℝ) - 1) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
@@ -562,7 +616,9 @@ theorem lowerRamificationGroupReal_falseTate_initial (n : ℕ) {t : ℝ}
   rw [viviani_lower_map π n (by linarith)]
   exact finiteUpperAffine_initial π n h.1 h.2
 
-/-- The lower intervals corresponding to the fractional-to-integer rows. -/
+/-- For `i ≤ n` and
+`ψ(i + δ) = (2p^{2i} + p - 1)/(p + 1) < t ≤ (p - 1)(p^{2i+1} + 1)/(p + 1) = ψ(i + 1)`, the image
+of `G_t` is `p^i ℤ/p^{n+1} ⋊ U_{i+1}`. -/
 theorem lowerRamificationGroupReal_falseTate_fractional_integer (n i : ℕ) (hi : i ≤ n)
     {t : ℝ}
     (ht0 : (2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1) < t)
@@ -582,7 +638,9 @@ theorem lowerRamificationGroupReal_falseTate_fractional_integer (n i : ℕ) (hi 
     ((inverseHerbrandFunction_mem_Ici (R := O(n)) G(n) _).trans h0.le)]
   exact finiteUpperAffine_fractional_integer π n i hi h.1 h.2
 
-/-- The lower intervals corresponding to the integer-to-fractional rows. -/
+/-- For `i + 1 ≤ n` and
+`ψ(i + 1) = (p - 1)(p^{2i+1} + 1)/(p + 1) < t ≤ (2p^{2i+2} + p - 1)/(p + 1) = ψ(i + 1 + δ)`, the
+image of `G_t` is `p^i ℤ/p^{n+1} ⋊ U_{i+2}`. -/
 theorem lowerRamificationGroupReal_falseTate_integer_fractional (n i : ℕ) (hi : i + 1 ≤ n)
     {t : ℝ}
     (ht0 : ((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1) < t)
@@ -605,7 +663,9 @@ theorem lowerRamificationGroupReal_falseTate_integer_fractional (n i : ℕ) (hi 
     ((inverseHerbrandFunction_mem_Ici (R := O(n)) G(n) _).trans h0.le)]
   exact finiteUpperAffine_integer_fractional π n i hi h.1 h.2
 
-/-- The final lower interval, before the last group vanishes. -/
+/-- For `ψ(n + δ) = (2p^{2n} + p - 1)/(p + 1) < t ≤ (p^{2n+2} + p^{2n} + p - 1)/(p + 1)`, the
+right endpoint being `ψ(n + 1 + δ)`, the image of `G_t` is the group `p^n ℤ/p^{n+1} ⋊ 1` of
+order `p`. -/
 theorem lowerRamificationGroupReal_falseTate_final_interval (n : ℕ) {t : ℝ}
     (ht0 : (2 * (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) / ((p : ℝ) + 1) < t)
     (ht1 : t ≤ ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
@@ -626,7 +686,7 @@ theorem lowerRamificationGroupReal_falseTate_final_interval (n : ℕ) {t : ℝ}
   exact finiteUpperAffine_final_interval π n h.1 h.2
 
 include hp₂ hπ in
-/-- The upper group is trivial strictly after the final upper break. -/
+/-- `G^u = 1` for `u > n + 1 + δ`. -/
 theorem upperRamificationGroup_falseTate_eq_bot (n : ℕ) {u : ℝ}
     (hu : (n : ℝ) + 1 + δ < u) : upperRamificationGroup (R := O(n)) G(n) u = ⊥ := by
   apply Subgroup.map_injective
@@ -636,7 +696,7 @@ theorem upperRamificationGroup_falseTate_eq_bot (n : ℕ) {u : ℝ}
   exact finiteUpperAffine_eq_bot π n hu
 
 include hp₂ hπ in
-/-- The lower group is trivial strictly after the final lower break. -/
+/-- `G_t = 1` for `t > ψ(n + 1 + δ) = (p^{2n+2} + p^{2n} + p - 1)/(p + 1)`. -/
 theorem lowerRamificationGroupReal_falseTate_eq_bot (n : ℕ) {t : ℝ}
     (ht : ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
       ((p : ℝ) + 1) < t) :
@@ -653,7 +713,7 @@ theorem lowerRamificationGroupReal_falseTate_eq_bot (n : ℕ) {t : ℝ}
   rw [← upperRamificationGroup_herbrandFunction G(n) htm]
   exact upperRamificationGroup_falseTate_eq_bot π n hu
 
-/-- Negative upper parameters through zero give the full affine group. -/
+/-- For `-1 ≤ u ≤ 0`, the image of `G^u` is all of `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ`. -/
 theorem finiteUpperAffine_nonpos (n : ℕ) {u : ℝ} (hu : -1 ≤ u) (hu0 : u ≤ 0) :
     finiteUpperAffineGroup π n u = ⊤ := by
   rw [finiteUpperAffineGroup, upperRamificationGroup_falseTate_nonpos π n hu hu0,
@@ -661,14 +721,14 @@ theorem finiteUpperAffine_nonpos (n : ℕ) {u : ℝ} (hu : -1 ≤ u) (hu0 : u �
       (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective]
 
 omit hp₂ in
-/-- The first-layer upper break equals the first strict radical threshold. -/
+/-- `1 + 1/(p-1) = p/(p-1)`. -/
 theorem viviani_first_break : 1 + δ = (p : ℝ) / ((p : ℝ) - 1) := by
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   field_simp
   ring
 
-/-- The positive first-layer upper group is precisely the translation
-factor, through and including p/(p-1). -/
+/-- For `D_0 = ℚ_p(π^{1/p}, ζ_p)` and `0 < u ≤ p/(p-1)`, the image of `G^u` is the group of
+translations `ℤ/p ⋊ 1`. -/
 theorem finiteUpperAffine_first_layer {u : ℝ}
     (hu : 0 < u) (hu1 : u ≤ (p : ℝ) / ((p : ℝ) - 1)) :
     finiteUpperAffineGroup π 0 u =
@@ -678,7 +738,8 @@ theorem finiteUpperAffine_first_layer {u : ℝ}
   rw [finiteUpperAffine_eq_tail π 0 (by simpa using hu),
     radicalTranslationDepth_initial p 1 hb, finiteAffineSubgroup_zero_bot]
 
-/-- The full first-layer upper filtration, with the right endpoint. -/
+/-- For `D_0 = ℚ_p(π^{1/p}, ζ_p)` and `u ≥ -1`, the image of `G^u` is `ℤ/p ⋊ (ℤ/p)ˣ` for `u ≤ 0`,
+the translations `ℤ/p ⋊ 1` for `0 < u ≤ p/(p-1)`, and trivial for `u > p/(p-1)`. -/
 theorem finiteUpperAffine_first_layer_filtration {u : ℝ} (hu : -1 ≤ u) :
     finiteUpperAffineGroup π 0 u =
       if u ≤ 0 then ⊤ else if u ≤ (p : ℝ) / ((p : ℝ) - 1) then
@@ -696,7 +757,7 @@ theorem finiteUpperAffine_first_layer_filtration {u : ℝ} (hu : -1 ≤ u) :
       simpa only [Nat.cast_zero, zero_add, viviani_first_break] using lt_of_not_ge hb
 
 include hp₂ hπ in
-/-- The first-layer inverse Herbrand function on its whole nontrivial interval. -/
+/-- For `D_0 = ℚ_p(π^{1/p}, ζ_p)` and `0 ≤ u ≤ p/(p-1)`, `ψ(u) = (p - 1) u`. -/
 theorem inverseHerbrandFunction_falseTate_first_layer {u : ℝ}
     (hu : 0 ≤ u) (hu1 : u ≤ (p : ℝ) / ((p : ℝ) - 1)) :
     Ψ(0) u = ((p : ℝ) - 1) * u := by
@@ -710,14 +771,15 @@ theorem inverseHerbrandFunction_falseTate_first_layer {u : ℝ}
   simpa only [Nat.cast_sub (Fact.out : p.Prime).one_le, Nat.cast_one, mul_comm] using h
 
 include hp₂ hπ in
-/-- The positive first-layer lower break is p. -/
+/-- For `D_0 = ℚ_p(π^{1/p}, ζ_p)`, `ψ(p/(p-1)) = p`. -/
 theorem inverseHerbrandFunction_falseTate_first_break :
     Ψ(0) ((p : ℝ) / ((p : ℝ) - 1)) = p := by
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   rw [inverseHerbrandFunction_falseTate_first_layer π (by positivity) le_rfl]
   field_simp
 
-/-- The positive first-layer lower group, including its final endpoint. -/
+/-- For `D_0 = ℚ_p(π^{1/p}, ζ_p)` and `0 < t ≤ p`, the image of `G_t` is the group of translations
+`ℤ/p ⋊ 1`. -/
 theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
     (ht : 0 < t) (ht1 : t ≤ p) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
@@ -735,7 +797,8 @@ theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
   rw [viviani_lower_map π 0 (by linarith)]
   exact finiteUpperAffine_first_layer π h.1 h.2
 
-/-- The full first-layer lower filtration. -/
+/-- For `D_0 = ℚ_p(π^{1/p}, ζ_p)`, the image of `G_t` is `ℤ/p ⋊ (ℤ/p)ˣ` for `t ≤ 0`, the
+translations `ℤ/p ⋊ 1` for `0 < t ≤ p`, and trivial for `t > p`. -/
 theorem lowerRamificationGroupReal_falseTate_first_layer_filtration (t : ℝ) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
       (finiteDiagonalGaloisEquiv_padic p π 1).toMonoidHom =
