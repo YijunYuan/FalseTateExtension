@@ -35,7 +35,7 @@ section FiniteCyclotomic
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
-private theorem intermediateField_eq_of_cyclic_finrank_eq
+theorem intermediateField_eq_of_cyclic_finrank_eq
     {F E : Type*} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
     [IsGalois F E] [IsCyclic (E ≃ₐ[F] E)]
     (A B : IntermediateField F E) (h : Module.finrank F A = Module.finrank F B) : A = B := by
@@ -58,7 +58,7 @@ theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
 
 /-- At an odd prime, the actual finite cyclotomic Galois group over any
 characteristic-zero base is cyclic, including level zero. -/
-theorem cyclotomicLayer_isCyclic (hp₂ : p ≠ 2) (n : ℕ) :
+theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
     IsCyclic (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
@@ -68,7 +68,7 @@ theorem cyclotomicLayer_isCyclic (hp₂ : p ≠ 2) (n : ℕ) :
   have hζ : IsPrimitiveRoot ζ (p ^ n) :=
     (isPrimitiveRoot_rootOfUnity (K := K) p n).of_map_of_injective
       (f := (cyclotomicLayer (K := K) p n).val) (cyclotomicLayer p n).val.injective
-  let := ZMod.isCyclic_units_of_prime_pow p (Fact.out : p.Prime) hp₂ n
+  let := ZMod.isCyclic_units_of_prime_pow p (Fact.out : p.Prime) hp₂.out n
   exact isCyclic_of_injective (hζ.autToPow K) (hζ.autToPow_injective K)
 
 /-- If the preceding cyclotomic layer and the first roots of unity are
@@ -161,7 +161,7 @@ theorem exists_first_nontrivial_cyclotomicLayer {n : ℕ}
 /-- A degree-`p` subfield of an actual finite odd-prime cyclotomic layer
 is exactly the first nontrivial cyclotomic layer, if the first roots of
 unity lie in the original base. -/
-theorem exists_eq_first_cyclotomicLayer_of_finrank_prime (hp₂ : p ≠ 2)
+theorem exists_eq_first_cyclotomicLayer_of_finrank_prime [hp₂ : Fact (p ≠ 2)]
     (F : IntermediateField K (AlgebraicClosure K)) [FiniteDimensional K F]
     {m : ℕ} (hFm : F ≤ cyclotomicLayer (K := K) p m)
     (hd : Module.finrank K F = p) (h₁ : cyclotomicLayer (K := K) p 1 = ⊥) :
@@ -177,7 +177,7 @@ theorem exists_eq_first_cyclotomicLayer_of_finrank_prime (hp₂ : p ≠ 2)
   let C := cyclotomicLayer (K := K) p m
   let i := IntermediateField.inclusion hFm
   let j := IntermediateField.inclusion (cyclotomicLayer_mono (K := K) p hrm)
-  let := cyclotomicLayer_isCyclic (K := K) p hp₂ m
+  let := cyclotomicLayer_isCyclic (K := K) p m
   have heq : i.fieldRange = j.fieldRange := by
     apply intermediateField_eq_of_cyclic_finrank_eq
     calc
@@ -193,7 +193,7 @@ theorem exists_eq_first_cyclotomicLayer_of_finrank_prime (hp₂ : p ≠ 2)
 
 end FiniteCyclotomic
 
-private theorem powerBasis_eigenvector_eq_smul_pow
+theorem powerBasis_eigenvector_eq_smul_pow
     {F E : Type*} [Field F] [Field E] [Algebra F E]
     (B : PowerBasis F E) (σ : E ≃ₐ[F] E) {ζ μ : F}
     (hζ : IsPrimitiveRoot ζ B.dim) (hgen : σ B.gen = ζ • B.gen)
@@ -252,10 +252,10 @@ open Polynomial
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
-variable {π : 𝒪[K]}
+variable (π : 𝒪[K])
 
 omit [CharZero K] in
-private theorem uniformizer_ne_pow_mul_torsion (hπ : Irreducible π)
+theorem uniformizer_ne_pow_mul_torsion [hπ : Fact (Irreducible π)]
     (a u : K) {N : ℕ} (hN : N ≠ 0) (hu : u ^ N = 1) : (π : K) ≠ a ^ p * u := by
   intro heq
   have hunorm : ‖u‖ = 1 := by
@@ -284,24 +284,23 @@ private theorem uniformizer_ne_pow_mul_torsion (hπ : Irreducible π)
           IsDiscreteValuationRing.addVal_eq_zero_iff.mpr huunit, add_zero]
       _ = IsDiscreteValuationRing.addVal _ π :=
         congrArg (IsDiscreteValuationRing.addVal _) heq₀.symm
-      _ = 1 := IsDiscreteValuationRing.addVal_uniformizer hπ
+      _ = 1 := IsDiscreteValuationRing.addVal_uniformizer hπ.out
   have hnat := congrArg (fun v : ℕ∞ => v.toNat) hv
   simp only [nsmul_eq_mul, ENat.toNat_mul, ENat.toNat_natCast, ENat.toNat_one] at hnat
   exact (Fact.out : p.Prime).not_dvd_one ⟨_, hnat.symm⟩
 
 /-- If an actual radical layer is already Galois, its normality contains
 all the corresponding roots of unity in that same original field. -/
-theorem cyclotomicLayer_le_radicalLayer_of_isGalois (hπ : Irreducible π) (n : ℕ)
+theorem cyclotomicLayer_le_radicalLayer_of_isGalois [hπ : Fact (Irreducible π)] (n : ℕ)
     [IsGalois K (radicalLayer p (π : K) n)] :
     cyclotomicLayer (K := K) p n ≤ radicalLayer p (π : K) n := by
   let F := radicalLayer p (π : K) n
   let f : K[X] := X ^ (p ^ n) - C (π : K)
   have hsplit : (f.map (algebraMap K F)).Splits := by
     have h := Normal.splits (inferInstance : Normal K F) (radicalLayerRoot p (π : K) n)
-    simpa only [minpoly_radicalLayerRoot p hπ n] using h
+    simpa only [minpoly_radicalLayerRoot p π n] using h
   have hle : falseTateLayer p (π : K) n n ≤ F := by
-    rw [← adjoin_rootSet_eq_falseTateLayer p (π : K)
-      (fun h => hπ.ne_zero (Subtype.ext h)) n]
+    rw [← adjoin_rootSet_eq_falseTateLayer p (π : K) n]
     apply IntermediateField.adjoin_le_iff.mpr
     rw [← hsplit.image_rootSet F.val]
     rintro _ ⟨x, _, rfl⟩
@@ -312,13 +311,13 @@ theorem cyclotomicLayer_le_radicalLayer_of_isGalois (hπ : Irreducible π) (n : 
 /-- Normality of the first Eisenstein radical layer forces the first
 cyclotomic layer to be the original base. -/
 theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p]) K]
-    (hπ : Irreducible π)
+    [hπ : Fact (Irreducible π)]
     [IsGalois K (radicalLayer p (π : K) 1)] :
     cyclotomicLayer (K := K) p 1 = ⊥ := by
   have hd : Module.finrank K (cyclotomicLayer (K := K) p 1) ∣ p := by
-    simpa only [finrank_radicalLayer p hπ 1, pow_one] using
+    simpa only [finrank_radicalLayer p π 1, pow_one] using
       IntermediateField.finrank_dvd_of_le_right
-        (cyclotomicLayer_le_radicalLayer_of_isGalois p hπ 1)
+        (cyclotomicLayer_le_radicalLayer_of_isGalois p π 1)
   have hle : Module.finrank K (cyclotomicLayer (K := K) p 1) ≤ p - 1 := by
     simpa only [pow_one, Nat.totient_prime (Fact.out : p.Prime)] using
       finrank_cyclotomicLayer_le_totient (K := K) p 1
@@ -335,7 +334,7 @@ theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p
 cyclotomic extension at an odd prime. The proof uses finite cyclicity and
 the literal reverse eigenbasis comparison over the original base. -/
 theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     radical p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
   intro hmem
   obtain ⟨m, hm⟩ := (mem_cyclotomicExtension_iff p _).mp hmem
@@ -344,10 +343,10 @@ theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
   have := cyclotomicLayer_isAbelianGalois (K := K) p m
   have : IsAbelianGalois K (radicalLayer p (π : K) 1) :=
     IsAbelianGalois.of_algHom (IntermediateField.inclusion hFm)
-  have h₁ := cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois p hπ
+  have h₁ := cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois p π
   obtain ⟨r, _, hprev, hnext, hF⟩ :=
-    exists_eq_first_cyclotomicLayer_of_finrank_prime p hp₂ (radicalLayer p (π : K) 1)
-      hFm (by simpa only [pow_one] using finrank_radicalLayer p hπ 1) h₁
+    exists_eq_first_cyclotomicLayer_of_finrank_prime p (radicalLayer p (π : K) 1)
+      hFm (by simpa only [pow_one] using finrank_radicalLayer p π 1) h₁
   obtain ⟨u, hu, _⟩ := cyclotomicLayer_step_minpoly_of_eq_bot p r h₁ hprev hnext
   let C := cyclotomicLayer (K := K) p (r + 1)
   let B : PowerBasis K C := IntermediateField.adjoin.powerBasis
@@ -374,7 +373,7 @@ theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     simpa only [pow_one] using radical_pow p (π : K) 1
   have hα₀ : α ≠ 0 := by
     intro hz
-    exact radical_ne_zero p (π : K) (fun h => hπ.ne_zero (Subtype.ext h)) 1
+    exact radical_ne_zero p (π : K) 1
       (congrArg Subtype.val hz)
   have hζmem : rootOfUnity (K := K) p 1 ∈ (⊥ : IntermediateField K (AlgebraicClosure K)) := by
     rw [← h₁]
@@ -441,7 +440,7 @@ theorem radical_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     apply (algebraMap K (AlgebraicClosure K)).injective
     rw [map_pow, map_pow, hu, ← pow_mul, Nat.mul_comm (i : ℕ) (p ^ r), pow_mul,
       rootOfUnity_pow, one_pow, map_one]
-  exact uniformizer_ne_pow_mul_torsion p hπ a (u ^ (i : ℕ))
+  exact uniformizer_ne_pow_mul_torsion p π a (u ^ (i : ℕ))
     (pow_ne_zero r (Fact.out : p.Prime).ne_zero) hunity heq
 
 end RadicalNormality
@@ -460,14 +459,14 @@ theorem coe_extensionRadical (n : ℕ) :
     (extensionRadical p π n : AlgebraicClosure K) = radical p π n := rfl
 
 /-- The infinite Kummer coordinate evaluates on each original chosen radical. -/
-theorem padicKummerExponent_spec (hπ : π ≠ 0)
+theorem padicKummerExponent_spec [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
     g (extensionRadical p π n) = extensionRootOfUnity p π n ^
-      (PadicInt.toZModPow n (padicKummerExponent p π hπ g)).val *
+      (PadicInt.toZModPow n (padicKummerExponent p π g)).val *
         extensionRadical p π n := by
-  rw [padicKummerExponent_toZModPow p π hπ]
-  rw [extensionRadical, ← infiniteLayerRestriction_commutes p π hπ]
-  rw [finiteKummerExponent_spec p π n hπ, map_mul, map_pow]
+  rw [padicKummerExponent_toZModPow p π]
+  rw [extensionRadical, ← infiniteLayerRestriction_commutes p π]
+  rw [finiteKummerExponent_spec p π n, map_mul, map_pow]
   rfl
 
 /-- The original cyclotomic subfield has precisely the actual character kernel
@@ -496,14 +495,14 @@ theorem cyclotomicInclusion_fixingSubgroup :
     exact h.symm
 
 /-- Vanishing of the finite Kummer coordinate fixes the corresponding radical. -/
-theorem extensionRadical_fixed_of_toZModPow_eq_zero (hπ : π ≠ 0)
+theorem extensionRadical_fixed_of_toZModPow_eq_zero [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ)
-    (hb : PadicInt.toZModPow n (padicKummerExponent p π hπ g) = 0) :
+    (hb : PadicInt.toZModPow n (padicKummerExponent p π g) = 0) :
     g (extensionRadical p π n) = extensionRadical p π n := by
-  rw [padicKummerExponent_spec p π hπ, hb]
+  rw [padicKummerExponent_spec p π, hb]
   simp
 
-private theorem mem_of_fixed_by_inclusion
+theorem mem_of_fixed_by_inclusion
     {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
     {A B : IntermediateField F Ω} [IsGalois F B] (hAB : A ≤ B) (x : B)
     (hf : ∀ g ∈ (IntermediateField.inclusion hAB).fieldRange.fixingSubgroup, g x = x) :
@@ -519,11 +518,11 @@ private theorem mem_of_fixed_by_inclusion
 
 /-- Fixing by the actual character kernel places an original radical in the
 actual cyclotomic subfield, by infinite Galois correspondence. -/
-theorem radical_mem_cyclotomicExtension_of_fixed (hπ : π ≠ 0) (n : ℕ)
+theorem radical_mem_cyclotomicExtension_of_fixed [hπ : NeZero π] (n : ℕ)
     (hf : ∀ g : (padicCyclotomicCharacter p π).ker,
       g.val (extensionRadical p π n) = extensionRadical p π n) :
     radical p π n ∈ cyclotomicExtension (K := K) p := by
-  have := falseTateExtension_isGalois p π hπ
+  have := falseTateExtension_isGalois p π
   apply mem_of_fixed_by_inclusion (cyclotomicExtension_le_falseTateExtension p π)
     (extensionRadical p π n)
   intro g hg
@@ -594,29 +593,29 @@ variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 /-- The original affine coordinates, with unit coordinate in the actual
 cyclotomic character image rather than in the whole p-adic unit group. -/
-def restrictedAffineGaloisHom (hπ : π ≠ 0) :
+def restrictedAffineGaloisHom [hπ : NeZero π] :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →*
       RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range where
-  toFun g := ⟨Multiplicative.ofAdd (padicKummerExponent p π hπ g),
+  toFun g := ⟨Multiplicative.ofAdd (padicKummerExponent p π g),
     ⟨padicCyclotomicCharacter p π g, by
-      rw [← padicCyclotomicCharacter_range p π hπ]
+      rw [← padicCyclotomicCharacter_range p π]
       exact ⟨g, rfl⟩⟩⟩
   map_one' := by
     apply SemidirectProduct.ext
-    · exact congrArg (fun x : PadicAffineGroup p => x.left) (map_one (affineGaloisHom p π hπ))
+    · exact congrArg (fun x : PadicAffineGroup p => x.left) (map_one (affineGaloisHom p π))
     · apply Subtype.ext
       exact map_one (padicCyclotomicCharacter p π)
   map_mul' g h := by
     apply SemidirectProduct.ext
-    · exact congrArg (fun x : PadicAffineGroup p => x.left) (map_mul (affineGaloisHom p π hπ) g h)
+    · exact congrArg (fun x : PadicAffineGroup p => x.left) (map_mul (affineGaloisHom p π) g h)
     · apply Subtype.ext
       exact map_mul (padicCyclotomicCharacter p π) g h
 
 /-- Restricting the unit coordinate retains continuity in the ordinary product topology. -/
-theorem continuous_restrictedAffineGaloisHom (hπ : π ≠ 0) :
-    Continuous (restrictedAffineGaloisHom p π hπ) := by
+theorem continuous_restrictedAffineGaloisHom [hπ : NeZero π] :
+    Continuous (restrictedAffineGaloisHom p π) := by
   apply continuous_induced_rng.mpr
-  exact (continuous_padicKummerExponent p π hπ).prodMk
+  exact (continuous_padicKummerExponent p π).prodMk
     ((continuous_padicCyclotomicCharacter p π).subtype_mk _)
 
 end RestrictedCoordinates
@@ -693,9 +692,9 @@ section FullTranslation
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
-variable {π : 𝒪[K]}
+variable (π : 𝒪[K])
 
-private theorem closedAddSubgroup_toZModPow_one_eq_zero
+theorem closedAddSubgroup_toZModPow_one_eq_zero
     (M : ClosedAddSubgroup (ℤ_[p])) (hM : M.toAddSubgroup ≠ ⊤)
     {a : ℤ_[p]} (ha : a ∈ M) : PadicInt.toZModPow 1 a = 0 := by
   let J := PadicInt.closedAddSubgroupIdeal M
@@ -710,39 +709,39 @@ private theorem closedAddSubgroup_toZModPow_one_eq_zero
 
 /-- At an odd prime the actual closed translation kernel is the whole p-adic
 additive group, with the coordinate normalization fixed by the chosen roots. -/
-theorem affineAdditiveKernel_eq_top (hp₂ : p ≠ 2) (hπ : Irreducible π) :
-    (affineAdditiveKernel p (π : K) (fun h => hπ.ne_zero (Subtype.ext h))).toAddSubgroup = ⊤ := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+theorem affineAdditiveKernel_eq_top [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+    (affineAdditiveKernel p (π : K)).toAddSubgroup = ⊤ := by
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   by_contra hM
-  apply radical_one_not_mem_cyclotomicExtension p hp₂ hπ
-  apply radical_mem_cyclotomicExtension_of_fixed p (π : K) hπ₀ 1
+  apply radical_one_not_mem_cyclotomicExtension p π
+  apply radical_mem_cyclotomicExtension_of_fixed p (π : K) 1
   intro g
-  apply extensionRadical_fixed_of_toZModPow_eq_zero p (π : K) hπ₀ g.val 1
+  apply extensionRadical_fixed_of_toZModPow_eq_zero p (π : K) g.val 1
   exact closedAddSubgroup_toZModPow_one_eq_zero p
-    (affineAdditiveKernel p (π : K) hπ₀) hM
-    (padicKummerExponent_mem_affineAdditiveKernel p (π : K) hπ₀ g)
+    (affineAdditiveKernel p (π : K)) hM
+    (padicKummerExponent_mem_affineAdditiveKernel p (π : K) g)
 
 /-- The actual Kummer coordinate is a topological additive isomorphism onto
 all p-adic integers at an odd prime. -/
-def fullKummerKernelEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def fullKummerKernelEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     Additive (padicCyclotomicCharacter p (π : K)).ker ≃ₜ+ ℤ_[p] := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   let f : Additive (padicCyclotomicCharacter p (π : K)).ker →+ ℤ_[p] :=
-    (affineAdditiveKernel p (π : K) hπ₀).toAddSubgroup.subtype.comp
-      (kummerKernelHom p (π : K) hπ₀)
+    (affineAdditiveKernel p (π : K)).toAddSubgroup.subtype.comp
+      (kummerKernelHom p (π : K))
   have hf : Function.Bijective f := by
     constructor
     · intro g h heq
-      apply (kummerKernelHom_bijective p (π : K) hπ₀).injective
+      apply (kummerKernelHom_bijective p (π : K)).injective
       exact Subtype.ext heq
     · intro a
-      have ha : a ∈ affineAdditiveKernel p (π : K) hπ₀ := by
-        change a ∈ (affineAdditiveKernel p (π : K) hπ₀).toAddSubgroup
-        rw [affineAdditiveKernel_eq_top p hp₂ hπ]
+      have ha : a ∈ affineAdditiveKernel p (π : K) := by
+        change a ∈ (affineAdditiveKernel p (π : K)).toAddSubgroup
+        rw [affineAdditiveKernel_eq_top p π]
         trivial
-      obtain ⟨g, hg⟩ := (kummerKernelHom_bijective p (π : K) hπ₀).surjective ⟨a, ha⟩
+      obtain ⟨g, hg⟩ := (kummerKernelHom_bijective p (π : K)).surjective ⟨a, ha⟩
       exact ⟨g, congrArg Subtype.val hg⟩
-  have := falseTateExtension_isGalois p (π : K) hπ₀
+  have := falseTateExtension_isGalois p (π : K)
   have hclosed : IsClosed ((padicCyclotomicCharacter p (π : K)).ker :
       Set (falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K))) :=
     isClosed_singleton.preimage (continuous_padicCyclotomicCharacter p (π : K))
@@ -750,56 +749,56 @@ def fullKummerKernelEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) :
     isCompact_iff_compactSpace.mp hclosed.isCompact
   let e := AddEquiv.ofBijective f hf
   have hc : Continuous e := continuous_subtype_val.comp
-    (continuous_kummerKernelHom p (π : K) hπ₀)
+    (continuous_kummerKernelHom p (π : K))
   exact { e with
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 @[simp]
-theorem fullKummerKernelEquiv_apply (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem fullKummerKernelEquiv_apply [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : Additive (padicCyclotomicCharacter p (π : K)).ker) :
-    fullKummerKernelEquiv p hp₂ hπ g =
-      padicKummerExponent p (π : K) (fun h => hπ.ne_zero (Subtype.ext h)) g.toMul := rfl
+    fullKummerKernelEquiv p π g =
+      padicKummerExponent p (π : K) g.toMul := rfl
 
 /-- The actual character-kernel automorphism whose chosen Kummer coordinate
 is exactly one. -/
-def tau (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def tau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker :=
-  ((fullKummerKernelEquiv p hp₂ hπ).symm 1).toMul
+  ((fullKummerKernelEquiv p π).symm 1).toMul
 
 @[simp]
-theorem padicKummerExponent_tau (hp₂ : p ≠ 2) (hπ : Irreducible π) :
-    padicKummerExponent p (π : K) (fun h => hπ.ne_zero (Subtype.ext h))
-      (tau p hp₂ hπ).val = 1 :=
-  (fullKummerKernelEquiv p hp₂ hπ).apply_symm_apply 1
+theorem padicKummerExponent_tau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+    padicKummerExponent p (π : K)
+      (tau p π).val = 1 :=
+  (fullKummerKernelEquiv p π).apply_symm_apply 1
 
 /-- The prescribed generator acts on every chosen positive-level radical
 by multiplication by the corresponding chosen root of unity. -/
-theorem tau_extensionRadical (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
-    (tau p hp₂ hπ).val (extensionRadical p (π : K) (n + 1)) =
+theorem tau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
+    (tau p π).val (extensionRadical p (π : K) (n + 1)) =
       extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1) := by
-  rw [padicKummerExponent_spec p (π : K) (fun h => hπ.ne_zero (Subtype.ext h)),
+  rw [padicKummerExponent_spec p (π : K),
     padicKummerExponent_tau, map_one]
   have hpow : 1 < p ^ (n + 1) := one_lt_pow₀ (Fact.out : p.Prime).one_lt (Nat.succ_ne_zero n)
   simp only [ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
 /-- Integral powers of the prescribed automorphism are dense in the original
 cyclotomic-character kernel. -/
-theorem denseRange_tau_zpow (hp₂ : p ≠ 2) (hπ : Irreducible π) :
-    DenseRange (fun n : ℤ => tau p hp₂ hπ ^ n) := by
-  let e := fullKummerKernelEquiv p hp₂ hπ
+theorem denseRange_tau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+    DenseRange (fun n : ℤ => tau p π ^ n) := by
+  let e := fullKummerKernelEquiv p π
   have hd (a : ℤ_[p]) :
-      (e.symm a).toMul ∈ closure (Set.range (fun n : ℤ => tau p hp₂ hπ ^ n)) := by
+      (e.symm a).toMul ∈ closure (Set.range (fun n : ℤ => tau p π ^ n)) := by
     apply (PadicInt.denseRange_intCast (p := p)).induction_on
       (p := fun a => (e.symm a).toMul ∈
-        closure (Set.range (fun n : ℤ => tau p hp₂ hπ ^ n))) a
+        closure (Set.range (fun n : ℤ => tau p π ^ n))) a
     · exact isClosed_closure.preimage (continuous_toMul.comp e.symm.continuous)
     · intro n
       apply subset_closure
       refine ⟨n, ?_⟩
       have hn : (n : ℤ_[p]) = n • (1 : ℤ_[p]) := by simp
       rw [hn, map_zsmul]
-      change tau p hp₂ hπ ^ n = tau p hp₂ hπ ^ n
+      change tau p π ^ n = tau p π ^ n
       rfl
   intro g
   have hg := hd (e (Additive.ofMul g))
@@ -808,22 +807,22 @@ theorem denseRange_tau_zpow (hp₂ : p ≠ 2) (hπ : Irreducible π) :
 
 /-- Every translation coordinate and every actual cyclotomic unit coordinate
 occur together in the original Galois group. -/
-theorem exists_padicCoordinates_eq (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem exists_padicCoordinates_eq [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (b : ℤ_[p]) (u : (ℤ_[p])ˣ)
     (hu : u ∈ (cyclotomicExtensionCharacter (K := K) p).range) :
     ∃ g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K),
-      padicKummerExponent p (π : K) (fun h => hπ.ne_zero (Subtype.ext h)) g = b ∧
+      padicKummerExponent p (π : K) g = b ∧
         padicCyclotomicCharacter p (π : K) g = u := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
-  rw [← padicCyclotomicCharacter_range p (π : K) hπ₀] at hu
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
+  rw [← padicCyclotomicCharacter_range p (π : K)] at hu
   obtain ⟨g, rfl⟩ := hu
-  let a := b - padicKummerExponent p (π : K) hπ₀ g
-  have ha : a ∈ affineAdditiveKernel p (π : K) hπ₀ := by
-    change a ∈ (affineAdditiveKernel p (π : K) hπ₀).toAddSubgroup
-    rw [affineAdditiveKernel_eq_top p hp₂ hπ]
+  let a := b - padicKummerExponent p (π : K) g
+  have ha : a ∈ affineAdditiveKernel p (π : K) := by
+    change a ∈ (affineAdditiveKernel p (π : K)).toAddSubgroup
+    rw [affineAdditiveKernel_eq_top p π]
     trivial
-  obtain ⟨t, ht⟩ := (mem_affineAdditiveKernel_iff p (π : K) hπ₀ a).mp ha
-  have htb : padicKummerExponent p (π : K) hπ₀ t = a :=
+  obtain ⟨t, ht⟩ := (mem_affineAdditiveKernel_iff p (π : K) a).mp ha
+  have htb : padicKummerExponent p (π : K) t = a :=
     congrArg (fun x : PadicAffineGroup p => x.left.toAdd) ht
   have htχ : padicCyclotomicCharacter p (π : K) t = 1 :=
     congrArg SemidirectProduct.right ht
@@ -835,24 +834,24 @@ theorem exists_padicCoordinates_eq (hp₂ : p ≠ 2) (hπ : Irreducible π)
 
 /-- The actual cyclotomic fixer and actual radical fixer generate the whole
 original false Tate Galois group. -/
-theorem cyclotomicKernel_sup_kummerFixing (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+theorem cyclotomicKernel_sup_kummerFixing [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ⊔ falseTateKummerFixing p (π : K) = ⊤ := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   apply top_unique
   intro g _
   have hχg : padicCyclotomicCharacter p (π : K) g ∈
       (cyclotomicExtensionCharacter (K := K) p).range := by
-    rw [← padicCyclotomicCharacter_range p (π : K) hπ₀]
+    rw [← padicCyclotomicCharacter_range p (π : K)]
     exact ⟨g, rfl⟩
-  obtain ⟨s, hsb, hsχ⟩ := exists_padicCoordinates_eq p hp₂ hπ 0 _ hχg
+  obtain ⟨s, hsb, hsχ⟩ := exists_padicCoordinates_eq p π 0 _ hχg
   have hs : s ∈ falseTateKummerFixing p (π : K) :=
-    (mem_falseTateKummerFixing_iff p (π : K) hπ₀ s).mpr hsb
+    (mem_falseTateKummerFixing_iff p (π : K) s).mpr hsb
   have ht : g * s⁻¹ ∈ (padicCyclotomicCharacter p (π : K)).ker := by
     rw [MonoidHom.mem_ker, map_mul, map_inv, hsχ, mul_inv_cancel]
   have h := Subgroup.mul_mem_sup ht hs
   simpa only [inv_mul_cancel_right] using h
 
-private theorem inf_eq_bot_of_inclusion_fixing_sup_eq_top
+theorem inf_eq_bot_of_inclusion_fixing_sup_eq_top
     {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
     {A B C : IntermediateField F Ω} [IsGalois F C] (hAC : A ≤ C) (hBC : B ≤ C)
     (hsup : (IntermediateField.inclusion hAC).fieldRange.fixingSubgroup ⊔
@@ -879,58 +878,58 @@ private theorem inf_eq_bot_of_inclusion_fixing_sup_eq_top
 
 /-- The original infinite radical and cyclotomic subfields meet exactly in
 the original base field, for every odd prime and every actual uniformizer. -/
-theorem kummerExtension_inf_cyclotomicExtension (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+theorem kummerExtension_inf_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     kummerExtension p (π : K) ⊓ cyclotomicExtension (K := K) p = ⊥ := by
-  have := falseTateExtension_isGalois p (π : K) (fun h => hπ.ne_zero (Subtype.ext h))
+  have := falseTateExtension_isGalois p (π : K)
   apply inf_eq_bot_of_inclusion_fixing_sup_eq_top
     (kummerExtension_le_falseTateExtension p (π : K))
     (cyclotomicExtension_le_falseTateExtension p (π : K))
   rw [cyclotomicInclusion_fixingSubgroup, sup_comm]
-  exact cyclotomicKernel_sup_kummerFixing p hp₂ hπ
+  exact cyclotomicKernel_sup_kummerFixing p π
 
 /-- The original Krull Galois group is the canonical affine semidirect product
 of all translations by the actual cyclotomic character image. -/
-def falseTateGaloisEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def falseTateGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) ≃ₜ*
       RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
-  let f := restrictedAffineGaloisHom p (π : K) hπ₀
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
+  let f := restrictedAffineGaloisHom p (π : K)
   have hf : Function.Bijective f := by
     constructor
     · intro g h heq
-      apply padicCoordinates_injective p (π : K) hπ₀
+      apply padicCoordinates_injective p (π : K)
       exact Prod.ext (congrArg (fun x => x.left.toAdd) heq)
         (congrArg (fun x => x.right.val) heq)
     · intro x
-      obtain ⟨g, hb, hχ⟩ := exists_padicCoordinates_eq p hp₂ hπ x.left.toAdd x.right.val
+      obtain ⟨g, hb, hχ⟩ := exists_padicCoordinates_eq p π x.left.toAdd x.right.val
         x.right.property
       refine ⟨g, ?_⟩
       apply SemidirectProduct.ext
       · exact congrArg Multiplicative.ofAdd hb
       · exact Subtype.ext hχ
-  have := falseTateExtension_isGalois p (π : K) hπ₀
+  have := falseTateExtension_isGalois p (π : K)
   let e := MulEquiv.ofBijective f hf
-  have hc : Continuous e := continuous_restrictedAffineGaloisHom p (π : K) hπ₀
+  have hc : Continuous e := continuous_restrictedAffineGaloisHom p (π : K)
   exact { e with
     continuous_toFun := hc
     continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 /-- The semidirect isomorphism retains the original actual Kummer coordinate. -/
-theorem falseTateGaloisEquiv_left (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem falseTateGaloisEquiv_left [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
-    (falseTateGaloisEquiv p hp₂ hπ g).left.toAdd =
-      padicKummerExponent p (π : K) (fun h => hπ.ne_zero (Subtype.ext h)) g := rfl
+    (falseTateGaloisEquiv p π g).left.toAdd =
+      padicKummerExponent p (π : K) g := rfl
 
 /-- The semidirect isomorphism retains the original actual cyclotomic character. -/
-theorem falseTateGaloisEquiv_right (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem falseTateGaloisEquiv_right [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
-    (falseTateGaloisEquiv p hp₂ hπ g).right.val = padicCyclotomicCharacter p (π : K) g := rfl
+    (falseTateGaloisEquiv p π g).right.val = padicCyclotomicCharacter p (π : K) g := rfl
 
 /-- The original cyclotomic fixer is exactly the translation factor under
 the actual topological semidirect isomorphism. -/
-theorem falseTateGaloisEquiv_mem_translations (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem falseTateGaloisEquiv_mem_translations [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
-    falseTateGaloisEquiv p hp₂ hπ g ∈
+    falseTateGaloisEquiv p π g ∈
       (SemidirectProduct.inl : Multiplicative (ℤ_[p]) →*
         RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range).range ↔
       g ∈ (padicCyclotomicCharacter p (π : K)).ker := by
@@ -940,53 +939,53 @@ theorem falseTateGaloisEquiv_mem_translations (hp₂ : p ≠ 2) (hπ : Irreducib
   · exact fun h => Subtype.ext h
 
 /-- The original radical fixer is exactly the pure cyclotomic-unit factor. -/
-theorem falseTateGaloisEquiv_mem_units (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem falseTateGaloisEquiv_mem_units [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K)) :
-    falseTateGaloisEquiv p hp₂ hπ g ∈
+    falseTateGaloisEquiv p π g ∈
       (SemidirectProduct.inr : (cyclotomicExtensionCharacter (K := K) p).range →*
         RestrictedPadicAffineGroup p (cyclotomicExtensionCharacter (K := K) p).range).range ↔
       g ∈ falseTateKummerFixing p (π : K) := by
-  rw [mem_falseTateKummerFixing_iff p (π : K) (fun h => hπ.ne_zero (Subtype.ext h))]
+  rw [mem_falseTateKummerFixing_iff p (π : K)]
   constructor
   · rintro ⟨u, hu⟩
     exact (congrArg (fun x => x.left.toAdd) hu).symm
   · intro hb
-    refine ⟨(falseTateGaloisEquiv p hp₂ hπ g).right, ?_⟩
+    refine ⟨(falseTateGaloisEquiv p π g).right, ?_⟩
     apply SemidirectProduct.ext
     · exact congrArg Multiplicative.ofAdd hb.symm
     · rfl
 
 /-- Restriction of the actual cyclotomic character identifies the original
 radical fixer with the actual cyclotomic character image. -/
-def kummerFixingEquivCyclotomicImage (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def kummerFixingEquivCyclotomicImage [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateKummerFixing p (π : K) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   let f : falseTateKummerFixing p (π : K) →*
       (cyclotomicExtensionCharacter (K := K) p).range :=
-    ((SemidirectProduct.rightHom.comp (restrictedAffineGaloisHom p (π : K) hπ₀)).comp
+    ((SemidirectProduct.rightHom.comp (restrictedAffineGaloisHom p (π : K))).comp
       (falseTateKummerFixing p (π : K)).subtype)
   have hf : Function.Bijective f := by
     constructor
     · intro g h heq
       apply Subtype.ext
-      apply padicCoordinates_injective p (π : K) hπ₀
+      apply padicCoordinates_injective p (π : K)
       refine Prod.ext ?_ (congrArg Subtype.val heq)
-      exact ((mem_falseTateKummerFixing_iff p (π : K) hπ₀ g.val).mp g.property).trans
-        ((mem_falseTateKummerFixing_iff p (π : K) hπ₀ h.val).mp h.property).symm
+      exact ((mem_falseTateKummerFixing_iff p (π : K) g.val).mp g.property).trans
+        ((mem_falseTateKummerFixing_iff p (π : K) h.val).mp h.property).symm
     · intro u
-      obtain ⟨g, hb, hχ⟩ := exists_padicCoordinates_eq p hp₂ hπ 0 u.val u.property
-      refine ⟨⟨g, (mem_falseTateKummerFixing_iff p (π : K) hπ₀ g).mpr hb⟩, ?_⟩
+      obtain ⟨g, hb, hχ⟩ := exists_padicCoordinates_eq p π 0 u.val u.property
+      refine ⟨⟨g, (mem_falseTateKummerFixing_iff p (π : K) g).mpr hb⟩, ?_⟩
       exact Subtype.ext hχ
-  have := falseTateExtension_isGalois p (π : K) hπ₀
+  have := falseTateExtension_isGalois p (π : K)
   have hclosed : IsClosed (falseTateKummerFixing p (π : K) :
       Set (falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K))) := by
     have heq : (falseTateKummerFixing p (π : K) :
         Set (falseTateExtension p (π : K) ≃ₐ[K] falseTateExtension p (π : K))) =
-        (padicKummerExponent p (π : K) hπ₀) ⁻¹' {0} := by
+        (padicKummerExponent p (π : K)) ⁻¹' {0} := by
       ext g
-      exact mem_falseTateKummerFixing_iff p (π : K) hπ₀ g
+      exact mem_falseTateKummerFixing_iff p (π : K) g
     rw [heq]
-    exact isClosed_singleton.preimage (continuous_padicKummerExponent p (π : K) hπ₀)
+    exact isClosed_singleton.preimage (continuous_padicKummerExponent p (π : K))
   have : CompactSpace (falseTateKummerFixing p (π : K)) :=
     isCompact_iff_compactSpace.mp hclosed.isCompact
   let e := MulEquiv.ofBijective f hf
@@ -998,37 +997,37 @@ def kummerFixingEquivCyclotomicImage (hp₂ : p ≠ 2) (hπ : Irreducible π) :
 
 /-- On the original radical fixer the factor isomorphism is the usual
 cyclotomic character, with its actual image as codomain. -/
-theorem kummerFixingEquivCyclotomicImage_apply (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem kummerFixingEquivCyclotomicImage_apply [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateKummerFixing p (π : K)) :
-    (kummerFixingEquivCyclotomicImage p hp₂ hπ g).val =
+    (kummerFixingEquivCyclotomicImage p π g).val =
       padicCyclotomicCharacter p (π : K) g.val := rfl
 
 /-- The prescribed generator fixes the original embedded cyclotomic field. -/
-theorem tau_fixes_cyclotomicExtension (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem tau_fixes_cyclotomicExtension [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (x : cyclotomicExtension (K := K) p) :
-    (tau p hp₂ hπ).val
+    (tau p π).val
       (IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) x) =
       IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K)) x := by
-  have hg : (tau p hp₂ hπ).val ∈
+  have hg : (tau p π).val ∈
       (IntermediateField.inclusion
         (cyclotomicExtension_le_falseTateExtension p (π : K))).fieldRange.fixingSubgroup := by
     rw [cyclotomicInclusion_fixingSubgroup]
-    exact (tau p hp₂ hπ).property
+    exact (tau p π).property
   exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hg _ ⟨x, rfl⟩
 
 /-- Fixing the cyclotomic field and the displayed actions on all compatible
 positive-level radicals uniquely specify the original automorphism. -/
-theorem tau_unique (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem tau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : (padicCyclotomicCharacter p (π : K)).ker)
     (hg : ∀ n : ℕ, g.val (extensionRadical p (π : K) (n + 1)) =
       extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1)) :
-    g = tau p hp₂ hπ := by
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+    g = tau p π := by
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   apply Subtype.ext
-  apply padicCoordinates_injective p (π : K) hπ₀
-  refine Prod.ext ?_ (g.property.trans (tau p hp₂ hπ).property.symm)
-  change padicKummerExponent p (π : K) hπ₀ g.val =
-    padicKummerExponent p (π : K) hπ₀ (tau p hp₂ hπ).val
+  apply padicCoordinates_injective p (π : K)
+  refine Prod.ext ?_ (g.property.trans (tau p π).property.symm)
+  change padicKummerExponent p (π : K) g.val =
+    padicKummerExponent p (π : K) (tau p π).val
   rw [padicKummerExponent_tau]
   apply PadicInt.ext_of_toZModPow.mp
   intro n
@@ -1040,7 +1039,7 @@ theorem tau_unique (hp₂ : p ≠ 2) (hπ : Irreducible π)
     exact Subsingleton.elim _ _
   | succ n =>
     rw [padicKummerExponent_toZModPow]
-    apply finiteKummerExponent_unique p (π : K) (n + 1) hπ₀ _ 1
+    apply finiteKummerExponent_unique p (π : K) (n + 1) _ 1
     let i := IntermediateField.inclusion
       (falseTateLayer_le_falseTateExtension p (π : K) (n + 1) (n + 1))
     apply (show Function.Injective i from i.injective)
@@ -1048,15 +1047,15 @@ theorem tau_unique (hp₂ : p ≠ 2) (hπ : Irreducible π)
       one_lt_pow₀ (Fact.out : p.Prime).one_lt (Nat.succ_ne_zero n)
     calc
       _ = g.val (i (layerRadical p (π : K) (n + 1))) :=
-        infiniteLayerRestriction_commutes p (π : K) hπ₀ (n + 1) g.val _
+        infiniteLayerRestriction_commutes p (π : K) (n + 1) g.val _
       _ = i (layerRootOfUnity p (π : K) (n + 1)) * i (layerRadical p (π : K) (n + 1)) := hg n
       _ = _ := by rw [map_mul, map_pow, ZMod.val_one'' (ne_of_gt hpow), pow_one]
 
 /-- Multiplicative notation for the topological Kummer-coordinate isomorphism
 on the original character kernel. -/
-def fullKummerKernelMulEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def fullKummerKernelMulEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ≃ₜ* Multiplicative (ℤ_[p]) := by
-  let e := fullKummerKernelEquiv p hp₂ hπ
+  let e := fullKummerKernelEquiv p π
   exact
     { AddEquiv.toMultiplicativeRight e.toAddEquiv with
       continuous_toFun := continuous_ofAdd.comp (e.continuous.comp continuous_ofMul)
@@ -1068,7 +1067,7 @@ section RelativeCyclotomic
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
-variable {π : 𝒪[K]}
+variable (π : 𝒪[K])
 
 /-- The original inclusion defines the relative cyclotomic scalar action. -/
 local instance cyclotomicRelativeAlgebra :
@@ -1091,71 +1090,71 @@ theorem cyclotomicRelative_scalarHom_eq :
 
 /-- The original character kernel is the original relative cyclotomic Galois
 group, with its own Krull topology and original inclusion of scalars. -/
-def cyclotomicKernelRelativeEquiv (hπ : Irreducible π) :
+def cyclotomicKernelRelativeEquiv [hπ : Fact (Irreducible π)] :
     (padicCyclotomicCharacter p (π : K)).ker ≃ₜ*
       (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
         falseTateExtension p (π : K)) := by
-  have := falseTateExtension_isGalois p (π : K) (fun h => hπ.ne_zero (Subtype.ext h))
+  have := falseTateExtension_isGalois p (π : K)
   let i := IntermediateField.inclusion (cyclotomicExtension_le_falseTateExtension p (π : K))
   let e : (padicCyclotomicCharacter p (π : K)).ker ≃ₜ* i.fieldRange.fixingSubgroup :=
     { MulEquiv.subgroupCongr (cyclotomicInclusion_fixingSubgroup p (π : K)).symm with
       continuous_toFun := continuous_subtype_val.subtype_mk _
       continuous_invFun := continuous_subtype_val.subtype_mk _ }
   exact e.trans (relativeGaloisFixingKrullEquiv K (cyclotomicExtension (K := K) p)
-    (falseTateExtension p (π : K)) i (AlgHom.congr_fun (cyclotomicRelative_scalarHom_eq p)))
+    (falseTateExtension p (π : K)) i (AlgHom.congr_fun (cyclotomicRelative_scalarHom_eq p π)))
 
 /-- The original relative cyclotomic Galois group is the full p-adic
 translation factor, normalized by the prescribed roots. -/
-def cyclotomicRelativeGaloisEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def cyclotomicRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K)) ≃ₜ* Multiplicative (ℤ_[p]) :=
-  (cyclotomicKernelRelativeEquiv p hπ).symm.trans (fullKummerKernelMulEquiv p hp₂ hπ)
+  (cyclotomicKernelRelativeEquiv p π).symm.trans (fullKummerKernelMulEquiv p π)
 
 /-- The prescribed generator as an actual automorphism over the original
 cyclotomic field, rather than only as an element of its fixing subgroup. -/
-def relativeTau (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def relativeTau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K) :=
-  cyclotomicKernelRelativeEquiv p hπ (tau p hp₂ hπ)
+  cyclotomicKernelRelativeEquiv p π (tau p π)
 
 /-- The original relative generator has precisely the prescribed radical actions. -/
-theorem relativeTau_extensionRadical (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
-    relativeTau p hp₂ hπ (extensionRadical p (π : K) (n + 1)) =
+theorem relativeTau_extensionRadical [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
+    relativeTau p π (extensionRadical p (π : K) (n + 1)) =
       extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1) :=
-  tau_extensionRadical p hp₂ hπ n
+  tau_extensionRadical p π n
 
 /-- Integral powers are dense in the original relative cyclotomic Galois group. -/
-theorem denseRange_relativeTau_zpow (hp₂ : p ≠ 2) (hπ : Irreducible π) :
-    DenseRange (fun n : ℤ => relativeTau p hp₂ hπ ^ n) := by
-  have hd := (cyclotomicKernelRelativeEquiv p hπ).surjective.denseRange.comp
-    (denseRange_tau_zpow p hp₂ hπ) (cyclotomicKernelRelativeEquiv p hπ).continuous
+theorem denseRange_relativeTau_zpow [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+    DenseRange (fun n : ℤ => relativeTau p π ^ n) := by
+  have hd := (cyclotomicKernelRelativeEquiv p π).surjective.denseRange.comp
+    (denseRange_tau_zpow p π) (cyclotomicKernelRelativeEquiv p π).continuous
   simpa only [Function.comp_def, map_zpow, relativeTau] using hd
 
 /-- The original relative generator corresponds to exactly one under the
 isomorphism normalized by the prescribed compatible roots. -/
-theorem cyclotomicRelativeGaloisEquiv_relativeTau (hp₂ : p ≠ 2) (hπ : Irreducible π) :
-    cyclotomicRelativeGaloisEquiv p hp₂ hπ (relativeTau p hp₂ hπ) =
+theorem cyclotomicRelativeGaloisEquiv_relativeTau [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
+    cyclotomicRelativeGaloisEquiv p π (relativeTau p π) =
       Multiplicative.ofAdd (1 : ℤ_[p]) := by
-  change fullKummerKernelMulEquiv p hp₂ hπ
-    ((cyclotomicKernelRelativeEquiv p hπ).symm
-      (cyclotomicKernelRelativeEquiv p hπ (tau p hp₂ hπ))) = _
-  rw [(cyclotomicKernelRelativeEquiv p hπ).symm_apply_apply]
-  exact congrArg Multiplicative.ofAdd (padicKummerExponent_tau p hp₂ hπ)
+  change fullKummerKernelMulEquiv p π
+    ((cyclotomicKernelRelativeEquiv p π).symm
+      (cyclotomicKernelRelativeEquiv p π (tau p π))) = _
+  rw [(cyclotomicKernelRelativeEquiv p π).symm_apply_apply]
+  exact congrArg Multiplicative.ofAdd (padicKummerExponent_tau p π)
 
 /-- The displayed actions uniquely determine the generator in the original
 relative cyclotomic Galois group. -/
-theorem relativeTau_unique (hp₂ : p ≠ 2) (hπ : Irreducible π)
+theorem relativeTau_unique [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (g : falseTateExtension p (π : K) ≃ₐ[cyclotomicExtension (K := K) p]
       falseTateExtension p (π : K))
     (hg : ∀ n : ℕ, g (extensionRadical p (π : K) (n + 1)) =
       extensionRootOfUnity p (π : K) (n + 1) * extensionRadical p (π : K) (n + 1)) :
-    g = relativeTau p hp₂ hπ := by
-  apply (cyclotomicKernelRelativeEquiv p hπ).symm.injective
-  change (cyclotomicKernelRelativeEquiv p hπ).symm g =
-    (cyclotomicKernelRelativeEquiv p hπ).symm
-      (cyclotomicKernelRelativeEquiv p hπ (tau p hp₂ hπ))
-  rw [(cyclotomicKernelRelativeEquiv p hπ).symm_apply_apply]
-  apply tau_unique p hp₂ hπ
+    g = relativeTau p π := by
+  apply (cyclotomicKernelRelativeEquiv p π).symm.injective
+  change (cyclotomicKernelRelativeEquiv p π).symm g =
+    (cyclotomicKernelRelativeEquiv p π).symm
+      (cyclotomicKernelRelativeEquiv p π (tau p π))
+  rw [(cyclotomicKernelRelativeEquiv p π).symm_apply_apply]
+  apply tau_unique p π
   exact hg
 
 end RelativeCyclotomic
@@ -1164,7 +1163,7 @@ section RelativeKummer
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
-variable {π : 𝒪[K]}
+variable (π : 𝒪[K])
 
 /-- The original inclusion defines the relative radical scalar action. -/
 local instance kummerRelativeAlgebra :
@@ -1186,14 +1185,14 @@ theorem kummerRelative_scalarHom_eq :
 
 /-- The actual Galois group over the original radical field is the actual
 cyclotomic character image, with both of their original topologies. -/
-def kummerRelativeGaloisEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+def kummerRelativeGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     (falseTateExtension p (π : K) ≃ₐ[kummerExtension p (π : K)]
       falseTateExtension p (π : K)) ≃ₜ* (cyclotomicExtensionCharacter (K := K) p).range := by
-  have := falseTateExtension_isGalois p (π : K) (fun h => hπ.ne_zero (Subtype.ext h))
+  have := falseTateExtension_isGalois p (π : K)
   exact (relativeGaloisFixingKrullEquiv K (kummerExtension p (π : K))
     (falseTateExtension p (π : K)) (falseTateKummerInclusion p (π : K))
-    (AlgHom.congr_fun (kummerRelative_scalarHom_eq p))).symm.trans
-      (kummerFixingEquivCyclotomicImage p hp₂ hπ)
+    (AlgHom.congr_fun (kummerRelative_scalarHom_eq p π))).symm.trans
+      (kummerFixingEquivCyclotomicImage p π)
 
 end RelativeKummer
 

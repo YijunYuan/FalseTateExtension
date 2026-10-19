@@ -124,9 +124,9 @@ theorem cyclotomicRestriction_commutes
 
 /-- Every automorphism of the actual cyclotomic field extends to the false
 Tate field with nonzero radicand. -/
-theorem cyclotomicRestriction_surjective (hπ : π ≠ 0) :
+theorem cyclotomicRestriction_surjective [hπ : NeZero π] :
     Function.Surjective (cyclotomicRestriction p π) := by
-  have := falseTateExtension_isGalois p π hπ
+  have := falseTateExtension_isGalois p π
   let : Algebra (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
     RingHom.toAlgebra (Subsemiring.inclusion (cyclotomicExtension_le_falseTateExtension p π))
   let : IsScalarTower K (cyclotomicExtension (K := K) p) (falseTateExtension p π) :=
@@ -181,7 +181,7 @@ theorem padicCyclotomicCharacter_ker :
   exact (cyclotomicExtensionCharacter_injective p).eq_iff
 
 /-- Surjective restriction makes the two actual character images equal. -/
-theorem padicCyclotomicCharacter_range (hπ : π ≠ 0) :
+theorem padicCyclotomicCharacter_range [hπ : NeZero π] :
     (padicCyclotomicCharacter p π).range =
       (cyclotomicExtensionCharacter (K := K) p).range := by
   ext u
@@ -190,18 +190,18 @@ theorem padicCyclotomicCharacter_range (hπ : π ≠ 0) :
     exact ⟨cyclotomicRestriction p π g,
       (congrArg (fun f ↦ f g) (padicCyclotomicCharacter_eq_comp p π)).symm⟩
   · rintro ⟨g, rfl⟩
-    obtain ⟨h, rfl⟩ := cyclotomicRestriction_surjective p π hπ g
+    obtain ⟨h, rfl⟩ := cyclotomicRestriction_surjective p π g
     exact ⟨h, congrArg (fun f ↦ f h) (padicCyclotomicCharacter_eq_comp p π)⟩
 
 /-- The actual cyclotomic Galois group, with its Krull topology, is the
 topological group given by the actual false Tate character image. -/
-def cyclotomicImageEquiv (hπ : π ≠ 0) :
+def cyclotomicImageEquiv [hπ : NeZero π] :
     (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) ≃ₜ*
       (padicCyclotomicCharacter p π).range := by
   let f : (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →*
       (padicCyclotomicCharacter p π).range :=
     { toFun := fun g ↦ ⟨cyclotomicExtensionCharacter p g, by
-        rw [padicCyclotomicCharacter_range p π hπ]
+        rw [padicCyclotomicCharacter_range p π]
         exact ⟨g, rfl⟩⟩
       map_one' := Subtype.ext (map_one (cyclotomicExtensionCharacter (K := K) p))
       map_mul' := fun g h ↦ Subtype.ext (map_mul (cyclotomicExtensionCharacter p) g h) }
@@ -211,7 +211,7 @@ def cyclotomicImageEquiv (hπ : π ≠ 0) :
       exact cyclotomicExtensionCharacter_injective p (congrArg Subtype.val heq)
     · intro u
       have hu : u.val ∈ (cyclotomicExtensionCharacter (K := K) p).range := by
-        rw [← padicCyclotomicCharacter_range p π hπ]
+        rw [← padicCyclotomicCharacter_range p π]
         exact u.property
       obtain ⟨g, hg⟩ := hu
       exact ⟨g, Subtype.ext hg⟩
@@ -223,15 +223,15 @@ def cyclotomicImageEquiv (hπ : π ≠ 0) :
       continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 /-- The topological identification is given by the actual canonical character. -/
-theorem cyclotomicImageEquiv_apply (hπ : π ≠ 0)
+theorem cyclotomicImageEquiv_apply [hπ : NeZero π]
     (g : cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :
-    (cyclotomicImageEquiv p π hπ g : (ℤ_[p])ˣ) = cyclotomicExtensionCharacter p g := rfl
+    (cyclotomicImageEquiv p π g : (ℤ_[p])ˣ) = cyclotomicExtensionCharacter p g := rfl
 
 /-- Under this identification, restriction is exactly the false Tate
 cyclotomic character with its codomain restricted to its actual image. -/
-theorem cyclotomicImageEquiv_restrict (hπ : π ≠ 0)
+theorem cyclotomicImageEquiv_restrict [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
-    (cyclotomicImageEquiv p π hπ (cyclotomicRestriction p π g) : (ℤ_[p])ˣ) =
+    (cyclotomicImageEquiv p π (cyclotomicRestriction p π g) : (ℤ_[p])ˣ) =
       padicCyclotomicCharacter p π g := by
   rw [cyclotomicImageEquiv_apply, padicCyclotomicCharacter_eq_comp, MonoidHom.comp_apply]
 

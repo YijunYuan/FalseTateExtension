@@ -115,7 +115,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_of_nonpos
   rw [← upperRamificationGroupInfinite_cyclotomic_zero p]
   exact upperRamificationGroupInfinite_antitoneOn ℚ_[p] Cyc hu (by norm_num) hu0
 
-private theorem exists_cyclotomic_upper_interval {u : ℝ} (hu : 0 < u) :
+theorem exists_cyclotomic_upper_interval {u : ℝ} (hu : 0 < u) :
     ∃ r : ℕ, (r : ℝ) < u ∧ u ≤ (r : ℝ) + 1 := by
   have hc : 0 < Nat.ceil u := Nat.lt_ceil.mpr (by simpa using hu)
   refine ⟨Nat.ceil u - 1, Nat.lt_ceil.mp (by omega), ?_⟩
@@ -178,7 +178,7 @@ theorem upperRamificationGroupInfinite_cyclotomic_finiteIndex
 
 /-- APF for the original infinite rational cyclotomic extension, as an
 abstract separable field extension. -/
-theorem isAPF_cyclotomicExtension_padic : IsAPF ℚ_[p] Cyc := by
+instance isAPF_cyclotomicExtension_padic : IsAPF ℚ_[p] Cyc := by
   rw [isAPF_iff_upperInfinite_finiteIndex]
   exact fun _ hu ↦ upperRamificationGroupInfinite_cyclotomic_finiteIndex p hu
 
@@ -217,7 +217,7 @@ theorem apfIndex_cyclotomicExtension_padic_add_one {u : ℝ} (hu : 0 < u) :
 
 /-- Strict APF for the original infinite rational cyclotomic extension
 follows from the proved growth of its actual intrinsic index. -/
-theorem isStrictlyAPF_cyclotomicExtension_padic : IsStrictlyAPF ℚ_[p] Cyc := by
+instance isStrictlyAPF_cyclotomicExtension_padic : IsStrictlyAPF ℚ_[p] Cyc := by
   let := isAPF_cyclotomicExtension_padic p
   apply isStrictlyAPF_of_apfIndex_boundedGrowth ℚ_[p] Cyc
     (ℓ := 1) (C := (p : ℝ)) (U := 1) (by norm_num)
@@ -355,7 +355,7 @@ variable (K : Type*) [NontriviallyNormedField K] [CharZero K]
 
 /-- The original cyclotomic extension of every finite compatible normed
 extension of `Qp` is strictly APF, at every prime. -/
-theorem isStrictlyAPF_cyclotomicExtension :
+instance isStrictlyAPF_cyclotomicExtension :
     IsStrictlyAPF K (cyclotomicExtension (K := K) p) := by
   let := rationalCyclotomicBase_isAlgebraic (K := K) p
   exact (isStrictlyAPF_finiteBase_iff_of_normedAlgebra ℚ_[p] K
@@ -364,7 +364,7 @@ theorem isStrictlyAPF_cyclotomicExtension :
 
 /-- Public APF for the original cyclotomic field over its original finite
 normed base, with no normality or finiteness restriction on the top. -/
-theorem isAPF_cyclotomicExtension :
+instance isAPF_cyclotomicExtension :
     IsAPF K (cyclotomicExtension (K := K) p) := by
   exact (isStrictlyAPF_cyclotomicExtension p K).toIsAPF
 

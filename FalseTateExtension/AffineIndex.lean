@@ -489,7 +489,7 @@ theorem affineIndex_finiteIndex_of_projectionIndices
   rw [affineTranslation_index_product]
   exact mul_ne_zero Subgroup.FiniteIndex.index_ne_zero hbound.1.ne'
 
-private theorem index_sup_le_index_sup_mul_relIndex
+theorem index_sup_le_index_sup_mul_relIndex
     {Γ : Type*} [Group Γ] (S M I : Subgroup Γ) [M.Normal] [I.Normal]
     [I.FiniteIndex] [(S ⊔ M).FiniteIndex] :
     (S ⊔ I).index ≤ (S ⊔ M).index * I.relIndex M := by

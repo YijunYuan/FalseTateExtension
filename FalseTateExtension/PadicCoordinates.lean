@@ -31,42 +31,42 @@ noncomputable section
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 /-- Galois restriction from `K_FT` to the diagonal layer `n`. -/
-def infiniteLayerRestriction (hπ : π ≠ 0) (n : ℕ) :
+def infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →*
       (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :=
-  haveI := falseTateLayer_isGalois p π hπ n
+  haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE (falseTateLayer_le_falseTateExtension p π n n)
 
 /-- Restriction commutes with the inclusion of the layer into `K_FT`. -/
-theorem infiniteLayerRestriction_commutes (hπ : π ≠ 0) (n : ℕ)
+theorem infiniteLayerRestriction_commutes [hπ : NeZero π] (n : ℕ)
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π)
     (x : falseTateLayer p π n n) :
     IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
-        (infiniteLayerRestriction p π hπ n g x) =
+        (infiniteLayerRestriction p π n g x) =
       g (IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n) x) :=
-  haveI := falseTateLayer_isGalois p π hπ n
+  haveI := falseTateLayer_isGalois p π n
   IntermediateField.restrictNormalHomOfLE_commutes _ g x
 
 /-- Every automorphism of a diagonal layer extends to `K_FT`. -/
-theorem infiniteLayerRestriction_surjective (hπ : π ≠ 0) (n : ℕ) :
-    Function.Surjective (infiniteLayerRestriction p π hπ n) :=
-  haveI := falseTateLayer_isGalois p π hπ n
-  haveI := falseTateExtension_isGalois p π hπ
+theorem infiniteLayerRestriction_surjective [hπ : NeZero π] (n : ℕ) :
+    Function.Surjective (infiniteLayerRestriction p π n) :=
+  haveI := falseTateLayer_isGalois p π n
+  haveI := falseTateExtension_isGalois p π
   IntermediateField.restrictNormalHomOfLE_surjective _
 
 /-- Restriction to `K_FT` factors through restriction between layers. -/
-theorem infiniteLayerRestriction_comp (hπ : π ≠ 0) {n m : ℕ} (h : n ≤ m) :
-    (finiteLayerRestriction p π hπ h).comp (infiniteLayerRestriction p π hπ m) =
-      infiniteLayerRestriction p π hπ n :=
-  haveI := falseTateLayer_isGalois p π hπ n
-  haveI := falseTateLayer_isGalois p π hπ m
+theorem infiniteLayerRestriction_comp [hπ : NeZero π] {n m : ℕ} (h : n ≤ m) :
+    (finiteLayerRestriction p π h).comp (infiniteLayerRestriction p π m) =
+      infiniteLayerRestriction p π n :=
+  haveI := falseTateLayer_isGalois p π n
+  haveI := falseTateLayer_isGalois p π m
   IntermediateField.restrictNormalHomOfLE_comp _ _
 
 /-- All finite restrictions together determine an automorphism, since their
 actual diagonal fields exhaust the infinite field. -/
-theorem infiniteLayerRestriction_jointly_injective (hπ : π ≠ 0)
+theorem infiniteLayerRestriction_jointly_injective [hπ : NeZero π]
     {g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π}
-    (heq : ∀ n, infiniteLayerRestriction p π hπ n g = infiniteLayerRestriction p π hπ n h) :
+    (heq : ∀ n, infiniteLayerRestriction p π n g = infiniteLayerRestriction p π n h) :
     g = h := by
   apply AlgEquiv.ext
   intro x
@@ -74,8 +74,8 @@ theorem infiniteLayerRestriction_jointly_injective (hπ : π ≠ 0)
   let xn : falseTateLayer p π n n := ⟨x, hn⟩
   have hx : IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n) xn = x :=
     Subtype.ext rfl
-  rw [← hx, ← infiniteLayerRestriction_commutes p π hπ n g,
-    ← infiniteLayerRestriction_commutes p π hπ n h, heq n]
+  rw [← hx, ← infiniteLayerRestriction_commutes p π n g,
+    ← infiniteLayerRestriction_commutes p π n h, heq n]
 
 /-- The chosen primitive root of unity viewed in the actual infinite field. -/
 def extensionRootOfUnity (n : ℕ) : falseTateExtension p π :=
@@ -109,10 +109,10 @@ def padicCyclotomicCharacter :
 
 /-- Every finite projection of the usual cyclotomic character is the actual
 finite cyclotomic coordinate of the corresponding restriction. -/
-theorem padicCyclotomicCharacter_toZModPow (hπ : π ≠ 0) (n : ℕ)
+theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
     Units.map (PadicInt.toZModPow n).toMonoidHom (padicCyclotomicCharacter p π g) =
-      finiteCyclotomicCharacter p π n (infiniteLayerRestriction p π hπ n g) := by
+      finiteCyclotomicCharacter p π n (infiniteLayerRestriction p π n g) := by
   symm
   apply finiteCyclotomicCharacter_unique p π n
   apply (show Function.Injective
@@ -124,90 +124,90 @@ theorem padicCyclotomicCharacter_toZModPow (hπ : π ≠ 0) (n : ℕ)
 
 /-- The canonical nonnegative integer representative of a finite Kummer
 coordinate of an infinite-field automorphism. -/
-def kummerRepresentative (hπ : π ≠ 0)
+def kummerRepresentative [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) : ℤ :=
-  (finiteKummerExponent p π n hπ (infiniteLayerRestriction p π hπ n g)).val
+  (finiteKummerExponent p π n (infiniteLayerRestriction p π n g)).val
 
 /-- Successive integer representatives differ by a multiple of p^n, as a
 consequence of actual finite restriction compatibility. -/
-theorem kummerRepresentative_step (hπ : π ≠ 0)
+theorem kummerRepresentative_step [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
-    (p : ℤ) ^ n ∣ kummerRepresentative p π hπ g (n + 1) - kummerRepresentative p π hπ g n := by
+    (p : ℤ) ^ n ∣ kummerRepresentative p π g (n + 1) - kummerRepresentative p π g n := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero (n + 1) (Fact.out : p.Prime).ne_zero⟩
-  have hr := congrArg (fun r ↦ r g) (infiniteLayerRestriction_comp p π hπ (Nat.le_succ n))
-  change finiteLayerRestriction p π hπ (Nat.le_succ n)
-      (infiniteLayerRestriction p π hπ (n + 1) g) = infiniteLayerRestriction p π hπ n g at hr
-  have hc := finiteKummerExponent_restrict p π hπ (Nat.le_succ n)
-    (infiniteLayerRestriction p π hπ (n + 1) g)
+  have hr := congrArg (fun r ↦ r g) (infiniteLayerRestriction_comp p π (Nat.le_succ n))
+  change finiteLayerRestriction p π (Nat.le_succ n)
+      (infiniteLayerRestriction p π (n + 1) g) = infiniteLayerRestriction p π n g at hr
+  have hc := finiteKummerExponent_restrict p π (Nat.le_succ n)
+    (infiniteLayerRestriction p π (n + 1) g)
   rw [hr, ZMod.castHom_apply, ZMod.cast_eq_val] at hc
-  have he : (kummerRepresentative p π hπ g n : ZMod (p ^ n)) =
-      (kummerRepresentative p π hπ g (n + 1) : ZMod (p ^ n)) := by
+  have he : (kummerRepresentative p π g n : ZMod (p ^ n)) =
+      (kummerRepresentative p π g (n + 1) : ZMod (p ^ n)) := by
     simpa only [kummerRepresentative, Int.cast_natCast, ZMod.natCast_zmod_val] using hc
   have hd := (ZMod.intCast_eq_intCast_iff_dvd_sub ..).mp he
   simpa only [Nat.cast_pow] using hd
 
 /-- The p-adic Kummer coordinate is the actual limit of the compatible integer
 representatives supplied by the finite coordinates. -/
-def padicKummerExponent (hπ : π ≠ 0)
+def padicKummerExponent [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) : ℤ_[p] :=
-  PadicInt.ofIntSeq (kummerRepresentative p π hπ g)
-    (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (kummerRepresentative p π hπ g) p
-      (kummerRepresentative_step p π hπ g))
+  PadicInt.ofIntSeq (kummerRepresentative p π g)
+    (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (kummerRepresentative p π g) p
+      (kummerRepresentative_step p π g))
 
 /-- Every finite projection of the p-adic Kummer coordinate is the prescribed
 Kummer coordinate on the actual finite restriction. -/
-theorem padicKummerExponent_toZModPow (hπ : π ≠ 0)
+theorem padicKummerExponent_toZModPow [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (n : ℕ) :
-    PadicInt.toZModPow n (padicKummerExponent p π hπ g) =
-      finiteKummerExponent p π n hπ (infiniteLayerRestriction p π hπ n g) := by
+    PadicInt.toZModPow n (padicKummerExponent p π g) =
+      finiteKummerExponent p π n (infiniteLayerRestriction p π n g) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   rw [padicKummerExponent, PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub
-    (kummerRepresentative p π hπ g) p (kummerRepresentative_step p π hπ g) n]
+    (kummerRepresentative p π g) p (kummerRepresentative_step p π g) n]
   simp only [kummerRepresentative, Int.cast_natCast, ZMod.natCast_zmod_val]
 
 /-- The finite projection formulas uniquely determine the p-adic Kummer
 coordinate, hence make it independent of integer representative choices. -/
-theorem padicKummerExponent_unique (hπ : π ≠ 0)
+theorem padicKummerExponent_unique [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (a : ℤ_[p])
     (ha : ∀ n, PadicInt.toZModPow n a =
-      finiteKummerExponent p π n hπ (infiniteLayerRestriction p π hπ n g)) :
-    padicKummerExponent p π hπ g = a := by
+      finiteKummerExponent p π n (infiniteLayerRestriction p π n g)) :
+    padicKummerExponent p π g = a := by
   apply PadicInt.ext_of_toZModPow.mp
   intro n
   rw [padicKummerExponent_toZModPow, ha n]
 
 /-- The finite cocycles pass to the actual p-adic coordinates through their
 proved projections. -/
-theorem padicKummerExponent_mul (hπ : π ≠ 0)
+theorem padicKummerExponent_mul [hπ : NeZero π]
     (g h : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
-    padicKummerExponent p π hπ (g * h) = padicKummerExponent p π hπ g +
-      (padicCyclotomicCharacter p π g : ℤ_[p]) * padicKummerExponent p π hπ h := by
+    padicKummerExponent p π (g * h) = padicKummerExponent p π g +
+      (padicCyclotomicCharacter p π g : ℤ_[p]) * padicKummerExponent p π h := by
   apply PadicInt.ext_of_toZModPow.mp
   intro n
-  have hχ := congrArg Units.val (padicCyclotomicCharacter_toZModPow p π hπ n g)
+  have hχ := congrArg Units.val (padicCyclotomicCharacter_toZModPow p π n g)
   change PadicInt.toZModPow n (padicCyclotomicCharacter p π g : ℤ_[p]) =
-    (finiteCyclotomicCharacter p π n (infiniteLayerRestriction p π hπ n g) : ZMod (p ^ n)) at hχ
+    (finiteCyclotomicCharacter p π n (infiniteLayerRestriction p π n g) : ZMod (p ^ n)) at hχ
   simp only [map_add, map_mul, padicKummerExponent_toZModPow, hχ]
-  exact finiteKummerExponent_mul p π n hπ
-    (infiniteLayerRestriction p π hπ n g) (infiniteLayerRestriction p π hπ n h)
+  exact finiteKummerExponent_mul p π n
+    (infiniteLayerRestriction p π n g) (infiniteLayerRestriction p π n h)
 
 /-- The actual p-adic Kummer and cyclotomic coordinates determine every
 automorphism of the infinite false Tate field. -/
-theorem padicCoordinates_injective (hπ : π ≠ 0) :
+theorem padicCoordinates_injective [hπ : NeZero π] :
     Function.Injective (fun g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π ↦
-      (padicKummerExponent p π hπ g, padicCyclotomicCharacter p π g)) := by
+      (padicKummerExponent p π g, padicCyclotomicCharacter p π g)) := by
   intro g h heq
   have hb := congrArg Prod.fst heq
   have hχ := congrArg Prod.snd heq
-  change padicKummerExponent p π hπ g = padicKummerExponent p π hπ h at hb
+  change padicKummerExponent p π g = padicKummerExponent p π h at hb
   change padicCyclotomicCharacter p π g = padicCyclotomicCharacter p π h at hχ
-  apply infiniteLayerRestriction_jointly_injective p π hπ
+  apply infiniteLayerRestriction_jointly_injective p π
   intro n
-  apply finiteCoordinates_injective p π n hπ
+  apply finiteCoordinates_injective p π n
   apply Prod.ext
   · simpa only [padicKummerExponent_toZModPow] using congrArg (PadicInt.toZModPow n) hb
-  · simpa only [padicCyclotomicCharacter_toZModPow p π hπ n] using
+  · simpa only [padicCyclotomicCharacter_toZModPow p π n] using
       congrArg (Units.map (PadicInt.toZModPow n).toMonoidHom) hχ
 
 end

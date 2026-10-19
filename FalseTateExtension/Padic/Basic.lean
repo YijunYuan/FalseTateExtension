@@ -99,6 +99,18 @@ instance padicUnits_infinite : Infinite ℤ_[p]ˣ := by
     mul_left_cancel₀ (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero) (add_left_cancel hv)
   exact_mod_cast hnm
 
+section Uniformizer
+
+variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] (π : 𝒪[K])
+  [Fact (Irreducible π)]
+
+instance neZero_of_irreducible : NeZero π := ⟨(Fact.out : Irreducible π).ne_zero⟩
+
+instance neZero_coe_of_irreducible : NeZero (π : K) :=
+  ⟨fun h => (Fact.out : Irreducible π).ne_zero (Subtype.ext h)⟩
+
+end Uniformizer
+
 end
 
 end FalseTateExtension

@@ -207,29 +207,29 @@ abbrev FiniteAffineGroup (H : Subgroup (ZMod (p ^ n))ˣ) :=
 
 /-- The normalized finite action coordinates in the canonical affine group
 with the original finite cyclotomic image. -/
-def finiteAffineGaloisHom (hπ : π ≠ 0) :
+def finiteAffineGaloisHom [hπ : NeZero π] :
     (falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) →*
       FiniteAffineGroup p n (cyclotomicLayerCharacterOver (K := K) p n).range where
-  toFun g := ⟨Multiplicative.ofAdd (finiteKummerExponent p π n hπ g),
+  toFun g := ⟨Multiplicative.ofAdd (finiteKummerExponent p π n g),
     ⟨finiteCyclotomicCharacter p π n g, finiteCyclotomicCharacter_mem_range p π n g⟩⟩
   map_one' := by
     apply SemidirectProduct.ext
-    · change Multiplicative.ofAdd (finiteKummerExponent p π n hπ 1) = 1
-      have hb : finiteKummerExponent p π n hπ 1 = 0 :=
-        finiteKummerExponent_unique p π n hπ 1 0 (by simp)
+    · change Multiplicative.ofAdd (finiteKummerExponent p π n 1) = 1
+      have hb : finiteKummerExponent p π n 1 = 0 :=
+        finiteKummerExponent_unique p π n 1 0 (by simp)
       exact congrArg Multiplicative.ofAdd hb
     · apply Subtype.ext
       exact map_one (finiteCyclotomicCharacter p π n)
   map_mul' g h := by
     apply SemidirectProduct.ext
-    · exact congrArg Multiplicative.ofAdd (finiteKummerExponent_mul p π n hπ g h)
+    · exact congrArg Multiplicative.ofAdd (finiteKummerExponent_mul p π n g h)
     · apply Subtype.ext
       exact map_mul (finiteCyclotomicCharacter p π n) g h
 
-theorem finiteAffineGaloisHom_injective (hπ : π ≠ 0) :
-    Function.Injective (finiteAffineGaloisHom p π n hπ) := by
+theorem finiteAffineGaloisHom_injective [hπ : NeZero π] :
+    Function.Injective (finiteAffineGaloisHom p π n) := by
   intro g h heq
-  apply finiteCoordinates_injective p π n hπ
+  apply finiteCoordinates_injective p π n
   exact Prod.ext (congrArg (fun x => x.left.toAdd) heq)
     (congrArg (fun x => x.right.val) heq)
 
@@ -272,14 +272,14 @@ theorem finiteCyclotomicInclusion_fixingSubgroup :
     exact h.symm
 
 /-- The actual finite pure-radical fixer is precisely the zero Kummer coordinate. -/
-theorem mem_finiteRadicalInclusion_fixingSubgroup_iff (hπ : π ≠ 0)
+theorem mem_finiteRadicalInclusion_fixingSubgroup_iff [hπ : NeZero π]
     (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
     g ∈ (finiteRadicalInclusion p π n).fieldRange.fixingSubgroup ↔
-        finiteKummerExponent p π n hπ g = 0 := by
+        finiteKummerExponent p π n g = 0 := by
   let i := finiteRadicalInclusion p π n
   constructor
   · intro hg
-    apply finiteKummerExponent_unique p π n hπ g 0
+    apply finiteKummerExponent_unique p π n g 0
     simp only [ZMod.val_zero, pow_zero, one_mul]
     exact (IntermediateField.mem_fixingSubgroup_iff i.fieldRange g).mp hg _
       ⟨⟨radical p π n, radical_mem_radicalLayer p π n⟩, rfl⟩
@@ -290,7 +290,7 @@ theorem mem_finiteRadicalInclusion_fixingSubgroup_iff (hπ : π ≠ 0)
       intro z hz
       obtain rfl := Set.mem_singleton_iff.mp hz
       change g (layerRadical p π n) = layerRadical p π n
-      have h := finiteKummerExponent_spec p π n hπ g
+      have h := finiteKummerExponent_spec p π n g
       simpa only [hb, ZMod.val_zero, pow_zero, one_mul] using h
     rintro x ⟨y, rfl⟩
     exact AlgHom.congr_fun heq y
@@ -340,27 +340,27 @@ section FiniteAffineSurjectivity
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
 variable (p : ℕ) [Fact p.Prime] [Algebra (ℚ_[p]) K]
-variable {π : 𝒪[K]}
+variable (π : 𝒪[K])
 
 /-- Every finite translation coordinate and every actual finite cyclotomic
 coordinate are realized together on the original diagonal field. -/
-theorem exists_finiteCoordinates_eq (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+theorem exists_finiteCoordinates_eq [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ)
     (b : ZMod (p ^ n)) (u : (ZMod (p ^ n))ˣ)
     (hu : u ∈ (cyclotomicLayerCharacterOver (K := K) p n).range) :
     ∃ g : falseTateLayer p (π : K) n n ≃ₐ[K] falseTateLayer p (π : K) n n,
-      finiteKummerExponent p (π : K) n (fun h => hπ.ne_zero (Subtype.ext h)) g = b ∧
+      finiteKummerExponent p (π : K) n g = b ∧
         finiteCyclotomicCharacter p (π : K) n g = u := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
-  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+  let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   obtain ⟨c, hc⟩ := hu
   obtain ⟨γ, hγ⟩ := cyclotomicLayerRestrictionOver_surjective (K := K) p n c
   have hu' : Units.map (PadicInt.toZModPow n).toMonoidHom
       (cyclotomicExtensionCharacter p γ) = u :=
     (cyclotomicLayerCharacterOver_restrict p n γ).symm.trans
       ((congrArg (cyclotomicLayerCharacterOver p n) hγ).trans hc)
-  obtain ⟨g, hb, hχ⟩ := exists_padicCoordinates_eq p hp₂ hπ (b.val : ℤ_[p])
+  obtain ⟨g, hb, hχ⟩ := exists_padicCoordinates_eq p π (b.val : ℤ_[p])
     (cyclotomicExtensionCharacter p γ) ⟨γ, rfl⟩
-  refine ⟨infiniteLayerRestriction p (π : K) hπ₀ n g, ?_, ?_⟩
+  refine ⟨infiniteLayerRestriction p (π : K) n g, ?_, ?_⟩
   · rw [← padicKummerExponent_toZModPow, hb]
     simp only [map_natCast, ZMod.natCast_zmod_val]
   · rw [← padicCyclotomicCharacter_toZModPow, hχ]
@@ -368,11 +368,11 @@ theorem exists_finiteCoordinates_eq (hp₂ : p ≠ 2) (hπ : Irreducible π) (n 
 
 /-- The normalized coordinate map is onto the whole finite affine group,
 with no enlargement of the actual finite unit image. -/
-theorem finiteAffineGaloisHom_surjective (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+theorem finiteAffineGaloisHom_surjective [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     Function.Surjective
-      (finiteAffineGaloisHom p (π : K) n (fun h => hπ.ne_zero (Subtype.ext h))) := by
+      (finiteAffineGaloisHom p (π : K) n) := by
   intro x
-  obtain ⟨g, hb, hχ⟩ := exists_finiteCoordinates_eq p hp₂ hπ n x.left.toAdd x.right.val
+  obtain ⟨g, hb, hχ⟩ := exists_finiteCoordinates_eq p π n x.left.toAdd x.right.val
     x.right.property
   refine ⟨g, ?_⟩
   apply SemidirectProduct.ext
@@ -381,28 +381,29 @@ theorem finiteAffineGaloisHom_surjective (hp₂ : p ≠ 2) (hπ : Irreducible π
 
 /-- The actual finite diagonal Galois group is the full canonical affine
 semidirect product with its actual finite cyclotomic image. -/
-def finiteDiagonalGaloisEquiv (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+def finiteDiagonalGaloisEquiv [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (falseTateLayer p (π : K) n n ≃ₐ[K] falseTateLayer p (π : K) n n) ≃*
       FiniteAffineGroup p n (cyclotomicLayerCharacterOver (K := K) p n).range :=
   MulEquiv.ofBijective
-    (finiteAffineGaloisHom p (π : K) n (fun h => hπ.ne_zero (Subtype.ext h)))
-    ⟨finiteAffineGaloisHom_injective p (π : K) n (fun h => hπ.ne_zero (Subtype.ext h)),
-      finiteAffineGaloisHom_surjective p hp₂ hπ n⟩
+    (finiteAffineGaloisHom p (π : K) n)
+    ⟨finiteAffineGaloisHom_injective p (π : K) n,
+      finiteAffineGaloisHom_surjective p π n⟩
 
 /-- Degree of the original diagonal field, retaining the actual cyclotomic degree. -/
-theorem finrank_falseTateLayer_diagonal (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+theorem finrank_falseTateLayer_diagonal [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     Module.finrank K (falseTateLayer p (π : K) n n) =
       p ^ n * Module.finrank K (cyclotomicLayer (K := K) p n) := by
-  have := falseTateLayer_isGalois p (π : K) (fun h => hπ.ne_zero (Subtype.ext h)) n
+  have := falseTateLayer_isGalois p (π : K) n
   rw [← IsGalois.card_aut_eq_finrank K (falseTateLayer p (π : K) n n),
-    Nat.card_congr (finiteDiagonalGaloisEquiv p hp₂ hπ n).toEquiv,
+    Nat.card_congr (finiteDiagonalGaloisEquiv p π n).toEquiv,
     card_finiteAffineGroup, card_cyclotomicLayerCharacterOver_range]
 
 /-- The finite cyclotomic fixing subgroup is the full translation factor
 in the actual diagonal affine isomorphism. -/
-theorem finiteDiagonalGaloisEquiv_mem_translations (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+theorem finiteDiagonalGaloisEquiv_mem_translations [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+    (n : ℕ)
     (g : falseTateLayer p (π : K) n n ≃ₐ[K] falseTateLayer p (π : K) n n) :
-    finiteDiagonalGaloisEquiv p hp₂ hπ n g ∈
+    finiteDiagonalGaloisEquiv p π n g ∈
       (SemidirectProduct.inl : Multiplicative (ZMod (p ^ n)) →*
         FiniteAffineGroup p n (cyclotomicLayerCharacterOver (K := K) p n).range).range ↔
       g ∈ (finiteCyclotomicInclusion p (π : K) n).fieldRange.fixingSubgroup := by
@@ -413,19 +414,18 @@ theorem finiteDiagonalGaloisEquiv_mem_translations (hp₂ : p ≠ 2) (hπ : Irre
   · exact fun h => Subtype.ext h
 
 /-- The finite radical fixing subgroup is the actual pure-unit factor. -/
-theorem finiteDiagonalGaloisEquiv_mem_units (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+theorem finiteDiagonalGaloisEquiv_mem_units [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ)
     (g : falseTateLayer p (π : K) n n ≃ₐ[K] falseTateLayer p (π : K) n n) :
-    finiteDiagonalGaloisEquiv p hp₂ hπ n g ∈
+    finiteDiagonalGaloisEquiv p π n g ∈
       (SemidirectProduct.inr : (cyclotomicLayerCharacterOver (K := K) p n).range →*
         FiniteAffineGroup p n (cyclotomicLayerCharacterOver (K := K) p n).range).range ↔
       g ∈ (finiteRadicalInclusion p (π : K) n).fieldRange.fixingSubgroup := by
-  rw [mem_finiteRadicalInclusion_fixingSubgroup_iff p (π : K) n
-    (fun h => hπ.ne_zero (Subtype.ext h))]
+  rw [mem_finiteRadicalInclusion_fixingSubgroup_iff p (π : K) n]
   constructor
   · rintro ⟨u, hu⟩
     exact (congrArg (fun x => x.left.toAdd) hu).symm
   · intro hb
-    refine ⟨(finiteDiagonalGaloisEquiv p hp₂ hπ n g).right, ?_⟩
+    refine ⟨(finiteDiagonalGaloisEquiv p π n g).right, ?_⟩
     apply SemidirectProduct.ext
     · exact congrArg Multiplicative.ofAdd hb.symm
     · rfl
@@ -441,11 +441,12 @@ local instance finiteDiagonalCyclotomicScalarTower (n : ℕ) :
 
 /-- The original finite diagonal field has relative degree p^n over its
 original finite cyclotomic subfield. -/
-theorem finrank_falseTateLayer_over_cyclotomic (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+theorem finrank_falseTateLayer_over_cyclotomic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+    (n : ℕ) :
     Module.finrank (cyclotomicLayer (K := K) p n) (falseTateLayer p (π : K) n n) = p ^ n := by
   have hd := Module.finrank_mul_finrank K (cyclotomicLayer (K := K) p n)
     (falseTateLayer p (π : K) n n)
-  rw [finrank_falseTateLayer_diagonal p hp₂ hπ n] at hd
+  rw [finrank_falseTateLayer_diagonal p π n] at hd
   have hpos : 0 < Module.finrank K (cyclotomicLayer (K := K) p n) := Module.finrank_pos
   nlinarith
 
@@ -454,7 +455,7 @@ end FiniteAffineSurjectivity
 section RationalFiniteAffine
 
 variable (p : ℕ) [Fact p.Prime]
-variable {π : 𝒪[ℚ_[p]]}
+variable (π : 𝒪[ℚ_[p]])
 
 /-- The general finite character specializes to the existing actual rational
 cyclotomic character. -/
@@ -463,55 +464,58 @@ theorem cyclotomicLayerCharacterOver_padic (n : ℕ) :
 
 /-- The original rational diagonal Galois group realizes the full finite unit
 factor, in the same normalized action coordinates. -/
-def finiteDiagonalGaloisEquiv_padic (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+def finiteDiagonalGaloisEquiv_padic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) ≃* FullFiniteAffineGroup p n := by
-  let hπ₀ : (π : ℚ_[p]) ≠ 0 := fun h => hπ.ne_zero (Subtype.ext h)
+  let hπ₀ : (π : ℚ_[p]) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   let f := (finiteAffineInclusion p n (cyclotomicLayerCharacterOver (K := ℚ_[p]) p n).range).comp
-    (finiteAffineGaloisHom p (π : ℚ_[p]) n hπ₀)
+    (finiteAffineGaloisHom p (π : ℚ_[p]) n)
   apply MulEquiv.ofBijective f
   constructor
   · exact (finiteAffineInclusion_injective p n _).comp
-      (finiteAffineGaloisHom_injective p (π : ℚ_[p]) n hπ₀)
+      (finiteAffineGaloisHom_injective p (π : ℚ_[p]) n)
   · intro x
     have hu : x.right ∈ (cyclotomicLayerCharacterOver (K := ℚ_[p]) p n).range := by
       rw [cyclotomicLayerCharacterOver_padic]
       exact cyclotomicLayerCharacter_surjective p n x.right
-    obtain ⟨g, hb, hχ⟩ := exists_finiteCoordinates_eq p hp₂ hπ n x.left.toAdd x.right hu
+    obtain ⟨g, hb, hχ⟩ := exists_finiteCoordinates_eq p π n x.left.toAdd x.right hu
     refine ⟨g, ?_⟩
     apply SemidirectProduct.ext
     · exact congrArg Multiplicative.ofAdd hb
     · exact hχ
 
 /-- The actual rational affine isomorphism retains the finite Kummer coordinate. -/
-theorem finiteDiagonalGaloisEquiv_padic_left (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+theorem finiteDiagonalGaloisEquiv_padic_left [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+    (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    (finiteDiagonalGaloisEquiv_padic p hp₂ hπ n g).left.toAdd =
-      finiteKummerExponent p (π : ℚ_[p]) n (fun h => hπ.ne_zero (Subtype.ext h)) g := rfl
+    (finiteDiagonalGaloisEquiv_padic p π n g).left.toAdd =
+      finiteKummerExponent p (π : ℚ_[p]) n g := rfl
 
 /-- The actual rational affine isomorphism retains the finite cyclotomic character. -/
-theorem finiteDiagonalGaloisEquiv_padic_right (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+theorem finiteDiagonalGaloisEquiv_padic_right [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+    (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    (finiteDiagonalGaloisEquiv_padic p hp₂ hπ n g).right =
+    (finiteDiagonalGaloisEquiv_padic p π n g).right =
       finiteCyclotomicCharacter p (π : ℚ_[p]) n g := rfl
 
 /-- Every positive rational diagonal layer has the expected actual degree,
 including the first layer. -/
-theorem finrank_falseTateLayer_diagonal_padic (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+theorem finrank_falseTateLayer_diagonal_padic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+    (n : ℕ) :
     Module.finrank (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) =
       p ^ (n + 1) * (p - 1) * p ^ n := by
-  rw [finrank_falseTateLayer_diagonal p hp₂ hπ (n + 1), finrank_cyclotomicLayer_padic,
+  rw [finrank_falseTateLayer_diagonal p π (n + 1), finrank_cyclotomicLayer_padic,
     Nat.totient_prime_pow_succ (Fact.out : p.Prime)]
   ring
 
 /-- The original rational cyclotomic fixer is the entire translation factor. -/
 theorem finiteDiagonalGaloisEquiv_padic_mem_translations
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    finiteDiagonalGaloisEquiv_padic p hp₂ hπ n g ∈
+    finiteDiagonalGaloisEquiv_padic p π n g ∈
       (SemidirectProduct.inl : Multiplicative (ZMod (p ^ n)) →* FullFiniteAffineGroup p n).range ↔
       g ∈ (finiteCyclotomicInclusion p (π : ℚ_[p]) n).fieldRange.fixingSubgroup := by
   rw [finiteCyclotomicInclusion_fixingSubgroup, SemidirectProduct.range_inl_eq_ker_rightHom,
@@ -520,19 +524,18 @@ theorem finiteDiagonalGaloisEquiv_padic_mem_translations
 
 /-- The original rational radical fixer is the entire pure-unit factor. -/
 theorem finiteDiagonalGaloisEquiv_padic_mem_units
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ)
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    finiteDiagonalGaloisEquiv_padic p hp₂ hπ n g ∈
+    finiteDiagonalGaloisEquiv_padic p π n g ∈
       (SemidirectProduct.inr : (ZMod (p ^ n))ˣ →* FullFiniteAffineGroup p n).range ↔
       g ∈ (finiteRadicalInclusion p (π : ℚ_[p]) n).fieldRange.fixingSubgroup := by
-  rw [mem_finiteRadicalInclusion_fixingSubgroup_iff p (π : ℚ_[p]) n
-    (fun h => hπ.ne_zero (Subtype.ext h))]
+  rw [mem_finiteRadicalInclusion_fixingSubgroup_iff p (π : ℚ_[p]) n]
   constructor
   · rintro ⟨u, hu⟩
     exact (congrArg (fun x => x.left.toAdd) hu).symm
   · intro hb
-    refine ⟨(finiteDiagonalGaloisEquiv_padic p hp₂ hπ n g).right, ?_⟩
+    refine ⟨(finiteDiagonalGaloisEquiv_padic p π n g).right, ?_⟩
     apply SemidirectProduct.ext
     · exact congrArg Multiplicative.ofAdd hb.symm
     · rfl
@@ -545,42 +548,42 @@ open FontaineWintenberger
 open scoped commutatorElement
 
 variable (p : ℕ) [Fact p.Prime]
-variable {π : 𝒪[ℚ_[p]]}
+variable (π : 𝒪[ℚ_[p]])
 
 /-- Oddness makes the literal affine multiplier two invertible at every
 finite level, including the zeroth level. -/
-def finiteAffineTwo (hp₂ : p ≠ 2) (n : ℕ) : (ZMod (p ^ n))ˣ :=
+def finiteAffineTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) : (ZMod (p ^ n))ˣ :=
   ZMod.unitOfCoprime 2 (by
     have hp : p.Coprime 2 := (Fact.out : p.Prime).coprime_iff_not_dvd.mpr (by
       intro h
       have hle := Nat.le_of_dvd (by decide : 0 < 2) h
-      exact hp₂ (le_antisymm hle (Fact.out : p.Prime).two_le))
+      exact hp₂.out (le_antisymm hle (Fact.out : p.Prime).two_le))
     exact hp.symm.pow_right n)
 
 @[simp]
-theorem coe_finiteAffineTwo (hp₂ : p ≠ 2) (n : ℕ) :
-    (finiteAffineTwo p hp₂ n : ZMod (p ^ n)) = 2 := ZMod.coe_unitOfCoprime _ _
+theorem coe_finiteAffineTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
+    (finiteAffineTwo p n : ZMod (p ^ n)) = 2 := ZMod.coe_unitOfCoprime _ _
 
 /-- Every actual translation in the original rational finite Galois group
 belongs to its original inertia subgroup. -/
 theorem finiteDiagonal_translation_mem_inertia
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) (b : ZMod (p ^ n)) :
-    (finiteDiagonalGaloisEquiv_padic p hp₂ hπ n).symm
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) (b : ZMod (p ^ n)) :
+    (finiteDiagonalGaloisEquiv_padic p π n).symm
         (SemidirectProduct.inl (Multiplicative.ofAdd b)) ∈
       lowerRamificationGroup
         (falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]] falseTateLayer p (π : ℚ_[p]) n n)
         (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p])
           (falseTateLayer p (π : ℚ_[p]) n n))) 0 := by
-  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) n
-  let e := finiteDiagonalGaloisEquiv_padic p hp₂ hπ n
-  let δ := e.symm (SemidirectProduct.inr (finiteAffineTwo p hp₂ n))
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) n
+  let e := finiteDiagonalGaloisEquiv_padic p π n
+  let δ := e.symm (SemidirectProduct.inr (finiteAffineTwo p n))
   let τ := e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b))
   have h := commutatorElement_mem_lowerRamificationGroup_zero (ℚ_[p])
     (falseTateLayer p (π : ℚ_[p]) n n) δ τ
   have heq : ⁅δ, τ⁆ = τ := by
     apply e.injective
     rw [map_commutatorElement]
-    change ⁅e (e.symm (SemidirectProduct.inr (finiteAffineTwo p hp₂ n))),
+    change ⁅e (e.symm (SemidirectProduct.inr (finiteAffineTwo p n))),
       e (e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b)))⁆ =
         e (e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b)))
     rw [e.apply_symm_apply, e.apply_symm_apply, finiteAffine_commutator_inl]
@@ -590,37 +593,37 @@ theorem finiteDiagonal_translation_mem_inertia
 
 /-- The original finite cyclotomic fixing subgroup lies in the original
 inertia group; no total ramification is assumed. -/
-theorem finiteCyclotomicFixing_le_inertia (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+theorem finiteCyclotomicFixing_le_inertia [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (finiteCyclotomicInclusion p (π : ℚ_[p]) n).fieldRange.fixingSubgroup ≤
       lowerRamificationGroup
         (falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]] falseTateLayer p (π : ℚ_[p]) n n)
         (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p])
           (falseTateLayer p (π : ℚ_[p]) n n))) 0 := by
   intro g hg
-  obtain ⟨b, hb⟩ := (finiteDiagonalGaloisEquiv_padic_mem_translations p hp₂ hπ n g).mpr hg
-  have h := finiteDiagonal_translation_mem_inertia p hp₂ hπ n b.toAdd
-  have heq : (finiteDiagonalGaloisEquiv_padic p hp₂ hπ n).symm
+  obtain ⟨b, hb⟩ := (finiteDiagonalGaloisEquiv_padic_mem_translations p π n g).mpr hg
+  have h := finiteDiagonal_translation_mem_inertia p π n b.toAdd
+  have heq : (finiteDiagonalGaloisEquiv_padic p π n).symm
       (SemidirectProduct.inl b) = g := by
-    rw [hb, (finiteDiagonalGaloisEquiv_padic p hp₂ hπ n).symm_apply_apply]
+    rw [hb, (finiteDiagonalGaloisEquiv_padic p π n).symm_apply_apply]
   exact heq ▸ h
 
 /-- Every positive original rational diagonal layer has full inertia,
 including the first layer, at an odd prime. -/
 theorem lowerRamificationGroup_falseTateLayer_zero
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     lowerRamificationGroup
       (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1) ≃ₐ[ℚ_[p]]
         falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1))
       (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p])
         (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))) 0 = ⊤ := by
   let D := falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
-  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) (n + 1)
   let i := finiteCyclotomicInclusion p (π : ℚ_[p]) (n + 1)
   let I := lowerRamificationGroup (D ≃ₐ[ℚ_[p]] D)
     (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p]) D)) 0
   have hidx := fixingSubgroup_sup_lowerRamificationGroup_zero_index_eq_residueDegree (ℚ_[p])
     D i.fieldRange
-  rw [sup_eq_right.mpr (finiteCyclotomicFixing_le_inertia p hp₂ hπ (n + 1)),
+  rw [sup_eq_right.mpr (finiteCyclotomicFixing_le_inertia p π (n + 1)),
     spectral_residueDegree_algEquiv (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1))
       i.equivFieldRange,
     cyclotomicLayer_spectral_residueDegree] at hidx
@@ -629,16 +632,16 @@ theorem lowerRamificationGroup_falseTateLayer_zero
 /-- The original spectral residue degree of each positive rational diagonal
 layer is one at every odd prime. -/
 theorem falseTateLayer_spectral_residueDegree
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     Module.finrank
       (𝓀[ℚ_[p]])
       (IsLocalRing.ResidueField (spectralIntegerRing (ℚ_[p])
         (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))) = 1 := by
   let D := falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
-  have := falseTateLayer_isGalois p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) (n + 1)
+  have := falseTateLayer_isGalois p (π : ℚ_[p]) (n + 1)
   have h := fixingSubgroup_sup_lowerRamificationGroup_zero_index_eq_residueDegree (ℚ_[p]) D
     (⊤ : IntermediateField (ℚ_[p]) D)
-  rw [lowerRamificationGroup_falseTateLayer_zero p hp₂ hπ n, sup_top_eq, Subgroup.index_top,
+  rw [lowerRamificationGroup_falseTateLayer_zero p π n, sup_top_eq, Subgroup.index_top,
     spectral_residueDegree_algEquiv (ℚ_[p]) D (IntermediateField.topEquiv :
       (⊤ : IntermediateField (ℚ_[p]) D) ≃ₐ[ℚ_[p]] D).symm] at h
   exact h.symm
@@ -646,7 +649,7 @@ theorem falseTateLayer_spectral_residueDegree
 /-- The original spectral ramification index equals the full field degree
 for every positive rational diagonal layer at an odd prime. -/
 theorem falseTateLayer_spectral_ramificationIdx
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) (n : ℕ) :
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p])
       (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))).ramificationIdx
         𝒪[ℚ_[p]] =
@@ -654,7 +657,7 @@ theorem falseTateLayer_spectral_ramificationIdx
   have h := extensionValuationSubring_ramificationIdx_mul_residueDegree (ℚ_[p])
     (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1))
     (spectralValuation (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))
-  rwa [falseTateLayer_spectral_residueDegree p hp₂ hπ n, mul_one] at h
+  rwa [falseTateLayer_spectral_residueDegree p π n, mul_one] at h
 
 end RationalTotalRamification
 
@@ -663,7 +666,7 @@ section RationalInfiniteTotalRamification
 open FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
-variable {π : 𝒪[ℚ_[p]]}
+variable (π : 𝒪[ℚ_[p]])
 
 /-- The actual residue inclusion from a positive diagonal layer to the
 original infinite false Tate field. -/
@@ -681,7 +684,7 @@ diagonal layer, using the original field and residue inclusions. -/
 theorem exists_falseTateResidueFromLayer_preimage
     (z : IsLocalRing.ResidueField (spectralIntegerRing (ℚ_[p])
       (falseTateExtension p (π : ℚ_[p])))) :
-    ∃ n, ∃ x, falseTateResidueFromLayer p n x = z := by
+    ∃ n, ∃ x, falseTateResidueFromLayer p π n x = z := by
   obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective z
   obtain ⟨m, hm⟩ :=
     (mem_falseTateExtension_iff_diagonal p (π : ℚ_[p])
@@ -712,22 +715,22 @@ theorem exists_falseTateResidueFromLayer_preimage
 /-- The actual base-residue map onto the original infinite false Tate
 residue field is surjective at every odd prime. -/
 theorem falseTateExtension_residue_algebraMap_surjective
-    (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     Function.Surjective (algebraMap
       (𝓀[ℚ_[p]])
       (IsLocalRing.ResidueField (spectralIntegerRing (ℚ_[p])
         (falseTateExtension p (π : ℚ_[p]))))) := by
   intro z
-  obtain ⟨n, x, hx⟩ := exists_falseTateResidueFromLayer_preimage p z
+  obtain ⟨n, x, hx⟩ := exists_falseTateResidueFromLayer_preimage p π z
   have hsurj := (Algebra.finrank_eq_one_iff_bijective_algebraMap.mp
-    (falseTateLayer_spectral_residueDegree p hp₂ hπ n)).surjective
+    (falseTateLayer_spectral_residueDegree p π n)).surjective
   obtain ⟨a, ha⟩ := hsurj x
   refine ⟨a, ?_⟩
-  rw [← (falseTateResidueFromLayer p n).commutes a, ha, hx]
+  rw [← (falseTateResidueFromLayer p π n).commutes a, ha, hx]
 
 /-- The original infinite false Tate field has exactly the original rational
 residue field at an odd prime. -/
-theorem falseTateExtension_residueDegree_padic (hp₂ : p ≠ 2) (hπ : Irreducible π) :
+theorem falseTateExtension_residueDegree_padic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     Module.finrank
       (𝓀[ℚ_[p]])
       (IsLocalRing.ResidueField (spectralIntegerRing (ℚ_[p])
@@ -737,12 +740,12 @@ theorem falseTateExtension_residueDegree_padic (hp₂ : p ≠ 2) (hπ : Irreduci
     (𝓀[ℚ_[p]])
     (IsLocalRing.ResidueField (spectralIntegerRing (ℚ_[p])
       (falseTateExtension p (π : ℚ_[p]))))).injective,
-    falseTateExtension_residue_algebraMap_surjective p hp₂ hπ⟩
+    falseTateExtension_residue_algebraMap_surjective p π⟩
 
 /-- Every original finite separable subextension of the odd rational false
 Tate field has residue degree one under its actual specified embedding. -/
 theorem finiteSubextension_falseTate_residueDegree_padic
-    (hp₂ : p ≠ 2) (hπ : Irreducible π)
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (E : Type*) [Field E] [Algebra (ℚ_[p]) E] [FiniteDimensional (ℚ_[p]) E]
     (i : E →ₐ[ℚ_[p]] falseTateExtension p (π : ℚ_[p])) :
     Module.finrank
@@ -753,7 +756,7 @@ theorem finiteSubextension_falseTate_residueDegree_padic
     (𝓀[ℚ_[p]])
     (IsLocalRing.ResidueField (spectralIntegerRing (ℚ_[p]) E))).injective, ?_⟩
   intro z
-  obtain ⟨a, ha⟩ := falseTateExtension_residue_algebraMap_surjective p hp₂ hπ
+  obtain ⟨a, ha⟩ := falseTateExtension_residue_algebraMap_surjective p π
     (spectralResidueInclusion (ℚ_[p]) i z)
   refine ⟨a, (spectralResidueInclusion (ℚ_[p]) i).injective ?_⟩
   exact ((spectralResidueInclusion (ℚ_[p]) i).commutes a).trans ha
@@ -761,14 +764,14 @@ theorem finiteSubextension_falseTate_residueDegree_padic
 /-- Every original finite subextension is totally ramified, with its own
 spectral integer ring and its actual specified inclusion into the odd tower. -/
 theorem finiteSubextension_falseTate_ramificationIdx_padic
-    (hp₂ : p ≠ 2) (hπ : Irreducible π)
+    [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (E : Type*) [Field E] [Algebra (ℚ_[p]) E] [FiniteDimensional (ℚ_[p]) E]
     (i : E →ₐ[ℚ_[p]] falseTateExtension p (π : ℚ_[p])) :
     (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p]) E)).ramificationIdx
       𝒪[ℚ_[p]] = Module.finrank (ℚ_[p]) E := by
   have h := extensionValuationSubring_ramificationIdx_mul_residueDegree (ℚ_[p]) E
     (spectralValuation (ℚ_[p]) E)
-  rwa [finiteSubextension_falseTate_residueDegree_padic p hp₂ hπ E i, mul_one] at h
+  rwa [finiteSubextension_falseTate_residueDegree_padic p π E i, mul_one] at h
 
 end RationalInfiniteTotalRamification
 

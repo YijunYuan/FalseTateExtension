@@ -141,18 +141,19 @@ theorem irreducible_cyclotomicUniformizer (n : ℕ)
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
     [(NormedField.valuation (K := ℚ_[p])).HasExtension w] :
     Irreducible (cyclotomicUniformizer p n w) := by
-  obtain ⟨π, hπ⟩ := exists_irreducible w.valuationSubring
+  obtain ⟨π, hπ.out⟩ := exists_irreducible w.valuationSubring
   have hvπ : (maximalIdeal w.valuationSubring).valuation
       (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) (π : cyclotomicLayer p (n + 1)) =
         WithZero.exp (-1 : ℤ) := by
     change (maximalIdeal w.valuationSubring).valuation _
       (algebraMap w.valuationSubring (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) π) = _
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
-    exact (maximalIdeal w.valuationSubring).intValuation_singleton hπ.ne_zero hπ.maximalIdeal_eq
+    exact (maximalIdeal w.valuationSubring).intValuation_singleton hπ.out.ne_zero
+        hπ.out.maximalIdeal_eq
   obtain ⟨u, hu⟩ := associated_of_valuation_eq (A := w.valuationSubring)
     (π : cyclotomicLayer p (n + 1)) (cyclotomicLayerRoot p (n + 1) - 1)
     (hvπ.trans (cyclotomicLayer_normalizedValuation_sub_one p n w).symm)
-  apply Associated.irreducible _ hπ
+  apply Associated.irreducible _ hπ.out
   refine ⟨u, ?_⟩
   apply Subtype.ext
   change (π : cyclotomicLayer p (n + 1)) *

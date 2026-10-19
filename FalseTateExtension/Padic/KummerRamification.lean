@@ -152,53 +152,53 @@ section ActualGenerator
 open IsDiscreteValuationRing FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
-variable {π : 𝒪[ℚ_[p]]}
-variable (hp₂ : p ≠ 2) (hπ : Irreducible π)
+variable (π : 𝒪[ℚ_[p]])
+variable [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
 
 /-- The ordinary finite restriction of the prescribed original generator power. -/
 def kummerTauFinite (N k : ℕ) :
     (falseTateLayer p (π : ℚ_[p]) N N) ≃ₐ[ℚ_[p]]
       (falseTateLayer p (π : ℚ_[p]) N N) :=
-  infiniteLayerRestriction p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h)) N
-    ((tau p hp₂ hπ).val ^ (p ^ k))
+  infiniteLayerRestriction p (π : ℚ_[p]) N
+    ((tau p π).val ^ (p ^ k))
 
 /-- Powers in the actual character kernel have their prescribed additive coordinate. -/
 lemma padicKummerExponent_tau_pow (m : ℕ) :
-    padicKummerExponent p (π : ℚ_[p]) (fun h => hπ.ne_zero (Subtype.ext h))
-      ((tau p hp₂ hπ).val ^ m) = m := by
-  change (fullKummerKernelMulEquiv p hp₂ hπ ((tau p hp₂ hπ) ^ m)).toAdd = _
+    padicKummerExponent p (π : ℚ_[p])
+      ((tau p π).val ^ m) = m := by
+  change (fullKummerKernelMulEquiv p π ((tau p π) ^ m)).toAdd = _
   rw [map_pow]
-  change m • padicKummerExponent p (π : ℚ_[p])
-    (fun h => hπ.ne_zero (Subtype.ext h)) (tau p hp₂ hπ).val = _
+  change m • padicKummerExponent p (π : ℚ_[p]) (tau p π).val = _
   rw [padicKummerExponent_tau]
   simp
 
 /-- Under the checked finite affine isomorphism the actual restriction is
 the translation by `p^k`; the unit coordinate is exactly one. -/
 lemma finiteDiagonalGaloisEquiv_kummerTauFinite (N k : ℕ) :
-    finiteDiagonalGaloisEquiv_padic p hp₂ hπ N (kummerTauFinite p hp₂ hπ N k) =
+    finiteDiagonalGaloisEquiv_padic p π N (kummerTauFinite p π N k) =
       SemidirectProduct.inl (Multiplicative.ofAdd (p ^ k : ZMod (p ^ N))) := by
   apply SemidirectProduct.ext
   · apply congrArg Multiplicative.ofAdd
-    change finiteKummerExponent p (π : ℚ_[p]) N _
-      (infiniteLayerRestriction p (π : ℚ_[p]) _ N ((tau p hp₂ hπ).val ^ (p ^ k))) = _
+    change finiteKummerExponent p (π : ℚ_[p]) N
+      (infiniteLayerRestriction p (π : ℚ_[p]) N ((tau p π).val ^ (p ^ k))) = _
     rw [← padicKummerExponent_toZModPow, padicKummerExponent_tau_pow]
     simp
   · rw [finiteDiagonalGaloisEquiv_padic_right]
     change finiteCyclotomicCharacter p (π : ℚ_[p]) N
-      (infiniteLayerRestriction p (π : ℚ_[p]) _ N ((tau p hp₂ hπ).val ^ (p ^ k))) = 1
+      (infiniteLayerRestriction p (π : ℚ_[p]) N ((tau p π).val ^ (p ^ k))) = 1
     rw [← padicCyclotomicCharacter_toZModPow, map_pow]
-    have hχ : padicCyclotomicCharacter p (π : ℚ_[p]) (tau p hp₂ hπ).val = 1 :=
-      (tau p hp₂ hπ).property
+    have hχ : padicCyclotomicCharacter p (π : ℚ_[p]) (tau p π).val = 1 :=
+      (tau p π).property
     simp [hχ]
 
-omit [Fact p.Prime] in
+omit [Fact p.Prime] hp₂ in
 lemma primePower_mem_finiteTranslationSubgroup (N k : ℕ) :
     Multiplicative.ofAdd (p ^ k : ZMod (p ^ N)) ∈ finiteTranslationSubgroup p N k := by
   refine ⟨Multiplicative.ofAdd (1 : ZMod (p ^ N)), ?_⟩
   change Multiplicative.ofAdd ((p ^ k) • (1 : ZMod (p ^ N))) = _
   simp [nsmul_eq_mul]
 
+omit hp₂ in
 lemma primePower_notMem_finiteTranslationSubgroup (N k : ℕ) (hk : k < N) :
     Multiplicative.ofAdd (p ^ k : ZMod (p ^ N)) ∉ finiteTranslationSubgroup p N (k + 1) := by
   rintro ⟨a, ha⟩
@@ -217,14 +217,14 @@ lemma primePower_notMem_finiteTranslationSubgroup (N k : ℕ) (hk : k < N) :
 
 /-- The original generator power belongs to the actual lower group at its break. -/
 lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
-    kummerTauFinite p hp₂ hπ (n + 1) k ∈
+    kummerTauFinite p π (n + 1) k ∈
       lowerRamificationGroupReal
         ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
         (IsLocalRing.maximalIdeal
           (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1))))
         (kummerRamificationBreak p k) := by
-  let e := finiteDiagonalGaloisEquiv_padic p hp₂ hπ (n + 1)
-  have htable := lowerRamificationGroupReal_falseTate_fractional hp₂ hπ n (k + 1)
+  let e := finiteDiagonalGaloisEquiv_padic p π (n + 1)
+  have htable := lowerRamificationGroupReal_falseTate_fractional π n (k + 1)
     (by omega) hk
   have hd : (kummerRamificationBreak p k : ℝ) =
       (2 * (p : ℝ) ^ (2 * (k + 1)) + (p : ℝ) - 1) / ((p : ℝ) + 1) := by
@@ -232,7 +232,7 @@ lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
       kummerRamificationBreak_real p k (Fact.out : p.Prime).one_le
   rw [← hd] at htable
   simp only [Nat.add_sub_cancel] at htable
-  have hm : e (kummerTauFinite p hp₂ hπ (n + 1) k) ∈
+  have hm : e (kummerTauFinite p π (n + 1) k) ∈
       (lowerRamificationGroupReal
         ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
         (IsLocalRing.maximalIdeal
@@ -245,29 +245,29 @@ lemma kummerTauFinite_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
       (finiteUnitSubgroup p (n + 1) (k + 1 + 1)) from
       ⟨primePower_mem_finiteTranslationSubgroup p (n + 1) k, Subgroup.one_mem _⟩)
   obtain ⟨g, hg, he⟩ := hm
-  have hge : g = kummerTauFinite p hp₂ hπ (n + 1) k := e.injective he
+  have hge : g = kummerTauFinite p π (n + 1) k := e.injective he
   simpa only [lowerRamificationGroupReal, Int.ceil_natCast, hge, SetLike.mem_coe] using hg
 
 /-- Immediately beyond that break the actual restriction leaves the lower group. -/
 lemma kummerTauFinite_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) :
-    kummerTauFinite p hp₂ hπ (n + 1) k ∉
+    kummerTauFinite p π (n + 1) k ∉
       lowerRamificationGroupReal
         ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
         (IsLocalRing.maximalIdeal
           (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1))))
         ((kummerRamificationBreak p k : ℝ) + 1) := by
   intro hg
-  have hp3 : 3 ≤ p := by have := (Fact.out : p.Prime).two_le; omega
-  have htable := lowerRamificationGroupReal_falseTate_fractional_integer hp₂ hπ n (k + 1) hk
+  have hp3 : 3 ≤ p := by have := (Fact.out : p.Prime).two_le; have := hp₂.out; omega
+  have htable := lowerRamificationGroupReal_falseTate_fractional_integer π n (k + 1) hk
     (t := (kummerRamificationBreak p k : ℝ) + 1)
     (by rw [kummerRamificationBreak_real p k (by omega)];
         simp only [show 2 * (k + 1) = 2 * k + 2 by omega]; linarith)
     (kummerRamificationBreak_add_one_le_integer p k hp3)
   have hm := Subgroup.mem_map_of_mem
-    (finiteDiagonalGaloisEquiv_padic p hp₂ hπ (n + 1)).toMonoidHom hg
+    (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom hg
   rw [htable] at hm
-  change finiteDiagonalGaloisEquiv_padic p hp₂ hπ (n + 1)
-    (kummerTauFinite p hp₂ hπ (n + 1) k) ∈ _ at hm
+  change finiteDiagonalGaloisEquiv_padic p π (n + 1)
+    (kummerTauFinite p π (n + 1) k) ∈ _ at hm
   rw [finiteDiagonalGaloisEquiv_kummerTauFinite] at hm
   exact primePower_notMem_finiteTranslationSubgroup p (n + 1) k (by omega) hm.1
 
@@ -276,17 +276,17 @@ theorem ramificationOrder_kummerTauFinite_succ (n k : ℕ) (hk : k + 1 ≤ n) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)))
       ((falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)) ≃ₐ[ℚ_[p]] _)
-      (kummerTauFinite p hp₂ hπ (n + 1) k) = (kummerRamificationBreak p k + 1 : ℕ) := by
+      (kummerTauFinite p π (n + 1) k) = (kummerRamificationBreak p k + 1 : ℕ) := by
   let D := falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
   let G := D ≃ₐ[ℚ_[p]] D
   let O := spectralIntegerRing (ℚ_[p]) D
-  have hm := kummerTauFinite_mem_lower_break p hp₂ hπ n k hk
-  have hn := kummerTauFinite_notMem_lower_break_add_one p hp₂ hπ n k hk
+  have hm := kummerTauFinite_mem_lower_break p π n k hk
+  have hn := kummerTauFinite_notMem_lower_break_add_one p π n k hk
   have hlo : (kummerRamificationBreak p k + 1 : ℕ∞) ≤
-      ramificationOrder (R := O) G (kummerTauFinite p hp₂ hπ (n + 1) k) := by
+      ramificationOrder (R := O) G (kummerTauFinite p π (n + 1) k) := by
     simpa [lowerRamificationGroupReal, mem_lowerRamificationGroup_iff_le_order] using hm
   have hhi : ¬ (kummerRamificationBreak p k + 1 : ℕ∞) + 1 ≤
-      ramificationOrder (R := O) G (kummerTauFinite p hp₂ hπ (n + 1) k) := by
+      ramificationOrder (R := O) G (kummerTauFinite p π (n + 1) k) := by
     have hto : ((kummerRamificationBreak p k : ℤ) + 2).toNat =
         kummerRamificationBreak p k + 2 := by omega
     simpa [lowerRamificationGroupReal, mem_lowerRamificationGroup_iff_le_order,
@@ -300,23 +300,23 @@ theorem ramificationOrder_kummerTauFinite (N k : ℕ) (hk : k + 2 ≤ N) :
     ramificationOrder
       (R := spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))
       ((falseTateLayer p (π : ℚ_[p]) N N) ≃ₐ[ℚ_[p]] _)
-      (kummerTauFinite p hp₂ hπ N k) = (kummerRamificationBreak p k + 1 : ℕ) := by
+      (kummerTauFinite p π N k) = (kummerRamificationBreak p k + 1 : ℕ) := by
   obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (show N ≠ 0 by omega)
-  exact ramificationOrder_kummerTauFinite_succ p hp₂ hπ n k (by omega)
+  exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
 /-- Every actual uniformizer attains that same integral displacement order. -/
 theorem addVal_kummerTauFinite_uniformizer (N k : ℕ) (hk : k + 2 ≤ N)
     {ϖ : spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N)}
     (hϖ : Irreducible ϖ) :
     addVal (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))
-      (kummerTauFinite p hp₂ hπ N k • ϖ - ϖ) = (kummerRamificationBreak p k + 1 : ℕ) := by
+      (kummerTauFinite p π N k • ϖ - ϖ) = (kummerRamificationBreak p k + 1 : ℕ) := by
   obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (show N ≠ 0 by omega)
   let D := falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1)
   have hgen := extensionValuationSubring_adjoin_uniformizer_eq_top (ℚ_[p]) D
     (spectralValuation (ℚ_[p]) D)
-    (falseTateLayer_spectral_ramificationIdx p hp₂ hπ n) hϖ
+    (falseTateLayer_spectral_ramificationIdx p π n) hϖ
   rw [← ramificationOrder_eq_generator (D ≃ₐ[ℚ_[p]] D) hgen]
-  exact ramificationOrder_kummerTauFinite_succ p hp₂ hπ n k (by omega)
+  exact ramificationOrder_kummerTauFinite_succ p π n k (by omega)
 
 /-- Exact normalized displacement on the original finite field, for every uniformizer. -/
 theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2 ≤ N)
@@ -324,22 +324,22 @@ theorem normalizedValuation_kummerTauFinite_displacement (N k : ℕ) (hk : k + 2
     (hϖ : Irreducible ϖ) :
     (maximalIdeal (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))).valuation
       (falseTateLayer p (π : ℚ_[p]) N N)
-      (kummerTauFinite p hp₂ hπ N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) - ϖ) =
+      (kummerTauFinite p π N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) - ϖ) =
       WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
   let D := falseTateLayer p (π : ℚ_[p]) N N
   let O := spectralIntegerRing (ℚ_[p]) D
   have hv : (maximalIdeal O).valuation D
-      ((kummerTauFinite p hp₂ hπ N k • ϖ - ϖ : O) : D) =
+      ((kummerTauFinite p π N k • ϖ - ϖ : O) : D) =
       WithZero.exp (-(kummerRamificationBreak p k + 1 : ℕ) : ℤ) := by
     change (maximalIdeal O).valuation D
-      (algebraMap O D (kummerTauFinite p hp₂ hπ N k • ϖ - ϖ)) = _
+      (algebraMap O D (kummerTauFinite p π N k • ϖ - ϖ)) = _
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
-      intValuation_maximalIdeal, addVal_kummerTauFinite_uniformizer p hp₂ hπ N k hk hϖ]
+      intValuation_maximalIdeal, addVal_kummerTauFinite_uniformizer p π N k hk hϖ]
     rw [ENat.recTopCoe_natCast]
     simp [← WithZero.exp_eq_coe_ofAdd]
-  have hc : ((kummerTauFinite p hp₂ hπ N k • ϖ - ϖ : O) : D) =
-      kummerTauFinite p hp₂ hπ N k (ϖ : D) - ϖ := by
-    change ((kummerTauFinite p hp₂ hπ N k • ϖ : O) : D) - (ϖ : D) = _
+  have hc : ((kummerTauFinite p π N k • ϖ - ϖ : O) : D) =
+      kummerTauFinite p π N k (ϖ : D) - ϖ := by
+    change ((kummerTauFinite p π N k • ϖ : O) : D) - (ϖ : D) = _
     rw [coe_spectralIntegerRing_galois_smul]
   rw [hc] at hv
   exact hv
@@ -350,7 +350,7 @@ theorem normalizedValuation_kummerTauFinite_div_sub_one (N k : ℕ) (hk : k + 2 
     (hϖ : Irreducible ϖ) :
     (maximalIdeal (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) N N))).valuation
       (falseTateLayer p (π : ℚ_[p]) N N)
-      (kummerTauFinite p hp₂ hπ N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) / ϖ - 1) =
+      (kummerTauFinite p π N k (ϖ : falseTateLayer p (π : ℚ_[p]) N N) / ϖ - 1) =
       WithZero.exp (-(kummerRamificationBreak p k : ℤ)) := by
   let D := falseTateLayer p (π : ℚ_[p]) N N
   let O := spectralIntegerRing (ℚ_[p]) D
@@ -359,10 +359,10 @@ theorem normalizedValuation_kummerTauFinite_div_sub_one (N k : ℕ) (hk : k + 2 
     change (maximalIdeal O).valuation D (algebraMap O D ϖ) = _
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
     exact (maximalIdeal O).intValuation_singleton hϖ.ne_zero hϖ.maximalIdeal_eq
-  have he : kummerTauFinite p hp₂ hπ N k (ϖ : D) / ϖ - 1 =
-      (kummerTauFinite p hp₂ hπ N k (ϖ : D) - ϖ) / ϖ := by
+  have he : kummerTauFinite p π N k (ϖ : D) / ϖ - 1 =
+      (kummerTauFinite p π N k (ϖ : D) - ϖ) / ϖ := by
     field_simp
-  rw [he, map_div₀, normalizedValuation_kummerTauFinite_displacement p hp₂ hπ N k hk hϖ, hu]
+  rw [he, map_div₀, normalizedValuation_kummerTauFinite_displacement p π N k hk hϖ, hu]
   rw [← WithZero.exp_sub]
   congr 1
   push_cast

@@ -27,7 +27,7 @@ noncomputable section
 
 variable {Ω : Type*} [Field Ω] [IsAlgClosed Ω]
 
-private theorem exists_pow_right_inverse (p : ℕ) (hp : 0 < p) :
+theorem exists_pow_right_inverse (p : ℕ) (hp : 0 < p) :
     ∃ r : Ω → Ω, ∀ x, r x ^ p = x := by
   have hs : Function.Surjective (fun x : Ω ↦ x ^ p) :=
     fun x ↦ IsAlgClosed.exists_pow_nat_eq x hp

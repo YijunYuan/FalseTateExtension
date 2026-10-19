@@ -105,11 +105,11 @@ variable {K : Type*} [Field K] [CharZero K] (π : K)
 /-- Ordinary restriction to each actual diagonal layer is continuous for the
 Krull topologies. The intermediate field inside the infinite field is the
 actual image of the original inclusion. -/
-theorem continuous_infiniteLayerRestriction (hπ : π ≠ 0) (n : ℕ) :
-    Continuous (infiniteLayerRestriction p π hπ n) := by
+theorem continuous_infiniteLayerRestriction [hπ : NeZero π] (n : ℕ) :
+    Continuous (infiniteLayerRestriction p π n) := by
   let i := IntermediateField.inclusion (falseTateLayer_le_falseTateExtension p π n n)
   let e := i.equivFieldRange
-  have := falseTateLayer_isGalois p π hπ n
+  have := falseTateLayer_isGalois p π n
   have : Module.Finite K i.fieldRange := Module.Finite.equiv e.toLinearEquiv
   have : IsGalois K i.fieldRange := IsGalois.of_algEquiv e
   have hc : Continuous (fun g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π ↦
@@ -129,62 +129,62 @@ theorem continuous_infiniteLayerRestriction (hπ : π ≠ 0) (n : ℕ) :
   exact (AlgEquiv.restrictNormal_commutes g i.fieldRange (e x)).symm
 
 /-- The canonical Kummer coordinate is continuous for the actual Krull topology. -/
-theorem continuous_padicKummerExponent (hπ : π ≠ 0) :
-    Continuous (padicKummerExponent p π hπ) := by
+theorem continuous_padicKummerExponent [hπ : NeZero π] :
+    Continuous (padicKummerExponent p π) := by
   apply PadicInt.continuous_of_toZModPow p
   intro n
   simp_rw [padicKummerExponent_toZModPow]
-  exact (continuous_of_discreteTopology : Continuous (finiteKummerExponent p π n hπ)).comp
-    (continuous_infiniteLayerRestriction p π hπ n)
+  exact (continuous_of_discreteTopology : Continuous (finiteKummerExponent p π n)).comp
+    (continuous_infiniteLayerRestriction p π n)
 
 /-- The canonical cyclotomic character is continuous for the actual Krull topology. -/
 theorem continuous_padicCyclotomicCharacter : Continuous (padicCyclotomicCharacter p π) :=
   _root_.cyclotomicCharacter.continuous p K (falseTateExtension p π)
 
 /-- The actual Galois homomorphism into the canonical affine semidirect product. -/
-def affineGaloisHom (hπ : π ≠ 0) :
+def affineGaloisHom [hπ : NeZero π] :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* PadicAffineGroup p where
-  toFun g := ⟨Multiplicative.ofAdd (padicKummerExponent p π hπ g),
+  toFun g := ⟨Multiplicative.ofAdd (padicKummerExponent p π g),
     padicCyclotomicCharacter p π g⟩
   map_one' := by
     apply SemidirectProduct.ext
-    · change Multiplicative.ofAdd (padicKummerExponent p π hπ 1) = 1
-      have h : padicKummerExponent p π hπ 1 + padicKummerExponent p π hπ 1 =
-          padicKummerExponent p π hπ 1 + 0 := by
-        simpa using (padicKummerExponent_mul p π hπ 1 1).symm
+    · change Multiplicative.ofAdd (padicKummerExponent p π 1) = 1
+      have h : padicKummerExponent p π 1 + padicKummerExponent p π 1 =
+          padicKummerExponent p π 1 + 0 := by
+        simpa using (padicKummerExponent_mul p π 1 1).symm
       rw [add_left_cancel h]
       rfl
     · exact map_one (padicCyclotomicCharacter p π)
   map_mul' g h := by
     apply SemidirectProduct.ext
-    · exact congrArg Multiplicative.ofAdd (padicKummerExponent_mul p π hπ g h)
+    · exact congrArg Multiplicative.ofAdd (padicKummerExponent_mul p π g h)
     · exact map_mul (padicCyclotomicCharacter p π) g h
 
 /-- The affine homomorphism has the previously constructed actual coordinates. -/
-theorem affineGaloisHom_coordinates (hπ : π ≠ 0)
+theorem affineGaloisHom_coordinates [hπ : NeZero π]
     (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
-    padicAffineHomeomorphProd p (affineGaloisHom p π hπ g) =
-      (padicKummerExponent p π hπ g, padicCyclotomicCharacter p π g) := rfl
+    padicAffineHomeomorphProd p (affineGaloisHom p π g) =
+      (padicKummerExponent p π g, padicCyclotomicCharacter p π g) := rfl
 
-theorem affineGaloisHom_injective (hπ : π ≠ 0) :
-    Function.Injective (affineGaloisHom p π hπ) := by
+theorem affineGaloisHom_injective [hπ : NeZero π] :
+    Function.Injective (affineGaloisHom p π) := by
   intro g h heq
-  apply padicCoordinates_injective p π hπ
+  apply padicCoordinates_injective p π
   exact congrArg (padicAffineHomeomorphProd p) heq
 
-theorem continuous_affineGaloisHom (hπ : π ≠ 0) :
-    Continuous (affineGaloisHom p π hπ) := by
+theorem continuous_affineGaloisHom [hπ : NeZero π] :
+    Continuous (affineGaloisHom p π) := by
   apply continuous_induced_rng.mpr
-  exact (continuous_padicKummerExponent p π hπ).prodMk
+  exact (continuous_padicKummerExponent p π).prodMk
     (continuous_padicCyclotomicCharacter p π)
 
 /-- The actual false Tate Galois group embeds as a closed subgroup of the
 Hausdorff topological affine group. -/
-theorem isClosedEmbedding_affineGaloisHom (hπ : π ≠ 0) :
-    Topology.IsClosedEmbedding (affineGaloisHom p π hπ) := by
-  have := falseTateExtension_isGalois p π hπ
-  exact (continuous_affineGaloisHom p π hπ).isClosedEmbedding
-    (affineGaloisHom_injective p π hπ)
+theorem isClosedEmbedding_affineGaloisHom [hπ : NeZero π] :
+    Topology.IsClosedEmbedding (affineGaloisHom p π) := by
+  have := falseTateExtension_isGalois p π
+  exact (continuous_affineGaloisHom p π).isClosedEmbedding
+    (affineGaloisHom_injective p π)
 
 end
 
