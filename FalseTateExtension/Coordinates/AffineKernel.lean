@@ -6,6 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Coordinates.AffineEmbedding
+public import FalseTateExtension.Affine.ClosedSubgroup
 public import Mathlib.Topology.Algebra.Group.ClosedSubgroup
 
 /-!
@@ -44,17 +45,15 @@ theorem continuous_padicAffine_inl : Continuous (fun a : ℤ_[p] ↦
     (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) :=
   AffineGroup.continuous_inl _
 
-/-- The closed additive subgroup `{a ∈ ℤ_[p] | (a, 1) ∈ im (b, χ)}` of `ℤ_[p]`: the translation
-kernel of the image of `Gal(K_FT/K)` in `ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
-def affineAdditiveKernel [hπ : NeZero π] : ClosedAddSubgroup (ℤ_[p]) where
-  toAddSubgroup := Subgroup.toAddSubgroup'
-    ((affineGaloisHom p π).range.comap SemidirectProduct.inl)
-  isClosed' := by
-    change IsClosed ((fun a : ℤ_[p] ↦
-      (SemidirectProduct.inl (Multiplicative.ofAdd a) : PadicAffineGroup p)) ⁻¹'
-        Set.range (affineGaloisHom p π))
-    exact (isClosedEmbedding_affineGaloisHom p π).isClosed_range.preimage
-      (continuous_padicAffine_inl p)
+/-- The image of `Gal(K_FT/K)` in `ℤ_[p] ⋊ ℤ_[p]ˣ`, a closed subgroup. -/
+def falseTateAffineImage [hπ : NeZero π] : ClosedSubgroup (PadicAffineGroup p) where
+  toSubgroup := (affineGaloisHom p π).range
+  isClosed' := (isClosedEmbedding_affineGaloisHom p π).isClosed_range
+
+/-- The translation kernel of the image of `Gal(K_FT/K)`: the closed additive subgroup of the
+`a ∈ ℤ_[p]` with `(a, 1)` in the image. -/
+abbrev affineAdditiveKernel [hπ : NeZero π] : ClosedAddSubgroup (ℤ_[p]) :=
+  affineTranslationKernel (falseTateAffineImage p π)
 
 /-- `a ∈ affineAdditiveKernel p π` if and only if `(a, 1)` is in the image of `Gal(K_FT/K)`. -/
 theorem mem_affineAdditiveKernel_iff [hπ : NeZero π] (a : ℤ_[p]) :

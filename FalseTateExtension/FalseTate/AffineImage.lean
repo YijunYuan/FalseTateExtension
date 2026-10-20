@@ -6,6 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Affine.Index
+public import FalseTateExtension.Coordinates.AffineKernel
 public import FalseTateExtension.Cyclotomic.APF
 public import FalseTateExtension.Cyclotomic.InertiaImage
 public import FalseTateExtension.Kummer.APF
@@ -54,12 +55,6 @@ section AffineImage
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (π : K)
 
 local notation "Γ" => falseTateExtension p π ≃ₐ[K] falseTateExtension p π
-
-/-- The image `G = {(b(g), χ(g)) | g ∈ Gal(K_FT/K)}`, a closed subgroup of
-`ℤ_[p] ⋊ ℤ_[p]ˣ`. -/
-def falseTateAffineImage [hπ : NeZero π] : ClosedSubgroup (PadicAffineGroup p) where
-  toSubgroup := (affineGaloisHom p π).range
-  isClosed' := (isClosedEmbedding_affineGaloisHom p π).isClosed_range
 
 /-- The isomorphism of topological groups `Gal(K_FT/K) ≃ₜ* G`, `g ↦ (b(g), χ(g))`. -/
 def falseTateGaloisEquivAffineImage [hπ : NeZero π] : Γ ≃ₜ* falseTateAffineImage p π := by
