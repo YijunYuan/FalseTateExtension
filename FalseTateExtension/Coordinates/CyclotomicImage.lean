@@ -61,17 +61,14 @@ instance cyclotomicExtension_hasEnoughRootsOfUnity (n : ℕ) :
 
 /-- The cyclotomic character `Gal(K_cyc/K) → ℤ_p^×`, given by `g(ζ) = ζ^{χ(g)}` for every
 `p`-power root of unity `ζ`. -/
-def cyclotomicExtensionCharacter :
+abbrev cyclotomicExtensionCharacter :
     (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) →* (ℤ_[p])ˣ :=
-  (_root_.cyclotomicCharacter (cyclotomicExtension (K := K) p) p).comp
-    (MulSemiringAction.toRingAut
-      (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)
-      (cyclotomicExtension (K := K) p))
+  intermediateFieldCyclotomicCharacter p (cyclotomicExtension (K := K) p)
 
 /-- The cyclotomic character of `Gal(K_cyc/K)` is continuous for the Krull topology. -/
 theorem continuous_cyclotomicExtensionCharacter :
     Continuous (cyclotomicExtensionCharacter (K := K) p) :=
-  _root_.cyclotomicCharacter.continuous p K (cyclotomicExtension (K := K) p)
+  continuous_intermediateFieldCyclotomicCharacter p _
 
 /-- `g(ζ_{p^n}) = ζ_{p^n}^{χ(g)}` for `g ∈ Gal(K_cyc/K)`. -/
 theorem cyclotomicExtensionCharacter_spec (n : ℕ)

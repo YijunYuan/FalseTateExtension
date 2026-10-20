@@ -50,7 +50,7 @@ theorem cyclotomicLayerCharacter_restrict (m : ℕ)
   let i := IntermediateField.inclusion (cyclotomicLayer_le_cyclotomicExtension (K := ℚ_[p]) p m)
   apply i.injective
   rw [map_pow]
-  change i (cyclotomicRestrictionToLayer p m g (zetaCyc p m)) =
+  change i (cyclotomicRestrictionToLayer p m g (zetaCyc (K := ℚ_[p]) p m)) =
     zetaCycExt p m ^
       (PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p])).val
   rw [cyclotomicRestrictionToLayer_commutes]
@@ -68,9 +68,10 @@ theorem isClosed_cyclotomicCharacterFiber (u : (ℤ_[p])ˣ) (m : ℕ) :
   have hc : Continuous (fun g ↦
       (cyclotomicLayerCharacter p m (cyclotomicRestrictionToLayer p m g) : ZMod (p ^ m))) :=
     (Units.continuous_val.comp (continuous_of_discreteTopology :
-      Continuous (cyclotomicLayerCharacter p m))).comp (continuous_cyclotomicRestrictionToLayer p m)
-  have he : (fun g ↦ (cyclotomicLayerCharacter p m (cyclotomicRestrictionToLayer p m g) :
-      ZMod (p ^ m))) =
+      Continuous (cyclotomicLayerCharacter (K := ℚ_[p]) p m))).comp
+      (continuous_cyclotomicRestrictionToLayer p m)
+  have he : (fun g ↦ (cyclotomicLayerCharacter (K := ℚ_[p]) p m
+      (cyclotomicRestrictionToLayer p m g) : ZMod (p ^ m))) =
       (fun g ↦ PadicInt.toZModPow m (cyclotomicExtensionCharacter p g : ℤ_[p])) := by
     funext g
     exact congrArg Units.val (cyclotomicLayerCharacter_restrict p m g)

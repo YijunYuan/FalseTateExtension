@@ -160,10 +160,10 @@ theorem normalizedValuation_cyclotomic_displacement_of_exponent
     (g : L(n) ≃ₐ[ℚ_[p]] L(n))
     (ha : (cyclotomicLayerCharacter p (n + 1) g : ZMod (p ^ (n + 1))).val =
       1 + p ^ s * b) :
-    v(n) (g (zetaCyc p (n + 1)) - zetaCyc p (n + 1)) =
+    v(n) (g (zetaCyc (K := ℚ_[p]) p (n + 1)) - zetaCyc (K := ℚ_[p]) p (n + 1)) =
       WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
-  let ζ := zetaCyc p (n + 1)
-  have hζ := isPrimitiveRoot_zetaCyc p (n + 1)
+  let ζ := zetaCyc (K := ℚ_[p]) p (n + 1)
+  have hζ := isPrimitiveRoot_zetaCyc (K := ℚ_[p]) p (n + 1)
   have hpower : IsPrimitiveRoot (ζ ^ b) (p ^ (n + 1)) :=
     hζ.pow_of_coprime b ((Fact.out : p.Prime).coprime_pow_of_not_dvd hb)
   have hv := normalizedValuation_primitive_cyclotomic_pow_sub_one p n s hs hpower
@@ -180,7 +180,7 @@ some `s ≤ n`. -/
 theorem normalizedValuation_cyclotomic_displacement
     (n : ℕ) (g : L(n) ≃ₐ[ℚ_[p]] L(n)) (hg : g ≠ 1) :
     ∃ s : ℕ, s ≤ n ∧
-      v(n) (g (zetaCyc p (n + 1)) - zetaCyc p (n + 1)) =
+      v(n) (g (zetaCyc (K := ℚ_[p]) p (n + 1)) - zetaCyc (K := ℚ_[p]) p (n + 1)) =
         WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
   have ha : cyclotomicLayerCharacter p (n + 1) g ≠ 1 := by
     intro h
@@ -212,11 +212,11 @@ theorem ramificationOrder_cyclotomic_of_exponent
     (cyclotomicUniformizer_adjoin_spectral p n)]
   have hv : v(n) ((g • π - π : O(n)) : L(n)) = WithZero.exp (-(p ^ s : ℕ) : ℤ) := by
     have hcoe : ((g • π - π : O(n)) : L(n)) =
-        g (zetaCyc p (n + 1)) - zetaCyc p (n + 1) := by
+        g (zetaCyc (K := ℚ_[p]) p (n + 1)) - zetaCyc (K := ℚ_[p]) p (n + 1) := by
       change ((g • π : O(n)) : L(n)) - (π : L(n)) = _
       rw [FontaineWintenberger.coe_spectralIntegerRing_galois_smul]
-      change g (zetaCyc p (n + 1) - 1) -
-        (zetaCyc p (n + 1) - 1) = _
+      change g (zetaCyc (K := ℚ_[p]) p (n + 1) - 1) -
+        (zetaCyc (K := ℚ_[p]) p (n + 1) - 1) = _
       rw [map_sub, map_one]
       ring
     rw [hcoe]
@@ -278,7 +278,7 @@ theorem lowerRamificationGroup_cyclotomic_eq_comap_unitReduction
     FontaineWintenberger.lowerRamificationGroup
         (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1) =
       (ZMod.unitsMap (pow_dvd_pow p hr)).ker.comap
-        (cyclotomicLayerCharacter p (n + 1)) := by
+        (cyclotomicLayerCharacter (K := ℚ_[p]) p (n + 1)) := by
   have hN : 1 < p ^ (n + 1) := one_lt_pow₀ (Fact.out : p.Prime).one_lt (by omega)
   have : Fact (1 < p ^ (n + 1)) := ⟨hN⟩
   ext g
@@ -324,7 +324,7 @@ theorem lowerRamificationGroup_cyclotomic_zero (n : ℕ) :
 theorem lowerRamificationGroup_cyclotomic_map_character (n r : ℕ) (hr : r ≤ n + 1) :
     (FontaineWintenberger.lowerRamificationGroup
       (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n)) (((p ^ r : ℕ) : ℤ) - 1)).map
-        (cyclotomicLayerCharacter p (n + 1)) =
+        (cyclotomicLayerCharacter (K := ℚ_[p]) p (n + 1)) =
       (ZMod.unitsMap (pow_dvd_pow p hr)).ker := by
   rw [lowerRamificationGroup_cyclotomic_eq_comap_unitReduction p n r hr,
     Subgroup.map_comap_eq,
@@ -339,7 +339,7 @@ theorem lowerRamificationGroup_cyclotomic_card (n r : ℕ)
   calc
     _ = Nat.card ((FontaineWintenberger.lowerRamificationGroup
         (L(n) ≃ₐ[ℚ_[p]] L(n)) (IsLocalRing.maximalIdeal O(n))
-          (((p ^ r : ℕ) : ℤ) - 1)).map (cyclotomicLayerCharacter p (n + 1))) :=
+          (((p ^ r : ℕ) : ℤ) - 1)).map (cyclotomicLayerCharacter (K := ℚ_[p]) p (n + 1))) :=
       (Subgroup.card_map_of_injective (cyclotomicLayerCharacter_injective p (n + 1))).symm
     _ = _ := by
       rw [lowerRamificationGroup_cyclotomic_map_character p n r hr,
@@ -502,7 +502,7 @@ theorem upperRamificationGroup_cyclotomic_eq_comap_unitReduction
     (n r : ℕ) (hr : r ≤ n) {u : ℝ} (hu0 : (r : ℝ) < u) (hu1 : u ≤ (r : ℝ) + 1) :
     FontaineWintenberger.upperRamificationGroup (R := O(n)) (L(n) ≃ₐ[ℚ_[p]] L(n)) u =
       (ZMod.unitsMap (pow_dvd_pow p (by omega : r + 1 ≤ n + 1))).ker.comap
-        (cyclotomicLayerCharacter p (n + 1)) := by
+        (cyclotomicLayerCharacter (K := ℚ_[p]) p (n + 1)) := by
   have hφ0 := herbrandFunction_cyclotomic_threshold p n r (by omega)
   have hφ1 := herbrandFunction_cyclotomic_threshold p n (r + 1) (by omega)
   have ht0 : -1 ≤ ((p ^ r : ℕ) : ℝ) - 1 := by

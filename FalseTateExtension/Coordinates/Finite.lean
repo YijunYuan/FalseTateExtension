@@ -255,10 +255,15 @@ theorem finiteLayer_aut_ext
   · exact hα
   · exact hζ
 
+/-- The coordinates `g ↦ (b_n(g), χ_n(g)) ∈ ℤ/p^n × (ℤ/p^n)ˣ` of `g ∈ Gal(L_n/K)`. -/
+abbrev finiteCoordinates [hπ : NeZero π]
+    (g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n) :
+    ZMod (p ^ n) × (ZMod (p ^ n))ˣ :=
+  (finiteKummerExponent p π n g, finiteCyclotomicCharacter p π n g)
+
 /-- `g ↦ (b_n(g), χ_n(g))` is injective on `Gal(K(π^{1/p^n}, ζ_{p^n})/K)`. -/
 theorem finiteCoordinates_injective [hπ : NeZero π] :
-    Function.Injective (fun g : falseTateLayer p π n n ≃ₐ[K] falseTateLayer p π n n ↦
-      (finiteKummerExponent p π n g, finiteCyclotomicCharacter p π n g)) := by
+    Function.Injective (finiteCoordinates p π n) := by
   intro g h hgh
   have hb := congrArg Prod.fst hgh
   have hχ := congrArg Prod.snd hgh

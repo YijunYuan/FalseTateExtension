@@ -179,7 +179,7 @@ theorem finiteUpperAffine_unit_projection (n : ℕ) {u : ℝ} (hu : -1 ≤ u) :
         (diagonalCyclotomicRestriction p (π : ℚ_[p]) (n + 1)) := by
     apply MonoidHom.ext
     intro g
-    exact (cyclotomicLayerCharacterOver_diagonalRestriction p (π : ℚ_[p]) (n + 1) g).symm
+    exact (cyclotomicLayerCharacter_diagonalRestriction p (π : ℚ_[p]) (n + 1) g).symm
   have hr := restrictNormalHom_map_upperRamificationGroup_tower ℚ_[p]
     (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) D(n) u hu
   change (upperRamificationGroup (R := O(n)) G(n) u).map

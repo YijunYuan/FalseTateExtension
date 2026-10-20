@@ -84,7 +84,7 @@ theorem continuous_padicKummerExponent [hπ : NeZero π] :
 
 /-- The cyclotomic character `χ : Gal(K_FT/K) → ℤ_[p]ˣ` is continuous. -/
 theorem continuous_padicCyclotomicCharacter : Continuous (padicCyclotomicCharacter p π) :=
-  _root_.cyclotomicCharacter.continuous p K (falseTateExtension p π)
+  continuous_intermediateFieldCyclotomicCharacter p _
 
 /-- The homomorphism `Gal(K_FT/K) →* ℤ_[p] ⋊ ℤ_[p]ˣ`, `g ↦ (b(g), χ(g))`. -/
 def affineGaloisHom [hπ : NeZero π] :

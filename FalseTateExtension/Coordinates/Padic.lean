@@ -114,13 +114,24 @@ instance falseTateExtension_hasEnoughRootsOfUnity (n : ℕ) :
   ⟨⟨zetaExt p π n, isPrimitiveRoot_zetaExt p π n⟩,
     rootsOfUnity.isCyclic _ _⟩
 
+/-- The cyclotomic character `Gal(L/K) →* ℤ_[p]ˣ` of an intermediate field `L` of the algebraic
+closure, `g(ζ) = ζ^{χ(g)}` for every `p`-power root of unity `ζ ∈ L`. -/
+def intermediateFieldCyclotomicCharacter (L : IntermediateField K (AlgebraicClosure K)) :
+    (L ≃ₐ[K] L) →* (ℤ_[p])ˣ :=
+  (_root_.cyclotomicCharacter L p).comp (MulSemiringAction.toRingAut (L ≃ₐ[K] L) L)
+
+omit [CharZero K] in
+/-- The cyclotomic character is continuous for the Krull topology. -/
+theorem continuous_intermediateFieldCyclotomicCharacter
+    (L : IntermediateField K (AlgebraicClosure K)) :
+    Continuous (intermediateFieldCyclotomicCharacter p L) :=
+  _root_.cyclotomicCharacter.continuous p K L
+
 /-- The cyclotomic character `χ : Gal(K_FT/K) → ℤ_p^×`, given by `g(ζ) = ζ^{χ(g)}` for every
 `p`-power root of unity `ζ`. -/
-def padicCyclotomicCharacter :
+abbrev padicCyclotomicCharacter :
     (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) →* (ℤ_[p])ˣ :=
-  (_root_.cyclotomicCharacter (falseTateExtension p π) p).comp
-    (MulSemiringAction.toRingAut
-      (falseTateExtension p π ≃ₐ[K] falseTateExtension p π) (falseTateExtension p π))
+  intermediateFieldCyclotomicCharacter p (falseTateExtension p π)
 
 /-- `χ(g) mod p^n = χ_n(g|_{L_n})`. -/
 theorem padicCyclotomicCharacter_toZModPow [hπ : NeZero π] (n : ℕ)
@@ -202,10 +213,15 @@ theorem padicKummerExponent_mul [hπ : NeZero π]
   exact finiteKummerExponent_mul p π n
     (infiniteLayerRestriction p π n g) (infiniteLayerRestriction p π n h)
 
+/-- The coordinates `g ↦ (b(g), χ(g)) ∈ ℤ_[p] × ℤ_[p]ˣ` of `g ∈ Gal(K_FT/K)`. -/
+abbrev padicCoordinates [hπ : NeZero π]
+    (g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π) :
+    ℤ_[p] × (ℤ_[p])ˣ :=
+  (padicKummerExponent p π g, padicCyclotomicCharacter p π g)
+
 /-- `g ↦ (b(g), χ(g))` is injective on `Gal(K_FT/K)`. -/
 theorem padicCoordinates_injective [hπ : NeZero π] :
-    Function.Injective (fun g : falseTateExtension p π ≃ₐ[K] falseTateExtension p π ↦
-      (padicKummerExponent p π g, padicCyclotomicCharacter p π g)) := by
+    Function.Injective (padicCoordinates p π) := by
   intro g h heq
   have hb := congrArg Prod.fst heq
   have hχ := congrArg Prod.snd heq

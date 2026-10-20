@@ -45,22 +45,22 @@ namespace FalseTateExtension
 
 variable (p : ℕ) [Fact p.Prime]
 
-/-- The primitive `p^m`-th root of unity `ζ_{p^m}` as an element of `ℚ_[p](ζ_{p^m})`. -/
-def zetaCyc (m : ℕ) : cyclotomicLayer (K := ℚ_[p]) p m :=
+/-- `ζ_{p^m}` as an element of `K(ζ_{p^m})`. -/
+def zetaCyc {K : Type*} [Field K] [CharZero K] (m : ℕ) : cyclotomicLayer (K := K) p m :=
   ⟨zeta p m, zeta_mem_cyclotomicLayer p m⟩
 
-/-- `ζ_{p^m}` is a primitive `p^m`-th root of unity in `ℚ_[p](ζ_{p^m})`. -/
-theorem isPrimitiveRoot_zetaCyc (m : ℕ) :
-    IsPrimitiveRoot (zetaCyc p m) (p ^ m) :=
-  (isPrimitiveRoot_zeta (K := ℚ_[p]) p m).of_map_of_injective
-    (f := (cyclotomicLayer (K := ℚ_[p]) p m).val) (cyclotomicLayer p m).val.injective
+/-- `ζ_{p^m}` is a primitive `p^m`-th root of unity in `K(ζ_{p^m})`. -/
+theorem isPrimitiveRoot_zetaCyc {K : Type*} [Field K] [CharZero K] (m : ℕ) :
+    IsPrimitiveRoot (zetaCyc (K := K) p m) (p ^ m) :=
+  (isPrimitiveRoot_zeta (K := K) p m).of_map_of_injective
+    (f := (cyclotomicLayer (K := K) p m).val) (cyclotomicLayer p m).val.injective
 
 /-- `N_{ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]}(ζ_{p^{n+1}} - 1) = (-1)^{φ(p^{n+1})} p`. -/
 theorem norm_zetaCyc_sub_one (n : ℕ) :
-    Algebra.norm (ℚ_[p]) (zetaCyc p (n + 1) - 1) =
+    Algebra.norm (ℚ_[p]) (zetaCyc (K := ℚ_[p]) p (n + 1) - 1) =
       (-1 : ℚ_[p]) ^ (p ^ (n + 1)).totient * p := by
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
-  let hζ := isPrimitiveRoot_zetaCyc p (n + 1)
+  let hζ := isPrimitiveRoot_zetaCyc (K := ℚ_[p]) p (n + 1)
   let pb := hζ.subOnePowerBasis (ℚ_[p])
   have hdim : pb.dim = (p ^ (n + 1)).totient := by
     rw [← pb.finrank, finrank_cyclotomicLayer_padic]
@@ -87,12 +87,12 @@ theorem cyclotomicLayer_normalizedValuation_pow (n : ℕ)
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
     [(NormedField.valuation (K := ℚ_[p])).HasExtension w] :
     ((maximalIdeal w.valuationSubring).valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1))
-      (zetaCyc p (n + 1) - 1)) ^
+      (zetaCyc (K := ℚ_[p]) p (n + 1) - 1)) ^
         Module.finrank (𝓀[ℚ_[p]]) (IsLocalRing.ResidueField w.valuationSubring) =
       WithZero.exp (-1 : ℤ) := by
   have hn := FontaineWintenberger.extensionValuationSubring_normalizedValuation_norm
     (ℚ_[p]) (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) w
-    (zetaCyc p (n + 1) - 1)
+    (zetaCyc (K := ℚ_[p]) p (n + 1) - 1)
   rw [norm_zetaCyc_sub_one] at hn
   simpa only [map_mul, map_pow, Valuation.map_neg, map_one, one_pow, one_mul,
     padicValuationSubring_valuation_p] using hn.symm
@@ -120,7 +120,7 @@ theorem cyclotomicLayer_normalizedValuation_sub_one (n : ℕ)
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
     [(NormedField.valuation (K := ℚ_[p])).HasExtension w] :
     (maximalIdeal w.valuationSubring).valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1))
-      (zetaCyc p (n + 1) - 1) = WithZero.exp (-1 : ℤ) := by
+      (zetaCyc (K := ℚ_[p]) p (n + 1) - 1) = WithZero.exp (-1 : ℤ) := by
   simpa only [cyclotomicLayer_residueDegree_eq_one p n w, pow_one] using
     cyclotomicLayer_normalizedValuation_pow p n w
 
@@ -130,7 +130,7 @@ theorem zetaCyc_sub_one_mem (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
     [(NormedField.valuation (K := ℚ_[p])).HasExtension w] :
-    zetaCyc p (n + 1) - 1 ∈ w.valuationSubring := by
+    zetaCyc (K := ℚ_[p]) p (n + 1) - 1 ∈ w.valuationSubring := by
   rw [← w.valuationSubring.normalizedValuation_valuationSubring]
   change (maximalIdeal w.valuationSubring).valuation _ _ ≤ 1
   rw [cyclotomicLayer_normalizedValuation_sub_one]
@@ -142,7 +142,7 @@ def cyclotomicUniformizer (n : ℕ)
     {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
     (w : Valuation (cyclotomicLayer (K := ℚ_[p]) p (n + 1)) Γ)
     [(NormedField.valuation (K := ℚ_[p])).HasExtension w] : w.valuationSubring :=
-  ⟨zetaCyc p (n + 1) - 1, zetaCyc_sub_one_mem p n w⟩
+  ⟨zetaCyc (K := ℚ_[p]) p (n + 1) - 1, zetaCyc_sub_one_mem p n w⟩
 
 /-- `ζ_{p^{n+1}} - 1` is a uniformizer of the valuation ring of every valuation on
 `ℚ_[p](ζ_{p^{n+1}})` extending the valuation of `ℚ_[p]`. -/
@@ -161,15 +161,15 @@ theorem irreducible_cyclotomicUniformizer (n : ℕ)
     exact (maximalIdeal w.valuationSubring).intValuation_singleton hπ.out.ne_zero
         hπ.out.maximalIdeal_eq
   obtain ⟨u, hu⟩ := associated_of_valuation_eq (A := w.valuationSubring)
-    (π : cyclotomicLayer p (n + 1)) (zetaCyc p (n + 1) - 1)
+    (π : cyclotomicLayer p (n + 1)) (zetaCyc (K := ℚ_[p]) p (n + 1) - 1)
     (hvπ.trans (cyclotomicLayer_normalizedValuation_sub_one p n w).symm)
   apply Associated.irreducible _ hπ.out
   refine ⟨u, ?_⟩
   apply Subtype.ext
   change (π : cyclotomicLayer p (n + 1)) *
-    ((u : w.valuationSubring) : cyclotomicLayer p (n + 1)) = zetaCyc p (n + 1) - 1
+    ((u : w.valuationSubring) : cyclotomicLayer p (n + 1)) = zetaCyc (K := ℚ_[p]) p (n + 1) - 1
   change ((u : w.valuationSubring) : cyclotomicLayer p (n + 1)) *
-    (π : cyclotomicLayer p (n + 1)) = zetaCyc p (n + 1) - 1 at hu
+    (π : cyclotomicLayer p (n + 1)) = zetaCyc (K := ℚ_[p]) p (n + 1) - 1 at hu
   exact (mul_comm _ _).trans hu
 
 /-- The ramification index of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]`, for any valuation extending the
