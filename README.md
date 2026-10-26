@@ -37,9 +37,6 @@ The library builds on [FontaineWintenberger](https://github.com/YijunYuan/Fontai
 <Lib>.lean        imports one aggregate per layer
 ```
 
-A layer imports only layers above it; `scripts/check_layers.py` (run in CI) checks this and
-that every file is imported by its layer's aggregate.
-
 ## Build
 
 Install [elan](https://github.com/leanprover/elan), then run from this directory:
@@ -53,9 +50,6 @@ Lean is pinned to `leanprover/lean4:v4.35.0`; Mathlib and FontaineWintenberger c
 recorded in `lakefile.toml` and `lake-manifest.json`. The library contains no `sorry` and builds
 without warnings under Mathlib's standard linter set.
 
-See `CLAUDE.md` for conventions and standing hypotheses, `docs/REFACTOR_PLAN.md` for the design,
-`docs/BUILD_TIMES.md` for per-module compile times.
-
 ## References
 
 * T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
@@ -63,8 +57,6 @@ See `CLAUDE.md` for conventions and standing hypotheses, `docs/REFACTOR_PLAN.md`
 * J.-P. Serre, *Local Fields*, Chapter IV.
 * J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
   applications*, Ann. Sci. ENS 16 (1983).
-
-The papers are not distributed with this repository.
 
 ## License
 
