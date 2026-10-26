@@ -29,7 +29,8 @@ factors as `[G : I] = [ρ(G) : ρ(I)] · [T(G) : T(I)]`, where `T(I) = {a ∈ T(
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

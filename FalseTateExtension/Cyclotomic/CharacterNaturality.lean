@@ -6,8 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Cyclotomic.InfiniteCharacter
-public import FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.RestrictScalars
+public import FalseTateExtension.Mathlib.NumberTheory.Cyclotomic.CharacterNaturality
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-!
@@ -31,7 +31,8 @@ image of `χ : Gal(K(ζ_{p^∞})/K) → ℤ_[p]ˣ` is the image of the subgroup 
 
 ## References
 
-* Liu, *On lattices in semi-stable representations*, §5.1.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

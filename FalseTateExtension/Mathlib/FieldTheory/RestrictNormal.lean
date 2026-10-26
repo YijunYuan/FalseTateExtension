@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import Mathlib.FieldTheory.Normal.Defs
 public import Mathlib.FieldTheory.Galois.Basic
+public import Mathlib.FieldTheory.Normal.Defs
 
 /-!
 # Restriction of automorphisms between nested intermediate fields
@@ -29,6 +29,7 @@ variable {K L : Type*} [Field K] [Field L] [Algebra K L] {E F : IntermediateFiel
 a proof, so it cannot be found by instance search. -/
 abbrev algebraOfLE (hEF : E ≤ F) : Algebra E F := (inclusion hEF).toAlgebra
 
+/-- The inclusion algebra of nested intermediate fields is compatible with the base field. -/
 theorem isScalarTower_of_le (hEF : E ≤ F) :
     letI := algebraOfLE hEF; IsScalarTower K E F :=
   letI := algebraOfLE hEF
@@ -41,28 +42,33 @@ noncomputable def restrictNormalHomOfLE (hEF : E ≤ F) [Normal K E] :
   haveI := isScalarTower_of_le hEF
   AlgEquiv.restrictNormalHom E
 
+/-- Restriction to a normal intermediate field commutes with its inclusion. -/
 theorem restrictNormalHomOfLE_commutes (hEF : E ≤ F) [Normal K E] (g : F ≃ₐ[K] F) (x : E) :
     inclusion hEF (restrictNormalHomOfLE hEF g x) = g (inclusion hEF x) :=
   letI := algebraOfLE hEF
   haveI := isScalarTower_of_le hEF
   AlgEquiv.restrictNormal_commutes g E x
 
+/-- Restriction to a normal intermediate field preserves the action in the ambient field. -/
 theorem coe_restrictNormalHomOfLE_apply (hEF : E ≤ F) [Normal K E] (g : F ≃ₐ[K] F) (x : E) :
     (restrictNormalHomOfLE hEF g x : L) = g ⟨x, hEF x.2⟩ :=
   congrArg Subtype.val (restrictNormalHomOfLE_commutes hEF g x)
 
+/-- Every automorphism of a normal intermediate field extends to a larger normal field. -/
 theorem restrictNormalHomOfLE_surjective (hEF : E ≤ F) [Normal K E] [Normal K F] :
     Function.Surjective (restrictNormalHomOfLE hEF) :=
   letI := algebraOfLE hEF
   haveI := isScalarTower_of_le hEF
   AlgEquiv.restrictNormalHom_surjective F
 
+/-- Restricting an automorphism to the same field gives the identity homomorphism. -/
 @[simp]
 theorem restrictNormalHomOfLE_refl [Normal K E] :
     restrictNormalHomOfLE (le_refl E) = MonoidHom.id (E ≃ₐ[K] E) := by
   ext g x
   exact congrArg Subtype.val (restrictNormalHomOfLE_commutes (le_refl E) g x)
 
+/-- Successive restrictions to nested normal intermediate fields compose to restriction. -/
 theorem restrictNormalHomOfLE_comp {G : IntermediateField K L} (hEF : E ≤ F) (hFG : F ≤ G)
     [Normal K E] [Normal K F] :
     (restrictNormalHomOfLE hEF).comp (restrictNormalHomOfLE hFG) =

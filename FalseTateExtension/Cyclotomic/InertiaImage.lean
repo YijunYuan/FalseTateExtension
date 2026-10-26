@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Cyclotomic.Inertia
 public import FalseTateExtension.Cyclotomic.CharacterNaturality
+public import FalseTateExtension.Cyclotomic.Inertia
 public import FontaineWintenberger.Ramification.Lower.SpectralMaps
 public import Mathlib.NumberTheory.Padics.ProperSpace
 
@@ -34,7 +34,8 @@ of finite index.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations*, §5.1.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -44,8 +45,6 @@ noncomputable section
 open FontaineWintenberger
 
 namespace FalseTateExtension
-
-
 
 section CyclotomicResidues
 
@@ -189,8 +188,8 @@ variable (p : ℕ) [Fact p.Prime] (K : Type*) [NontriviallyNormedField K] [CharZ
 
 /-- The subgroup `χ(Gal(K̄/K)^0)` of `ℤ_[p]ˣ`: the image of the inertia subgroup of `Gal(K̄/K)`
 under restriction to `K(ζ_{p^∞})` followed by the cyclotomic character. -/
-def cyclotomicInertiaCharacterImage : Subgroup (ℤ_[p])ˣ := by
-  exact (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
+def cyclotomicInertiaCharacterImage : Subgroup (ℤ_[p])ˣ :=
+  (upperRamificationGroupInfinite K (AlgebraicClosure K) 0).map
     ((cyclotomicExtensionCharacter (K := K) p).comp
       (AlgEquiv.restrictNormalHom (cyclotomicExtension (K := K) p)))
 

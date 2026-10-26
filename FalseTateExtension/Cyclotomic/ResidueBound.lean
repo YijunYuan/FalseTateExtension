@@ -6,11 +6,11 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Cyclotomic.Ramification
-public import FontaineWintenberger.Ramification.Upper.Transport
-public import FontaineWintenberger.Ramification.Lower.Inertia
 public import FontaineWintenberger.APF.BaseChange.UpperGroups
-public import Mathlib.NumberTheory.Padics.RingHoms
 public import FontaineWintenberger.LocalField.Spectral.Transport
+public import FontaineWintenberger.Ramification.Lower.Inertia
+public import FontaineWintenberger.Ramification.Upper.Transport
+public import Mathlib.NumberTheory.Padics.RingHoms
 
 /-!
 # The residue degree of the cyclotomic layers over a finite extension of `ℚ_[p]`
@@ -35,8 +35,10 @@ extension of `ℚ_[p]` is totally ramified, and that the spectral integer ring o
 
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
-* Liu, *On lattices in semi-stable representations*, §5.1.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Proposition 17.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

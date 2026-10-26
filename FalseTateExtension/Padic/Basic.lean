@@ -7,8 +7,8 @@ module
 
 public import FontaineWintenberger.LocalField.Basic
 public import FontaineWintenberger.Mathlib.RingTheory.DiscreteValuationRing
-public import Mathlib.NumberTheory.Padics.RingHoms
 public import Mathlib.NumberTheory.Padics.ProperSpace
+public import Mathlib.NumberTheory.Padics.RingHoms
 
 /-!
 # The `p`-adic numbers as a local field

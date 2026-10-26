@@ -25,7 +25,8 @@ it is a compact Hausdorff topological group. The Galois group of the false Tate 
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

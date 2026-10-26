@@ -49,9 +49,10 @@ for all `u ≥ 0`, and if it is zero then `(Γ : Γ^u) = (Gal(K_cyc/K) : Gal(K_c
 
 ## References
 
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2, Proposition 1.2.3.
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2, Proposition 1.2.3.
+* [Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

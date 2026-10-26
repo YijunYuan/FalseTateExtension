@@ -5,10 +5,10 @@ Authors: Yijun Yuan
 -/
 module
 
+public import FalseTateExtension.FalseTate.FiniteGaloisGroup
 public import FalseTateExtension.FalseTate.Viviani.Filtration
 public import FalseTateExtension.FalseTate.Viviani.Preliminaries
 public import FalseTateExtension.Kummer.APF
-public import FalseTateExtension.FalseTate.FiniteGaloisGroup
 public import FontaineWintenberger.APF.Finite.ConstantIndex
 public import FontaineWintenberger.Ramification.Herbrand.Interval
 public import FontaineWintenberger.Ramification.Upper.Transport
@@ -20,7 +20,7 @@ public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 Let `p ≠ 2` and let `a` be an integer with `v_p(a) = 1`, so that `a` is a uniformizer of `ℚ_p`.
 For `D = ℚ_p(a^{1/p^{n+1}}, ζ_{p^{n+1}})` and `G = Gal(D/ℚ_p) ≅ ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ`:
 
-* the upper ramification groups are `G^u = ⊤` for `u ≤ 0`, on `(r, r + 1]` (`r ≤ n`)
+* the upper ramification groups are `G^u = ⊤` for `-1 ≤ u ≤ 0`, on `(r, r + 1]` (`r ≤ n`)
   `G^u = p^{d(u)} ℤ/p^{n+1} ⋊ (1 + p^{r+1})` where `d(u)` counts the thresholds
   `j + 1 + 1/(p-1) < u`, and `G^u = ⊥` for `u > n + 1 + 1/(p-1)`;
 * the inverse Herbrand function takes the values `ψ(i + 1/(p-1)) = (2p^{2i} + p - 1)/(p+1)`,
@@ -36,13 +36,22 @@ versions are in `Viviani/Filtration`.
 ## Main results
 
 * `finiteUpperAffine_integerParameter_interval`, `upperRamificationGroup_integerParameter_eq_bot`
-* `inverseHerbrandFunction_integerParameter_fractional`, `_integer`, `_final`
-* `lowerRamificationGroupReal_integerParameter_fractional`, `_integer`, `_eq_bot`
+* `inverseHerbrandFunction_integerParameter_fractional`,
+  `inverseHerbrandFunction_integerParameter_integer`,
+  `inverseHerbrandFunction_integerParameter_final`
+* `lowerRamificationGroupReal_integerParameter_fractional`,
+  `lowerRamificationGroupReal_integerParameter_integer`,
+  `lowerRamificationGroupReal_integerParameter_eq_bot`
+
+## Notation
+
+The local notations `D`, `G` and `O` denote the diagonal layer, its Galois group over `ℚ_[p]`
+and its valuation ring, respectively.
 
 ## References
 
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, Corollary 6.10;
-  FalseTateLift, Remark 5.2.
+* [Viviani, *Ramification groups and Artin conductors of radical extensions of
+  ℚ*](https://doi.org/10.5802/jtnb.470), Corollary 6.10; FalseTateLift, Remark 5.2.
 -/
 
 @[expose] public section
@@ -57,8 +66,7 @@ variable (p : ℕ) [Fact p.Prime]
 
 section IntegerParameter
 
-/-- The integer hypothesis v_p(a)=1 supplies the rational
-valuation-ring uniformizer used by every preceding coordinate bridge. -/
+/-- An integer `a` with `v_p(a) = 1` is irreducible in the valuation ring of `ℚ_[p]`. -/
 theorem irreducible_integerParameter (a : ℤ) (ha : padicValInt p a = 1) :
     Irreducible (a : 𝒪[ℚ_[p]]) := by
   have haZ : a ≠ 0 := by
@@ -134,7 +142,7 @@ theorem lowerRamificationGroupReal_integerParameter_fractional (i : ℕ) (hi : 1
     (hin : i ≤ n) :
     (lowerRamificationGroupReal G (IsLocalRing.maximalIdeal O)
       ((2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1))).map
-        (finiteDiagonalGaloisEquiv_padic p (a : 𝒪[ℚ_[p]]) (n + 1)).toMonoidHom =
+        (finiteDiagonalGaloisEquivPadic p (a : 𝒪[ℚ_[p]]) (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) (i - 1) (finiteUnitSubgroup p (n + 1) (i + 1)) :=
   lowerRamificationGroupReal_falseTate_fractional (a : 𝒪[ℚ_[p]]) n i hi hin
 
@@ -143,7 +151,7 @@ theorem lowerRamificationGroupReal_integerParameter_fractional (i : ℕ) (hi : 1
 theorem lowerRamificationGroupReal_integerParameter_integer (i : ℕ) (hi : i ≤ n) :
     (lowerRamificationGroupReal G (IsLocalRing.maximalIdeal O)
       (((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1))).map
-        (finiteDiagonalGaloisEquiv_padic p (a : 𝒪[ℚ_[p]]) (n + 1)).toMonoidHom =
+        (finiteDiagonalGaloisEquivPadic p (a : 𝒪[ℚ_[p]]) (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) i (finiteUnitSubgroup p (n + 1) (i + 1)) :=
   lowerRamificationGroupReal_falseTate_integer (a : 𝒪[ℚ_[p]]) n i hi
 

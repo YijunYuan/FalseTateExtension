@@ -7,9 +7,9 @@ module
 
 public import FalseTateExtension.Layers.Galois
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
-public import Mathlib.NumberTheory.Cyclotomic.Gal
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.LinearDisjoint
+public import Mathlib.NumberTheory.Cyclotomic.Gal
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
@@ -23,8 +23,8 @@ therefore `K(ζ_{p^{r+1}})`.
 
 ## Main results
 
-* `cyclotomicLayer_isAbelianGalois`: `K(ζ_{p^n})/K` is abelian.
-* `cyclotomicLayer_isCyclic`: `Gal(K(ζ_{p^n})/K)` is cyclic for `p ≠ 2`.
+* `isAbelianGalois_cyclotomicLayer`: `K(ζ_{p^n})/K` is abelian.
+* `isCyclic_cyclotomicLayer`: `Gal(K(ζ_{p^n})/K)` is cyclic for `p ≠ 2`.
 * `cyclotomicLayer_step_minpoly_of_eq_bot`: if `ζ_p ∈ K`, `K(ζ_{p^n}) = K` and
   `K(ζ_{p^{n+1}}) ≠ K`, the minimal polynomial of `ζ_{p^{n+1}}` over `K` is `X^p - ζ_{p^n}`.
 * `cyclotomicLayer_step_finrank_of_eq_bot`: under the same hypotheses `[K(ζ_{p^{n+1}}) : K] = p`.
@@ -33,8 +33,8 @@ therefore `K(ζ_{p^{r+1}})`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
-  Lemma 5.1.2.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -51,15 +51,18 @@ section FiniteCyclotomic
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime]
 
 /-- `K(ζ_{p^n})/K` is an abelian Galois extension. -/
-theorem cyclotomicLayer_isAbelianGalois (n : ℕ) :
+theorem isAbelianGalois_cyclotomicLayer (n : ℕ) :
     IsAbelianGalois K (cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
     (isPrimitiveRoot_zeta (K := K) p n).intermediateField_adjoin_isCyclotomicExtension K
   exact IsCyclotomicExtension.isAbelianGalois {p ^ n} K _
 
+@[deprecated (since := "2026-10-26")]
+alias cyclotomicLayer_isAbelianGalois := isAbelianGalois_cyclotomicLayer
+
 /-- For `p ≠ 2`, `Gal(K(ζ_{p^n})/K)` is cyclic. -/
-theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
+theorem isCyclic_cyclotomicLayer [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
     IsCyclic (cyclotomicLayer (K := K) p n ≃ₐ[K] cyclotomicLayer (K := K) p n) := by
   have : NeZero (p ^ n) := ⟨pow_ne_zero n (Fact.out : p.Prime).ne_zero⟩
   have : IsCyclotomicExtension {p ^ n} K (cyclotomicLayer (K := K) p n) :=
@@ -71,6 +74,9 @@ theorem cyclotomicLayer_isCyclic [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
       (f := (cyclotomicLayer (K := K) p n).val) (cyclotomicLayer p n).val.injective
   let := ZMod.isCyclic_units_of_prime_pow p (Fact.out : p.Prime) hp₂.out n
   exact isCyclic_of_injective (hζ.autToPow K) (hζ.autToPow_injective K)
+
+@[deprecated (since := "2026-10-26")]
+alias cyclotomicLayer_isCyclic := isCyclic_cyclotomicLayer
 
 /-- If `ζ_p ∈ K`, `K(ζ_{p^n}) = K` and `K(ζ_{p^{n+1}}) ≠ K`, then `ζ_{p^n} = a` for some
 `a ∈ K` and the minimal polynomial of `ζ_{p^{n+1}}` over `K` is `X^p - a`. -/
@@ -174,7 +180,7 @@ theorem exists_eq_first_cyclotomicLayer_of_finrank_prime [hp₂ : Fact (p ≠ 2)
   let C := cyclotomicLayer (K := K) p m
   let i := IntermediateField.inclusion hFm
   let j := IntermediateField.inclusion (cyclotomicLayer_mono (K := K) p hrm)
-  let := cyclotomicLayer_isCyclic (K := K) p m
+  let := isCyclic_cyclotomicLayer (K := K) p m
   have heq : i.fieldRange = j.fieldRange := by
     apply IntermediateField.eq_of_finrank_eq_of_isCyclic
     calc

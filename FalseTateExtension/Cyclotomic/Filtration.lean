@@ -6,10 +6,10 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Cyclotomic.FiniteCharacter
-public import FontaineWintenberger.Ramification.Lower.Generator
-public import FontaineWintenberger.Ramification.Lower.Basic
-public import FontaineWintenberger.Ramification.Upper.Basic
 public import FalseTateExtension.Mathlib.Data.ZMod.UnitsMap
+public import FontaineWintenberger.Ramification.Lower.Basic
+public import FontaineWintenberger.Ramification.Lower.Generator
+public import FontaineWintenberger.Ramification.Upper.Basic
 
 /-!
 # The ramification filtration of `ℚ_[p](ζ_{p^{n+1}})/ℚ_[p]`
@@ -37,9 +37,15 @@ numbering filtration is `G^u = G^{(r+1)}` for `r < u ≤ r + 1`, with `G^0 = G` 
 * `upperRamificationGroup_cyclotomic_zero`, `upperRamificationGroup_cyclotomic_eq_bot`:
   `G^0 = G` and `G^u = 1` for `u > n`
 
+## Notation
+
+The local notation `L(n)` denotes `ℚ_[p](ζ_{p^{n+1}})`, `O(n)` its spectral integer ring,
+and `v(n)` its normalized multiplicative valuation.
+
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Propositions 17 and 18.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Propositions 17 and 18.
 -/
 
 @[expose] public section
@@ -59,6 +65,7 @@ variable (p : ℕ) [Fact p.Prime]
 local notation "L(" n ")" => cyclotomicLayer (K := ℚ_[p]) p (n + (1 : ℕ))
 local notation "O(" n ")" => FontaineWintenberger.spectralIntegerRing (ℚ_[p]) L(n)
 
+/-- The spectral integer ring of `ℚ_[p](ζ_{p^{n+1}})` is a discrete valuation ring. -/
 local instance (n : ℕ) : IsDiscreteValuationRing O(n) :=
   cyclotomicValuationSubring_isDiscreteValuationRing p (n + 1)
     (FontaineWintenberger.spectralValuation ℚ_[p] L(n))

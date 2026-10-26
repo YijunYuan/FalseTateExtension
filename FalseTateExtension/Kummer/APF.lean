@@ -39,10 +39,14 @@ holds and both properties are instances.
 * `isAPF_kummerExtension`, `isStrictlyAPF_kummerExtension`: the instances over a `p`-adic
   base.
 
+## Notation
+
+The local notation `G` denotes the absolute Galois group `Gal(K^sep/K)`.
+
 ## References
 
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2.1, §1.2.3.
+* [J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.1, §1.2.3.
 -/
 
 @[expose] public section

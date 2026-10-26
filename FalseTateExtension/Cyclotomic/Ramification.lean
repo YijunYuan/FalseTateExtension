@@ -7,8 +7,8 @@ module
 
 public import FalseTateExtension.Cyclotomic.Basic
 public import FalseTateExtension.Layers.Galois
-public import FontaineWintenberger.Ramification.Norm.Valuation
 public import FontaineWintenberger.Ramification.Lower.Basic
+public import FontaineWintenberger.Ramification.Norm.Valuation
 public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 
 /-!
@@ -31,7 +31,8 @@ spectral integer ring of `ℚ_[p](ζ)`.
 
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Proposition 17.
 -/
 
 @[expose] public section

@@ -5,17 +5,17 @@ Authors: Yijun Yuan
 -/
 module
 
+public import FalseTateExtension.Cyclotomic.CharacterNaturality
 public import FalseTateExtension.Cyclotomic.Filtration
 public import FalseTateExtension.Cyclotomic.Inertia
 public import FalseTateExtension.Cyclotomic.InfiniteCharacter
-public import FalseTateExtension.Cyclotomic.CharacterNaturality
-public import FontaineWintenberger.Ramification.Infinite.Basic
+public import FontaineWintenberger.APF.BaseChange.Strict
+public import FontaineWintenberger.APF.Finite.Slope
 public import FontaineWintenberger.APF.Galois
 public import FontaineWintenberger.APF.Strict
 public import FontaineWintenberger.APF.Subextension
-public import FontaineWintenberger.APF.BaseChange.Strict
 public import FontaineWintenberger.APF.Tower.Stages
-public import FontaineWintenberger.APF.Finite.Slope
+public import FontaineWintenberger.Ramification.Infinite.Basic
 
 /-!
 # The upper ramification filtration of `ℚ_[p](ζ_{p^∞})/ℚ_[p]` and strict APF
@@ -46,11 +46,18 @@ multiplied by `p` when `v` is shifted by `e(K/ℚ_[p])`.
 * `exists_upperRamificationGroupInfinite_cyclotomic_index_add_ramificationIdx`: for `v` large,
   `(G_K : G_K^{v + e(K/ℚ_[p])}) = p · (G_K : G_K^v)` where `G_K = Gal(K(ζ_{p^∞})/K)`
 
+## Notation
+
+The local notation `Cyc` denotes `cyclotomicExtension (K := ℚ_[p]) p`.
+
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Proposition 18.
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux*, §1.2.
-* Liu, *On lattices in semi-stable representations*, §5.1.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Proposition 18.
+* [J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

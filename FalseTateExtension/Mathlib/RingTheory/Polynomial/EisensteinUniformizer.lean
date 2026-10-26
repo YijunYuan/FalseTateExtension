@@ -5,11 +5,11 @@ Authors: Yijun Yuan
 -/
 module
 
+public import Mathlib.FieldTheory.Minpoly.Field
 public import Mathlib.RingTheory.DiscreteValuationRing.Basic
 public import Mathlib.RingTheory.Polynomial.Eisenstein.Basic
 public import Mathlib.RingTheory.Polynomial.GaussLemma
 public import Mathlib.RingTheory.Polynomial.RationalRoot
-public import Mathlib.FieldTheory.Minpoly.Field
 
 /-!
 # The Eisenstein polynomial `X ^ m - π` of a uniformizer
@@ -23,7 +23,7 @@ Upstream candidate: `Mathlib.RingTheory.Polynomial.Eisenstein`.
 ## Main results
 
 * `Polynomial.isEisensteinAt_X_pow_sub_C_of_irreducible`
-* `Polynomial.X_pow_sub_C_irreducible_of_irreducible`
+* `Polynomial.irreducible_X_pow_sub_C_of_irreducible`
 * `Polynomial.minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible`
 -/
 
@@ -55,7 +55,7 @@ theorem isEisensteinAt_X_pow_sub_C_of_irreducible {π : R} (hπ : Irreducible π
     exact (mul_dvd_mul_iff_left hπ.ne_zero).mp (by rwa [mul_one, ← pow_two])
 
 /-- `X ^ m - π` is irreducible over the fraction field of `R` (Gauss's lemma). -/
-theorem X_pow_sub_C_irreducible_of_irreducible {π : R} (hπ : Irreducible π)
+theorem irreducible_X_pow_sub_C_of_irreducible {π : R} (hπ : Irreducible π)
     {m : ℕ} (hm : 0 < m) (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K] :
     Irreducible (X ^ m - C (algebraMap R K π) : K[X]) := by
   have hE := isEisensteinAt_X_pow_sub_C_of_irreducible hπ hm
@@ -65,6 +65,9 @@ theorem X_pow_sub_C_irreducible_of_irreducible {π : R} (hπ : Irreducible π)
   simpa only [Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_X, Polynomial.map_C]
     using h.mp hI
 
+@[deprecated (since := "2026-10-26")]
+alias X_pow_sub_C_irreducible_of_irreducible := irreducible_X_pow_sub_C_of_irreducible
+
 /-- The minimal polynomial over the fraction field of an `m`-th root of a uniformizer. -/
 theorem minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible {π : R} (hπ : Irreducible π)
     {m : ℕ} (hm : 0 < m) (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
@@ -73,7 +76,7 @@ theorem minpoly_eq_X_pow_sub_C_of_pow_eq_of_irreducible {π : R} (hπ : Irreduci
     minpoly K α = X ^ m - C (algebraMap R K π) := by
   symm
   apply minpoly.eq_of_irreducible_of_monic
-    (X_pow_sub_C_irreducible_of_irreducible hπ hm K)
+    (irreducible_X_pow_sub_C_of_irreducible hπ hm K)
     (by simpa only [map_sub, map_pow, aeval_X, aeval_C] using sub_eq_zero.mpr hα)
     (monic_X_pow_sub_C _ hm.ne')
 

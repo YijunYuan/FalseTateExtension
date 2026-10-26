@@ -33,8 +33,8 @@ every `n`. The exponent satisfies the cocycle rule `b(gh) = b(g) + χ(g) b(h)`, 
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1,
-  Lemma 5.1.2.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1, Lemma 5.1.2.
 -/
 
 @[expose] public section

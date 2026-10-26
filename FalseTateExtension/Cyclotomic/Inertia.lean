@@ -36,7 +36,8 @@ inertia subgroup of `Gal(K̄/K)` onto `G^0`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations*, §5.1.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -144,8 +145,8 @@ theorem cyclotomicLayer_inertia_index (n : ℕ) :
 /-- The subgroup `I_n` of `Gal(K(ζ_{p^∞})/K)`: the preimage of the inertia subgroup of
 `Gal(K(ζ_{p^{n+1}})/K)` under restriction. -/
 def cyclotomicInertiaPreimage (n : ℕ) :
-    Subgroup (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) := by
-  exact (upperRamificationGroup
+    Subgroup (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p) :=
+  (upperRamificationGroup
     (R := spectralIntegerRing K (cyclotomicLayer (K := K) p (n + 1)))
     (cyclotomicLayer (K := K) p (n + 1) ≃ₐ[K] cyclotomicLayer (K := K) p (n + 1)) 0).comap
       (cyclotomicRestrictionToLayer p (n + 1))
@@ -166,8 +167,8 @@ omit [NormedAlgebra ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
 /-- `I_n` is open in `Gal(K(ζ_{p^∞})/K)`. -/
 theorem isOpen_cyclotomicInertiaPreimage (n : ℕ) :
     IsOpen (cyclotomicInertiaPreimage p K n :
-      Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) := by
-  exact (isOpen_discrete _).preimage (continuous_cyclotomicRestrictionToLayer p (n + 1))
+      Set (cyclotomicExtension (K := K) p ≃ₐ[K] cyclotomicExtension (K := K) p)) :=
+  (isOpen_discrete _).preimage (continuous_cyclotomicRestrictionToLayer p (n + 1))
 
 /-- The index of `I_n` in `Gal(K(ζ_{p^∞})/K)` is the residue degree `f(K(ζ_{p^{n+1}})/K)`. -/
 theorem cyclotomicInertiaPreimage_index (n : ℕ) :

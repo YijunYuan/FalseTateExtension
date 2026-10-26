@@ -5,13 +5,13 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Layers.Basic
 public import FalseTateExtension.Cyclotomic.Ramification
-public import FontaineWintenberger.Ramification.Norm.Valuation
-public import FontaineWintenberger.Ramification.Different.Monogenic
-public import FontaineWintenberger.Ramification.Lower.SpectralMaps
-public import FontaineWintenberger.Ramification.Different.Subextension
+public import FalseTateExtension.Layers.Basic
 public import FalseTateExtension.Mathlib.RingTheory.Polynomial.EisensteinUniformizer
+public import FontaineWintenberger.Ramification.Different.Monogenic
+public import FontaineWintenberger.Ramification.Different.Subextension
+public import FontaineWintenberger.Ramification.Lower.SpectralMaps
+public import FontaineWintenberger.Ramification.Norm.Valuation
 
 /-!
 # Eisenstein layers of the Kummer extension
@@ -38,11 +38,18 @@ ramification index `p` and different exponent `p^{n+1} v_K(p) + p - 1`. Over a `
   ramification index `p` and different exponent `p^{n+1} v_K(p) + p - 1`.
 * `addVal_p_toNat_eq_padic_ramificationIdx`: `v_K(p) = e_K` over `ℚ_p`.
 
+## Notation
+
+In the relative calculations, `F₀` and `F₁` denote the consecutive layers
+`K(π^{1/p^n})` and `K(π^{1/p^{n+1}})`, and `O₀` and `O₁` their spectral integer rings over `K`.
+These notations are local to this file.
+
 ## References
 
-* Serre, *Local Fields*, Chapter I §6, Chapter III §6.
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2.3.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter I §6, Chapter
+  III §6.
+* [J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.3.
 -/
 
 @[expose] public section
@@ -54,7 +61,9 @@ open FontaineWintenberger
 
 namespace FalseTateExtension
 
-/-- The absolute ramification index `e_K = v_K(p)` of `K`, as a natural number. -/
+/-- The natural-number value of `v_K(p)`, with `∞` mapped to `0`.
+
+For a finite extension of `ℚ_[p]`, this is the absolute ramification index of `K`. -/
 abbrev absoluteRamificationIdx (p : ℕ) (K : Type*) [NontriviallyNormedField K]
     [IsCompleteDiscreteValuedField K] : ℕ :=
   (addVal 𝒪[K] (p : 𝒪[K])).toNat
@@ -79,7 +88,6 @@ section EisensteinLayers
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
 variable (p : ℕ) [Fact p.Prime]
-
 
 /-- `[K(π^{1/p^n}) : K] = p^n` for a uniformizer `π`. -/
 theorem finrank_radicalLayer (π : 𝒪[K]) [hπ : Fact (Irreducible π)] (n : ℕ) :
@@ -130,7 +138,6 @@ section ValuedLayers
 variable {K : Type*} [NontriviallyNormedField K]
     [FontaineWintenberger.IsCompleteDiscreteValuedField K]
 variable (p : ℕ) [Fact p.Prime]
-
 
 variable [CharZero K]
 
@@ -366,7 +373,6 @@ local instance radicalStepIntegerScalarTower'' : IsScalarTower O₀ O₁ F₁ :=
 
 include hπ
 
-
 /-- `K(π^{1/p^{n+1}})/K(π^{1/p^n})` has ramification index `p`. -/
 theorem radicalLayer_step_ramificationIdx :
     (IsLocalRing.maximalIdeal O₁).ramificationIdx O₀ = p := by
@@ -407,10 +413,8 @@ section PadicBase
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
 variable (p : ℕ) [Fact p.Prime]
 
-
 variable [Algebra (ℚ_[p]) K]
     [(NormedField.valuation (K := ℚ_[p])).HasExtension (NormedField.valuation (K := K))]
-
 
 /-- `v_K(p)` is the ramification index `e_K` of `K/ℚ_p`, in `ℕ∞`. -/
 theorem addVal_p_eq_padic_ramificationIdx :

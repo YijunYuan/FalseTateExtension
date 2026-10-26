@@ -6,9 +6,9 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Mathlib.NumberTheory.Padics.ClosedAddSubgroup
+public import Mathlib.Algebra.Group.Pointwise.Set.Card
 public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.Topology.Algebra.Group.Pointwise
-public import Mathlib.Algebra.Group.Pointwise.Set.Card
 
 /-!
 # Scalar multiplication on closed additive subgroups of `ℤ_[p]`

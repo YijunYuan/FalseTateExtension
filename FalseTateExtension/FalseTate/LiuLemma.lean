@@ -8,10 +8,10 @@ module
 public import FalseTateExtension.Coordinates.AffineKernel
 public import FalseTateExtension.Cyclotomic.CyclicLayers
 public import FalseTateExtension.FalseTate.RadicalNotCyclotomic
+public import FalseTateExtension.FalseTate.StrictAPF
 public import FalseTateExtension.FalseTate.TranslationKernel
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
 public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
-public import FalseTateExtension.FalseTate.StrictAPF
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
@@ -38,8 +38,8 @@ its integer powers are dense. The Galois group `Gal(K_FT/K_Kum)` is isomorphic, 
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
-  Lemma 5.1.2.
+* [Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), Lemma 5.1.2.
 -/
 
 @[expose] public section

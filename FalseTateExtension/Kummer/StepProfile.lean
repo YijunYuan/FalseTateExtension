@@ -32,11 +32,16 @@ of `F_{n+1}/K` are those of `F_n/K` composed with this step profile.
 * `radicalLayer_apfIndex_succ`, `radicalLayer_apfPsi_succ`: the index and inverse Herbrand
   function of `F_{n+1}/K` in terms of those of `F_n/K`.
 
+## Notation
+
+The local notations `F₀` and `F₁` denote the consecutive layers `K(π^{1/p^n})` and
+`K(π^{1/p^{n+1}})`, and `O₀` and `O₁` their spectral integer rings over `K`.
+
 ## References
 
-* Serre, *Local Fields*, Chapter IV §1, §3.
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2.3.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV §1, §3.
+* [J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.3.
 -/
 
 @[expose] public section
@@ -63,38 +68,49 @@ local notation "O₁" => spectralIntegerRing K F₁
 /-- The spectral norm on `F_n = K(π^{1/p^n})`. -/
 noncomputable local instance kummerBaseNormedField : NontriviallyNormedField F₀ :=
   spectralNorm.nontriviallyNormedField K F₀
+
 /-- `F_n` is a normed `K`-algebra for the spectral norm. -/
 noncomputable local instance kummerBaseNormedAlgebra : NormedAlgebra K F₀ :=
   spectralNorm.normedAlgebra K F₀
+
 /-- The spectral norm on `F_n` is nonarchimedean. -/
 local instance kummerBaseUltrametric : IsUltrametricDist F₀ :=
   IsUltrametricDist.isUltrametricDist_iff_isNonarchimedean_norm.mpr
     (isNonarchimedean_spectralNorm (K := K) (L := F₀))
+
 /-- `F_n` is complete for the spectral norm. -/
 local instance kummerBaseComplete : CompleteSpace F₀ := spectralNorm.completeSpace K F₀
+
 /-- The valuation ring of `F_n` is a discrete valuation ring. -/
 local instance kummerBaseDVR : IsDiscreteValuationRing
     (NormedField.valuation (K := F₀)).valuationSubring :=
   normedAlgebra_unitBall_isDiscreteValuationRing K F₀
+
 /-- `F_n` is a complete discretely valued field. -/
 local instance kummerBaseCompleteDiscreteValuedField : IsCompleteDiscreteValuedField F₀ where
+
 /-- The residue field of `F_n` is perfect. -/
 local instance kummerBasePerfect : PerfectField (IsLocalRing.ResidueField
     (NormedField.valuation (K := F₀)).valuationSubring) :=
   Algebra.IsAlgebraic.perfectField (𝓀[K])
+
 /-- The algebra structure of `F_{n+1}` over `F_n`. -/
 local instance kummerStepAlgebra : Algebra F₀ F₁ :=
   (IntermediateField.inclusion (radicalLayer_le_succ p (π : K) n)).toRingHom.toAlgebra
+
 /-- `K ⊆ F_n ⊆ F_{n+1}` is a tower. -/
 local instance kummerStepScalarTower : IsScalarTower K F₀ F₁ :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
+
 /-- `F_{n+1}/F_n` is finite. -/
 local instance kummerStepFinite : FiniteDimensional F₀ F₁ :=
   Module.Finite.right K F₀ F₁
+
 /-- The spectral valuation of `F_{n+1}` over `K` extends that of `F_n` over `K`. -/
 local instance kummerStepValuation :
     (spectralValuation K F₀).HasExtension (spectralValuation K F₁) :=
   spectralValuation_hasExtension_tower K (E := F₀) (L := F₁)
+
 /-- The spectral valuation of `F_{n+1}` over `K` extends the valuation of `F_n`. -/
 local instance kummerStepOwnValuation :
     (NormedField.valuation (K := F₀)).HasExtension (spectralValuation K F₁) where

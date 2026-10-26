@@ -5,10 +5,10 @@ Authors: Yijun Yuan
 -/
 module
 
+public import Mathlib.GroupTheory.Index
 public import Mathlib.NumberTheory.Padics.ProperSpace
 public import Mathlib.Topology.Algebra.Group.ClosedSubgroup
 public import Mathlib.Topology.Algebra.Ring.Compact
-public import Mathlib.GroupTheory.Index
 
 /-!
 # Closed additive subgroups of the `p`-adic integers
@@ -50,10 +50,12 @@ def closedAddSubgroupIdeal (M : ClosedAddSubgroup (ℤ_[p])) : Ideal (ℤ_[p]) w
   add_mem' := M.add_mem
   smul_mem' a x hx := mul_mem_closedAddSubgroup M a x hx
 
+/-- The ideal associated to a closed additive subgroup has the same elements. -/
 @[simp]
 theorem mem_closedAddSubgroupIdeal (M : ClosedAddSubgroup (ℤ_[p])) (x : ℤ_[p]) :
     x ∈ closedAddSubgroupIdeal M ↔ x ∈ M := Iff.rfl
 
+/-- The additive subgroup of the associated ideal is the original closed subgroup. -/
 theorem closedAddSubgroupIdeal_toAddSubgroup (M : ClosedAddSubgroup (ℤ_[p])) :
     (closedAddSubgroupIdeal M).toAddSubgroup = M.toAddSubgroup := rfl
 
@@ -66,11 +68,14 @@ theorem closedAddSubgroup_eq_bot_or_span_pow (M : ClosedAddSubgroup (ℤ_[p])) :
   · obtain ⟨s, hs⟩ := ideal_eq_span_pow_p hM
     exact Or.inr ⟨s, congrArg (fun I : Ideal (ℤ_[p]) ↦ I.toAddSubgroup) hs⟩
 
+/-- Multiplication by a `p`-adic integer maps a closed additive subgroup into itself. -/
 theorem closedAddSubgroup_map_mulLeft_le (M : ClosedAddSubgroup (ℤ_[p])) (a : ℤ_[p]) :
     M.toAddSubgroup.map (AddMonoidHom.mulLeft a) ≤ M.toAddSubgroup := by
   rintro y ⟨x, hx, rfl⟩
   exact mul_mem_closedAddSubgroup M a x hx
 
+/-- Multiplication by a scalar commutes with passing from the associated ideal to its
+additive subgroup. -/
 theorem closedAddSubgroupIdeal_map_mulLeft_toAddSubgroup
     (M : ClosedAddSubgroup (ℤ_[p])) (a : ℤ_[p]) :
     (Submodule.map (LinearMap.mulLeft (ℤ_[p]) a) (closedAddSubgroupIdeal M)).toAddSubgroup =
@@ -108,12 +113,15 @@ theorem closedAddSubgroup_map_mulLeft_finiteRelIndex
     exact AddSubgroup.isFiniteRelIndex_iff_finiteIndex.mpr
       AddSubgroup.finiteIndex_of_finite_quotient
 
+/-- The image under a nonzero scalar has positive relative index in a closed additive
+subgroup of `ℤ_[p]`. -/
 theorem closedAddSubgroup_map_mulLeft_relIndex_pos
     (M : ClosedAddSubgroup (ℤ_[p])) (a : ℤ_[p]) (ha : a ≠ 0) :
     0 < (M.toAddSubgroup.map (AddMonoidHom.mulLeft a)).relIndex M.toAddSubgroup := by
   have := closedAddSubgroup_map_mulLeft_finiteRelIndex M a ha
   exact Nat.pos_of_ne_zero AddSubgroup.relIndex_ne_zero
 
+/-- Every scalar image of the zero subgroup has relative index one in that subgroup. -/
 theorem closedAddSubgroup_map_mulLeft_relIndex_eq_one_of_eq_bot
     (M : ClosedAddSubgroup (ℤ_[p])) (hM : M.toAddSubgroup = ⊥) (a : ℤ_[p]) :
     (M.toAddSubgroup.map (AddMonoidHom.mulLeft a)).relIndex M.toAddSubgroup = 1 := by

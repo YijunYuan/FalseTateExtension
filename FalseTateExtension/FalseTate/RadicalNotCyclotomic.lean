@@ -7,9 +7,9 @@ module
 
 public import FalseTateExtension.Coordinates.AffineKernel
 public import FalseTateExtension.Cyclotomic.CyclicLayers
+public import FalseTateExtension.FalseTate.StrictAPF
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
 public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
-public import FalseTateExtension.FalseTate.StrictAPF
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
@@ -32,12 +32,12 @@ would give `π = a^p ζ_{p^r}^i`, which is impossible for a uniformizer.
   `ζ_{p^n} ∈ K(π^{1/p^n})`.
 * `cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois`: if `K(π^{1/p})/K` is Galois then
   `ζ_p ∈ K`.
-* `pPowRoot_one_not_mem_cyclotomicExtension`: `π^{1/p} ∉ K(ζ_{p^∞})` for `p ≠ 2`.
+* `pPowRoot_one_notMem_cyclotomicExtension`: `π^{1/p} ∉ K(ζ_{p^∞})` for `p ≠ 2`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
-  Lemma 5.1.2.
+* [Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -50,8 +50,6 @@ open Polynomial
 open FontaineWintenberger
 
 section RadicalNormality
-
-open Polynomial
 
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K] [CharZero K]
 variable (p : ℕ) [Fact p.Prime]
@@ -133,14 +131,14 @@ theorem cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois [Algebra (ℚ_[p
     (IntermediateField.finrank_adjoin_simple_eq_one_iff.mp hd₁)
 
 /-- For `p ≠ 2` and a uniformizer `π` of `K`, `π^{1/p} ∉ K(ζ_{p^∞})`. -/
-theorem pPowRoot_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
+theorem pPowRoot_one_notMem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] :
     pPowRoot p (π : K) 1 ∉ cyclotomicExtension (K := K) p := by
   intro hmem
   obtain ⟨m, hm⟩ := (mem_cyclotomicExtension_iff p _).mp hmem
   have hFm : radicalLayer p (π : K) 1 ≤ cyclotomicLayer p m :=
     IntermediateField.adjoin_simple_le_iff.mpr hm
-  have := cyclotomicLayer_isAbelianGalois (K := K) p m
+  have := isAbelianGalois_cyclotomicLayer (K := K) p m
   have : IsAbelianGalois K (radicalLayer p (π : K) 1) :=
     IsAbelianGalois.of_algHom (IntermediateField.inclusion hFm)
   have h₁ := cyclotomicLayer_one_eq_bot_of_radicalLayer_one_isGalois p π
@@ -244,6 +242,9 @@ theorem pPowRoot_one_not_mem_cyclotomicExtension [Algebra (ℚ_[p]) K]
     (pow_ne_zero r (Fact.out : p.Prime).ne_zero) hunity heq
 
 end RadicalNormality
+
+@[deprecated (since := "2026-10-26")]
+alias pPowRoot_one_not_mem_cyclotomicExtension := pPowRoot_one_notMem_cyclotomicExtension
 
 end FalseTateExtension
 end

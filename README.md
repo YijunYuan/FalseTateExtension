@@ -43,12 +43,13 @@ Install [elan](https://github.com/leanprover/elan), then run from this directory
 
 ```sh
 lake exe cache get
-lake build
+lake --wfail build
 ```
 
 Lean is pinned to `leanprover/lean4:v4.35.0`; Mathlib and FontaineWintenberger commits are
-recorded in `lakefile.toml` and `lake-manifest.json`. The library contains no `sorry` and builds
-without warnings under Mathlib's standard linter set.
+recorded in `lakefile.toml` and `lake-manifest.json`. FontaineWintenberger is pinned to
+`7b9f6b3459c69b3282cd09ced55d15d89344c58e`. The library contains no `sorry` and builds
+without warnings under Mathlib's standard linter set; `--wfail` also rejects builds with warnings.
 
 ## References
 

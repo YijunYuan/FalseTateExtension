@@ -31,8 +31,8 @@ numbering of `K(π^{1/p^n})`, and `t_n = ψ_{K(π^{1/p^n})/K}(u_{n+1})`.
 
 ## References
 
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2.3.
+* [J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.3.
 -/
 
 @[expose] public section
@@ -48,7 +48,10 @@ section Breaks
 variable {K : Type*} [NontriviallyNormedField K] [IsCompleteDiscreteValuedField K]
 variable (p : ℕ) [Fact p.Prime]
 
-/-- The upper ramification break `u_j = e_K (j + 1/(p-1))` of `K(π^{1/p^∞})/K`. -/
+/-- The quantity `u_j = e_K (j + 1/(p-1))` in the Kummer ramification profile.
+
+For a uniformizer over a `p`-adic field and `j ≥ 1`, this is an upper ramification break of
+`K(π^{1/p^∞})/K`. The value at `j = 0` is an auxiliary endpoint. -/
 def radicalUpperBreak (j : ℕ) : ℝ :=
   (absoluteRamificationIdx p K : ℝ) * ((j : ℝ) + 1 / ((p : ℝ) - 1))
 

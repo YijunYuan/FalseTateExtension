@@ -37,9 +37,14 @@ units `(0, u)`, and the unit projection `G → ℤ_[p]ˣ` is the cyclotomic char
 * `falseTateExtension_eq_cyclotomicExtension_of_translationKernel_eq_bot`: if `T(G) = 0`, then
   `K_FT = K_cyc`.
 
+## Notation
+
+The local notation `Γ` denotes `Gal(K_FT/K)`.
+
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

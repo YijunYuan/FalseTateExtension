@@ -8,9 +8,9 @@ module
 public import FalseTateExtension.Mathlib.Topology.Algebra.SemidirectProduct
 public import Mathlib.Algebra.Ring.AddAut
 public import Mathlib.GroupTheory.Commutator.Basic
+public import Mathlib.Tactic.Ring
 public import Mathlib.Topology.Algebra.Group.Units
 public import Mathlib.Topology.Algebra.Ring.Basic
-public import Mathlib.Tactic.Ring
 
 /-!
 # The affine group of a commutative ring
@@ -18,8 +18,8 @@ public import Mathlib.Tactic.Ring
 For a commutative topological ring `A` and a group `H` with a homomorphism `ι : H →* Aˣ`, the
 affine group `AffineGroup A ι = A ⋊ H` is the semidirect product of the additive group of `A`
 (written multiplicatively) by `H` acting through multiplication by `ι h`. Its elements are the
-maps `x ↦ ι h * x + a`. With the product topology it is a topological group, Hausdorff and
-compact when `A` and `H` are.
+maps `x ↦ ι h * x + a`. When `H` is a topological group and `h ↦ (ι h : A)` is continuous,
+the product topology makes it a topological group. It is Hausdorff or compact when both factors are.
 
 The library uses `AffineGroup ℤ_[p] (MonoidHom.id ℤ_[p]ˣ)` (the Galois group of `K_FT/K`
 embeds into it), `AffineGroup ℤ_[p] H.subtype` for a subgroup `H ≤ ℤ_[p]ˣ`, and
@@ -28,7 +28,11 @@ embeds into it), `AffineGroup ℤ_[p] H.subtype` for a subgroup `H ≤ ℤ_[p]ˣ
 ## Main results
 
 * `AffineGroup.commutator_inl`: `⁅g, inl a⁆ = inl ((ι g.right - 1) * a)`.
-* `AffineGroup.instIsTopologicalGroup`, `AffineGroup.instCompactSpace`.
+* `AffineGroup.homeomorphProd`: the product homeomorphism with `A × H`.
+* `AffineGroup.continuousAct_of_continuous`: continuity of the action induced by `ι`.
+
+The topological group, Hausdorff and compactness instances are inherited from
+`SemidirectProduct`.
 -/
 
 @[expose] public section
@@ -41,6 +45,7 @@ variable (A : Type*) [CommRing A] {H : Type*} [Group H]
 def affineAction (ι : H →* Aˣ) : H →* MulAut (Multiplicative A) :=
   ((MulAutMultiplicative A).symm.toMonoidHom.comp AddAut.mulLeft).comp ι
 
+/-- The action of `h` multiplies the additive coordinate by `ι h`. -/
 @[simp] theorem affineAction_apply (ι : H →* Aˣ) (h : H) (a : A) :
     affineAction A ι h (Multiplicative.ofAdd a) = Multiplicative.ofAdd ((ι h : A) * a) := rfl
 
@@ -54,6 +59,8 @@ open scoped commutatorElement
 
 variable {A} (ι : H →* Aˣ)
 
+/-- Commuting an affine transformation with translation by `a` gives translation by
+`(ι g.right - 1) * a`. -/
 theorem commutator_inl (g : AffineGroup A ι) (a : A) :
     ⁅g, (SemidirectProduct.inl (Multiplicative.ofAdd a) : AffineGroup A ι)⁆ =
       SemidirectProduct.inl (Multiplicative.ofAdd (((ι g.right : A) - 1) * a)) := by
@@ -81,15 +88,19 @@ def homeomorphProd : AffineGroup A ι ≃ₜ A × H :=
         continuous_toFun := continuous_toAdd, continuous_invFun := continuous_ofAdd }
       (Homeomorph.refl H))
 
+/-- The affine product homeomorphism returns the translation and group coordinates. -/
 @[simp] theorem homeomorphProd_apply (x : AffineGroup A ι) :
     homeomorphProd ι x = (x.left.toAdd, x.right) := rfl
 
+/-- The translation coordinate of an affine transformation is continuous. -/
 theorem continuous_left : Continuous fun x : AffineGroup A ι => x.left.toAdd :=
   continuous_fst.comp (homeomorphProd ι).continuous
 
+/-- The group coordinate of an affine transformation is continuous. -/
 theorem continuous_right : Continuous fun x : AffineGroup A ι => x.right :=
   SemidirectProduct.continuous_right
 
+/-- The inclusion of translations into the affine group is continuous. -/
 theorem continuous_inl : Continuous fun a : A =>
     (SemidirectProduct.inl (Multiplicative.ofAdd a) : AffineGroup A ι) :=
   SemidirectProduct.continuous_inl.comp continuous_ofAdd
@@ -105,9 +116,11 @@ theorem continuousAct_of_continuous (hι : Continuous fun h : H => (ι h : A)) :
     exact continuous_ofAdd.comp ((hι.comp continuous_fst).mul
       (continuous_toAdd.comp continuous_snd))
 
+/-- Multiplication by units acts continuously on the additive group of a topological ring. -/
 instance : SemidirectProduct.ContinuousAct (affineAction A (MonoidHom.id Aˣ)) :=
   continuousAct_of_continuous _ Units.continuous_val
 
+/-- A subgroup of units acts continuously on the additive group of a topological ring. -/
 instance (S : Subgroup Aˣ) : SemidirectProduct.ContinuousAct (affineAction A S.subtype) :=
   continuousAct_of_continuous _ (Units.continuous_val.comp continuous_subtype_val)
 

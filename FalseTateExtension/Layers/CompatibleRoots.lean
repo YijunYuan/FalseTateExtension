@@ -25,7 +25,8 @@ false Tate extension `K(π^{1/p^∞}, ζ_{p^∞})`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -59,7 +60,7 @@ theorem exists_compatible_radicals (p : ℕ) [Fact p.Prime] (π : Ω) :
     induction n with
     | zero => simp
     | succ n ih =>
-        rw [pow_succ', pow_mul, Function.iterate_succ_apply', hr, ih]
+      rw [pow_succ', pow_mul, Function.iterate_succ_apply', hr, ih]
 
 variable [CharZero Ω]
 
@@ -77,12 +78,12 @@ theorem exists_compatible_primitive_roots (p : ℕ) [Fact p.Prime] :
     induction n with
     | zero => simpa using hη
     | succ n ih =>
-        apply IsPrimitiveRoot.iff_orderOf.mpr
-        apply orderOf_eq_prime_pow (p := p) (n := n + 1)
-        · rw [pow_succ', pow_mul, Function.iterate_succ_apply', hr]
-          exact ih.pow_ne_one_of_pos_of_lt (pow_ne_zero n (Fact.out : p.Prime).ne_zero)
-            (pow_lt_pow_right₀ (Fact.out : p.Prime).one_lt (Nat.lt_succ_self n))
-        · rw [pow_succ', pow_mul, Function.iterate_succ_apply', hr, ih.pow_eq_one]
+      apply IsPrimitiveRoot.iff_orderOf.mpr
+      apply orderOf_eq_prime_pow (p := p) (n := n + 1)
+      · rw [pow_succ', pow_mul, Function.iterate_succ_apply', hr]
+        exact ih.pow_ne_one_of_pos_of_lt (pow_ne_zero n (Fact.out : p.Prime).ne_zero)
+          (pow_lt_pow_right₀ (Fact.out : p.Prime).one_lt (Nat.lt_succ_self n))
+      · rw [pow_succ', pow_mul, Function.iterate_succ_apply', hr, ih.pow_eq_one]
   let ζ : ℕ → Ω
     | 0 => 1
     | n + 1 => r^[n] η

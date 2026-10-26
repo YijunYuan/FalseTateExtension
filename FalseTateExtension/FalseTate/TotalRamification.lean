@@ -29,8 +29,9 @@ valuation ring of `K_FT` is `𝔽_p` (`falseTateExtension_residueDegree_padic`).
 
 The proof goes through the finite layers `ℚ_p(π^{1/p^{n+1}}, ζ_{p^{n+1}})`, whose Galois group is
 `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ`: the translations are commutators (with the unit `2`, hence `p ≠ 2`)
-and the units fix the cyclotomic subfield, which is totally ramified; both lie in the inertia
-group, so the inertia group is everything (`lowerRamificationGroup_falseTateLayer_zero`).
+and therefore lie in inertia. Their fixed field is the cyclotomic subfield, which is totally
+ramified. Its residue degree then shows that inertia is the whole Galois group
+(`lowerRamificationGroup_falseTateLayer_zero`).
 
 ## Main results
 
@@ -42,7 +43,8 @@ group, so the inertia group is everything (`lowerRamificationGroup_falseTateLaye
 
 ## References
 
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6.
+* [Viviani, *Ramification groups and Artin conductors of radical extensions of
+  ℚ*](https://doi.org/10.5802/jtnb.470), §6.
 -/
 
 @[expose] public section
@@ -55,7 +57,6 @@ open FontaineWintenberger
 
 section RationalTotalRamification
 
-open FontaineWintenberger
 open scoped commutatorElement
 
 variable (p : ℕ) [Fact p.Prime]
@@ -71,6 +72,7 @@ def unitTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) : (ZMod (p ^ n))ˣ :=
       exact hp₂.out (le_antisymm hle (Fact.out : p.Prime).two_le))
     exact hp.symm.pow_right n)
 
+/-- The unit `unitTwo p n` has underlying residue class `2`. -/
 @[simp]
 theorem coe_unitTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
     (unitTwo p n : ZMod (p ^ n)) = 2 := ZMod.coe_unitOfCoprime _ _
@@ -79,14 +81,14 @@ theorem coe_unitTwo [hp₂ : Fact (p ≠ 2)] (n : ℕ) :
 belongs to its inertia subgroup. -/
 theorem finiteDiagonal_translation_mem_inertia
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) (b : ZMod (p ^ n)) :
-    (finiteDiagonalGaloisEquiv_padic p π n).symm
+    (finiteDiagonalGaloisEquivPadic p π n).symm
         (SemidirectProduct.inl (Multiplicative.ofAdd b)) ∈
       lowerRamificationGroup
         (falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]] falseTateLayer p (π : ℚ_[p]) n n)
         (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p])
           (falseTateLayer p (π : ℚ_[p]) n n))) 0 := by
   have := falseTateLayer_isGalois p (π : ℚ_[p]) n
-  let e := finiteDiagonalGaloisEquiv_padic p π n
+  let e := finiteDiagonalGaloisEquivPadic p π n
   let δ := e.symm (SemidirectProduct.inr (unitTwo p n))
   let t₀ := e.symm (SemidirectProduct.inl (Multiplicative.ofAdd b))
   have h := commutatorElement_mem_lowerRamificationGroup_zero (ℚ_[p])
@@ -111,11 +113,11 @@ theorem finiteCyclotomicFixing_le_inertia [hp₂ : Fact (p ≠ 2)] [hπ : Fact (
         (IsLocalRing.maximalIdeal (spectralIntegerRing (ℚ_[p])
           (falseTateLayer p (π : ℚ_[p]) n n))) 0 := by
   intro g hg
-  obtain ⟨b, hb⟩ := (finiteDiagonalGaloisEquiv_padic_mem_translations p π n g).mpr hg
+  obtain ⟨b, hb⟩ := (finiteDiagonalGaloisEquivPadic_mem_translations p π n g).mpr hg
   have h := finiteDiagonal_translation_mem_inertia p π n b.toAdd
-  have heq : (finiteDiagonalGaloisEquiv_padic p π n).symm
+  have heq : (finiteDiagonalGaloisEquivPadic p π n).symm
       (SemidirectProduct.inl b) = g := by
-    rw [hb, (finiteDiagonalGaloisEquiv_padic p π n).symm_apply_apply]
+    rw [hb, (finiteDiagonalGaloisEquivPadic p π n).symm_apply_apply]
   exact heq ▸ h
 
 /-- Every positive rational diagonal layer has full inertia,
@@ -173,8 +175,6 @@ theorem falseTateLayer_spectral_ramificationIdx
 end RationalTotalRamification
 
 section RationalInfiniteTotalRamification
-
-open FontaineWintenberger
 
 variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[ℚ_[p]])

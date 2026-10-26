@@ -5,9 +5,9 @@ Authors: Yijun Yuan
 -/
 module
 
+public import FalseTateExtension.FalseTate.FiniteGaloisGroup
 public import FalseTateExtension.FalseTate.Viviani.Preliminaries
 public import FalseTateExtension.Kummer.APF
-public import FalseTateExtension.FalseTate.FiniteGaloisGroup
 public import FontaineWintenberger.APF.Finite.ConstantIndex
 public import FontaineWintenberger.Ramification.Herbrand.Interval
 public import FontaineWintenberger.Ramification.Upper.Transport
@@ -18,11 +18,11 @@ public import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 Let `p ≠ 2`, `π` a uniformizer of `ℚ_p`, `D_n = ℚ_p(π^{1/p^{n+1}}, ζ_{p^{n+1}})` and
 `G = Gal(D_n/ℚ_p)`, identified with the affine group `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` by
-`g ↦ (b_{n+1}(g), χ_{n+1}(g))` (`finiteDiagonalGaloisEquiv_padic`). Write `δ = 1/(p-1)`,
+`g ↦ (b_{n+1}(g), χ_{n+1}(g))` (`finiteDiagonalGaloisEquivPadic`). Write `δ = 1/(p-1)`,
 `U_r = 1 + p^r ℤ/p^{n+1}` for the principal units (`finiteUnitSubgroup`, trivial for
 `r ≥ n + 1`) and `p^k ℤ/p^{n+1} ⋊ V` for the subgroups `finiteAffineSubgroup p (n+1) k V`.
 
-The upper numbering filtration of `G` is: `G^u = G` for `u ≤ 0`;
+The upper numbering filtration of `G` is: `G^u = G` for `-1 ≤ u ≤ 0`;
 `G^u = p^d ℤ/p^{n+1} ⋊ U_{r+1}` for `r < u ≤ r + 1`, `r ≤ n`, where `d` is the number of
 breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u` (`radicalTranslationDepth`); and `G^u = 1` for
 `u > n + 1 + δ`. Explicitly, `G^u = ℤ/p^{n+1} ⋊ U_1` for `0 < u ≤ 1`,
@@ -57,14 +57,25 @@ and the lower numbering filtration `G_t = G^{φ(t)}` on the corresponding interv
   `lowerRamificationGroupReal_falseTate_first_layer_filtration`: both filtrations of
   `ℚ_p(π^{1/p}, ζ_p)/ℚ_p`.
 
-The correction: at the integer breaks the inverse Herbrand function is
+## Notation
+
+* `D(n)`, `O(n)` and `G(n)` denote the diagonal layer `D_n`, its valuation ring and
+  `Gal(D_n/ℚ_[p])`, respectively.
+* `δ` denotes `1 / ((p : ℝ) - 1)`.
+* `Ψ(n)` denotes the inverse Herbrand function of `D_n/ℚ_[p]`.
+
+## Implementation notes
+
+At the integer breaks the inverse Herbrand function is
 `(p-1)(p^{2i+1} + 1)/(p+1)`, with exponent `2i + 1` where Viviani's table prints `2i`.
 
 ## References
 
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6 and
-  Corollary 6.10, with the correction of FalseTateLift, Remark 5.2.
-* Serre, *Local Fields*, Chapter IV, §3 (Herbrand functions and upper numbering).
+* [Viviani, *Ramification groups and Artin conductors of radical extensions of
+  ℚ*](https://doi.org/10.5802/jtnb.470), §6 and Corollary 6.10, with the correction of
+  FalseTateLift, Remark 5.2.
+* [Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §3 (Herbrand
+  functions and upper numbering).
 -/
 
 @[expose] public section
@@ -101,7 +112,7 @@ under `g ↦ (b_{n+1}(g), χ_{n+1}(g))`. -/
 def finiteUpperAffineGroup (n : ℕ) (u : ℝ) :
     Subgroup (FullFiniteAffineGroup p (n + 1)) := by
   let e : G(n) ≃* FullFiniteAffineGroup p (n + 1) :=
-    finiteDiagonalGaloisEquiv_padic p π (n + 1)
+    finiteDiagonalGaloisEquivPadic p π (n + 1)
   let U : Subgroup G(n) := upperRamificationGroup (R := O(n)) G(n) u
   exact U.map e.toMonoidHom
 
@@ -109,22 +120,22 @@ def finiteUpperAffineGroup (n : ℕ) (u : ℝ) :
 instance finiteUpperAffineGroup_normal (n : ℕ) (u : ℝ) :
     (finiteUpperAffineGroup π n u).Normal :=
   Subgroup.Normal.map inferInstance _
-    (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective
+    (finiteDiagonalGaloisEquivPadic p π (n + 1)).surjective
 
 /-- The image of `Gal(D_n/ℚ_p(π^{1/p^{n+1}}))` in `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` is the group of units
 `0 ⋊ (ℤ/p^{n+1})ˣ`. -/
 theorem finiteRadicalFixing_map_affine (n : ℕ) :
     ((finiteRadicalInclusion p (π : ℚ_[p]) (n + 1)).fieldRange.fixingSubgroup : Subgroup G(n)).map
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
     (SemidirectProduct.inr : (ZMod (p ^ (n + 1)))ˣ →*
       FullFiniteAffineGroup p (n + 1)).range := by
   ext x
   constructor
   · rintro ⟨g, hg, rfl⟩
-    exact (finiteDiagonalGaloisEquiv_padic_mem_units p π (n + 1) g).mpr hg
+    exact (finiteDiagonalGaloisEquivPadic_mem_units p π (n + 1) g).mpr hg
   · intro hx
-    obtain ⟨g, rfl⟩ := (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective x
-    exact ⟨g, (finiteDiagonalGaloisEquiv_padic_mem_units p π (n + 1) g).mp hx, rfl⟩
+    obtain ⟨g, rfl⟩ := (finiteDiagonalGaloisEquivPadic p π (n + 1)).surjective x
+    exact ⟨g, (finiteDiagonalGaloisEquivPadic_mem_units p π (n + 1) g).mp hx, rfl⟩
 
 /-- For `u ≥ 0`, the translations in the image of `G^u` form a subgroup of `ℤ/p^{n+1}` of index
 `p^d`, where `d` is the number of breaks `j + δ`, `1 ≤ j ≤ n + 1`, below `u`. -/
@@ -143,11 +154,11 @@ theorem finiteUpperAffine_translation_index (n : ℕ) {u : ℝ} (hu : 0 ≤ u) :
         FullFiniteAffineGroup p (n + 1)).range ⊔ finiteUpperAffineGroup π n u).index :=
       (finiteAffine_units_sup_index (n + 1) _).symm
     _ = ((M.fixingSubgroup ⊔ upperRamificationGroup (R := O(n)) G(n) u).map
-        (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom).index := by
+        (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom).index := by
       rw [Subgroup.map_sup, finiteRadicalFixing_map_affine π]
       rfl
     _ = (M.fixingSubgroup ⊔ upperRamificationGroup (R := O(n)) G(n) u).index :=
-      Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquiv_padic p π (n + 1))
+      Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquivPadic p π (n + 1))
     _ = apfIndex ℚ_[p] M u := hi.symm
     _ = apfIndex ℚ_[p] (radicalLayer p (π : ℚ_[p]) (n + 1)) u :=
       (apfIndex_algEquiv ℚ_[p] (radicalLayer p (π : ℚ_[p]) (n + 1))
@@ -174,7 +185,7 @@ theorem finiteUpperAffine_unit_projection (n : ℕ) {u : ℝ} (hu : -1 ≤ u) :
         (cyclotomicLayerCharacter p (n + 1)) := by
   have := falseTateLayer_isGalois p (π : ℚ_[p]) (n + 1)
   have hc : SemidirectProduct.rightHom.comp
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       (cyclotomicLayerCharacter p (n + 1)).comp
         (diagonalCyclotomicRestriction p (π : ℚ_[p]) (n + 1)) := by
     apply MonoidHom.ext
@@ -240,7 +251,7 @@ theorem upperRamificationGroup_falseTate_index (n r : ℕ) (hr : r ≤ n)
       (p ^ (r + 1)).totient * p ^ radicalTranslationDepth p (n + 1) u := by
   have he : (finiteUpperAffineGroup π n u).index =
       (upperRamificationGroup (R := O(n)) G(n) u).index :=
-    Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquiv_padic p π (n + 1))
+    Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquivPadic p π (n + 1))
   rw [← he, finiteAffine_normal_index,
     finiteUpperAffine_translation_index π n (by linarith [Nat.cast_nonneg (α := ℝ) r]),
     finiteUpperAffine_unit_interval π n r hr hu0 hu1,
@@ -255,7 +266,7 @@ theorem upperRamificationGroup_falseTate_index_tail (n : ℕ) {u : ℝ} (hu : (n
       (p ^ (n + 1)).totient * p ^ radicalTranslationDepth p (n + 1) u := by
   have he : (finiteUpperAffineGroup π n u).index =
       (upperRamificationGroup (R := O(n)) G(n) u).index :=
-    Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquiv_padic p π (n + 1))
+    Subgroup.index_map_equiv _ (finiteDiagonalGaloisEquivPadic p π (n + 1))
   rw [← he, finiteAffine_normal_index,
     finiteUpperAffine_translation_index π n (by linarith [Nat.cast_nonneg (α := ℝ) n]),
     finiteUpperAffine_unit_tail π n hu, Subgroup.index_bot]
@@ -468,7 +479,7 @@ theorem lowerRamificationGroupReal_falseTate_fractional (n i : ℕ)
     (hi : 1 ≤ i) (hin : i ≤ n) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       ((2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1))).map
-        (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+        (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) (i - 1) (finiteUnitSubgroup p (n + 1) (i + 1)) := by
   rw [← inverseHerbrandFunction_falseTate_fractional π n i hin]
   exact finiteUpperAffine_fractional π n i hi (by omega)
@@ -479,7 +490,7 @@ include hp₂ hπ in
 theorem lowerRamificationGroupReal_falseTate_integer (n i : ℕ) (hi : i ≤ n) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       (((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1))).map
-        (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+        (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) i (finiteUnitSubgroup p (n + 1) (i + 1)) := by
   rw [← inverseHerbrandFunction_falseTate_integer π n i hi]
   exact finiteUpperAffine_integer π n i hi
@@ -491,7 +502,7 @@ theorem lowerRamificationGroupReal_falseTate_final (n : ℕ) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n))
       (((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
         ((p : ℝ) + 1))).map
-        (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+        (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) n ⊥ := by
   rw [← inverseHerbrandFunction_falseTate_final π n]
   have h := finiteUpperAffine_fractional π n (n + 1) (by omega) le_rfl
@@ -602,7 +613,7 @@ theorem viviani_lower_parameter (n : ℕ) {a b t : ℝ}
 /-- For `t ≥ -1`, the image of `G_t` in `ℤ/p^{n+1} ⋊ (ℤ/p^{n+1})ˣ` is the image of `G^{φ(t)}`. -/
 theorem viviani_lower_map (n : ℕ) {t : ℝ} (ht : -1 ≤ t) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteUpperAffineGroup π n (herbrandFunction (R := O(n)) G(n) t) := by
   rw [finiteUpperAffineGroup, upperRamificationGroup_herbrandFunction G(n) ht]
 
@@ -610,7 +621,7 @@ theorem viviani_lower_map (n : ℕ) {t : ℝ} (ht : -1 ≤ t) :
 theorem lowerRamificationGroupReal_falseTate_initial (n : ℕ) {t : ℝ}
     (ht0 : 0 < t) (ht1 : t ≤ (p : ℝ) - 1) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) 0 (finiteUnitSubgroup p (n + 1) 1) := by
   have h := viviani_lower_parameter π n (a := 0) (b := 1)
     (by norm_num) (by norm_num)
@@ -627,7 +638,7 @@ theorem lowerRamificationGroupReal_falseTate_fractional_integer (n i : ℕ) (hi 
     (ht0 : (2 * (p : ℝ) ^ (2 * i) + (p : ℝ) - 1) / ((p : ℝ) + 1) < t)
     (ht1 : t ≤ ((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1)) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) i (finiteUnitSubgroup p (n + 1) (i + 1)) := by
   have hδ := viviani_fraction_pos_lt_one p
   have h0 : Ψ(n) ((i : ℝ) + δ) < t := by
@@ -649,7 +660,7 @@ theorem lowerRamificationGroupReal_falseTate_integer_fractional (n i : ℕ) (hi 
     (ht0 : ((p : ℝ) - 1) * ((p : ℝ) ^ (2 * i + 1) + 1) / ((p : ℝ) + 1) < t)
     (ht1 : t ≤ (2 * (p : ℝ) ^ (2 * (i + 1)) + (p : ℝ) - 1) / ((p : ℝ) + 1)) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) i (finiteUnitSubgroup p (n + 1) (i + 2)) := by
   have hδ := viviani_fraction_pos_lt_one p
   have h0 : Ψ(n) ((i : ℝ) + 1) < t := by
@@ -674,7 +685,7 @@ theorem lowerRamificationGroupReal_falseTate_final_interval (n : ℕ) {t : ℝ}
     (ht1 : t ≤ ((p : ℝ) ^ (2 * (n + 1)) + (p : ℝ) ^ (2 * n) + (p : ℝ) - 1) /
       ((p : ℝ) + 1)) :
     (lowerRamificationGroupReal G(n) (IsLocalRing.maximalIdeal O(n)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom =
       finiteAffineSubgroup p (n + 1) n ⊥ := by
   have hδ := viviani_fraction_pos_lt_one p
   have h0 : Ψ(n) ((n : ℝ) + δ) < t := by
@@ -693,8 +704,8 @@ include hp₂ hπ in
 theorem upperRamificationGroup_falseTate_eq_bot (n : ℕ) {u : ℝ}
     (hu : (n : ℝ) + 1 + δ < u) : upperRamificationGroup (R := O(n)) G(n) u = ⊥ := by
   apply Subgroup.map_injective
-    (f := (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom)
-    (finiteDiagonalGaloisEquiv_padic p π (n + 1)).injective
+    (f := (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom)
+    (finiteDiagonalGaloisEquivPadic p π (n + 1)).injective
   rw [Subgroup.map_bot]
   exact finiteUpperAffine_eq_bot π n hu
 
@@ -721,7 +732,7 @@ theorem finiteUpperAffine_nonpos (n : ℕ) {u : ℝ} (hu : -1 ≤ u) (hu0 : u �
     finiteUpperAffineGroup π n u = ⊤ := by
   rw [finiteUpperAffineGroup, upperRamificationGroup_falseTate_nonpos π n hu hu0,
     Subgroup.map_top, MonoidHom.range_eq_top.mpr
-      (finiteDiagonalGaloisEquiv_padic p π (n + 1)).surjective]
+      (finiteDiagonalGaloisEquivPadic p π (n + 1)).surjective]
 
 omit hp₂ in
 /-- `1 + 1/(p-1) = p/(p-1)`. -/
@@ -786,7 +797,7 @@ theorem inverseHerbrandFunction_falseTate_first_break :
 theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
     (ht : 0 < t) (ht1 : t ≤ p) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π 1).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π 1).toMonoidHom =
       (SemidirectProduct.inl :
         Multiplicative (ZMod (p ^ 1)) →* FullFiniteAffineGroup p 1).range := by
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
@@ -804,14 +815,14 @@ theorem lowerRamificationGroupReal_falseTate_first_layer {t : ℝ}
 translations `ℤ/p ⋊ 1` for `0 < t ≤ p`, and trivial for `t > p`. -/
 theorem lowerRamificationGroupReal_falseTate_first_layer_filtration (t : ℝ) :
     (lowerRamificationGroupReal G(0) (IsLocalRing.maximalIdeal O(0)) t).map
-      (finiteDiagonalGaloisEquiv_padic p π 1).toMonoidHom =
+      (finiteDiagonalGaloisEquivPadic p π 1).toMonoidHom =
       if t ≤ 0 then ⊤ else if t ≤ (p : ℝ) then
         (SemidirectProduct.inl : Multiplicative (ZMod (p ^ 1)) →* FullFiniteAffineGroup p 1).range
         else ⊥ := by
   by_cases ht0 : t ≤ 0
   · rw [ite_eq_left ht0, lowerRamificationGroupReal_falseTate_nonpos π 0 ht0,
       Subgroup.map_top, MonoidHom.range_eq_top.mpr
-        (finiteDiagonalGaloisEquiv_padic p π 1).surjective]
+        (finiteDiagonalGaloisEquivPadic p π 1).surjective]
   · rw [ite_eq_right ht0]
     by_cases ht1 : t ≤ (p : ℝ)
     · rw [ite_eq_left ht1]

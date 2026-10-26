@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import Mathlib.Data.ZMod.Units
 public import Mathlib.Data.Nat.Totient
+public import Mathlib.Data.ZMod.Units
 public import Mathlib.GroupTheory.Index
 
 /-!
@@ -31,6 +31,8 @@ namespace ZMod
 
 variable (p : ℕ) [Fact p.Prime]
 
+/-- The kernel of reduction modulo `p ^ r` has index `φ(p ^ r)` in the units modulo
+`p ^ (n + 1)`. -/
 theorem index_ker_unitsMap_prime_pow (n r : ℕ) (hr : r ≤ n + 1) :
     (unitsMap (pow_dvd_pow p hr)).ker.index = (p ^ r).totient := by
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
@@ -39,6 +41,8 @@ theorem index_ker_unitsMap_prime_pow (n r : ℕ) (hr : r ≤ n + 1) :
     MonoidHom.range_eq_top.mpr (unitsMap_surjective (pow_dvd_pow p hr)),
     Subgroup.card_top, Nat.card_eq_fintype_card, card_units_eq_totient]
 
+/-- For `0 < r ≤ n + 1`, the kernel of reduction from units modulo `p ^ (n + 1)` to
+units modulo `p ^ r` has order `p ^ (n + 1 - r)`. -/
 theorem card_ker_unitsMap_prime_pow (n r : ℕ) (hr0 : 0 < r) (hr : r ≤ n + 1) :
     Nat.card (unitsMap (pow_dvd_pow p hr)).ker = p ^ (n + 1 - r) := by
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
@@ -57,6 +61,8 @@ theorem card_ker_unitsMap_prime_pow (n r : ℕ) (hr0 : 0 < r) (hr : r ≤ n + 1)
   congr 2
   omega
 
+/-- A unit reduces to `1` modulo `p ^ r` if and only if `p ^ r` divides its natural
+representative minus `1`. -/
 theorem mem_ker_unitsMap_prime_pow_iff (n r : ℕ) (hr : r ≤ n + 1) (a : (ZMod (p ^ (n + 1)))ˣ) :
     a ∈ (unitsMap (pow_dvd_pow p hr)).ker ↔ p ^ r ∣ (a : ZMod (p ^ (n + 1))).val - 1 := by
   have : NeZero (p ^ (n + 1)) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩

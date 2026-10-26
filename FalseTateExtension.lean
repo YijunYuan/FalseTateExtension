@@ -5,14 +5,14 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Mathlib
-public import FalseTateExtension.Padic
 public import FalseTateExtension.Affine
-public import FalseTateExtension.Layers
 public import FalseTateExtension.Coordinates
 public import FalseTateExtension.Cyclotomic
-public import FalseTateExtension.Kummer
 public import FalseTateExtension.FalseTate
+public import FalseTateExtension.Kummer
+public import FalseTateExtension.Layers
+public import FalseTateExtension.Mathlib
+public import FalseTateExtension.Padic
 
 /-!
 # The false Tate curve extension

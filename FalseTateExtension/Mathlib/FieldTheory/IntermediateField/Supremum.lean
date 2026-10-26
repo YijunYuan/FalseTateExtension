@@ -23,11 +23,15 @@ namespace IntermediateField
 variable {K L : Type*} [Field K] [Field L] [Algebra K L]
   {ι : Type*} [Nonempty ι] {t : ι → IntermediateField K L}
 
+/-- An element belongs to a directed supremum of intermediate fields if and only if it
+belongs to one of the fields. -/
 theorem mem_iSup_of_directed (dir : Directed (· ≤ ·) t) {x : L} :
     x ∈ iSup t ↔ ∃ i, x ∈ t i := by
   rw [← SetLike.mem_coe, coe_iSup_of_directed dir, Set.mem_iUnion]
   rfl
 
+/-- An element belongs to the supremum of a monotone family indexed by a directed order
+if and only if it belongs to one of the intermediate fields. -/
 theorem mem_iSup_of_monotone [Preorder ι] [IsDirectedOrder ι] (hm : Monotone t) {x : L} :
     x ∈ iSup t ↔ ∃ i, x ∈ t i :=
   mem_iSup_of_directed hm.directed_le

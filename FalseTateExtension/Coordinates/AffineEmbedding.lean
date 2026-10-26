@@ -5,14 +5,14 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Coordinates.Padic
 public import FalseTateExtension.Affine.Padic
+public import FalseTateExtension.Coordinates.Padic
 public import FalseTateExtension.Mathlib.NumberTheory.Padics.Continuity
-public import Mathlib.FieldTheory.Galois.Profinite
 public import Mathlib.Algebra.Ring.AddAut
+public import Mathlib.FieldTheory.Galois.Profinite
 public import Mathlib.GroupTheory.SemidirectProduct
-public import Mathlib.Topology.Homeomorph.TransferInstance
 public import Mathlib.Topology.Algebra.Group.Units
+public import Mathlib.Topology.Homeomorph.TransferInstance
 public import Mathlib.Topology.Instances.ZMod
 
 /-!
@@ -35,7 +35,8 @@ closed embedding of the compact group `Gal(K_FT/K)` into the Hausdorff group `�
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section

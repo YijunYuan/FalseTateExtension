@@ -6,8 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Cyclotomic.Ramification
-public import Mathlib.NumberTheory.Cyclotomic.Gal
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
+public import Mathlib.NumberTheory.Cyclotomic.Gal
 
 /-!
 # The finite cyclotomic character over `ℚ_[p]`
@@ -26,7 +26,8 @@ order `φ(p^m)`.
 
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Proposition 17.
 -/
 
 @[expose] public section
@@ -39,6 +40,7 @@ section General
 
 variable {K : Type*} [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (m : ℕ)
 
+/-- A power of the prime `p` is nonzero. -/
 local instance : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
 
 /-- The cyclotomic character `χ_m : Gal(K(ζ_{p^m})/K) →* (ℤ/p^m)ˣ`, determined by
@@ -88,6 +90,7 @@ section Padic
 
 variable (p : ℕ) [Fact p.Prime] (m : ℕ)
 
+/-- A power of the prime `p` is nonzero. -/
 local instance : NeZero (p ^ m) := ⟨pow_ne_zero m (Fact.out : p.Prime).ne_zero⟩
 
 /-- The cyclotomic character `χ_m` agrees with Mathlib's `IsCyclotomicExtension.autEquivPow`. -/

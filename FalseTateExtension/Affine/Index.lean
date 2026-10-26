@@ -6,9 +6,9 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Affine.ClosedSubgroup
+public import Mathlib.Algebra.Group.Pointwise.Set.Card
 public import Mathlib.GroupTheory.GroupAction.Quotient
 public import Mathlib.Topology.Algebra.Group.Pointwise
-public import Mathlib.Algebra.Group.Pointwise.Set.Card
 
 /-!
 # Uniform index bounds in closed subgroups of the `p`-adic affine group
@@ -44,7 +44,8 @@ compare the ramification indices of `K_FT/K` with those of `K_Kum/K` and `K_cyc/
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -135,7 +136,7 @@ theorem affineTranslationStabilizer_eq_sup (G : ClosedSubgroup (PadicAffineGroup
   · intro g hg
     have ht : (SemidirectProduct.inl g.val.left : PadicAffineGroup p) ∈ G := hg
     let t : G := ⟨SemidirectProduct.inl g.val.left, ht⟩
-    have htk : t ∈ (affineProjection G).ker := by rfl
+    have htk : t ∈ (affineProjection G).ker := rfl
     have hs : t⁻¹ * g ∈ affinePureUnits G := by
       rw [mem_affinePureUnits]
       change ((SemidirectProduct.inl g.val.left : PadicAffineGroup p)⁻¹ * g.val).left = 1

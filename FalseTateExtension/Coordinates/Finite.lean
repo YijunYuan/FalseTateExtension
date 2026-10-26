@@ -30,7 +30,8 @@ satisfies the cocycle rule `b_n(gh) = b_n(g) + χ_n(g) b_n(h)`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -60,15 +61,14 @@ theorem coe_zetaLayer :
 
 /-- `ζ_{p^n}` is a primitive `p^n`-th root of unity in `K(π^{1/p^n}, ζ_{p^n})`. -/
 theorem isPrimitiveRoot_zetaLayer :
-    IsPrimitiveRoot (zetaLayer p π n) (p ^ n) := by
-  exact (isPrimitiveRoot_zeta (K := K) p n).of_map_of_injective
+    IsPrimitiveRoot (zetaLayer p π n) (p ^ n) :=
+  (isPrimitiveRoot_zeta (K := K) p n).of_map_of_injective
     (f := (falseTateLayer p π n n).val) (falseTateLayer p π n n).val.injective
 
 /-- `(π^{1/p^n})^{p^n} = π` in `K(π^{1/p^n}, ζ_{p^n})`. -/
 theorem pPowRootLayer_pow :
-    pPowRootLayer p π n ^ (p ^ n) = algebraMap K (falseTateLayer p π n n) π := by
-  apply Subtype.ext
-  exact pPowRoot_pow p π n
+    pPowRootLayer p π n ^ (p ^ n) = algebraMap K (falseTateLayer p π n n) π :=
+  Subtype.ext (pPowRoot_pow p π n)
 
 /-- `π^{1/p^n} ≠ 0` in `K(π^{1/p^n}, ζ_{p^n})` when `π ≠ 0`. -/
 theorem pPowRootLayer_ne_zero [hπ : NeZero π] : pPowRootLayer p π n ≠ 0 := by

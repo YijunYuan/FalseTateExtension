@@ -160,6 +160,7 @@ def fixingSubgroupContinuousMulEquiv [IsGalois F Ω] (i : M →ₐ[F] Ω)
     continuous_toFun := hc.continuous_symm_of_equiv_compact_to_t2
     continuous_invFun := hc }
 
+/-- The isomorphism from the fixing subgroup to `Gal(Ω/M)` preserves its action on `Ω`. -/
 theorem fixingSubgroupContinuousMulEquiv_apply [IsGalois F Ω] (i : M →ₐ[F] Ω)
     (hi : ∀ x, algebraMap M Ω x = i x) (g : i.fieldRange.fixingSubgroup) (x : Ω) :
     fixingSubgroupContinuousMulEquiv F M Ω i hi g x = g.val x := rfl

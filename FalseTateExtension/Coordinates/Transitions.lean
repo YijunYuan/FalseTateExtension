@@ -31,7 +31,8 @@ relations `(π^{1/p^m})^{p^{m-n}} = π^{1/p^n}` and `ζ_{p^m}^{p^{m-n}} = ζ_{p^
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
+* [Tong Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -88,8 +89,8 @@ theorem pPowRoot_add_pow (n k : ℕ) : pPowRoot p π (n + k) ^ (p ^ k) = pPowRoo
   induction k with
   | zero => simp
   | succ k ih =>
-      change pPowRoot p π (n + k + 1) ^ (p ^ (k + 1)) = pPowRoot p π n
-      rw [pow_succ', pow_mul, pPowRoot_succ_pow, ih]
+    change pPowRoot p π (n + k + 1) ^ (p ^ (k + 1)) = pPowRoot p π n
+    rw [pow_succ', pow_mul, pPowRoot_succ_pow, ih]
 
 omit [CharZero K] in
 /-- `(π^{1/p^m})^{p^{m-n}} = π^{1/p^n}` for `n ≤ m`. -/
@@ -104,8 +105,8 @@ theorem zeta_add_pow (n k : ℕ) :
   induction k with
   | zero => simp
   | succ k ih =>
-      change zeta (K := K) p (n + k + 1) ^ (p ^ (k + 1)) = zeta p n
-      rw [pow_succ', pow_mul, zeta_succ_pow, ih]
+    change zeta (K := K) p (n + k + 1) ^ (p ^ (k + 1)) = zeta p n
+    rw [pow_succ', pow_mul, zeta_succ_pow, ih]
 
 /-- `ζ_{p^m}^{p^{m-n}} = ζ_{p^n}` for `n ≤ m`. -/
 theorem zeta_pow_sub {n m : ℕ} (h : n ≤ m) :
@@ -116,16 +117,14 @@ theorem zeta_pow_sub {n m : ℕ} (h : n ≤ m) :
 /-- In `L_m`, the element `π^{1/p^n}` of `L_n` is `(π^{1/p^m})^{p^{m-n}}`. -/
 theorem inclusion_pPowRootLayer {n m : ℕ} (h : n ≤ m) :
     IntermediateField.inclusion (falseTateLayer_mono p π h h) (pPowRootLayer p π n) =
-      pPowRootLayer p π m ^ (p ^ (m - n)) := by
-  apply Subtype.ext
-  exact (pPowRoot_pow_sub p π h).symm
+      pPowRootLayer p π m ^ (p ^ (m - n)) :=
+  Subtype.ext (pPowRoot_pow_sub p π h).symm
 
 /-- In `L_m`, the element `ζ_{p^n}` of `L_n` is `ζ_{p^m}^{p^{m-n}}`. -/
 theorem inclusion_zetaLayer {n m : ℕ} (h : n ≤ m) :
     IntermediateField.inclusion (falseTateLayer_mono p π h h) (zetaLayer p π n) =
-      zetaLayer p π m ^ (p ^ (m - n)) := by
-  apply Subtype.ext
-  exact (zeta_pow_sub (K := K) p h).symm
+      zetaLayer p π m ^ (p ^ (m - n)) :=
+  Subtype.ext (zeta_pow_sub (K := K) p h).symm
 
 /-- `g|_{L_n}(π^{1/p^n}) = ζ_{p^n}^{b_m(g)} π^{1/p^n}` for `g ∈ Gal(L_m/K)`. -/
 theorem finiteLayerRestriction_pPowRoot [hπ : NeZero π] {n m : ℕ} (h : n ≤ m)

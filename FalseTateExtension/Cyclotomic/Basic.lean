@@ -6,8 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import FalseTateExtension.Layers.Basic
-public import FalseTateExtension.Padic.Basic
 public import FalseTateExtension.Mathlib.NumberTheory.Padics.Cyclotomic
+public import FalseTateExtension.Padic.Basic
 public import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 
 /-!
@@ -25,7 +25,8 @@ irreducible over `ℚ_[p]` (`Padic.irreducible_cyclotomic_prime_pow`).
 
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Proposition 17.
 -/
 
 @[expose] public section

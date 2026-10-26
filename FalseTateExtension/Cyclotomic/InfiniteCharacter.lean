@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Cyclotomic.FiniteCharacter
 public import FalseTateExtension.Coordinates.CyclotomicImage
+public import FalseTateExtension.Cyclotomic.FiniteCharacter
 public import FalseTateExtension.Cyclotomic.Restriction
 
 /-!
@@ -28,8 +28,10 @@ The cyclotomic character `χ : Gal(ℚ_[p](ζ_{p^∞})/ℚ_[p]) → ℤ_[p]ˣ`
 
 ## References
 
-* Serre, *Local Fields*, Chapter IV, §4, Proposition 17.
-* Liu, *On lattices in semi-stable representations*, §5.1.
+* [J.-P. Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV, §4,
+  Proposition 17.
+* [T. Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
 -/
 
 @[expose] public section
@@ -122,19 +124,11 @@ def cyclotomicExtensionGaloisEquivUnits :
       (ℤ_[p])ˣ := by
   let e := MulEquiv.ofBijective (cyclotomicExtensionCharacter (K := ℚ_[p]) p)
     ⟨cyclotomicExtensionCharacter_injective p, cyclotomicExtensionCharacter_surjective_padic p⟩
-  have hc : Continuous e := continuous_cyclotomicExtensionCharacter p
-  have hi : Continuous e.symm :=
-    (isClosedEmbedding_cyclotomicExtensionCharacter (K := ℚ_[p]) p).isEmbedding.continuous_iff.mpr
-      (by
-        change Continuous (fun u ↦ cyclotomicExtensionCharacter p (e.symm u))
-        have he : (fun u ↦ cyclotomicExtensionCharacter p (e.symm u)) = id :=
-          funext e.apply_symm_apply
-        rw [he]
-        exact continuous_id)
+  have hc : Continuous e.toEquiv := continuous_cyclotomicExtensionCharacter p
   exact
     { e with
       continuous_toFun := hc
-      continuous_invFun := hi }
+      continuous_invFun := hc.continuous_symm_of_equiv_compact_to_t2 }
 
 /-- The isomorphism `Gal(ℚ_[p](ζ_{p^∞})/ℚ_[p]) ≃ₜ* ℤ_[p]ˣ` is the cyclotomic character. -/
 @[simp]
@@ -152,7 +146,7 @@ theorem cyclotomicLayer_padic_degrees_unbounded (N : ℕ) :
 
 /-- `ℚ_[p](ζ_{p^∞})/ℚ_[p]` is an infinite extension. -/
 theorem not_finiteDimensional_cyclotomicExtension_padic :
-    ¬FiniteDimensional (ℚ_[p]) (cyclotomicExtension (K := ℚ_[p]) p) := by
+    ¬ FiniteDimensional (ℚ_[p]) (cyclotomicExtension (K := ℚ_[p]) p) := by
   intro h
   let := h
   obtain ⟨m, hm⟩ := cyclotomicLayer_padic_degrees_unbounded p

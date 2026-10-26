@@ -34,8 +34,9 @@ ring of `L_N` is `d_k + 1`, and `v(τ^{p^k} ϖ - ϖ) = d_k + 1` for every unifor
 
 ## References
 
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6.
-* Serre, *Local Fields*, Chapter IV §1.
+* [Viviani, *Ramification groups and Artin conductors of radical extensions of
+  ℚ*](https://doi.org/10.5802/jtnb.470), §6.
+* [Serre, *Local Fields*](https://doi.org/10.1007/978-1-4757-5673-9), Chapter IV §1.
 -/
 
 @[expose] public section
@@ -44,7 +45,8 @@ noncomputable section
 
 namespace FalseTateExtension
 
-/-- `d_k = 1 + 2(p-1) ∑_{j ≤ k} p^{2j}`, the lower ramification number of `τ^{p^k}`. -/
+/-- `d_k = 1 + 2(p-1) ∑_{j ≤ k} p^{2j}`, the lower ramification break of `τ^{p^k}`
+on diagonal layers of level at least `k + 2`. -/
 def kummerRamificationBreak (p k : ℕ) : ℕ :=
   1 + 2 * (p - 1) * ∑ j ∈ Finset.range (k + 1), p ^ (2 * j)
 
@@ -207,7 +209,7 @@ lemma padicKummerExponent_kummerGenerator_pow (m : ℕ) :
 /-- In the affine coordinates `(b_N, χ_N)` of `Gal(L_N/ℚ_p)`, the restriction of `τ^{p^k}`
 is the translation by `p^k`: `b_N = p^k` and `χ_N = 1`. -/
 lemma finiteDiagonalGaloisEquiv_tauPowRestrict (N k : ℕ) :
-    finiteDiagonalGaloisEquiv_padic p π N (tauPowRestrict p π N k) =
+    finiteDiagonalGaloisEquivPadic p π N (tauPowRestrict p π N k) =
       SemidirectProduct.inl (Multiplicative.ofAdd (p ^ k : ZMod (p ^ N))) := by
   apply SemidirectProduct.ext
   · apply congrArg Multiplicative.ofAdd
@@ -215,7 +217,7 @@ lemma finiteDiagonalGaloisEquiv_tauPowRestrict (N k : ℕ) :
       (infiniteLayerRestriction p (π : ℚ_[p]) N ((kummerGenerator p π).val ^ (p ^ k))) = _
     rw [← padicKummerExponent_toZModPow, padicKummerExponent_kummerGenerator_pow]
     simp
-  · rw [finiteDiagonalGaloisEquiv_padic_right]
+  · rw [finiteDiagonalGaloisEquivPadic_right]
     change finiteCyclotomicCharacter p (π : ℚ_[p]) N
       (infiniteLayerRestriction p (π : ℚ_[p]) N ((kummerGenerator p π).val ^ (p ^ k))) = 1
     rw [← padicCyclotomicCharacter_toZModPow, map_pow]
@@ -258,7 +260,7 @@ lemma tauPowRestrict_mem_lower_break (n k : ℕ) (hk : k + 1 ≤ n) :
         (IsLocalRing.maximalIdeal
           (spectralIntegerRing (ℚ_[p]) (falseTateLayer p (π : ℚ_[p]) (n + 1) (n + 1))))
         (kummerRamificationBreak p k) := by
-  let e := finiteDiagonalGaloisEquiv_padic p π (n + 1)
+  let e := finiteDiagonalGaloisEquivPadic p π (n + 1)
   have htable := lowerRamificationGroupReal_falseTate_fractional π n (k + 1)
     (by omega) hk
   have hd : (kummerRamificationBreak p k : ℝ) =
@@ -300,9 +302,9 @@ lemma tauPowRestrict_notMem_lower_break_add_one (n k : ℕ) (hk : k + 1 ≤ n) :
         simp only [show 2 * (k + 1) = 2 * k + 2 by omega]; linarith)
     (kummerRamificationBreak_add_one_le_integer p k hp3)
   have hm := Subgroup.mem_map_of_mem
-    (finiteDiagonalGaloisEquiv_padic p π (n + 1)).toMonoidHom hg
+    (finiteDiagonalGaloisEquivPadic p π (n + 1)).toMonoidHom hg
   rw [htable] at hm
-  change finiteDiagonalGaloisEquiv_padic p π (n + 1)
+  change finiteDiagonalGaloisEquivPadic p π (n + 1)
     (tauPowRestrict p π (n + 1) k) ∈ _ at hm
   rw [finiteDiagonalGaloisEquiv_tauPowRestrict] at hm
   exact primePower_notMem_finiteTranslationSubgroup p (n + 1) k (by omega) hm.1

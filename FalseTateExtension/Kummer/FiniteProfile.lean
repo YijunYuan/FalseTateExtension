@@ -39,8 +39,8 @@ ramification bound `p^{n+1} e_K / (p - 1)`.
 
 ## References
 
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
-  applications*, §1.2.3.
+* [J.-P. Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.3.
 -/
 
 @[expose] public section

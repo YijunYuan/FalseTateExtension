@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import FalseTateExtension.Kummer.APF
 public import FalseTateExtension.FalseTate.TotalRamification
+public import FalseTateExtension.Kummer.APF
 public import FontaineWintenberger.APF.Finite.ConstantIndex
 public import FontaineWintenberger.Ramification.Herbrand.Interval
 public import FontaineWintenberger.Ramification.Upper.Transport
@@ -40,8 +40,10 @@ principal units `1 + p^r ℤ/p^n`.
 
 ## References
 
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6.
-* Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux*, §1.2.
+* [Viviani, *Ramification groups and Artin conductors of radical extensions of
+  ℚ*](https://doi.org/10.5802/jtnb.470), §6.
+* [Wintenberger, *Le corps des normes de certaines extensions infinies de corps locaux;
+  applications*](https://doi.org/10.24033/asens.1440), §1.2.
 -/
 
 @[expose] public section

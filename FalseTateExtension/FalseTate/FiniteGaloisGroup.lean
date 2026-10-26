@@ -41,16 +41,18 @@ under it, `Gal(L_n/K(ζ_{p^n}))` is the group of translations `ℤ/p^n ⋊ 1` an
 * `finiteDiagonalGaloisEquiv`: `Gal(L_n/K) ≃* ℤ/p^n ⋊ H_n`, `g ↦ (b_n(g), χ_n(g))`.
 * `finrank_falseTateLayer_diagonal`, `finrank_falseTateLayer_over_cyclotomic`:
   `[L_n : K] = p^n [K(ζ_{p^n}) : K]` and `[L_n : K(ζ_{p^n})] = p^n`.
-* `finiteDiagonalGaloisEquiv_padic`: `Gal(L_n/ℚ_p) ≃* ℤ/p^n ⋊ (ℤ/p^n)ˣ`.
+* `finiteDiagonalGaloisEquivPadic`: `Gal(L_n/ℚ_p) ≃* ℤ/p^n ⋊ (ℤ/p^n)ˣ`.
 * `finrank_falseTateLayer_diagonal_padic`: `[L_{n+1} : ℚ_p] = p^{n+1} (p - 1) p^n`.
-* `finiteDiagonalGaloisEquiv_padic_mem_translations`,
-  `finiteDiagonalGaloisEquiv_padic_mem_units`: `Gal(L_n/ℚ_p(ζ_{p^n}))` and
+* `finiteDiagonalGaloisEquivPadic_mem_translations`,
+  `finiteDiagonalGaloisEquivPadic_mem_units`: `Gal(L_n/ℚ_p(ζ_{p^n}))` and
   `Gal(L_n/ℚ_p(π^{1/p^n}))` are the translations and the units of `ℤ/p^n ⋊ (ℤ/p^n)ˣ`.
 
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*, §5.1.
-* Viviani, *Ramification groups and Artin conductors of radical extensions of ℚ*, §6.
+* [Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), §5.1.
+* [Viviani, *Ramification groups and Artin conductors of radical extensions of
+  ℚ*](https://doi.org/10.5802/jtnb.470), §6.
 -/
 
 @[expose] public section
@@ -377,7 +379,7 @@ variable (p : ℕ) [Fact p.Prime]
 variable (π : 𝒪[ℚ_[p]])
 
 /-- `Gal(ℚ_p(π^{1/p^n}, ζ_{p^n})/ℚ_p) ≃* ℤ/p^n ⋊ (ℤ/p^n)ˣ`, `g ↦ (b_n(g), χ_n(g))`. -/
-def finiteDiagonalGaloisEquiv_padic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
+def finiteDiagonalGaloisEquivPadic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ) :
     (falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) ≃* FullFiniteAffineGroup p n := by
   let hπ₀ : (π : ℚ_[p]) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
@@ -389,29 +391,29 @@ def finiteDiagonalGaloisEquiv_padic [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irredu
       (finiteAffineGaloisHom_injective p (π : ℚ_[p]) n)
   · intro x
     have hu : x.right ∈ (cyclotomicLayerCharacter (K := ℚ_[p]) p n).range := by
-            exact cyclotomicLayerCharacter_surjective p n x.right
+      exact cyclotomicLayerCharacter_surjective p n x.right
     obtain ⟨g, hb, hχ⟩ := exists_finiteCoordinates_eq p π n x.left.toAdd x.right hu
     refine ⟨g, ?_⟩
     apply SemidirectProduct.ext
     · exact congrArg Multiplicative.ofAdd hb
     · exact hχ
 
-/-- The translation coordinate of `g` under `finiteDiagonalGaloisEquiv_padic` is the Kummer
+/-- The translation coordinate of `g` under `finiteDiagonalGaloisEquivPadic` is the Kummer
 exponent `b_n(g)`. -/
-theorem finiteDiagonalGaloisEquiv_padic_left [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem finiteDiagonalGaloisEquivPadic_left [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    (finiteDiagonalGaloisEquiv_padic p π n g).left.toAdd =
+    (finiteDiagonalGaloisEquivPadic p π n g).left.toAdd =
       finiteKummerExponent p (π : ℚ_[p]) n g := rfl
 
-/-- The unit coordinate of `g` under `finiteDiagonalGaloisEquiv_padic` is the cyclotomic
+/-- The unit coordinate of `g` under `finiteDiagonalGaloisEquivPadic` is the cyclotomic
 character `χ_n(g)`. -/
-theorem finiteDiagonalGaloisEquiv_padic_right [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
+theorem finiteDiagonalGaloisEquivPadic_right [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)]
     (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    (finiteDiagonalGaloisEquiv_padic p π n g).right =
+    (finiteDiagonalGaloisEquivPadic p π n g).right =
       finiteCyclotomicCharacter p (π : ℚ_[p]) n g := rfl
 
 /-- `[ℚ_p(π^{1/p^{n+1}}, ζ_{p^{n+1}}) : ℚ_p] = p^{n+1} φ(p^{n+1}) = p^{n+1} (p - 1) p^n`. -/
@@ -425,11 +427,11 @@ theorem finrank_falseTateLayer_diagonal_padic [hp₂ : Fact (p ≠ 2)] [hπ : Fa
 
 /-- Under `Gal(ℚ_p(π^{1/p^n}, ζ_{p^n})/ℚ_p) ≃ ℤ/p^n ⋊ (ℤ/p^n)ˣ`, the subgroup fixing
 `ℚ_p(ζ_{p^n})` corresponds to the translations `ℤ/p^n ⋊ 1`. -/
-theorem finiteDiagonalGaloisEquiv_padic_mem_translations
+theorem finiteDiagonalGaloisEquivPadic_mem_translations
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    finiteDiagonalGaloisEquiv_padic p π n g ∈
+    finiteDiagonalGaloisEquivPadic p π n g ∈
       (SemidirectProduct.inl : Multiplicative (ZMod (p ^ n)) →* FullFiniteAffineGroup p n).range ↔
       g ∈ (finiteCyclotomicInclusion p (π : ℚ_[p]) n).fieldRange.fixingSubgroup := by
   rw [finiteCyclotomicInclusion_fixingSubgroup, SemidirectProduct.range_inl_eq_ker_rightHom,
@@ -438,11 +440,11 @@ theorem finiteDiagonalGaloisEquiv_padic_mem_translations
 
 /-- Under `Gal(ℚ_p(π^{1/p^n}, ζ_{p^n})/ℚ_p) ≃ ℤ/p^n ⋊ (ℤ/p^n)ˣ`, the subgroup fixing
 `ℚ_p(π^{1/p^n})` corresponds to the units `0 ⋊ (ℤ/p^n)ˣ`. -/
-theorem finiteDiagonalGaloisEquiv_padic_mem_units
+theorem finiteDiagonalGaloisEquivPadic_mem_units
     [hp₂ : Fact (p ≠ 2)] [hπ : Fact (Irreducible π)] (n : ℕ)
     (g : falseTateLayer p (π : ℚ_[p]) n n ≃ₐ[ℚ_[p]]
       falseTateLayer p (π : ℚ_[p]) n n) :
-    finiteDiagonalGaloisEquiv_padic p π n g ∈
+    finiteDiagonalGaloisEquivPadic p π n g ∈
       (SemidirectProduct.inr : (ZMod (p ^ n))ˣ →* FullFiniteAffineGroup p n).range ↔
       g ∈ (finiteRadicalInclusion p (π : ℚ_[p]) n).fieldRange.fixingSubgroup := by
   rw [mem_finiteRadicalInclusion_fixingSubgroup_iff p (π : ℚ_[p]) n]
@@ -450,12 +452,28 @@ theorem finiteDiagonalGaloisEquiv_padic_mem_units
   · rintro ⟨u, hu⟩
     exact (congrArg (fun x => x.left.toAdd) hu).symm
   · intro hb
-    refine ⟨(finiteDiagonalGaloisEquiv_padic p π n g).right, ?_⟩
+    refine ⟨(finiteDiagonalGaloisEquivPadic p π n g).right, ?_⟩
     apply SemidirectProduct.ext
     · exact congrArg Multiplicative.ofAdd hb.symm
     · rfl
 
 end RationalFiniteAffine
+
+@[deprecated (since := "2026-10-26")]
+alias finiteDiagonalGaloisEquiv_padic := finiteDiagonalGaloisEquivPadic
+
+@[deprecated (since := "2026-10-26")]
+alias finiteDiagonalGaloisEquiv_padic_left := finiteDiagonalGaloisEquivPadic_left
+
+@[deprecated (since := "2026-10-26")]
+alias finiteDiagonalGaloisEquiv_padic_right := finiteDiagonalGaloisEquivPadic_right
+
+@[deprecated (since := "2026-10-26")]
+alias finiteDiagonalGaloisEquiv_padic_mem_translations :=
+  finiteDiagonalGaloisEquivPadic_mem_translations
+
+@[deprecated (since := "2026-10-26")]
+alias finiteDiagonalGaloisEquiv_padic_mem_units := finiteDiagonalGaloisEquivPadic_mem_units
 
 end FalseTateExtension
 end

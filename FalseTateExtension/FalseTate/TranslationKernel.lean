@@ -8,9 +8,9 @@ module
 public import FalseTateExtension.Coordinates.AffineKernel
 public import FalseTateExtension.Cyclotomic.CyclicLayers
 public import FalseTateExtension.FalseTate.RadicalNotCyclotomic
+public import FalseTateExtension.FalseTate.StrictAPF
 public import FalseTateExtension.Mathlib.FieldTheory.Galois.InfiniteCorrespondence
 public import FalseTateExtension.Mathlib.RingTheory.PowerBasis.Eigenvector
-public import FalseTateExtension.FalseTate.StrictAPF
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.LinearDisjoint
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
@@ -44,10 +44,15 @@ topological groups, `Γ = Gal(K_FT/K_cyc) · Gal(K_FT/K_Kum)`, and `K_Kum ∩ K_
 * `falseTateGaloisEquivSemidirectProduct`: `Gal(K_FT/K) ≃ₜ* ℤ_[p] ⋊ χ(Gal(K_cyc/K))`.
 * `kummerFixingEquivCyclotomicImage`: `Gal(K_FT/K_Kum) ≃ₜ* χ(Gal(K_cyc/K))`.
 
+## Notation
+
+In the `FalseTateExtension` scope, `τ` denotes `kummerGenerator`; its arguments are the
+prime `p` and the uniformizer `π`.
+
 ## References
 
-* Liu, *On lattices in semi-stable representations: a proof of a conjecture of Breuil*,
-  Lemma 5.1.2.
+* [Liu, *On lattices in semi-stable representations: a proof of a conjecture of
+  Breuil*](https://doi.org/10.1112/S0010437X0700317X), Lemma 5.1.2.
 -/
 
 @[expose] public section
@@ -202,7 +207,7 @@ theorem affineAdditiveKernel_eq_top
     (affineAdditiveKernel p (π : K)).toAddSubgroup = ⊤ := by
   let hπ₀ : (π : K) ≠ 0 := fun h => hπ.out.ne_zero (Subtype.ext h)
   by_contra hM
-  apply pPowRoot_one_not_mem_cyclotomicExtension p π
+  apply pPowRoot_one_notMem_cyclotomicExtension p π
   apply pPowRoot_mem_cyclotomicExtension_of_fixed p (π : K) 1
   intro g
   apply pPowRootExt_fixed_of_toZModPow_eq_zero p (π : K) g.val 1
